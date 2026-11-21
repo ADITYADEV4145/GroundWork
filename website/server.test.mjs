@@ -21,6 +21,24 @@ test('all page assets resolve within a static host subdirectory', async () => {
   }
 });
 
+test('built page includes all install commands and accessible package manager tabs', async () => {
+  const html = await readFile(new URL('./dist/index.html', import.meta.url), 'utf8');
+  for (const command of [
+    'npm install -g groundwork-agent',
+    'pnpm add -g groundwork-agent',
+    'yarn global add groundwork-agent',
+    'bun add -g groundwork-agent',
+    'brew install ADITYADEV4145/groundwork/groundwork',
+    'curl -fsSL https://raw.githubusercontent.com/ADITYADEV4145/GroundWork/main/scripts/install.sh | sh',
+  ]) assert.ok(html.includes(command), command);
+  assert.match(html, /role="tablist" aria-label="Package manager"/);
+  for (const manager of ['npm', 'pnpm', 'yarn', 'bun', 'homebrew', 'curl']) {
+    assert.match(html, new RegExp(`id="install-tab-${manager}"[^>]+role="tab"[^>]+aria-selected="(?:true|false)"[^>]+aria-controls="install-panel"`));
+  }
+  assert.match(html, /id="install-panel" role="tabpanel" tabindex="0" aria-labelledby="install-tab-npm"/);
+  assert.match(html, /role="status" aria-live="polite"/);
+});
+
 test('static server contains malformed targets and never exposes repository files', async t => {
   const port = 18000 + Math.floor(Math.random() * 10000);
   const server = spawn(process.execPath, ['server.mjs'], {

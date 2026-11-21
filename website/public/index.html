@@ -52,6 +52,7 @@
     @media(max-aspect-ratio:5/4){.scrim{background:linear-gradient(90deg,#031b29d6,#061e2bbd 65%,#061e2b77),linear-gradient(180deg,#031e2a33,transparent 70%)}}
     @media(max-width:600px){.footrow{padding-right:0;flex-direction:column;align-items:flex-start}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}.js-enter [data-reveal]{opacity:1}.js-enter .headline,.js-enter .rule{transform:none}}
+    .install-picker{margin:24px 0;border:1px solid #b4cbbd;border-radius:6px;overflow:hidden;min-width:0}.install-tabs{display:flex;overflow-x:auto;background:#e7eee5;padding:5px;gap:3px}.install-tabs button{display:flex;align-items:center;gap:7px;flex-shrink:0;border:0;border-radius:4px;padding:12px 10px;background:transparent;color:#395747;font-size:12px}.install-tabs button[aria-selected=true]{background:#102f2b;color:var(--mint)}.install-tabs svg,.copy-button svg{width:16px;height:16px;flex-shrink:0}.install-tabs svg:not([fill]){fill:currentColor}.install-tabs button:focus-visible{outline-color:#305946;outline-offset:-3px}.install-picker pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.copy-button{display:inline-flex;align-items:center;gap:6px;min-height:32px}.install-picker [role=tabpanel]:focus-visible{outline-color:#305946;outline-offset:-3px}
   </style>
 </head>
 <body>
@@ -87,10 +88,22 @@
   </div>
   <dialog id="install" aria-labelledby="install-title">
     <button class="dialog-close" type="button" data-close aria-label="Close installation guide">×</button>
-    <p class="dialog-kicker">Your next build starts here</p><h2 id="install-title" class="dialog-title" tabindex="-1">Lay the groundwork.</h2>
-    <p class="dialog-intro">One install. A smarter starting point for your agent.<br>Node.js 22+ for npm, or use Homebrew.</p>
-    <div class="install-command"><div class="command-top"><span>01 / INSTALL WITH NPM</span><button class="copy-button" type="button" data-copy="install-code">Copy</button></div><pre id="install-code"><code>npm install -g groundwork-agent</code></pre></div>
-    <div class="install-command" id="homebrew-install"><div class="command-top"><span>OR USE HOMEBREW</span><button class="copy-button" type="button" data-copy="homebrew-code">Copy</button></div><pre id="homebrew-code"><code>brew install ADITYADEV4145/groundwork/groundwork</code></pre></div>
+    <p class="dialog-kicker">Your next build starts here</p><h2 id="install-title" class="dialog-title" tabindex="-1">Install Groundwork.</h2>
+    <p class="dialog-intro">One install. A smarter starting point for your agent.<br>Choose your package manager. Node.js 22+ for npm, pnpm and yarn; <code>yarn global</code> needs Yarn 1 (Classic).</p>
+    <section class="install-picker" aria-label="Install Groundwork">
+      <div class="install-tabs" role="tablist" aria-label="Package manager">
+        <button id="install-tab-npm" type="button" role="tab" aria-selected="true" aria-controls="install-panel" data-manager="npm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v10H12v-7H9v7H3zM15 10v4h3v-4"/></svg>npm</button>
+        <button id="install-tab-pnpm" type="button" role="tab" aria-selected="false" aria-controls="install-panel" tabindex="-1" data-manager="pnpm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h5v5H3zm7 0h5v5h-5zm7 0h5v5h-5zm-7 7h5v5h-5zm7 0h5v5h-5zM3 17h5v5H3zm7 0h5v5h-5zm7 0h5v5h-5z"/></svg>pnpm</button>
+        <button id="install-tab-yarn" type="button" role="tab" aria-selected="false" aria-controls="install-panel" tabindex="-1" data-manager="yarn"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m6 6 10 10M4 10l11 8M9 4l9 10M9 18c0 5 12 5 12-1"/></svg>yarn</button>
+        <button id="install-tab-bun" type="button" role="tab" aria-selected="false" aria-controls="install-panel" tabindex="-1" data-manager="bun"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3c0 4 9 4 9 11 0 9-18 9-18 0 0-5 6-7 9-11Z"/><path d="M8 13v2m8-2v2m-6 2h4"/></svg>bun</button>
+        <button id="install-tab-homebrew" type="button" role="tab" aria-selected="false" aria-controls="install-panel" tabindex="-1" data-manager="homebrew"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 7h12v14H5zM17 9h4v8h-4M8 10v8m5-8v8M5 7C1 1 10 0 11 4c5-5 9 2 6 3"/></svg>Homebrew</button>
+        <button id="install-tab-curl" type="button" role="tab" aria-selected="false" aria-controls="install-panel" tabindex="-1" data-manager="curl"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 6 6-6 6m9 0h7"/></svg>curl</button>
+      </div>
+      <div id="install-panel" role="tabpanel" tabindex="0" aria-labelledby="install-tab-npm">
+        <div class="command-top"><span>01 / INSTALL</span><button class="copy-button" type="button" data-copy="install-code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg><span>Copy</span></button></div>
+        <pre id="install-code"><code>npm install -g groundwork-agent</code></pre>
+      </div>
+    </section>
     <details class="source-install" id="source-install"><summary>Build from source instead</summary><div class="command-top"><span>NODE.JS 22+, NPM &amp; GIT</span><button class="copy-button" type="button" data-copy="source-code">Copy</button></div><pre id="source-code"><code>git clone https://github.com/ADITYADEV4145/GroundWork.git
 cd GroundWork
 npm ci &amp;&amp; npm run build &amp;&amp; npm link</code></pre></details>
@@ -189,7 +202,33 @@ Callers
         reuse: {title:'Your next helper might already exist.',description:'Find similar code before writing more. Groundwork compares existing functions and helps your agent choose REUSE, EXTEND, or NEW.',command:'$ gw similar "format a price in cents"',output:'Candidate: src/utils/money.ts:12\n  formatPrice(cents: number): string\n\nInspect the existing implementation.\nReuse what fits. Extend what almost does.'},
         ground: {title:'Real code. Real calls.',description:'Check definitely resolved imports, members, and arguments against the codebase. Dynamic dispatch and external packages are skipped, not guessed.',command:'$ gw verify src/checkout/summary.ts',output:'src/checkout/summary.ts:28\n  formatPrice(total, currency)\n\nArgument count mismatch\n  Expected 1 argument; received 2.\n  Definition: src/utils/money.ts:12'}
       };
-      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+      const installCommands = {
+        npm: 'npm install -g groundwork-agent',
+        pnpm: 'pnpm add -g groundwork-agent',
+        yarn: 'yarn global add groundwork-agent',
+        bun: 'bun add -g groundwork-agent',
+        homebrew: 'brew install ADITYADEV4145/groundwork/groundwork',
+        curl: 'curl -fsSL https://raw.githubusercontent.com/ADITYADEV4145/GroundWork/main/scripts/install.sh | sh'
+      };
+      const installTabs = Array.from(document.querySelectorAll('.install-tabs [role="tab"]'));
+      const chooseManager = (manager, focus = false) => {
+        installTabs.forEach(tab => {
+          const selected = tab.dataset.manager === manager;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+          if (selected && focus) { tab.focus(); tab.scrollIntoView({block:'nearest', inline:'nearest'}); }
+        });
+        document.querySelector('#install-code code').textContent = installCommands[manager];
+        document.getElementById('install-panel').setAttribute('aria-labelledby', `install-tab-${manager}`);
+      };
+      installTabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => chooseManager(tab.dataset.manager));
+        tab.addEventListener('keydown', event => {
+          const target = {ArrowRight:(index + 1) % installTabs.length, ArrowLeft:(index - 1 + installTabs.length) % installTabs.length, Home:0, End:installTabs.length - 1}[event.key];
+          if (target !== undefined) { event.preventDefault(); chooseManager(installTabs[target].dataset.manager, true); }
+        });
+      });
+      const tabs = Array.from(document.querySelectorAll('.demo-tabs [role="tab"]'));
       const panel = document.getElementById('workflow-panel');
       const chooseStep = (step, focus = false) => {
         const data = workflows[step] || workflows.navigate;
@@ -227,7 +266,7 @@ Callers
         dialog.querySelector('.dialog-title').focus();
         dialog.scrollTop = 0;
         if (link.dataset.install === 'source') document.getElementById('source-install').scrollIntoView({block:'center'});
-        if (link.dataset.install === 'homebrew') document.getElementById('homebrew-install').scrollIntoView({block:'center'});
+        if (dialog.id === 'install') chooseManager(link.dataset.install === 'homebrew' ? 'homebrew' : 'npm');
       }));
       document.querySelectorAll('dialog').forEach(dialog => {
         dialog.querySelector('[data-close]').addEventListener('click', () => dialog.close());
@@ -236,14 +275,28 @@ Callers
           if (event.target === dialog && (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom)) dialog.close();
         });
       });
+      const copyTimers = new WeakMap();
       document.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => {
         const source = document.getElementById(button.dataset.copy);
         const status = document.getElementById('copy-status');
         try {
-          await navigator.clipboard.writeText(source.textContent.trim());
-          button.textContent = 'Copied';
+          if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(source.textContent);
+          else {
+            const textarea = document.createElement('textarea');
+            textarea.value = source.textContent;
+            textarea.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+            button.closest('dialog').append(textarea);
+            try {
+              textarea.select();
+              if (!document.execCommand('copy')) throw new Error('Copy unavailable');
+            } finally { textarea.remove(); button.focus(); }
+          }
+          const original = button.dataset.original || button.innerHTML;
+          button.dataset.original = original;
+          clearTimeout(copyTimers.get(button));
+          button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Copied</span>';
           status.textContent = 'Command copied to clipboard.';
-          setTimeout(() => { button.textContent = 'Copy'; }, 1600);
+          copyTimers.set(button, setTimeout(() => { button.innerHTML = original; status.textContent = ''; }, 2000));
         } catch {
           const selection = window.getSelection();
           const range = document.createRange();
@@ -251,8 +304,6 @@ Callers
           selection.removeAllRanges();
           selection.addRange(range);
           status.textContent = 'Clipboard unavailable. Command selected; press Control+C or Command+C to copy.';
-          button.textContent = 'Selected';
-          setTimeout(() => { button.textContent = 'Copy'; }, 1600);
         }
       }));
     })();

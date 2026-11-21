@@ -165,8 +165,10 @@ not add extra reports beside them or replace the published evidence.
 Only score **trusted patches**: this executes submitted JavaScript. Worktrees and
 timeouts provide reproducibility, not a security sandbox. The recorded results
 above came from the six observations, not evaluator validation. The fixed
-`evidence.json` follows `bench/README.md`'s offline workflow. `--suite all`
-discovers this suite automatically.
+`evidence.json` follows `bench/README.md`'s offline workflow. Offline `--suite all`
+includes suites with recorded evidence. With `--observations`, `all` instead
+grades every installed suite with a task manifest and requires captures for
+each, not just the long-horizon captures.
 
 ## Grading and measurement definitions
 

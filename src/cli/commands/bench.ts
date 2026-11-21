@@ -6,7 +6,7 @@ import { emit, fail } from '../output.js';
 export function register(program: Command): void {
   program.command('bench')
     .description('score paired agent observations or reproduce a recorded benchmark report')
-    .option('--suite <name>', 'suite to run, or all installed suites', 'nav')
+    .option('--suite <name>', 'suite to run; all replays suites with evidence, or grades every manifest with --observations', 'nav')
     .option('--runs <n>', 'paired replicates expected per task', '3')
     .option('--observations <dir>', 'grade trusted capture JSON files (runs suite tests against submitted changes)')
     .option('--output-dir <dir>', 'write dated JSON and Markdown reports here (default: bench/results)')

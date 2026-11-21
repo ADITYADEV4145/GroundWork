@@ -1,8 +1,111 @@
-# Groundwork
+<p align="center">
+  <img src="docs/assets/groundwork-hero.webp" alt="Groundwork — give your coding agent solid ground. A live, local map of your codebase. Local, offline and open source." width="100%">
+</p>
 
-**A live, local map of your codebase for coding agents.** Claude Code, Codex and Cursor use it to find code without grep loops, reuse what already exists, and stop calling functions that aren't there.
+<h1 align="center">Less searching. More building.</h1>
 
-Coding agents waste most of their context finding their way around. They also rewrite helpers you already have under new names, and invent imports and calls that look plausible. Groundwork indexes your repository and hooks into the agent, so these problems are caught as they happen rather than in code review.
+<p align="center">
+  A live, local map of your codebase for coding agents.<br>
+  Find the right symbol. Reuse the right helper. Call code that actually exists.
+</p>
+
+<p align="center">
+  <strong>Claude Code · Codex · Cursor</strong><br>
+  TypeScript · JavaScript · Python &nbsp; / &nbsp; Node.js 22+ &nbsp; / &nbsp; MIT
+</p>
+
+<p align="center">
+  <a href="#install"><strong>Get started</strong></a> ·
+  <a href="#what-it-does">Why Groundwork</a> ·
+  <a href="#see-a-real-check">See a real check</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#learn-more">Docs</a>
+</p>
+
+---
+
+Your agent can write code. **Groundwork helps it understand the code you already have.**
+
+Instead of filling the context window with grep results and whole files, the agent gets a ranked map, precise symbol reads, and existing code to reuse. Hooks keep that map current and check new calls against real definitions as the agent works.
+
+**No hosted service. No telemetry. No network access at runtime.**
+
+## Install
+
+Requires **Node.js 22 or later**. Groundwork is **not published to npm yet**; install from source:
+
+```sh
+git clone https://github.com/ADITYADEV4145/GroundWork.git
+cd GroundWork
+npm ci
+npm run build
+npm link
+```
+
+Then, **from the repository you want your agent to work in**:
+
+```sh
+gw init       # build the local index in .groundwork/
+gw setup      # preview project-level changes, then confirm
+```
+
+Restart your agent after setup. Codex asks you to trust the new hooks once, under `/hooks`.
+
+Want to see exactly what setup would do first?
+
+```sh
+gw setup --dry-run
+```
+
+<details>
+<summary><strong>Setup options, changed files, and removal</strong></summary>
+
+| Flag | Effect |
+| --- | --- |
+| `--agent claude,codex,cursor` | Set up only these agents. By default, setup detects installed agents. |
+| `--profile minimal\|standard\|strict` | Choose guard behavior. See [Profiles](#profiles). |
+| `--dry-run` | Show the plan without writing anything. |
+| `--yes` | Apply without asking; required when there is no terminal. |
+| `--command "<cmd>"` | Choose how agents launch Groundwork; default: `gw`. |
+| `--remove` | Remove what setup added, preserving unrelated settings. |
+
+Setup writes project-level integration files for the agents you select: `.claude/settings.json`, `.mcp.json`, `.codex/hooks.json`, `.codex/config.toml`, `.cursor/hooks.json` and `.cursor/mcp.json`. It preserves existing settings. A selected profile is stored in `.groundwork/config.json`.
+
+To uninstall the integrations, run `gw setup --remove`. To remove the local index and state too, delete `.groundwork/` afterward.
+
+</details>
+
+<details>
+<summary><strong>Plugin and npx installation: not available yet</strong></summary>
+
+The repository includes plugin and MCP metadata, but those entry points use the unpublished `groundwork-agent` package. Use the source installation above today.
+
+**After the package is published**, these additional options will work:
+
+- **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
+- **Any MCP client:** `npx -y groundwork-agent mcp`.
+
+</details>
+
+## What it does
+
+<img src="docs/assets/groundwork-workflow.webp" alt="Three parts of the Groundwork workflow: navigate to the right symbol, reuse existing code, and ground calls in real definitions." width="100%">
+
+### One skill. Three better habits.
+
+| Instead of… | Groundwork helps your agent… |
+| --- | --- |
+| **Searching in circles** — grep loops, whole-file reads, re-reading unchanged code | Navigate a ranked repository map and read just the symbols it needs, within a token budget. Claude Code's read guard catches repeat reads of unchanged ranges. |
+| **Writing the same helper twice** — new names for code you already have | Find similar code first and choose `REUSE`, `EXTEND` or `NEW because …`. The change gate flags clones, duplicate constants and files, and code left dead by a change. |
+| **Calling code that sounds right** — invented imports, members or arguments | Check edited calls against the index, suggest real definitions, and run the same grounding checks explicitly with `gw verify` or `gw check`. |
+
+Waste guards also catch repeated commands, suggest more focused exploration, and trim noisy command output while retaining failures and a full local log. See [waste guards](docs/waste-guards.md) for the agent-specific behavior and limits.
+
+**Languages:** TypeScript, JavaScript (including JSX and CommonJS), and Python. Other files fall back to the agent's normal tools.
+
+## See a real check
+
+An agent imports `formatCurrency`, but the module exports `formatPrice`. It also passes two arguments to a one-argument function. Groundwork reports both, with the real signature:
 
 ```text
 $ gw check
@@ -14,153 +117,166 @@ BLOCK grounding (arity): label.ts:3
 Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): string (money.ts:1).
 ```
 
-Everything runs on your machine. There is no telemetry and no network access at runtime.
-
-## What it does
-
-| Problem | What Groundwork does |
-| --- | --- |
-| **Token waste**: grep loops, whole-file reads, re-reading unchanged files, huge command output | MCP tools return just the symbol you need within a token budget. A read guard catches repeat reads of unchanged files. Repeated commands get the earlier result, and noisy output is trimmed but keeps every failure. |
-| **Duplication**: semantic clones, new code instead of changing old code, dead code left behind | `find_similar` shows existing code before the agent writes new code, and the agent states `REUSE`, `EXTEND` or `NEW because …`. At Stop, `gw check` flags clones, duplicate constants and files, and code left dead by a change. |
-| **Invented code**: imports, functions and members that don't exist, wrong arguments | After every edit, Groundwork checks the new calls against the index and suggests the real symbol. `gw verify` and `gw check` report the same in CI. |
-
-Supported languages are TypeScript, JavaScript (including JSX and CommonJS) and Python. Other files fall back to the agent's normal tools.
-
-## Install
-
-Requires Node.js 22 or later. Groundwork is not on npm yet, so install it from source:
-
-```sh
-git clone https://github.com/ADITYADEV4145/GroundWork.git
-cd GroundWork && npm ci && npm run build && npm link   # puts `gw` on your PATH
-```
-
-Then, in the repository you want your agent to work in:
-
-```sh
-gw init     # builds the index in .groundwork/ (about 1 s for 15k lines)
-gw setup    # wires up Claude Code, Codex and Cursor; lists every file it will change and asks first
-```
-
-Restart your agent after setup. Codex asks you to trust the new hooks once, under `/hooks`.
-
-| Flag | Effect |
-| --- | --- |
-| `--agent claude,codex,cursor` | set up only these agents (default: every agent installed) |
-| `--profile minimal\|standard\|strict` | choose how strict the guards are (see [Profiles](#profiles)) |
-| `--dry-run` | show the plan and write nothing |
-| `--yes` | apply without asking (required when there is no terminal) |
-| `--command "<cmd>"` | how agents launch Groundwork (default `gw`) |
-| `--remove` | remove exactly what setup added, and nothing else |
-
-Setup only writes project-level files: `.claude/settings.json`, `.mcp.json`, `.codex/hooks.json`, `.codex/config.toml`, `.cursor/hooks.json` and `.cursor/mcp.json`. It keeps your existing settings, and `gw setup --remove` returns each file to exactly how it was before setup.
-
-Once `groundwork-agent` is published to npm, two more options will work:
-- **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
-- **Any MCP client:** run `npx -y groundwork-agent mcp`.
+**Not a plausible guess: a lookup against your repository.** `gw check` exits with code 1 on BLOCK findings, so you can also use it as a CI gate.
 
 ## How it works
 
-```text
-  agent                   hooks (fail open, 2 s budget)          .groundwork/index.db
-┌─────────────┐ PreToolUse  ┌──────────────────────────┐  query  ┌──────────────────────────┐
-│ Claude Code │ ──────────▶ │ read guard, repeat guard │ ──────▶ │ files, symbols, imports, │
-│ Codex       │ PostToolUse │ refresh, grounding notes │         │ calls, literals,         │
-│ Cursor      │ ──────────▶ │ output trimmer           │ ◀────── │ fingerprints             │
-│             │ Stop        │ gw check duplicate gate  │ refresh └──────────────────────────┘
-│             │ ──────────▶ └──────────────────────────┘                    ▲
-│             │ MCP: repo_map, find_code, outline, read_symbol, callers,    │
-│             │      callees, where_used, find_similar, verify_calls ───────┘
-└─────────────┘
-```
+<img src="docs/assets/architecture.svg" alt="Claude Code, Codex and Cursor connect through Groundwork's MCP navigation and hooks to a local tree-sitter and SQLite index. Hooks refresh changed files and fail open on errors. No hosted service or telemetry." width="100%">
 
-The index is built with tree-sitter and stored in SQLite (`node:sqlite`, falling back to `sql.js`). After each edit, only the changed files are parsed again; refreshing one to five files takes under 300 ms. [SKILL.md](SKILL.md) teaches the agent the workflow: navigate with the index, check for existing code before writing, and act on what the hooks report.
+1. **Map once.** `gw init` parses the repository with tree-sitter and stores files, symbols, imports, calls, literals and fingerprints in SQLite (`node:sqlite`, with a `sql.js` fallback).
+2. **Navigate precisely.** MCP tools answer with ranked, token-budgeted context. [SKILL.md](SKILL.md) teaches the agent to look for existing code before writing.
+3. **Stay current.** Edit hooks reparse changed files, provide grounding notes and run the duplicate gate at Stop. Errors and timeouts fail open so the agent can continue.
 
 ### MCP tools
 
-| Tool | Returns |
+| Tool | What your agent gets |
 | --- | --- |
-| `repo_map` | a ranked directory tree with each file's top symbols; narrow it by path |
-| `find_code` | symbols that match a name or description, with signatures |
-| `outline` | a file's symbols and signatures without their bodies |
-| `read_symbol` | one symbol's source, without the rest of the file |
-| `callers` / `callees` / `where_used` | who calls a symbol, what it calls, and every reference to it |
-| `find_similar` | existing code that already does what the agent is about to write |
-| `verify_calls` | whether the imports and calls in a snippet exist, and how many arguments each call takes |
-| `index_status` | index freshness and size |
+| `repo_map` | A ranked directory tree with top symbols per file; narrow by path. |
+| `find_code` | Symbols matching a name or description, with signatures. |
+| `outline` | A file's symbols and signatures without their bodies. |
+| `read_symbol` | One symbol's source, not the whole file. |
+| `callers` / `callees` / `where_used` | Who calls a symbol, what it calls, and its references. |
+| `find_similar` | Existing code to consider before writing something new. |
+| `verify_calls` | Whether snippet imports and calls exist, and their argument counts. |
+| `index_status` | Index freshness and size. |
 
-Each answer has a token budget. When an answer is longer than its budget, it is cut short and gives a way to fetch the rest.
+Each answer has a token budget. Oversized answers are cut short with a way to fetch the rest.
+
+### Agent support
+
+The map is shared; hook capabilities differ.
+
+| Capability | Claude Code | Codex | Cursor |
+| --- | --- | --- | --- |
+| MCP navigation and reuse tools | Yes | Yes | Yes |
+| Index refresh and grounding notes after edits | Yes | Yes | Yes |
+| Unchanged-file read guard | Yes | — | — |
+| Automatic noisy-command wrapping | Yes | — | — |
+| Stop findings in `standard` | Warnings | Warnings | Not shown |
+| Stop gate in `strict` | Once per new finding set | Once per new finding set | Once per new finding set |
+
+Use `gw run -- <cmd>` for explicit output trimming, or `gw check` for explicit change checks, regardless of agent. Cursor's Stop hook cannot show a warning without blocking; use `strict` or run `gw check` yourself there.
 
 ## Profiles
 
-| Profile | What runs |
-| --- | --- |
-| `minimal` | the navigation tools and the read guard only |
-| `standard` (default) | adds Reuse First, grounding notes after edits and waste guards. Findings at Stop are shown as warnings. |
-| `strict` | as `standard`, but the Stop gate blocks once on each new BLOCK finding |
+Start with `standard`. Tighten the Stop gate only when you want it.
 
-Choose a profile with `gw setup --profile strict`, or set `"profile"` in `.groundwork/config.json`. Every guard can also be turned on or off on its own, and a setting you write overrides the profile:
+| Profile | What runs | Stop behavior |
+| --- | --- | --- |
+| `minimal` | Navigation and the read guard where supported. | No duplicate gate. |
+| `standard` **(default)** | Adds Reuse First, grounding notes and waste guards. | Findings are warnings; Cursor does not display Stop warnings. |
+| `strict` | The same checks as `standard`. | Blocks once per new set of BLOCK findings in a session. |
+
+Choose a profile during setup:
+
+```sh
+gw setup --profile strict
+```
+
+Or edit `.groundwork/config.json`. Explicit settings override profile defaults:
 
 ```json
 {
   "profile": "standard",
   "grounding": { "enabled": true },
-  "guards": { "repeatCommand": { "enabled": false }, "explorationHint": { "threshold": 20 } }
+  "guards": {
+    "repeatCommand": { "enabled": false },
+    "explorationHint": { "threshold": 20 }
+  }
 }
 ```
 
-You can commit `config.json` so your team shares one profile. Everything else in `.groundwork/` is git-ignored.
+Commit `config.json` to share your team's preferences. Everything else in `.groundwork/` is git-ignored.
+
+> The profile controls the **Stop gate**, not every possible intervention. Read and repeat-command guards can deny redundant actions in the profiles where they are enabled; each has an override.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `gw symbols <query>` / `gw show <symbol>` | search symbols; show one symbol's signature, callers and callees |
-| `gw similar "<description>"` | find existing code to reuse before writing a symbol |
-| `gw check [--base <ref>]` | duplicate and grounding gate over changed code; exits 1 on BLOCK findings, so it works as a CI step |
-| `gw verify [files...]` | grounding check alone; exits 1 on definite errors |
-| `gw run -- <cmd>` | run a noisy command, keep the full log locally and print a trimmed summary |
-| `gw report` | what the guards saved in a session |
-| `gw refresh`, `gw stats`, `gw doctor`, `gw selftest` | update the index, show its contents, check the environment, run the acceptance checks |
+| `gw symbols <query>` / `gw show <symbol>` | Search symbols; show a signature, callers and callees. |
+| `gw similar "<description>"` | Find existing code to reuse. |
+| `gw check [--base <ref>]` | Check changed code for duplicates and grounding errors; exit 1 on BLOCK. |
+| `gw verify [files...]` | Check grounding alone; exit 1 on definite errors. |
+| `gw run -- <cmd>` | Keep the full command log locally and print a trimmed summary. |
+| `gw report` | Show session guard activity and estimated savings. |
+| `gw refresh` / `gw stats` | Refresh the index or inspect its contents. |
+| `gw doctor` / `gw selftest` | Check the environment or run acceptance checks. |
 
 Every command accepts `--json`.
 
 ## Accuracy
 
-On the labeled duplicate corpus, BLOCK findings are 95% precise. They catch 100% of exact copies and 96% of renamed copies, but fewer heavily rewritten clones, which are reported as warnings or not at all. See [references/reuse.md](references/reuse.md).
+**Useful guardrails, with explicit limits.**
 
-Grounding reports only calls it can resolve definitely: it skips dynamic dispatch, computed member names and external packages. On this repository, 99% of internal imports resolve.
+| Check | What is measured | What not to assume |
+| --- | --- | --- |
+| Duplicate BLOCK findings | 95% precision on the labeled duplicate corpus; 100% recall for exact copies and 96% for renamed copies. | These are planted examples, not production-repository results. Heavily rewritten clones may be warnings or missed. |
+| Grounding | Resolves 99% of internal imports in this repository. | Dynamic dispatch, computed member names and external packages are skipped, not verified. |
 
-Corpus figures come from planted examples, not production repositories.
+See [reuse methodology](references/reuse.md) and [grounding behavior](references/grounding.md). These figures are not a claim about end-to-end token savings.
 
 ## Privacy and security
 
-- All state lives in `.groundwork/` in your repository.
-- The only download is `gw init --embeddings`, which fetches a local embedding model when you ask for one. Without it, `find_similar` runs fine without a model.
-- Hooks run with your user permissions and never run commands for the agent.
-- Hooks fail open: on any error or timeout, the agent continues as if Groundwork were not there.
+- **Local state:** the index, logs and session state stay in your repository's `.groundwork/`.
+- **Offline runtime:** there is no telemetry or hosted inference. The optional `gw init --embeddings` command downloads a local model only when explicitly requested; similarity search also works without it.
+- **Your permissions:** hooks run as your user. They inspect agent actions and may wrap supported noisy commands with `gw run`; they are not an autonomous command runner.
+- **Fail open:** hook errors and timeouts let the agent continue. Explicit CLI checks still return nonzero on findings.
 
-See [SECURITY.md](SECURITY.md) for what each hook does and how to audit it.
+Read [SECURITY.md](SECURITY.md) for hook behavior and audit details.
 
 ## FAQ
 
-**Does it slow my agent down?** Hooks usually answer in milliseconds and have a 2-second limit. If one times out, the action goes ahead.
+<details>
+<summary><strong>Does it slow my agent down?</strong></summary>
 
-**What if a guard is wrong?** Retry the read once, rerun the command with `GW_FORCE=1`, or mark an intended duplicate with `// groundwork: allow-duplicate <reason>`. Each override is logged, so you can tune the config. See [troubleshooting](references/troubleshooting.md).
+Hooks usually answer in milliseconds and have a 2-second dispatch budget. If a hook errors or times out, the action goes ahead. The index refreshes changed files rather than reparsing the whole repository.
 
-**Will it block my agent?** Only in the `strict` profile, and only once for each set of findings.
+</details>
 
-**Does Cursor get everything?** It gets navigation, the read guard and grounding notes. Cursor's Stop hook cannot show a warning without blocking, so in `standard` Cursor shows no Stop findings. Use `strict` there, or run `gw check` yourself.
+<details>
+<summary><strong>What if a guard is wrong?</strong></summary>
 
-**How do I remove it?** Run `gw setup --remove`, then delete `.groundwork/`.
+Retry the exact read once, rerun a command with `GW_FORCE=1`, or mark a deliberate duplicate with `// groundwork: allow-duplicate <reason>`. Overrides are logged so you can tune the configuration. See [troubleshooting](references/troubleshooting.md).
+
+</details>
+
+<details>
+<summary><strong>Will it block my agent?</strong></summary>
+
+The duplicate Stop gate blocks only in `strict`, and never twice for the same finding set in a session. Read and repeat-command guards can independently deny redundant actions; use the overrides above when the repetition is intentional.
+
+</details>
+
+<details>
+<summary><strong>Can I use it without embeddings?</strong></summary>
+
+Yes. `find_similar` works without a downloaded model. Embeddings are optional and run locally after the explicit model download.
+
+</details>
+
+<details>
+<summary><strong>How do I remove it?</strong></summary>
+
+Run `gw setup --remove` to remove the integrations, then delete `.groundwork/` to remove local state.
+
+</details>
 
 ## Learn more
 
-- [SKILL.md](SKILL.md): the protocol the agent follows
-- [references/navigation.md](references/navigation.md), [reuse.md](references/reuse.md), [grounding.md](references/grounding.md), [docs/waste-guards.md](docs/waste-guards.md): how each part works
-- [references/troubleshooting.md](references/troubleshooting.md): common problems and fixes
-- [AGENTS.md](AGENTS.md): developing Groundwork (`npm test`, `npm run selftest -- --through 5`)
+| Start here | Go deeper |
+| --- | --- |
+| [The agent skill](SKILL.md) — the protocol the agent follows | [Navigation](references/navigation.md) — map and symbol tools |
+| [Reuse First](references/reuse.md) — reuse decisions and the duplicate gate | [Grounding](references/grounding.md) — how call verification works |
+| [Waste guards](docs/waste-guards.md) — repeat reads, commands and output | [Troubleshooting](references/troubleshooting.md) — common fixes |
+| [Security](SECURITY.md) — local behavior and auditing | [Contributing](AGENTS.md) — development commands and extension points |
 
-## License
+To work on Groundwork itself: `npm test`, `npm run typecheck`, `npm run build`, and `npm run selftest -- --through 5`.
 
-MIT
+---
+
+<p align="center">
+  <strong>Give your agent solid ground.</strong><br>
+  Built by <a href="https://github.com/ADITYADEV4145">Aditya Punjani</a> · <a href="LICENSE">MIT licensed</a><br>
+  <sub>The generated illustrations are conceptual artwork, not product screenshots.</sub>
+</p>

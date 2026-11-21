@@ -40,3 +40,7 @@ export class Patched {
     return this.m();
   }
 }
+
+import urlDefault from './lib/url-default';
+
+export const site = urlDefault;

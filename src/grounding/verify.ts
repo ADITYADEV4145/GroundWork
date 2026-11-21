@@ -143,8 +143,9 @@ export class Grounder {
       if (d) return d;
       if (this.importsOf(fileId).some((i) => (i.kind === 'reexport' && (i.alias ?? i.name) === 'default') || (i.kind === 'reexport-all' && /\bdefault\b/.test(i.alias ?? ''))))
         return 'unknown';
-      const code = text.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ' ');
-      return /\bexport\s+default\b|\bas\s*['"]?default\b|\bexport\s*\{[^}]*\bdefault\b/.test(code) ? 'unknown' : null;
+      // Test with and without comments: stripping can misfire on `//` inside strings, so either match is enough.
+      const re = /\bexport\s+default\b|\bas\s*['"]?default\b|\bexport\s*\{[^}]*\bdefault\b/;
+      return re.test(text) || re.test(text.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ' ')) ? 'unknown' : null;
     }
     const local = this.aliasesOf(fileId).find((a) => a.exported === name)?.local ?? name;
     const own = tops.find((s) => s.exported && s.name === local);

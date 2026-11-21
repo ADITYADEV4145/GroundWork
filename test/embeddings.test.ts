@@ -15,7 +15,8 @@ import { findSimilar } from '../src/reuse/similar.js';
 import { buildIdf, pairSignals, vectorCosine, type ComparableSymbol } from '../src/reuse/signals.js';
 import { withIndexedFixture } from '../src/selftest/fixtures.js';
 import { loadDataset } from '../src/reuse/calibration.js';
-import { withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
+import { withCheckScenario, writeScenarioFile, stopEvent } from '../src/reuse/scenarios.js';
+import { duplicateGate } from '../src/hooks/handlers/duplicate_gate.js';
 import { applySetup, planSetup } from '../src/setup/apply.js';
 import { profileTarget } from '../src/setup/targets.js';
 import evaluation from '../bench/dupes/embeddings-oof.json' with { type: 'json' };
@@ -270,6 +271,31 @@ describe('consented, offline-only optional meaning', () => {
         if (mode === 'overrun') expect(factory).toHaveBeenCalledOnce();
       } finally { clock.mockRestore(); prepare?.mockRestore(); }
       await expect(checkRepository(root, { timeoutMs: 0 })).rejects.toThrow();
+    });
+  });
+
+  it('fails Stop open if cached source/vector preparation overruns its absolute hook deadline', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await checkRepository(root);
+      const { factory } = fake();
+      await initializeEmbeddings(root, { consent: true, factory });
+      const config = { ...loadConfig(root), profile: 'strict' as const };
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try { await new CandidateIndex(db).prepareMeaning(root, config, factory); }
+      finally { db.close(); }
+      let now = Date.now();
+      const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
+      const original = CandidateIndex.prototype.prepareMeaning;
+      const prepare = vi.spyOn(CandidateIndex.prototype, 'prepareMeaning').mockImplementation(async function (this: CandidateIndex, ...args) {
+        await original.apply(this, args);
+        now += 1600;
+      });
+      try {
+        await expect(checkRepository(root, { config, timeoutMs: 1500 })).rejects.toThrow('reuse check timed out');
+        expect(await duplicateGate.run(stopEvent(root), { root, config })).toMatchObject({ action: 'allow' });
+        expect((await checkRepository(root, { config })).blocked).toBe(true);
+        expect(prepare).toHaveBeenCalledTimes(3);
+      } finally { clock.mockRestore(); prepare.mockRestore(); }
     });
   });
 

@@ -115,7 +115,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     });
   } catch {
     for (const symbol of candidates.symbols) delete symbol.embedding;
-  } finally { deadline += Math.max(0, Date.now() - meaningStart); }
+  } finally { if (options.timeoutMs === undefined) deadline += Math.max(0, Date.now() - meaningStart); }
   checkDeadline();
   const baseSymbols = new Map(base.state.symbols.map((s) => [s.id, s]));
   const symbols = new Map(state.symbols.map((s) => [s.id, s]));
@@ -295,5 +295,6 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   checkDeadline();
   findings.sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'BLOCK' ? -1 : 1) || a.added.file.localeCompare(b.added.file) || a.added.line - b.added.line || a.kind.localeCompare(b.kind));
   const blocked = findings.some((f) => f.severity === 'BLOCK');
+  checkDeadline();
   return { status: blocked ? 'BLOCK' : findings.length ? 'WARN' : 'PASS', blocked, base: commit, findings, allows, ms: performance.now() - start };
 }

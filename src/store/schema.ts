@@ -100,6 +100,14 @@ CREATE TABLE IF NOT EXISTS literals (
 CREATE INDEX IF NOT EXISTS literals_value ON literals(value);
 CREATE INDEX IF NOT EXISTS literals_file ON literals(file_id);
 
+-- export { local as exported } / module.exports = { exported: local }
+CREATE TABLE IF NOT EXISTS export_aliases (
+  file_id INTEGER NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  local_name TEXT NOT NULL,
+  exported_name TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS export_aliases_file ON export_aliases(file_id);
+
 `;
 
 // FTS5 (BM25 ranking) is used when available; the sql.js build only ships FTS4, so search ranks in JS there.
@@ -129,7 +137,7 @@ export function writeMeta(db: Db, key: string, value: string): void {
   db.prepare('INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').run(key, value);
 }
 
-const TABLES = ['symbols_fts', 'literals', 'calls', 'imports', 'symbols', 'files', 'meta'];
+const TABLES = ['symbols_fts', 'export_aliases', 'literals', 'calls', 'imports', 'symbols', 'files', 'meta'];
 
 /** Create tables; if the stored schema/tool/config fingerprint differs, drop everything and start clean. */
 export function ensureSchema(db: Db, fingerprint: { toolVersion: string; configHash: string }): { rebuilt: boolean; fts: FtsFlavor } {

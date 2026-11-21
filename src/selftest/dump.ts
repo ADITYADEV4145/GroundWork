@@ -19,6 +19,7 @@ export function canonicalDump(db: Db): string {
       `SELECT f.path, c.caller_id, c.callee_text, c.callee_name, c.line, c.col, c.arg_count, c.keyword_args_json, c.has_spread, c.callee_id, c.confidence
        FROM calls c JOIN files f ON f.id = c.file_id`,
     ),
+    exportAliases: q('SELECT f.path, a.local_name, a.exported_name FROM export_aliases a JOIN files f ON f.id = a.file_id'),
     literals: q('SELECT f.path, l.symbol_id, l.value, l.kind, l.line, l.const_name FROM literals l JOIN files f ON f.id = l.file_id'),
   });
 }

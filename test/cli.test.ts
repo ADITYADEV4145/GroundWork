@@ -19,7 +19,7 @@ describe('gw cli', () => {
 
   it('stats --json', () => {
     const s = JSON.parse(gw('--json', 'stats'));
-    expect(s.files).toBe(7);
+    expect(s.files).toBe(8);
     expect(s.symbols).toBeGreaterThan(20);
   });
 

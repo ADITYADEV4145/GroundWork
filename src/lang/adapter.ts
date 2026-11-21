@@ -59,6 +59,8 @@ export interface ExtractResult {
   imports: ExtractedImport[];
   calls: ExtractedCall[];
   literals: ExtractedLiteral[];
+  /** Names a file exports under a different name than the local binding. */
+  exportAliases: { local: string; exported: string }[];
   hasErrors: boolean;
 }
 

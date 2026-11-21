@@ -78,7 +78,7 @@ interface Ctx {
   imports: ExtractedImport[];
   calls: ExtractedCall[];
   literals: ExtractedLiteral[];
-  exportedNames: Map<string, string>; // local -> exported name ('default' allowed)
+  exportedNames: Map<string, Set<string>>; // local -> exported names ('default' allowed)
   overloads: Map<string, { min: number; max: number | null }[]>;
 }
 
@@ -206,14 +206,14 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
         for (const s of clause.namedChildren) {
           if (s?.type !== 'export_specifier') continue;
           const n = s.childForFieldName('name')?.text ?? s.text;
-          ctx.exportedNames.set(n, s.childForFieldName('alias')?.text ?? n);
+          addExport(ctx, n, s.childForFieldName('alias')?.text ?? n);
         }
         return;
       }
       if (decl) return visit(ctx, decl, parent, scope, { exported: true, isDefault }, topLevel);
       const value = node.childForFieldName('value') ?? node.namedChildren.find((c) => c && c.type !== 'comment' && c.type !== 'decorator') ?? null;
       if (value && isDefault) {
-        if (value.type === 'identifier') ctx.exportedNames.set(value.text, 'default');
+        if (value.type === 'identifier') addExport(ctx, value.text, 'default');
         else if (FN_VALUE.has(value.type)) {
           const idx = addSymbol(ctx, value, 'default', 'function', parent, { fnNode: value, exported: true, isDefault: true, docNode: node });
           walkBody(ctx, value.childForFieldName('body'), idx);
@@ -229,14 +229,14 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
       if (parent === null && right) {
         if (left === 'module.exports' && right.type === 'object') {
           for (const p of right.namedChildren) {
-            if (p?.type === 'shorthand_property_identifier') ctx.exportedNames.set(p.text, p.text);
+            if (p?.type === 'shorthand_property_identifier') addExport(ctx, p.text, p.text);
             else if (p?.type === 'pair' && p.childForFieldName('value')?.type === 'identifier')
-              ctx.exportedNames.set(p.childForFieldName('value')!.text, p.childForFieldName('key')?.text ?? p.text);
+              addExport(ctx, p.childForFieldName('value')!.text, p.childForFieldName('key')?.text ?? p.text);
           }
-        } else if (left === 'module.exports' && right.type === 'identifier') ctx.exportedNames.set(right.text, 'default');
+        } else if (left === 'module.exports' && right.type === 'identifier') addExport(ctx, right.text, 'default');
         else {
           const m = /^(?:module\.)?exports\.([A-Za-z_$][\w$]*)$/.exec(left);
-          if (m && right.type === 'identifier') ctx.exportedNames.set(right.text, m[1]!);
+          if (m && right.type === 'identifier') addExport(ctx, right.text, m[1]!);
           else if (m && FN_VALUE.has(right.type)) {
             const idx = addSymbol(ctx, node, m[1]!, 'function', null, { fnNode: right, exported: true });
             walkBody(ctx, right.childForFieldName('body'), idx);
@@ -393,6 +393,12 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
   }
 }
 
+function addExport(ctx: Ctx, local: string, exported: string): void {
+  const set = ctx.exportedNames.get(local);
+  if (set) set.add(exported);
+  else ctx.exportedNames.set(local, new Set([exported]));
+}
+
 function isRequire(n: Node): boolean {
   return n.type === 'call_expression' && n.childForFieldName('function')?.text === 'require';
 }
@@ -425,7 +431,7 @@ export const typescriptAdapter: LanguageAdapter = {
         const exp = ctx.exportedNames.get(s.name);
         if (exp) {
           s.exported = true;
-          if (exp === 'default') s.isDefaultExport = true;
+          if (exp.has('default')) s.isDefaultExport = true;
         }
         const ov = ctx.overloads.get(s.name);
         if (ov && (s.kind === 'function' || s.kind === 'component')) {
@@ -433,7 +439,10 @@ export const typescriptAdapter: LanguageAdapter = {
           s.maxArity = s.maxArity === null || ov.some((o) => o.max === null) ? null : Math.max(s.maxArity, ...ov.map((o) => o.max as number));
         }
       }
-      return { ...ctx, hasErrors: tree.rootNode.hasError };
+      const exportAliases: { local: string; exported: string }[] = [];
+      for (const [local, names] of ctx.exportedNames)
+        for (const exported of names) if (exported !== local && exported !== 'default') exportAliases.push({ local, exported });
+      return { symbols: ctx.symbols, imports: ctx.imports, calls: ctx.calls, literals: ctx.literals, exportAliases, hasErrors: tree.rootNode.hasError };
     } finally {
       tree.delete();
     }

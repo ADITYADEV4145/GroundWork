@@ -18,3 +18,5 @@ function pad(n: number, width = 2): string {
 export function joinParts(sep: string, ...parts: string[]): string {
   return parts.map((p) => pad(Number(p))).join(sep);
 }
+
+export { pad as padNumber };

@@ -20,7 +20,7 @@ export interface FileMeta {
 /** Remove everything derived from a file but keep its row (and id) so other files' import links survive. */
 export function clearFileRows(db: Db, fileId: number): void {
   db.prepare('DELETE FROM symbols_fts WHERE rowid IN (SELECT rowid FROM symbols WHERE file_id = ?)').run(fileId);
-  for (const t of ['symbols', 'imports', 'calls', 'literals']) db.prepare(`DELETE FROM ${t} WHERE file_id = ?`).run(fileId);
+  for (const t of ['symbols', 'imports', 'calls', 'literals', 'export_aliases']) db.prepare(`DELETE FROM ${t} WHERE file_id = ?`).run(fileId);
 }
 
 export function deleteFile(db: Db, fileId: number): void {
@@ -97,6 +97,8 @@ export function writeExtraction(db: Db, fileId: number, file: string, ex: Extrac
   for (const c of ex.calls)
     insCall.run(fileId, c.caller !== null ? ids[c.caller]! : null, c.calleeText, c.calleeName, c.line, c.column, c.argCount, JSON.stringify(c.keywordArgs), +c.hasSpread);
   const insLit = db.prepare('INSERT INTO literals(file_id, symbol_id, value, kind, line, const_name) VALUES(?,?,?,?,?,?)');
+  const insAlias = db.prepare('INSERT INTO export_aliases(file_id, local_name, exported_name) VALUES(?,?,?)');
+  for (const a of ex.exportAliases) insAlias.run(fileId, a.local, a.exported);
   const litSeen = new Set<string>();
   for (const l of ex.literals) {
     const k = `${l.value}\0${l.kind}\0${l.line}`;

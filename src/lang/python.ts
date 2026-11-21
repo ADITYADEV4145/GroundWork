@@ -373,7 +373,7 @@ export const pythonAdapter: LanguageAdapter = {
       walk(ctx, tree.rootNode, null, null, true);
       if (ctx.allNames) for (const s of ctx.symbols) if (s.parent === null) s.exported = ctx.allNames.has(s.name);
       const { allNames: _a, ...rest } = ctx;
-      return { ...rest, hasErrors: tree.rootNode.hasError };
+      return { ...rest, exportAliases: [], hasErrors: tree.rootNode.hasError };
     } finally {
       tree.delete();
     }

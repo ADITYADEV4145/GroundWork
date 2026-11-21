@@ -109,9 +109,28 @@ export function linkIndex(db: Db, root: string): LinkStats {
     else importsByFile.set(im.fileId, [im]);
   }
 
+  const aliasByFile = new Map<number, Map<string, string>>();
+  for (const r of db.prepare('SELECT file_id, local_name, exported_name FROM export_aliases').all()) {
+    const fid = Number(r.file_id);
+    let m = aliasByFile.get(fid);
+    if (!m) aliasByFile.set(fid, (m = new Map()));
+    m.set(String(r.exported_name), String(r.local_name));
+  }
+
   /** Follow re-exports (and Python package __init__ imports) to the defining symbol. */
   const exportOf = (fileId: number, name: string, depth = 0): Sym | null => {
     if (depth > 5) return null;
+    const aliased = aliasByFile.get(fileId)?.get(name);
+    if (aliased !== undefined) {
+      const local = topByFile.get(fileId)?.get(aliased);
+      if (local) return local;
+      // export { imported as renamed }
+      for (const im of importsByFile.get(fileId) ?? [])
+        if (im.resolvedFileId !== null && (im.alias ?? im.name) === aliased && im.kind !== 'namespace' && im.kind !== 'module') {
+          const hit = exportOf(im.resolvedFileId, im.kind === 'default' ? 'default' : im.name, depth + 1);
+          if (hit) return hit;
+        }
+    }
     if (name === 'default') {
       const d = defaultByFile.get(fileId);
       if (d) return d;

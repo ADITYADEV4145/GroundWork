@@ -12,3 +12,5 @@ export enum Mode {
   Plain,
   Rich,
 }
+
+export const shout = (t: string) => slug(t).toUpperCase();

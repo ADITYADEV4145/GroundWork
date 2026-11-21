@@ -55,15 +55,16 @@ export class CandidateIndex {
     }
   }
 
-  async prepareMeaning(root: string, config: GroundworkConfig, factory?: EmbedderFactory): Promise<void> {
+  async prepareMeaning(root: string, config: GroundworkConfig, factory?: EmbedderFactory, options: { deadline?: number } = {}): Promise<void> {
     if (!config.reuse.embeddings.enabled) return;
     const { DEFAULT_EMBEDDING_MODEL, embedSources, warnMeaning } = await import('./embeddings.js');
     this.meaningContext = { root, config, factory };
     const sources = this.symbols.flatMap((s) => {
+      if (Date.now() >= (options.deadline ?? Infinity)) return [];
       try { return [{ id: s.id, text: readFileSync(path.join(root, s.file), 'utf8').slice(s.startByte, s.endByte) }]; }
       catch { return []; }
     });
-    const vectors = await embedSources(root, config, sources, factory);
+    const vectors = await embedSources(root, config, sources, factory, options);
     for (const symbol of this.symbols) symbol.embedding = vectors.get(symbol.id);
     const model = config.reuse.embeddings.model ?? DEFAULT_EMBEDDING_MODEL;
     if (vectors.size && model !== meaningModel.embeddingModel)

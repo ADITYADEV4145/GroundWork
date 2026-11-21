@@ -18,6 +18,7 @@ import { allowReason, configName, inspectSource } from './inspection.js';
 import { scoreSignals } from './model.js';
 import { pairSignals, type Signals } from './signals.js';
 import { canBlock } from './policy.js';
+import type { EmbedderFactory } from './embeddings.js';
 
 type IndexedSymbol = ReuseState['symbols'][number];
 type Literal = ReuseState['literals'][number] & { configish?: boolean };
@@ -41,7 +42,7 @@ export interface CheckReport {
   allows: { file: string; symbol: string; reason: string }[];
   ms: number;
 }
-export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number }
+export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number; embeddingFactory?: EmbedderFactory }
 
 const location = (s: IndexedSymbol): CheckLocation => ({ file: s.file, symbol: s.qualifiedName, line: s.line });
 const order = (s: { file: string; line: number }) => `${s.file}\0${String(s.line).padStart(10, '0')}`;
@@ -104,7 +105,9 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
   }
   finally { db.close(); }
-  await candidates.prepareMeaning(root, config);
+  await candidates.prepareMeaning(root, config, options.embeddingFactory, {
+    deadline: Date.now() + Math.max(0, Math.min(250, (deadline - Date.now()) / 10)),
+  });
   checkDeadline();
   const baseSymbols = new Map(base.state.symbols.map((s) => [s.id, s]));
   const symbols = new Map(state.symbols.map((s) => [s.id, s]));

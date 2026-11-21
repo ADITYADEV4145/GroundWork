@@ -15,7 +15,7 @@ import { findSimilar } from '../src/reuse/similar.js';
 import { buildIdf, pairSignals, vectorCosine, type ComparableSymbol } from '../src/reuse/signals.js';
 import { withIndexedFixture } from '../src/selftest/fixtures.js';
 import { loadDataset } from '../src/reuse/calibration.js';
-import { withCheckScenario } from '../src/reuse/scenarios.js';
+import { withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
 import evaluation from '../bench/dupes/embeddings-oof.json' with { type: 'json' };
 
 const fake = () => {
@@ -190,6 +190,45 @@ describe('consented, offline-only optional meaning', () => {
         expect(missing.findings).toEqual(baseline.findings);
         expect(warning).toHaveBeenCalledOnce();
       } finally { warning.mockRestore(); }
+    });
+  });
+
+  it.each(['load', 'embed'])('preserves duplicate and grounding findings when cold meaning stalls during %s', async (stage) => {
+    await withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, 'caller.ts', "import { parseDateString } from './utils.js';\nparseDateString();\n");
+      const baseline = await checkRepository(root);
+      expect(baseline.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ kind: 'duplicate', severity: 'BLOCK' }),
+        expect.objectContaining({ kind: 'grounding', severity: 'BLOCK' }),
+      ]));
+      await initializeEmbeddings(root, { consent: true, factory: fake().factory });
+      const never = new Promise<never>(() => {});
+      const embed = vi.fn(() => never);
+      const factory = vi.fn<EmbedderFactory>(async () => stage === 'load' ? never : { embed });
+      const report = await checkRepository(root, { timeoutMs: 1500, embeddingFactory: factory });
+      expect(report.ms).toBeLessThan(1500);
+      expect(factory).toHaveBeenCalledOnce();
+      expect(embed).toHaveBeenCalledTimes(stage === 'embed' ? 1 : 0);
+      expect(report.findings).toEqual(baseline.findings);
+    });
+  });
+
+  it('retains completed vectors but starts no further embedding work after the optional budget', async () => {
+    await withIndexedFixture('reuse-app', async (_db, root) => {
+      await initializeEmbeddings(root, { consent: true, factory: fake().factory });
+      const embed = vi.fn(async (_text: string): Promise<number[]> => new Promise(() => {}));
+      embed.mockResolvedValueOnce([1, 0]);
+      const factory = vi.fn<EmbedderFactory>(async () => ({ embed }));
+      const config = loadConfig(root);
+      const sources = ['one', 'two', 'three'].map((id) => ({ id, text: id }));
+      const vectors = await embedSources(root, config, sources, factory, { deadline: Date.now() + 100 });
+      expect([...vectors.keys()]).toEqual(['one']);
+      expect(embed).toHaveBeenCalledTimes(2);
+      factory.mockClear();
+      expect((await embedSources(root, config, sources, factory, { deadline: 0 })).size).toBe(0);
+      expect(factory).not.toHaveBeenCalled();
+      expect((await embedSources(root, config, sources.slice(0, 1), factory)).get('one')?.vector).toEqual([1, 0]);
+      expect(factory).not.toHaveBeenCalled();
     });
   });
 

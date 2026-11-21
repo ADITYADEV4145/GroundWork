@@ -93,7 +93,16 @@ export function warnMeaning(root: string, model: string, error: string): void {
   log(root, 'warn', 'meaning_unavailable', { model, error });
 }
 
-export async function embedSources(root: string, config: GroundworkConfig, sources: { id: string; text: string }[], factory: EmbedderFactory = transformersEmbedder): Promise<Map<string, Embedding>> {
+async function withinBudget<T>(job: () => Promise<T>, deadline = Infinity): Promise<T | undefined> {
+  if (Date.now() >= deadline) return undefined;
+  if (!Number.isFinite(deadline)) return job();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([job(), new Promise<undefined>((resolve) => { timer = setTimeout(() => resolve(undefined), Math.max(0, deadline - Date.now())); })]);
+  } finally { clearTimeout(timer); }
+}
+
+export async function embedSources(root: string, config: GroundworkConfig, sources: { id: string; text: string }[], factory: EmbedderFactory = transformersEmbedder, options: { deadline?: number } = {}): Promise<Map<string, Embedding>> {
   const result = new Map<string, Embedding>();
   if (!config.reuse.embeddings.enabled || !sources.length) return result;
   const model = config.reuse.embeddings.model ?? DEFAULT_EMBEDDING_MODEL;
@@ -107,6 +116,7 @@ export async function embedSources(root: string, config: GroundworkConfig, sourc
     const db = openDb(indexDbPath(root), { readonly: true });
     try {
       for (const source of sources) {
+        if (Date.now() >= (options.deadline ?? Infinity)) break;
         const hash = embeddingHash(source.text);
         const vector = readEmbedding(db, model, hash);
         if (vector) vectors.set(hash, vector);
@@ -114,20 +124,24 @@ export async function embedSources(root: string, config: GroundworkConfig, sourc
       }
     } finally { db.close(); }
     if (pending.size) {
-      const embedder = await factory(model, { cacheDir: embeddingCacheDir(root), download: false });
+      const embedder = await withinBudget(() => factory(model, { cacheDir: embeddingCacheDir(root), download: false }), options.deadline);
       const fresh = new Map<string, number[]>();
-      for (const [hash, text] of pending) {
-        const vector = await embedder.embed(text);
+      for (const [hash, text] of embedder ? pending : []) {
+        const vector = await withinBudget(() => embedder!.embed(text), options.deadline);
+        if (!vector) break;
         if (!vector.length || vector.some((v) => !Number.isFinite(v)) || !vector.some((v) => v !== 0)) throw new Error('Invalid embedding vector.');
         fresh.set(hash, vector); vectors.set(hash, vector);
       }
-      withWriteLock(root, () => {
+      if (fresh.size) withWriteLock(root, () => {
         const writer = openDb(indexDbPath(root));
         try { writer.transaction(() => { for (const [hash, vector] of fresh) writeEmbedding(writer, model, hash, vector); }); }
         finally { writer.close(); }
       }, 100);
     }
-    for (const source of sources) result.set(source.id, { model, vector: vectors.get(embeddingHash(source.text))! });
+    for (const source of sources) {
+      const vector = vectors.get(embeddingHash(source.text));
+      if (vector) result.set(source.id, { model, vector });
+    }
   } catch (error) { warnMeaning(root, model, (error as Error).message); }
   return result;
 }

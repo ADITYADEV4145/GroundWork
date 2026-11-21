@@ -7,6 +7,84 @@ Features build on prior work: cards → invitations → agenda → reminders →
 → capacity → CSV → organizer digest → delivery → dashboard. Every step must
 preserve earlier acceptance contracts. No shared harness files are modified.
 
+## Recorded Devin-agent results
+
+**Devin-agent results (6 sessions: 3 baseline, 3 Groundwork; 10 sequential tasks each); tokens are estimated tool-output tokens (bytes/4), not model tokens**
+
+<!-- long-horizon-results:start -->
+| Measure | Baseline | Groundwork |
+| --- | ---: | ---: |
+| Success | 30/30 (100.0%) | 30/30 (100.0%) |
+| Estimated tool-output tokens (bytes / 4), mean per attempt | 143.8 | 179.4 |
+| Captured tool calls | 58 | 115 |
+| Distinct directly read files (summed across attempts) | 14 | 21 |
+| Direct source-read bytes | 4932 | 7398 |
+| Guarded reads blocked | 0 | 0 |
+| Wall time, mean per attempt (s) | 8.3 | 11.2 |
+| Provider input tokens per attempt | unavailable | unavailable |
+| Provider output tokens per attempt | unavailable | unavailable |
+
+Estimated tool-output token reduction (median of paired task reductions): **-76.8% (95% bootstrap interval [-82.8, -36.8]%)**.
+Provider input token reduction: unavailable. Wall time reduction: -15.2% (95% bootstrap interval [-49.0, -10.5]%).
+Success delta (Groundwork minus baseline, median per task): 0.0 pp (95% bootstrap interval [0.0, 0.0] pp).
+
+| Suite metric | Baseline total | Groundwork total | Paired delta (GW – baseline, per task) | Task coverage |
+| --- | ---: | ---: | ---: | ---: |
+| duplicatesAdded | 20 | 17 | 0.0 (95% bootstrap interval [-0.2, 0.0]) | 10/10 |
+| inventedCalls | 0 | 0 | 0.0 (95% bootstrap interval [0.0, 0.0]) | 10/10 |
+<!-- long-horizon-results:end -->
+
+**Groundwork used more estimated tool-output tokens and more wall time; these
+sessions do not demonstrate savings.** Negative reductions mean increases.
+These are the reporter's medians across tasks, not ratios of suite totals. Its
+95% task-bootstrap intervals condition on these sessions, do not estimate
+variation across independent model runs, and do not account for dependence
+between sequential tasks. Provider token usage and model identity were not
+exposed. Duplicate counts are raw scorer findings, not labeled clone counts.
+
+### Collection deviations
+
+- Groundwork run 3 authored files in a staging directory and copied them into
+  task workspaces via the shell wrapper. Its patches contain ordinary feature
+  source and replay successfully; that does not establish complete accounting
+  for staging-file authoring/read costs or time outside task begin/finish.
+- Two runs each had one failed-then-retried tool call, as reported during
+  collection. The capture JSON lacks command text and error status, so it
+  cannot independently identify those calls. The supplied captures are stored
+  unchanged; no retries were filtered out.
+- One Devin session per arm/run carried context across ten steps. This is a
+  small local event-library fixture, not evidence of performance on large
+  production repositories. Results do not establish end-to-end model-token
+  savings.
+
+### Evidence and offline reproduction
+
+The six [raw observations](observations/) retain original run labels 1–3 for
+both arms; none of the provisional two-pair relabeling is used. Each pins source
+`e366bbcd1944f81d118c486db4d1d8e6feeda705` and collector revision
+`34ea4c11efc47ffe7781308b31bdbf903e45f166`. The complete
+[report](results/2026-11-21T20-56-14-672Z-long-horizon.md),
+[JSON](results/2026-11-21T20-56-14-672Z-long-horizon.json) and dated graded evidence
+are committed under `results/`. [evidence.json](evidence.json) is the same graded
+evidence at the fixed path expected by the shared reporter. Its task/verifier
+digest is checked on replay.
+
+After `npm ci && npm run build`, reproduce the report offline, without agents,
+network access or execution of captured patches:
+
+```sh
+node dist/cli/main.js bench --suite long-horizon --runs 3 \
+  --output-dir /path/to/reproduced-results
+node bench/long-horizon/verify-results.mjs
+```
+
+To regrade all trusted patches instead of replaying graded evidence:
+
+```sh
+node dist/cli/main.js bench --suite long-horizon --runs 3 \
+  --observations bench/long-horizon/observations --output-dir /path/to/regraded-results
+```
+
 ## Run
 
 From the Groundwork source checkout, with Node 22+ and Git:
@@ -46,10 +124,10 @@ node dist/cli/main.js bench --suite long-horizon --runs 3 \
 ```
 
 Only score **trusted patches**: this executes submitted JavaScript. Worktrees and
-timeouts provide reproducibility, not a security sandbox. `results/` is the
-suggested location for future measured results; none are fabricated or committed
-by validation. To reproduce captured results offline, follow `bench/README.md`'s
-`evidence.json` workflow. `--suite all` discovers this suite automatically.
+timeouts provide reproducibility, not a security sandbox. The recorded results
+above came from the six observations, not evaluator validation. The fixed
+`evidence.json` follows `bench/README.md`'s offline workflow. `--suite all`
+discovers this suite automatically.
 
 ## Grading and measurement definitions
 

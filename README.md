@@ -250,6 +250,52 @@ Commit `config.json` to share your team's preferences. Everything else in `.grou
 
 Every command accepts `--json`.
 
+## Long-horizon benchmark
+
+**Devin-agent results (6 sessions: 3 baseline, 3 Groundwork; 10 sequential tasks each); tokens are estimated tool-output tokens (bytes/4), not model tokens**
+
+<!-- long-horizon-results:start -->
+| Measure | Baseline | Groundwork |
+| --- | ---: | ---: |
+| Success | 30/30 (100.0%) | 30/30 (100.0%) |
+| Estimated tool-output tokens (bytes / 4), mean per attempt | 143.8 | 179.4 |
+| Captured tool calls | 58 | 115 |
+| Distinct directly read files (summed across attempts) | 14 | 21 |
+| Direct source-read bytes | 4932 | 7398 |
+| Guarded reads blocked | 0 | 0 |
+| Wall time, mean per attempt (s) | 8.3 | 11.2 |
+| Provider input tokens per attempt | unavailable | unavailable |
+| Provider output tokens per attempt | unavailable | unavailable |
+
+Estimated tool-output token reduction (median of paired task reductions): **-76.8% (95% bootstrap interval [-82.8, -36.8]%)**.
+Provider input token reduction: unavailable. Wall time reduction: -15.2% (95% bootstrap interval [-49.0, -10.5]%).
+Success delta (Groundwork minus baseline, median per task): 0.0 pp (95% bootstrap interval [0.0, 0.0] pp).
+
+| Suite metric | Baseline total | Groundwork total | Paired delta (GW – baseline, per task) | Task coverage |
+| --- | ---: | ---: | ---: | ---: |
+| duplicatesAdded | 20 | 17 | 0.0 (95% bootstrap interval [-0.2, 0.0]) | 10/10 |
+| inventedCalls | 0 | 0 | 0.0 (95% bootstrap interval [0.0, 0.0]) | 10/10 |
+<!-- long-horizon-results:end -->
+
+**Groundwork used more estimated tool-output tokens and more wall time in these
+sessions; these results do not demonstrate token or time savings.** Negative
+reductions mean increases. The intervals above bootstrap the median across ten
+tasks, not suite-total ratios or variation across independent sessions; the
+sequential tasks also share conversation context. Duplicate counts are raw
+scorer findings, not independently labeled clones. Provider token usage is
+unavailable.
+
+Collection deviations: Groundwork run 3 authored files in a staging directory
+and copied them into task workspaces via the shell wrapper. Two runs each had
+one failed-then-retried tool call. These are collection-time disclosures; the
+capture JSON does not retain shell-command text or error status, so staging
+costs outside the wrappers or task timers cannot be verified. No retries were
+removed from the supplied captures.
+
+See the [full report](bench/long-horizon/results/2026-11-21T20-56-14-672Z-long-horizon.md),
+[raw observations](bench/long-horizon/observations/) and
+[methodology and offline reproduction](bench/long-horizon/README.md).
+
 ## Accuracy
 
 **Useful guardrails, with explicit limits.**

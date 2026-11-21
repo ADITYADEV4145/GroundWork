@@ -1,0 +1,215 @@
+# Gather long-horizon feature suite
+
+Ten sequential edit tasks on **one** dependency-free event-operations repository,
+`fixtures/long-horizon-events`, pinned by `tasks.json`. Sequence `gather-launch`
+starts with reusable slug, date, retry, validation, CSV and collection helpers.
+Features build on prior work: cards → invitations → agenda → reminders → roster
+→ capacity → CSV → organizer digest → delivery → dashboard. Every step must
+preserve earlier acceptance contracts. Tasks, acceptance checks and grading
+are unchanged between the first collection and this rerun.
+
+## Recorded Devin-agent results
+
+**Devin-agent results (6 sessions: 3 baseline, 3 Groundwork; 10 sequential tasks each); tokens are estimated tool-output tokens (bytes/4), not model tokens**
+
+<!-- long-horizon-results:start -->
+| Measure | Baseline | Groundwork |
+| --- | ---: | ---: |
+| Success | 30/30 (100.0%) | 30/30 (100.0%) |
+| Estimated tool-output tokens (bytes / 4), mean per attempt | 161.8 | 158.5 |
+| Captured tool calls | 60 | 93 |
+| Distinct directly read files (summed across attempts) | 17 | 21 |
+| Direct source-read bytes | 5769 | 7072 |
+| Guarded reads blocked | 0 | 0 |
+| Wall time, mean per attempt (s) | 4.7 | 9.2 |
+| Provider input tokens per attempt | unavailable | unavailable |
+| Provider output tokens per attempt | unavailable | unavailable |
+
+Estimated tool-output token reduction (median of paired task reductions): **18.8% (95% bootstrap interval [-9.9, 28.8]%)**.
+Provider input token reduction: unavailable. Wall time reduction: -166.2% (95% bootstrap interval [-229.4, -47.5]%).
+Success delta (Groundwork minus baseline, median per task): 0.0 pp (95% bootstrap interval [0.0, 0.0] pp).
+
+| Suite metric | Baseline total | Groundwork total | Paired delta (GW – baseline, per task) | Task coverage |
+| --- | ---: | ---: | ---: | ---: |
+| duplicatesAdded | 25 | 24 | 0.0 (95% bootstrap interval [-0.2, 0.0]) | 10/10 |
+| inventedCalls | 0 | 0 | 0.0 (95% bootstrap interval [0.0, 0.0]) | 10/10 |
+<!-- long-horizon-results:end -->
+
+**These sessions do not demonstrate token or time savings.** The estimated-output
+interval spans zero, so the observed median reduction does not establish
+savings. Groundwork took more wall time. Negative reductions mean increases.
+These are the reporter's medians across tasks, not ratios of suite totals. Its
+95% task-bootstrap intervals condition on these sessions, do not estimate
+variation across independent model runs, and do not account for dependence
+between sequential tasks. Provider token usage and model identity were not
+exposed. Duplicate counts are raw scorer findings, not labeled clone counts.
+
+### Collection deviations
+
+These are self-reported collection deviations for the rerun:
+
+- Baseline 1 read the task README with `cat` via the shell wrapper. Shell reads
+  contribute tool-output bytes but not the direct source-read counters.
+- Baseline 3 drafted files in `~/lhb3tmp` and `/tmp`, then base64-decoded them
+  into the workspace via the shell wrapper.
+- Groundwork 1 never called `find_similar`.
+- Groundwork 3 had one `find_similar` call fail on a wrong argument name,
+  then retried, and staged commands in `/tmp/cmd.sh`.
+
+The capture JSON lacks shell-command text and explicit error status, so these
+disclosures cannot be independently reconstructed from the tool records.
+Authoring or reads outside wrappers and time outside task begin/finish may
+be unmeasured. All supplied captures are stored unchanged; no retries or
+sessions were filtered out.
+
+- One Devin session per arm/run carried context across ten steps. This is a
+  small local event-library fixture, not evidence of performance on large
+  production repositories. Results do not establish end-to-end model-token
+  savings.
+
+### Evidence and offline reproduction
+
+The six active [raw observations](observations/) retain original run labels
+1–3 for both arms. They pin fixture revision
+`f2d5514fd96dac166b8e57c1790949fe67e65b05` and collector revision
+`fa8657cbb6bc73dfb9a8011b891f55b6af499eda` (final Phase 2 tools). The complete
+[report](results/2026-11-21T21-44-09-424Z-long-horizon.md),
+[JSON](results/2026-11-21T21-44-09-424Z-long-horizon.json) and dated graded evidence
+are under `results/`; [evidence.json](evidence.json) enables shared offline replay.
+The manifest/verifier digest is checked on replay. Both evidence sets record an
+`evaluator` SHA-256 fingerprint: every suite `.mjs` file (including acceptance,
+metrics, validation and verification helpers), the task manifest and every
+fixture file, including both archived and active manifests. `verify-results.mjs`
+checks both the file list and each file's bytes, rejecting edits, additions or
+deletions. Run it alongside shared replay;
+the shared reporter alone checks only its manifest/grade digest. This local
+fingerprint does not hash Node or third-party packages; the original collector
+revision and dependency lockfile define that environment.
+
+After `npm ci && npm run build`, replay and verify both sets offline, without agents,
+network access or execution of captured patches:
+
+```sh
+node dist/cli/main.js bench --suite all --runs 3 --output-dir /path/to/replayed-results
+node bench/long-horizon/verify-results.mjs
+```
+
+Offline `all` includes both navigation and active long-horizon evidence.
+Verification also invokes shared `loadEvidence` against the separate historical
+suite directory; the two long-horizon collections are not pooled.
+
+### First collection (historical pre-19 comparison)
+
+The first run reported estimated-output reduction -76.8%
+(95% interval [-82.8, -36.8]%) and wall-time reduction -15.2%
+(95% interval [-49.0, -10.5]%). Its mean estimated output was 143.8 versus
+179.4 tokens per attempt, and mean wall time was 8.3 versus 11.2 seconds
+(baseline versus Groundwork). That run demonstrated no savings either.
+
+Its original [report](results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.md),
+JSON, evidence, manifest, grader and all six raw captures remain under
+`results/pre-19/long-horizon/`. Original labels and measurements are unchanged.
+Those captures used collector `34ea4c1` and fixture pin `e366bbc`. Previously
+disclosed deviations were Groundwork 3's staged file authoring and two runs
+with one failed-then-retried tool call each.
+
+After rebasing onto merged Phase 2, the active manifest pins fixture commit
+`f2d5514fd96dac166b8e57c1790949fe67e65b05`, which is reachable in fresh clones.
+Its fixture tree is identical to the historical pin:
+`db8cdd31ecc3d901b1752acfc8145482c70bfa3d`. Only the pin changed; all ten tasks
+are unchanged. The active fixed-path evidence now contains only the rerun;
+historical results remain separate.
+
+## Run
+
+From the Groundwork source checkout, with Node 22+ and Git:
+
+```sh
+npm ci
+npm run build
+node bench/long-horizon/validate.mjs
+export GW_BENCH_SUITE=long-horizon
+node bench/capture.mjs list
+node bench/capture.mjs init /absolute/path/to/new-state groundwork 1
+node bench/capture.mjs begin /absolute/path/to/new-state lh-01
+node bench/capture.mjs mcp /absolute/path/to/new-state lh-01 repo_map '{}'
+node bench/capture.mjs read /absolute/path/to/new-state lh-01 README.md
+# Give the agent the lh-01 prompt and capture all shell edits/searches:
+node bench/capture.mjs shell /absolute/path/to/new-state lh-01 '<one short shell edit/search command>'
+node bench/capture.mjs finish /absolute/path/to/new-state lh-01
+# Continue begin/tools/finish with lh-02 through lh-10, in order.
+# begin restores and commits every prior step patch before the current task.
+node bench/capture.mjs export /absolute/path/to/new-state > /path/to/captures/groundwork-1.json
+```
+
+For baseline use a separate state/session and `init ... baseline 1`, no MCP or
+Groundwork instructions. Repeat both arms with runs 2 and 3, using identical
+agent/model/settings and retaining the same session across the ten steps within
+each arm/run. Never reveal `validation/` reference implementations to the agent.
+Capture provider token usage separately if available; the harness's bytes/4
+counter is only **estimated tool-output tokens**, not total provider input tokens.
+The existing reporter groups by step/category and reports duplication, invented
+calls and token estimates across tasks; retain step IDs when examining growth.
+
+Grade all six trusted capture exports using the shared harness:
+
+```sh
+node dist/cli/main.js bench --suite long-horizon --runs 3 \
+  --observations /path/to/captures --output-dir /path/to/grading-results
+```
+
+Keep ad-hoc grading output outside `bench/long-horizon/results/`. That directory
+contains the published reports checked by `verify-results.mjs`; regrading must
+not add extra reports beside them or replace the published evidence.
+
+Only score **trusted patches**: this executes submitted JavaScript. Worktrees and
+timeouts provide reproducibility, not a security sandbox. The recorded results
+above came from the six observations, not evaluator validation. The fixed
+`evidence.json` follows `bench/README.md`'s offline workflow. Offline `--suite all`
+includes suites with recorded evidence. With `--observations`, `all` instead
+grades every installed suite with a task manifest and requires captures for
+each, not just the long-horizon captures.
+
+## Grading and measurement definitions
+
+- `grade(task, observation, {withWorkspace})` uses the shared contract. The
+  harness supplies a worktree with the first N−1 patches **committed** and the Nth
+  patch uncommitted. Grading neither reapplies nor commits patches itself.
+- **success:** every `acceptance/step-01.mjs` through `step-N.mjs` exits zero in
+  that worktree. Tests cover normal, empty/boundary and invalid inputs, stable
+  ordering, UTC dates, error propagation, delivery retry exhaustion, escaping,
+  deduplication and immutable inputs. Behavioral success is independent of the
+  two guard metrics: a working but duplicative implementation still succeeds.
+- **duplicatesAdded:** the count of distinct Groundwork `checkRepository`
+  findings of kind `duplicate`, `duplicate-constant` or `duplicate-file`, WARN
+  and BLOCK, versus HEAD. This is a **scorer finding count**, not an independently
+  human-labeled clone count; a whole-file and a symbol finding may both count.
+  Inherited unchanged duplicates do not count again in later steps.
+- **inventedCalls:** distinct `(file,line,kind,name)` unresolved-target findings
+  (`missing-module`, `unknown-export`, `unknown-member`) on changed lines from
+  `verifyChanged`/Grounder, the exact verifier used by MCP `verify_calls`. Import
+  failures are included because the verifier can report an invented target at
+  its import rather than each call site. Arity/keyword errors are not unresolved
+  targets and are excluded. Dynamic/external/ambiguous calls that the verifier
+  deliberately skips are **not** evidence of correctness and are not counted.
+- `metrics.mjs` uses the checkout's built Groundwork modules with a fixed default
+  evaluator configuration (offline/no embeddings), not agent-provided config.
+  Index/parse/measurement failures throw instead of recording zero. Missing or
+  invalid patches are unsuccessful and have no measured metrics.
+
+## Evaluator validation
+
+`node bench/long-horizon/validate.mjs` reconstructs pinned worktrees using
+`bench/workspace.mjs` and calls the real grader. It checks all ten handwritten
+reference patches in sequence. For steps 1 and 2 it also checks:
+
+1. A working patch that actually uses a copied helper and exports a function
+   calling a nonexistent member of the real date module. Behavioral tests still
+   pass, but both guard metrics must be positive.
+2. A broken implementation whose acceptance must fail.
+3. An empty patch is rejected without entering a worktree.
+
+These are evaluator regression tests, **not agent benchmark observations**.
+The default scorer currently reports two duplicate findings on each reference
+patch for steps 3, 7, 8 and 10, despite their behavioral success. Treat these as
+raw scorer measurements, not a claim of independently calibrated clone accuracy.

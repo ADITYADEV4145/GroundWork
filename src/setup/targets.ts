@@ -159,13 +159,13 @@ export function claudeHookMap(gw: string): HookMap {
 
 export interface TargetOptions {
   root: string;
+  /** Unused since every file is project-scoped; kept so callers can pass it. */
   home?: string;
   /** How hooks and MCP launch Groundwork, e.g. `gw` or `npx -y groundwork-agent`. */
   gw: string;
 }
 
 export function targetsFor(opts: TargetOptions): AgentTarget[] {
-  const home = opts.home ?? os.homedir();
   const { root, gw } = opts;
   return [
     {
@@ -186,11 +186,11 @@ export function targetsFor(opts: TargetOptions): AgentTarget[] {
         }),
         {
           kind: 'block',
-          file: path.join(home, '.codex', 'config.toml'),
+          file: path.join(root, '.codex', 'config.toml'),
           block: `[mcp_servers.groundwork]\ncommand = ${JSON.stringify(gw.split(' ')[0])}\nargs = ${JSON.stringify([...gw.split(' ').slice(1), 'mcp'])}`,
         },
       ],
-      notes: ['Codex runs project hooks only after you trust them: open /hooks in Codex and approve the Groundwork entries.'],
+      notes: ['Codex loads project .codex/ hooks and MCP config only in trusted projects; then open /hooks in Codex and approve the Groundwork entries.'],
     },
     {
       agent: 'cursor',

@@ -41,7 +41,8 @@ describe('gw setup', () => {
     expect(settings.hooks.Stop).toHaveLength(2);
     expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('gw hook claude pre_tool');
     expect(JSON.parse(readFileSync(path.join(root, '.mcp.json'), 'utf8')).mcpServers.groundwork).toEqual({ command: 'gw', args: ['mcp'] });
-    expect(readFileSync(path.join(home, '.codex', 'config.toml'), 'utf8')).toContain('[mcp_servers.groundwork]');
+    expect(readFileSync(path.join(root, '.codex', 'config.toml'), 'utf8')).toContain('[mcp_servers.groundwork]');
+    expect(readFileSync(path.join(home, '.codex', 'config.toml'), 'utf8')).toBe('model = "o4"\n');
     expect(JSON.parse(readFileSync(path.join(root, '.cursor', 'hooks.json'), 'utf8')).hooks.preToolUse[0].command).toBe('gw hook cursor pre_tool');
     expect(planSetup(root, targets, 'add').every((c) => c.action === 'unchanged')).toBe(true);
 
@@ -84,6 +85,21 @@ describe('gw setup keeps user config', () => {
     expect(readFileSync(path.join(root, '.mcp.json'), 'utf8')).toBe(mine);
     applySetup(root, planSetup(root, targets, 'remove'), 'remove');
     expect(readFileSync(path.join(root, '.mcp.json'), 'utf8')).toBe(mine);
+  });
+});
+
+describe('gw setup with Codex config', () => {
+  it('does not declare mcp_servers.groundwork twice', () => {
+    const root = tempDir('gw-setup-root-');
+    dirs.push(root);
+    mkdirSync(path.join(root, '.codex'));
+    const mine = '[mcp_servers.groundwork]\ncommand = "node"\nargs = ["dist/cli/main.js", "mcp"]\n';
+    writeFileSync(path.join(root, '.codex', 'config.toml'), mine);
+    const targets = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === 'codex');
+    applySetup(root, planSetup(root, targets, 'add'), 'add');
+    expect(readFileSync(path.join(root, '.codex', 'config.toml'), 'utf8')).toBe(mine);
+    applySetup(root, planSetup(root, targets, 'remove'), 'remove');
+    expect(readFileSync(path.join(root, '.codex', 'config.toml'), 'utf8')).toBe(mine);
   });
 });
 

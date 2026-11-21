@@ -16,7 +16,7 @@ Dated Markdown, JSON and graded evidence go to `bench/results/`. To reproduce a 
 node dist/cli/main.js bench --suite nav --runs 3
 ```
 
-The latter reads `bench/nav/evidence.json`, validates the task/verifier digest and complete pairing, and recalculates the report. It does not make new token savings measurements. Add `--json` for machine output and `--output-dir <dir>` to choose a destination.
+The latter reads `bench/nav/evidence.json`, validates the task/verifier digest and complete pairing, and recalculates the report without new measurements. Add `--json` for machine output and `--output-dir <dir>` to choose a destination.
 
 ## Capture protocol
 
@@ -40,9 +40,16 @@ For the recorded navigation benchmark, both arms followed the same rotation: Gro
 
 The collector measures actual response bytes delivered through these actions. It converts those bytes to **estimated tool-output tokens** by dividing by four. It doesn't count messages, private model context, setup and skill instructions, or shell harness wrappers. Provider input/output counters are separate optional `usage: {inputTokens, outputTokens}` fields per task; never substitute the estimate for that counter. Devin did not expose provider counters or temperature/seed settings; we used the same Devin mode and isolated worktrees, but one conversation per arm/repeat means knowledge and compaction can carry over between its tasks.
 
-In the first run, both arms solved every task on every repeat, but Groundwork used **14.3% more estimated tool-output tokens** at the median (95% interval: 5.5% fewer to 35.2% more). Direct source-read bytes fell 57%, but search results, symbol bodies, outlines and repository maps made up 80% of the Groundwork arm's output. No repeated reads were blocked. Some agents retried invalid tool arguments or skipped the outline before reading a small file; those outputs still count.
+In the first run, direct source-read bytes fell 57%, but search results, symbol bodies, outlines and repository maps made up 80% of the Groundwork arm's output. No repeated reads were blocked. Some agents retried invalid tool arguments or skipped the outline before reading a small file; those outputs still count.
 
-The follow-up repeats the same pinned tasks, order, baseline instructions, graders and estimator with the updated navigation tools and their published skill. The tools can return just locations for directed lookups, and repository maps use smaller pages. The updated skill calls for a map only when orientation is needed and for reading bodies only when locations or call edges are insufficient.
+The follow-up repeated the same pinned tasks, order, baseline instructions, graders and estimator with location-only views, smaller map pages and the updated navigation skill. In both runs, the Groundwork instructions were included in the agent prompt; neither run tested skill installation or discovery.
+
+| Run | Baseline success | Groundwork success | Median estimated tool-output reduction (95% bootstrap interval) |
+| --- | ---: | ---: | ---: |
+| [Initial](nav/evidence-initial.json) | 90/90 | 90/90 | −14.3% [−35.2%, 5.5%] |
+| [Compact navigation](nav/evidence.json) | 90/90 | 90/90 | 4.3% [−22.8%, 18.8%] |
+
+Every task passed all three repeats in both arms. The follow-up interval spans zero, so the observed reduction is not statistically significant; task wall time increased (5.5 to 7.8 seconds on average). Provider token counts were unavailable. These results do not establish model input-token savings.
 
 ## Add a suite
 

@@ -5,7 +5,7 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 # Groundwork
 
-Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to spend fewer tokens finding your way around, to reuse code that already exists, and to call only functions that exist.
+Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
 
 ## 1. Navigate: index first, whole files last
 

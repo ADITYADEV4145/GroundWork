@@ -50,6 +50,12 @@ pnpm add -g groundwork-agent
 bun add -g groundwork-agent
 ```
 
+**Install script:**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/ADITYADEV4145/GroundWork/main/scripts/install.sh | sh
+```
+
 **One-off, without installing globally:**
 
 ```sh

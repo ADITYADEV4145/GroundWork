@@ -118,6 +118,8 @@ function openSqlJs(file: string, readonly: boolean): Db {
   if (!sqlJs) throw new Error('sql.js backend not initialized; call initSqlBackend() first');
   const data = file !== ':memory:' && existsSync(file) ? readFileSync(file) : undefined;
   const db = new sqlJs.Database(data);
+  // Deletes rely on ON DELETE CASCADE, which SQLite only enforces with this pragma.
+  db.exec('PRAGMA foreign_keys = ON');
   let dirty = false;
   const persist = () => {
     if (readonly || file === ':memory:' || !dirty) return;

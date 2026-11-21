@@ -141,7 +141,8 @@ export class Grounder {
     if (name === 'default') {
       const d = tops.find((s) => s.isDefaultExport);
       if (d) return d;
-      return /\bexport\s+default\b|\bas\s+default\b/.test(text) ? 'unknown' : null;
+      if (this.importsOf(fileId).some((i) => i.kind === 'reexport-all' || (i.kind === 'reexport' && (i.alias ?? i.name) === 'default'))) return 'unknown';
+      return /\bexport\s+default\b|\bas\s+default\b|\bexport\s*\{[^}]*\bdefault\b/.test(text) ? 'unknown' : null;
     }
     const local = this.aliasesOf(fileId).find((a) => a.exported === name)?.local ?? name;
     const own = tops.find((s) => s.exported && s.name === local);
@@ -384,7 +385,9 @@ export class Grounder {
   private checkCall(f: FileFacts, call: CallFact, text: string): Finding | null {
     if (call.calleeId && (call.confidence === 'exact' || call.confidence === 'import-resolved')) {
       const head = call.calleeText.split('.')[0]!;
-      if (!/^(this|self|cls|super)$/.test(head)) {
+      // `super.m()` may resolve to the subclass override: the base signature is not known for sure.
+      if (head === 'super' || /^super\(\)/.test(call.calleeText)) return null;
+      if (!/^(this|self|cls)$/.test(head)) {
         if (this.bindings(text, head) > 1 || this.maybeShadowed(f, call, head, text)) return null;
         if (this.bind(f.id, head) === 'unknown') return null;
       }
@@ -440,10 +443,16 @@ export class Grounder {
 
   /** A local variable, parameter or loop target with the same name as the import may shadow it. */
   private maybeShadowed(f: FileFacts, call: CallFact, head: string, text: string): boolean {
-    const scope = call.callerId ? symbolFact(this.db, call.callerId) : null;
-    const body = scope ? this.symText(scope) : text.split('\n').filter((l) => !/^\s*(import|from)\b/.test(l)).join('\n');
+    const re = new RegExp(`(?<![.\\w$])${escapeRe(head)}\\b(?!\\s*[.(])`);
     void f;
-    return new RegExp(`(?<![.\\w$])${escapeRe(head)}\\b(?!\\s*[.(])`).test(body);
+    let scope = call.callerId ? symbolFact(this.db, call.callerId) : null;
+    if (!scope) return re.test(text.split('\n').filter((l) => !/^\s*(import|from)\b/.test(l)).join('\n'));
+    // Parameters and locals of every enclosing function can shadow the import, not just the innermost one.
+    for (let depth = 0; scope && depth < 16; depth++) {
+      if (re.test(this.symText(scope))) return true;
+      scope = scope.parentId ? symbolFact(this.db, scope.parentId) : null;
+    }
+    return false;
   }
 
   private checkArgs(f: FileFacts, call: CallFact): Finding | null {
@@ -455,13 +464,17 @@ export class Grounder {
     const sameFamily = (isTs(f) && isTs(tf)) || (isPy(f) && isPy(tf));
     if (!sameFamily || tf.path.endsWith('.d.ts')) return null;
     const body = this.symText(target);
+    if (this.patched(target, f) || this.patched(target, tf)) return null;
     if (isPy(tf)) {
       const dataclassOk = (d: string) => target.kind === 'dataclass' && /^(dataclasses\.)?dataclass$/.test(d);
       if (target.decorators.some((d) => !SAFE_PY_DECORATORS.has(d.replace(/\(.*$/s, '')) && !dataclassOk(d))) return null;
       if (target.kind === 'class' || target.kind === 'dataclass') {
         if (/\bmetaclass\s*=|__new__|__call__/.test(body)) return null;
         // Without its own __init__ the signature comes from a base (often outside the repo): unknown.
-        if (target.kind === 'class' && !this.membersOf(target.id).some((m) => m.name === '__init__')) return null;
+        const init = this.membersOf(target.id).find((m) => m.name === '__init__');
+        if (target.kind === 'class' && !init) return null;
+        if (init?.decorators.some((d) => !SAFE_PY_DECORATORS.has(d.replace(/\(.*$/s, '')))) return null;
+        if (target.kind === 'dataclass' && /\bClassVar\b/.test(body)) return null;
         if (target.kind === 'dataclass' && (/^\s*class\s+\w+\s*\(/.test(body) || /kw_only|KW_ONLY|init\s*=\s*False/.test(body + target.decorators.join(' ')))) return null;
       }
       if (target.kind === 'method' && call.calleeText.includes('.') && !/^(self|cls)\./.test(call.calleeText)) {
@@ -475,6 +488,13 @@ export class Grounder {
     const max = target.maxArity;
     if (call.argCount >= target.minArity && (max === null || call.argCount <= max)) return null;
     return this.arityFinding(f, call, target, `takes ${arityText(target.minArity, max)} argument${max === 1 ? '' : 's'}, got ${call.argCount}`);
+  }
+
+  /** `Cls.m = ...`, `setattr(...)` or other dynamic rewiring of the target in `where` makes its signature unknown. */
+  private patched(target: SymbolFact, where: FileFacts): boolean {
+    const text = this.text(where.path) ?? '';
+    if (/\bsetattr\s*\(|Object\.(assign|defineProperty)\s*\(|\.prototype\b/.test(text)) return true;
+    return new RegExp(`\\.${escapeRe(target.name)}\\s*=(?!=)`).test(text);
   }
 
   private checkPyArgs(f: FileFacts, call: CallFact, target: SymbolFact): Finding | null {

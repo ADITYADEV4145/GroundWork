@@ -186,6 +186,18 @@ describe('scoped duplicate exemptions', () => {
 });
 
 describe('check command and Stop gate', () => {
+  it('names duplicate files directly and only mentions callers when there are callers', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      const fileFinding = (await checkRepository(root)).findings.find((f) => f.kind === 'duplicate-file')!;
+      expect(formatFinding(fileFinding)).toBe('BLOCK duplicate-file: calendar.ts:1\nExisting: utils.ts:1\nWhy: symbolOverlap=1, versionOrSameBasename=0\nFix: Delete calendar.ts; use utils.ts instead.');
+      expect(fileFinding.added.symbol).toBe('calendar.ts');
+      expect(fileFinding.existing?.symbol).toBe('utils.ts');
+      writeScenarioFile(root, 'consumer.ts', "import { decodeCalendar } from './calendar.js';\ndecodeCalendar('2024-01-01');\n");
+      const withCaller = (await checkRepository(root)).findings.find((f) => f.kind === 'duplicate-file')!;
+      expect(withCaller.fix).toBe('Delete calendar.ts and update its 1 caller to use utils.ts.');
+    });
+  });
+
   it('emits JSON and short human BLOCK output; PASS and unavailable checks exit zero', async () => {
     await withCheckScenario('duplicate', async (root) => {
       const json = cli(root, 'check', '--json');

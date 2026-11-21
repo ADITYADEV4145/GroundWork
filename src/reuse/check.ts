@@ -54,7 +54,7 @@ function topSignals(signals: Signals): CheckFinding['signals'] {
 
 export function formatFinding(f: CheckFinding): string {
   const clean = (s: string) => s.replace(/[\x00-\x1f\x7f]/g, ' ');
-  const ref = (s: CheckLocation) => `${clean(s.symbol)} (${clean(s.file)}:${s.line})`;
+  const ref = (s: CheckLocation) => f.kind === 'duplicate-file' ? `${clean(s.file)}:${s.line}` : `${clean(s.symbol)} (${clean(s.file)}:${s.line})`;
   return [
     `${f.severity} ${f.kind}: ${ref(f.added)}`,
     `Existing: ${f.existing ? ref(f.existing) : 'no valid duplicate exemption'}`,
@@ -237,9 +237,9 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
       if (overlap < (filenameHint ? 0.6 : 0.8)) continue;
       const callers = state.calls.filter((c) => c.calleeId && members.some((m) => m.id === c.calleeId)).length;
       add({ kind: 'duplicate-file', severity: group.blocks / members.length >= 0.8 ? 'BLOCK' : 'WARN',
-        added: { file: file.file, symbol: '<file>', line: 1 }, existing: { file: existing, symbol: '<file>', line: 1 },
+        added: { file: file.file, symbol: file.file, line: 1 }, existing: { file: existing, symbol: existing, line: 1 },
         signals: [{ name: 'symbolOverlap', value: overlap }, { name: 'versionOrSameBasename', value: Number(filenameHint) }],
-        fix: `Delete ${file.file} and update its ${callers} callers to use ${existing}.` });
+        fix: callers ? `Delete ${file.file} and update its ${callers} caller${callers === 1 ? '' : 's'} to use ${existing}.` : `Delete ${file.file}; use ${existing} instead.` });
     }
   }
   checkDeadline();

@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { z } from 'zod';
-import { addedLines, aggregateReview, applyOverride, labelReuse, renderBlockReport, renderReport, renderReview, summarize } from './bench-v2-lib.js';
+import { addedLines, aggregateReview, applyOverride, labelReuse, pythonAcceptanceCommand, renderBlockReport, renderReport, renderReview, summarize } from './bench-v2-lib.js';
 import type { Arm, BlockTask, Override, Result, ReviewRow, Run, Suite, Task } from './bench-v2-lib.js';
 
 const project = path.resolve(fileURLToPath(new URL('../', import.meta.url)));
@@ -153,7 +153,7 @@ for (const run of runs) {
         const injectVersion = generatedVersion && !existsSync(generatedVersion);
         if (injectVersion) copyFileSync(versionFile(task), generatedVersion);
         try {
-          const test = command('/bin/sh', ['-c', task.acceptance.command], tree, env);
+          const test = command('/bin/sh', ['-c', pythonAcceptanceCommand(task.acceptance.command, python)], tree, env);
           result.acceptance = { exitCode: test.exitCode, output: test.output };
           result.success = test.exitCode === 0;
         } finally {

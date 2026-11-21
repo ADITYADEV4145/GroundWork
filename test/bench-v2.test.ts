@@ -1,9 +1,9 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, describe, expect, it } from 'vitest';
-import { addedLines, aggregateReview, applyOverride, labelReuse, newcombe, renderReport, renderReview, summarize, wilson } from '../scripts/bench-v2-lib.js';
+import { addedLines, aggregateReview, applyOverride, labelReuse, newcombe, pythonAcceptanceCommand, renderReport, renderReview, summarize, wilson } from '../scripts/bench-v2-lib.js';
 import type { Result, ReviewRow, Task } from '../scripts/bench-v2-lib.js';
 import { evaluateBenchmarkV2, evaluateRealRepoReview } from '../src/selftest/real-repo-review.js';
 import { PHASE3_CHECKS } from '../src/selftest/checks/phase3.js';
@@ -100,6 +100,28 @@ describe('reuse call heuristics', () => {
     const files = addedLines('--- a/src/a.py\n+++ b/src/a.py\n@@ -1,2 +1,3 @@\n context\n-old\n+new\n+other\n');
     expect([...files.get('src/a.py')!]).toEqual([2, 3]);
     expect(addedLines('')).toEqual(new Map());
+  });
+});
+
+describe('selected acceptance interpreter', () => {
+  const run = (command: string, python: string) => spawnSync('/bin/sh', ['-c', pythonAcceptanceCommand(command, python)], { encoding: 'utf8' });
+  it('uses the exact interpreter path with quoting, arguments and command-local environment intact', () => {
+    const actual = spawnSync('python3', ['-c', 'import sys; print(sys.executable)'], { encoding: 'utf8' });
+    expect(actual.status, actual.stderr).toBe(0);
+    const bin = path.join(temp(), "selected interpreter's bin");
+    mkdirSync(bin);
+    const python = path.join(bin, 'python3.12');
+    symlinkSync(actual.stdout.trim(), python);
+    const acceptance = `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -c 'import json, os, sys; print(json.dumps([sys.executable, os.environ["PYTEST_DISABLE_PLUGIN_AUTOLOAD"], sys.argv[1:]]))' 'arg with spaces'`;
+    const result = run(acceptance, python);
+    expect(result.status, result.stderr).toBe(0);
+    expect(JSON.parse(result.stdout)).toEqual([python, '1', ['arg with spaces']]);
+  });
+  it('does not alter non-Python or empty commands, and retains interpreter errors and exit codes', () => {
+    expect(run('', '/missing/python').status).toBe(0);
+    expect(run("printf '%s' 'python -m pytest'", '/missing/python').stdout).toBe('python -m pytest');
+    expect(run('python -m pytest', '/missing/python').status).toBe(127);
+    expect(run("python -c 'raise SystemExit(7)'", 'python3').status).toBe(7);
   });
 });
 

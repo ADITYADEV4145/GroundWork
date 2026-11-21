@@ -382,3 +382,59 @@ export function suggestionPool(db: Db, kinds: SymbolKind[]): SymbolFact[] {
   const marks = kinds.map(() => '?').join(',');
   return db.prepare(`SELECT ${FACT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.kind IN (${marks}) AND f.is_test = 0`).all(...kinds).map(toFact);
 }
+
+export interface FingerprintedSymbol extends SymbolHit {
+  fingerprint: import('../types.js').BodyFingerprint;
+  params: Param[];
+  returnType: string | null;
+  docstring: string | null;
+  isGenerated: boolean;
+}
+
+export function readFingerprintedSymbols(db: Db): FingerprintedSymbol[] {
+  return db.prepare(`SELECT s.*, f.path, f.is_test, f.is_generated FROM symbols s JOIN files f ON f.id = s.file_id
+    WHERE s.minhash IS NOT NULL ORDER BY f.path, s.start_line`).all().map((r) => {
+    const bytes = r.minhash as Uint8Array;
+    return {
+      ...toHit(r),
+      fingerprint: { tokenCount: Number(r.token_count), normHash: String(r.norm_hash),
+        minhash: new Uint32Array(Uint8Array.from(bytes).buffer), vocab: JSON.parse(String(r.vocab_json)) },
+      params: JSON.parse(String(r.params_json)) as Param[],
+      returnType: r.return_type === null ? null : String(r.return_type),
+      docstring: r.docstring === null ? null : String(r.docstring),
+      isGenerated: Number(r.is_generated) === 1,
+    };
+  });
+}
+
+export interface ReuseState {
+  files: { id: number; file: string; hash: string; isTest: boolean; isGenerated: boolean; status: string }[];
+  symbols: (SymbolHit & { startByte: number; endByte: number; parentId: string | null })[];
+  calls: { file: string; callerId: string | null; calleeId: string | null; calleeText: string; line: number; column: number; argCount: number; confidence: string | null }[];
+  literals: { file: string; symbolId: string | null; value: string; kind: import('../types.js').LiteralKind; line: number; constName: string | null }[];
+}
+
+/** Complete, uncapped call/literal data for before/after change analysis. */
+export function readReuseState(db: Db): ReuseState {
+  const nullable = (v: unknown) => v === null ? null : String(v);
+  return {
+    files: db.prepare('SELECT id, path, hash, is_test, is_generated, status FROM files ORDER BY path').all().map((r) => ({
+      id: Number(r.id), file: String(r.path), hash: String(r.hash), isTest: Number(r.is_test) === 1,
+      isGenerated: Number(r.is_generated) === 1, status: String(r.status),
+    })),
+    symbols: db.prepare(`SELECT s.*, f.path, f.is_test FROM symbols s JOIN files f ON f.id = s.file_id
+      ORDER BY f.path, s.start_line, s.start_byte`).all().map((r) => ({
+      ...toHit(r), startByte: Number(r.start_byte), endByte: Number(r.end_byte), parentId: nullable(r.parent_id),
+    })),
+    calls: db.prepare(`SELECT c.*, f.path FROM calls c JOIN files f ON f.id = c.file_id
+      ORDER BY f.path, c.line, c.col, c.id`).all().map((r) => ({
+      file: String(r.path), callerId: nullable(r.caller_id), calleeId: nullable(r.callee_id), calleeText: String(r.callee_text),
+      line: Number(r.line), column: Number(r.col), argCount: Number(r.arg_count), confidence: nullable(r.confidence),
+    })),
+    literals: db.prepare(`SELECT l.*, f.path FROM literals l JOIN files f ON f.id = l.file_id
+      ORDER BY f.path, l.line, l.id`).all().map((r) => ({
+      file: String(r.path), symbolId: nullable(r.symbol_id), value: String(r.value),
+      kind: String(r.kind) as import('../types.js').LiteralKind, line: Number(r.line), constName: nullable(r.const_name),
+    })),
+  };
+}

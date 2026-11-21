@@ -1,6 +1,8 @@
 import { cpSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { defaultConfig } from '../src/config/load.js';
+import { makeTestMatcher } from '../src/index/discover.js';
 import { refreshIndex } from '../src/index/refresh.js';
 import { indexDbPath } from '../src/index/store.js';
 import { initSqlBackend, openDb, resetBackendForTests } from '../src/store/db.js';
@@ -31,6 +33,18 @@ const count = (dir: string, sql: string) => {
 };
 
 describe('refreshIndex', () => {
+  it('classifies common test conventions without matching similarly named production paths', () => {
+    const config = defaultConfig(), matches = makeTestMatcher(config);
+    for (const file of ['testing/python/fixtures.py', 'pkg/testing/helper.ts', 'spec/parser.ts', 'pkg/specs/parser.py', '__tests__/parser.ts', 'pkg/__tests__/parser.ts', 'test/parser.py', 'pkg/tests/parser.ts', 'parser.test.ts', 'pkg/parser.spec.ts', 'test_parser.py', 'pkg/parser_test.py', 'conftest.py', 'pkg/conftest.py'])
+      expect(matches(file), file).toBe(true);
+    for (const file of ['src/contest.py', 'src/inspection.py', 'src/testing_tools.py', 'src/specification.ts', 'src/parser.py'])
+      expect(matches(file), file).toBe(false);
+    config.index.testGlobs = [];
+    expect(makeTestMatcher(config)('testing/python/fixtures.py')).toBe(false);
+    config.index.testGlobs = ['quality/**/*.ts'];
+    expect(makeTestMatcher(config)('quality/parser.ts')).toBe(true);
+    expect(makeTestMatcher(config)('tests/parser.ts')).toBe(false);
+  });
   it('full rebuild works on an existing sql.js index', async () => {
     process.env.GW_FORCE_SQLJS = '1';
     resetBackendForTests();

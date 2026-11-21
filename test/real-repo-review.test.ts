@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { evaluateExpandedReview, evaluateReviewEvidence as evaluateRealRepoReview, evaluateRealRepoReview as evaluateFinalReview, reviewModelHash, wilson } from '../src/selftest/real-repo-review.js';
+import { evaluateExpandedReview, evaluateReviewEvidence as evaluateRealRepoReview, evaluateRealRepoReview as evaluateFinalReview, reviewModelHash, TEST_FILE_EXCLUSION, wilson } from '../src/selftest/real-repo-review.js';
 import { monthBounds, project, sampleCommits } from '../scripts/real-repos.js';
 
 const roots: string[] = [];
@@ -53,6 +53,31 @@ function expandedFixture() {
 }
 
 describe('frozen expanded reuse-or-extend history gate', () => {
+  it('retains pre-fix counts but fails vacuously after validated post-replay test exclusions', () => {
+    const root = expandedFixture();
+    for (const set of ['original', 'heldout', 'new-1', 'new-2']) {
+      const review = read(root, `step3/${set}/reviews.json`);
+      for (const row of review.reviews) row.excluded = TEST_FILE_EXCLUSION;
+      write(root, `step3/${set}/reviews.json`, review);
+      const data = read(root, `step3/${set}/runs/got.json`);
+      for (const finding of data.runs[0].findings) finding.added = { file: 'testing/python/fixtures.py' };
+      write(root, `step3/${set}/runs/got.json`, data);
+    }
+    const result = evaluateFinalReview(root);
+    expect(result.ok).toBe(false);
+    expect(result.metrics?.heldoutBlocks).toBe(0);
+    expect(result.metrics?.heldoutExcludedBlocks).toBe(30);
+    expect(result.metrics?.preFixHeldoutBlocks).toBe(30);
+    expect(result.detail).toContain('zero BLOCKs cannot establish agreement');
+    expect(result.detail).toContain('Wilson 95% undefined');
+    const data = read(root, 'step3/original/runs/got.json');
+    data.runs[0].findings[0].added.file = 'src/production.py';
+    write(root, 'step3/original/runs/got.json', data);
+    expect(evaluateFinalReview(root).detail).toContain('Exclusion requires a default-classified test file');
+    delete data.runs[0].findings[0].added;
+    write(root, 'step3/original/runs/got.json', data);
+    expect(evaluateFinalReview(root).detail).toContain('Exclusion requires a default-classified test file');
+  });
   it('computes two-sided Wilson intervals without a vacuous empty interval', () => {
     expect(wilson(0, 0)).toBeNull();
     expect(wilson(0, 1)![1]).toBeCloseTo(0.7934506856);
@@ -160,12 +185,14 @@ describe('stored real-repository review gate', () => {
 });
 
 describe('dev replay selection and cache safety', () => {
-  it('fails stored expanded evidence on reviewed agreement, not missing provenance', () => {
+  it('fails stored expanded evidence vacuously after three explicit test-file exclusions', () => {
     const result = evaluateExpandedReview(path.join(project, 'bench/real-repos'));
     expect(result.ok).toBe(false);
     expect(result.detail).not.toContain('Invalid expanded history evidence');
     expect(result.metrics?.commits).toBe(250);
-    expect(result.metrics?.heldoutBlocks).toBe(3);
+    expect(result.metrics?.heldoutBlocks).toBe(0);
+    expect(result.metrics?.preFixHeldoutBlocks).toBe(3);
+    expect(result.metrics?.heldoutExcludedBlocks).toBe(3);
     expect(result.metrics?.heldoutAgree).toBe(0);
     expect(result.metrics?.unavailable).toBe(0);
   });

@@ -128,6 +128,28 @@ describe('git-scripted reuse check scenarios (also exercised by selftest)', () =
     });
   });
 
+  it('reclassifies cached testing-directory files and skips them unless explicitly enabled', async () => {
+    await withCheckScenario('clean', async (root) => {
+      const clone = readFileSync(path.join(root, 'utils.ts'), 'utf8').split('\nexport function shortFormat')[0]!.replaceAll('parseDateString', 'decodeCalendar');
+      writeScenarioFile(root, 'testing/calendar.ts', clone);
+      writeScenarioFile(root, 'testing/python/fixtures.py', readFileSync(path.join(root, 'dates.py'), 'utf8').replaceAll('parse_date_string', 'decode_calendar'));
+      const oldConfig = defaultConfig();
+      oldConfig.index.testGlobs = oldConfig.index.testGlobs.filter((p) => !['**/testing/**', '**/spec/**', '**/specs/**'].includes(p));
+      expect((await checkRepository(root, { config: oldConfig })).findings.some((f) => f.severity === 'BLOCK' && f.added.file.startsWith('testing/'))).toBe(true);
+      expect((await checkRepository(root)).findings.filter((f) => f.added.file.startsWith('testing/'))).toEqual([]);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const symbols = readFingerprintedSymbols(db).filter((s) => s.file.startsWith('testing/'));
+        expect(symbols.length).toBeGreaterThan(0);
+        expect(symbols.every((s) => s.isTest)).toBe(true);
+        expect(new CandidateIndex(db).symbols.some((s) => s.file.startsWith('testing/'))).toBe(false);
+        expect(new CandidateIndex(db, false).symbols.some((s) => s.file.startsWith('testing/'))).toBe(true);
+      } finally { db.close(); }
+      const config = defaultConfig(); config.reuse.skipTests = false;
+      expect((await checkRepository(root, { config })).findings.some((f) => f.severity === 'BLOCK' && f.added.file.startsWith('testing/'))).toBe(true);
+    });
+  });
+
   it('skips trivial Python property getters and setters, not validating setters', async () => {
     await withCheckScenario('clean', async (root) => {
       await checkRepository(root);

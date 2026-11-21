@@ -6,7 +6,7 @@ import type { CheckFinding } from '../src/reuse/check.js';
 
 const root = path.join(project, 'bench/real-repos');
 const read = (f: string) => JSON.parse(readFileSync(path.join(root, f), 'utf8'));
-type Review = { repo: string; commit: string; findingId: string; label: string; reason: string; reuseOrExtendLabel: string; reuseOrExtendReason: string };
+type Review = { repo: string; commit: string; findingId: string; label: string; reason: string; reuseOrExtendLabel: string; reuseOrExtendReason: string; excluded?: string };
 type Item = { set: string; repo: string; url: string; commit: string; finding: CheckFinding; review: Review };
 const items: Item[] = [], tables: string[] = [];
 const sets = ['original', 'heldout', 'new-1', 'new-2'];
@@ -24,10 +24,11 @@ for (const set of sets) {
       return { set, repo, commit: r.commit, url: data.repository.url.replace(/\.git$/, ''), finding, review };
     }));
     items.push(...blocks);
-    const n = blocks.length, a = blocks.filter((b) => b.review.reuseOrExtendLabel === 'agree').length;
+    const included = blocks.filter((b) => !b.review.excluded);
+    const n = included.length, a = included.filter((b) => b.review.reuseOrExtendLabel === 'agree').length;
     const warnings = data.runs.reduce((n: number, r: { findings: CheckFinding[] }) => n + r.findings.filter((f) => f.severity === 'WARN').length, 0);
     const unavailable = data.runs.filter((r: { status: string; exitCode: number }) => r.status === 'UNAVAILABLE' || r.exitCode !== (r.status === 'BLOCK' ? 1 : 0)).length;
-    tables.push(`| ${set} | ${repo} / ${data.repository.month} | ${data.runs.length}/${data.eligibleCommits.length} | ${n} | ${a} | ${pct(a, n)}; ${ci(a, n)} | ${warnings} | ${unavailable} | ${(data.totalMs / 1000).toFixed(2)} s | not independently enumerable |`);
+    tables.push(`| ${set} | ${repo} / ${data.repository.month} | ${data.runs.length}/${data.eligibleCommits.length} | ${blocks.length} | ${blocks.length - n} | ${n} | ${a} | ${pct(a, n)}; ${ci(a, n)} | ${warnings} | ${unavailable} | ${(data.totalMs / 1000).toFixed(2)} s | not independently enumerable |`);
   }
 }
 const legacy = read('step3/legacy-reuse-reviews.json') as { reviews: (Review & { set: string })[] };
@@ -48,7 +49,7 @@ const introItems: Item[] = introBlocks.reviews.map((r) => ({ set: r.set, repo: r
 const archiveMarker = '\n<!-- archived-step-two -->\n';
 const old = readFileSync(path.join(root, 'review.md'), 'utf8');
 const archive = old.includes(archiveMarker) ? old.split(archiveMarker)[1]! : old;
-const newRows = items.map((x) => `| ${x.set} / ${x.repo} | [${x.commit.slice(0, 10)}](${x.url}/commit/${x.commit}) | ${site(x)} → ${site(x, x.finding.existing!)} | ${x.review.label} | ${x.review.reuseOrExtendLabel}: ${esc(x.review.reuseOrExtendReason)} |`);
+const newRows = items.map((x) => `| ${x.set} / ${x.repo} | [${x.commit.slice(0, 10)}](${x.url}/commit/${x.commit}) | ${site(x)} → ${site(x, x.finding.existing!)} | ${x.review.label} | ${x.review.reuseOrExtendLabel}: ${esc(x.review.reuseOrExtendReason)} | ${x.review.excluded ? `excluded: ${esc(x.review.excluded)}` : 'included'} |`);
 const lines = [`# Step-three frozen contract detector: agent-reviewed history
 
 **${gate.ok ? 'Observed agreement threshold met' : 'Acceptance gate NOT met'}.** ${gate.detail}
@@ -57,22 +58,33 @@ This is agent review, not human approval. Occurrence precision and its Wilson in
 
 ## Frozen protocol and classifier
 
-Review standard committed first in 0138d34: [REUSE or EXTEND](../real-history/review-standard.md). Detector/models/windows frozen in **${freeze.modelCommit}**, before all current captures; model SHA-256 ${freeze.modelHash}. No detector/model/retrieval/threshold tuning after replay. The original and former held-out months were previously inspected; only the two additional consecutive months per repo were untouched evaluation. The held-out aggregate includes all three designated held-out months per repo; it is not all fresh evidence.
+Review standard committed first in 0138d34: [REUSE or EXTEND](../real-history/review-standard.md). Detector/models/windows frozen in **${freeze.modelCommit}**, before all stored captures; model SHA-256 ${freeze.modelHash}. No model, coefficient, retrieval or threshold tuning after replay. The post-replay test-file spec correction is disclosed below; stored captures still describe the pre-fix runtime. The original and former held-out months were previously inspected; only the two additional consecutive months per repo were untouched evaluation. The held-out aggregate includes all three designated held-out months per repo; it is not all fresh evidence.
 
 [Calibration](../real-history/calibration.md): planted ${calibration.planted.tp} TP / ${calibration.planted.fp} FP, precision ${pct(calibration.planted.tp, calibration.planted.tp + calibration.planted.fp)}, recall ${pct(calibration.planted.tp, calibration.planted.support)}. Combined ${calibration.tp}/${calibration.tp + calibration.fp}; dev-only ${calibration.development.tp}/${calibration.development.tp + calibration.development.fp}. Planted clone recall: ${calibration.byType.map((r: { type: number; tp: number; support: number }) => `Type ${r.type} ${r.tp}/${r.support} (${pct(r.tp, r.support)})`).join('; ')}. Pre-replay non-quick Stop: p50 179.23 ms, p95 **215.84 ms**, 35 fresh processes including startup, all really blocked under strict; default standard uses the same computation but only warns. [Freeze notes](../real-history/pre-replay.md).
 
-## All current captures
+## Post-replay spec correction: skip test files by default
 
-| Set | Repository / UTC month | Checked / eligible | BLOCK | Agree | Precision; Wilson 95% | WARN | Unavailable | Runtime incl. checkout | Recall |
-| --- | --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- |
+The default test globs omitted \`testing/\` (pytest's suite), \`spec/\` and \`specs/\` directories. They are now classified as tests at any depth, alongside the already-covered \`test/\`, \`tests/\`, \`__tests__/\`, \`*.test.*\`, \`*.spec.*\`, \`test_*.py\`, \`*_test.py\` and \`conftest.py\` conventions. Classification lives in src/config/sections/index.ts and src/index/discover.ts (makeTestMatcher), is stored during live/base indexing, and is consumed by reuse.skipTests (default true). index.testGlobs remains overridable and reuse.skipTests=false opts back in. The index-config hash changes automatically, rebuilding stale classifications without a schema or extractor-version bump.
+
+**This is a spec-compliance noise-filter fix, explicitly made post-replay, not model tuning. No held-out commits were re-replayed.** Only the three annotated test-file BLOCKs are analytically excluded from the stored BLOCK denominator. The gate validates each annotation against the default path matcher. Raw captures, statuses, exit codes, timings and all earlier labels are untouched; WARN counts below are raw pre-fix counts, not freshly measured post-fix results. Filtered zero support is vacuous and still fails the gate; neither precision nor a Wilson interval is defined for 0/0.
+
+| Held-out evidence | BLOCK | Agree | Precision; Wilson 95% |
+| --- | ---: | ---: | --- |
+| Pre-fix stored replay | ${gate.metrics?.preFixHeldoutBlocks} | ${gate.metrics?.preFixHeldoutAgree} | ${pct(gate.metrics?.preFixHeldoutAgree ?? 0, gate.metrics?.preFixHeldoutBlocks ?? 0)}; ${ci(gate.metrics?.preFixHeldoutAgree ?? 0, gate.metrics?.preFixHeldoutBlocks ?? 0)} |
+| Post-replay analytical test-file exclusions | ${gate.metrics?.heldoutBlocks} | ${gate.metrics?.heldoutAgree} | ${pct(gate.metrics?.heldoutAgree ?? 0, gate.metrics?.heldoutBlocks ?? 0)}; ${ci(gate.metrics?.heldoutAgree ?? 0, gate.metrics?.heldoutBlocks ?? 0)} |
+
+## Stored captures: pre-fix counts and explicit BLOCK exclusions
+
+| Set | Repository / UTC month | Checked / eligible | Pre-fix BLOCK | Excluded | Included BLOCK | Agree | Precision; Wilson 95% | Raw WARN | Unavailable | Pre-fix runtime incl. checkout | Recall |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- |
 ${tables.join('\n')}
 
-Held-out total: **${gate.metrics?.heldoutAgree}/${gate.metrics?.heldoutBlocks}**; ${pct(gate.metrics?.heldoutAgree ?? 0, gate.metrics?.heldoutBlocks ?? 0)}, Wilson 95% ${ci(gate.metrics?.heldoutAgree ?? 0, gate.metrics?.heldoutBlocks ?? 0)}. Full captures, pins and exit codes are under step3/. Every eligible non-merge commit was checked; no finding-dependent sampling.
+Filtered held-out total: **${gate.metrics?.heldoutAgree}/${gate.metrics?.heldoutBlocks}**; ${pct(gate.metrics?.heldoutAgree ?? 0, gate.metrics?.heldoutBlocks ?? 0)}, Wilson 95% ${ci(gate.metrics?.heldoutAgree ?? 0, gate.metrics?.heldoutBlocks ?? 0)}. ${gate.metrics?.heldoutExcludedBlocks} test-file BLOCKs excluded post-replay. Full pre-fix captures, pins and exit codes are under step3/. Every eligible non-merge commit was originally checked; no finding-dependent sampling and no new replay.
 
-## Current BLOCK reviews: strict and new-standard columns
+## Pre-fix BLOCK reviews, retained with post-replay exclusion status
 
-| Set / repo | Commit | Added → proposed X | Strict substitution | Reuse-or-extend / one-line reason |
-| --- | --- | --- | --- | --- |
+| Set / repo | Commit | Added → proposed X | Strict substitution | Reuse-or-extend / one-line reason | Status |
+| --- | --- | --- | --- | --- | --- |
 ${newRows.join('\n') || '| All current sets | — | No BLOCKs emitted | — | Undefined precision, not a pass |'}
 
 ## Historical BLOCKs re-reviewed, strict labels untouched
@@ -109,8 +121,8 @@ All held-out commits were also passed through the existing development consolida
 
 [Human review sheet](human-review.md) has one row per current, historical or supplemental dev-introduction BLOCK, links to commit/both source sites, proposed X, the claim and an intentionally empty human verdict. Development and historical rows do not increase held-out support. Grounding rows retain their actual grounding claim rather than being mislabeled duplicates. No human agreement is claimed.
 
-Build once; for each frozen manifest run scripts/replay-real-repos.ts with GW_REAL_REPOS_MANIFEST and GW_REAL_REPOS_RESULTS pointing to the corresponding step3/<set>/runs directory. Do not change coefficients or thresholds. scripts/capture-step3-sites.ts selects the review sites; review them before writing the separate labels. scripts/mine-heldout-history.ts <set> reuses the miner. scripts/real-history-introductions.ts --replay audits origin candidates; source review is mandatory before counting a birth. Run scripts/render-real-repo-review.ts to regenerate this report. The non-quick stored-evidence gate validates all four complete captures, distinct commits, consecutive new pins, classifier/standard hashes and frozen detector commit; it requires both held-out and combined agreement >=90%, and fails with zero BLOCKs. Runtime stays offline; no upstream code/tests were executed.
+Historical replay reproduction requires the frozen detector build at ${freeze.modelCommit}, not the post-fix default patterns. For each frozen manifest, scripts/replay-real-repos.ts used GW_REAL_REPOS_MANIFEST and GW_REAL_REPOS_RESULTS pointing to the corresponding step3/<set>/runs directory. Those captures were NOT regenerated for this correction. scripts/capture-step3-sites.ts selected the review sites; scripts/mine-heldout-history.ts <set> reused the miner; scripts/real-history-introductions.ts --replay audited origin candidates. Run only scripts/render-real-repo-review.ts to regenerate this analytically filtered report. The non-quick stored-evidence gate validates all four complete captures, distinct commits, consecutive new pins, classifier/standard hashes, frozen detector commit and test-file exclusion annotations; it requires both held-out and combined agreement >=90%, and fails with zero BLOCKs. Runtime stays offline; no upstream code/tests were executed.
 `];
 writeFileSync(path.join(root, 'review.md'), lines.join('\n') + archiveMarker + '# Archived earlier-detector report (not current-model evidence)\n\n' + archive.replace(/^# Archived earlier-detector report \(not current-model evidence\)\n\n/, ''));
-writeFileSync(path.join(root, 'human-review.md'), `# Human review: BLOCK claims\n\nAgent-reviewed evidence is separate. The final column is intentionally empty. Historical rows were not emitted by the new classifier.\n\n| Set / repo | Commit | Added implementation | Proposed X | One-line claim | Human agree / disagree |\n| --- | --- | --- | --- | --- | --- |\n${[...items, ...legacyItems, ...introItems].map((x) => `| ${x.set} / ${x.repo} | [${x.commit.slice(0, 10)}](${x.url}/commit/${x.commit}) | ${site(x)} | ${site(x, x.finding.existing!)} | ${x.finding.kind === 'grounding' ? esc(x.finding.fix) : `Duplicate of ${esc(x.finding.existing?.symbol ?? x.finding.existing?.file ?? 'X')}: REUSE or EXTEND X instead of keeping both.`} | |`).join('\n')}\n`);
+writeFileSync(path.join(root, 'human-review.md'), `# Human review: BLOCK claims\n\nAgent-reviewed evidence is separate. The final column is intentionally empty. Historical rows were not emitted by the new classifier. The three excluded held-out test-file rows remain visible; this sheet is not a new replay.\n\n| Set / repo | Commit | Added implementation | Proposed X | One-line claim | Human agree / disagree |\n| --- | --- | --- | --- | --- | --- |\n${[...items, ...legacyItems, ...introItems].map((x) => `| ${x.set} / ${x.repo}${x.review.excluded ? ` — excluded: ${esc(x.review.excluded)}` : ''} | [${x.commit.slice(0, 10)}](${x.url}/commit/${x.commit}) | ${site(x)} | ${site(x, x.finding.existing!)} | ${x.finding.kind === 'grounding' ? esc(x.finding.fix) : `Duplicate of ${esc(x.finding.existing?.symbol ?? x.finding.existing?.file ?? 'X')}: REUSE or EXTEND X instead of keeping both.`} | |`).join('\n')}\n`);
 console.log(gate.detail);

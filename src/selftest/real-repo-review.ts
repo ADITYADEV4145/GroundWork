@@ -3,11 +3,15 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 import type { CheckResult } from './registry.js';
+import { defaultConfig } from '../config/load.js';
+import { makeTestMatcher } from '../index/discover.js';
 
+export const TEST_FILE_EXCLUSION = 'test file (spec noise filter, fixed post-replay)';
 const hash = z.string().regex(/^[a-f0-9]{40}$/);
 const pin = z.object({ id: z.string().regex(/^[a-z][a-z0-9-]*$/), start: hash, end: hash, month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).optional() });
 const manifestSchema = z.object({ repositories: z.array(pin).length(3) });
-const findingSchema = z.object({ id: hash, severity: z.enum(['BLOCK', 'WARN']) });
+const locationSchema = z.object({ file: z.string() });
+const findingSchema = z.object({ id: hash, severity: z.enum(['BLOCK', 'WARN']), added: locationSchema.optional(), existing: locationSchema.nullable().optional() });
 const runSchema = z.object({
   repository: pin, modelHash: z.string(), toolCommit: hash.optional(), sampling: z.string().optional(), eligibleCommits: z.array(hash), selectedCommits: z.array(hash),
   runs: z.array(z.object({ commit: hash, parent: hash, exitCode: z.number().nullable(),
@@ -16,6 +20,7 @@ const runSchema = z.object({
 const reviewSchema = z.object({ reviewer: z.literal('agent'), standardHash: z.string().optional(), method: z.string().min(20), reviews: z.array(z.object({
   repo: z.string(), commit: hash, findingId: hash, label: z.enum(['agree', 'disagree']), reason: z.string().trim().min(20),
   reuseOrExtendLabel: z.enum(['agree', 'disagree']).optional(), reuseOrExtendReason: z.string().trim().min(20).optional(),
+  excluded: z.literal(TEST_FILE_EXCLUSION).optional(),
 })) });
 const json = (file: string): unknown => JSON.parse(readFileSync(file, 'utf8'));
 export const reviewModelHash = (serialized: string) => createHash('sha256')
@@ -32,6 +37,7 @@ export function evaluateReviewEvidence(directory: string, manifestFile = path.jo
     if (standardHash && review.standardHash !== standardHash) throw new Error('Reviews use a different frozen standard.');
     const expectedHash = reviewModelHash(readFileSync(new URL('../reuse/model.json', import.meta.url), 'utf8'));
     const blocks = new Set<string>();
+    const testBlocks = new Set<string>(), isTest = makeTestMatcher(defaultConfig());
     let unavailable = 0, commits = 0, warnings = 0;
     for (const repo of manifest.repositories) {
       const data = runSchema.parse(json(path.join(directory, 'runs', `${repo.id}.json`)));
@@ -50,24 +56,30 @@ export function evaluateReviewEvidence(directory: string, manifestFile = path.jo
           const key = `${repo.id}:${run.commit}:${finding.id}`;
           if (blocks.has(key)) throw new Error(`Repeated BLOCK ${key}.`);
           blocks.add(key);
+          if ((finding.added && isTest(finding.added.file)) || (finding.existing && isTest(finding.existing.file))) testBlocks.add(key);
         }
       }
     }
     const labeled = new Set<string>();
-    let agree = 0;
+    let agree = 0, preFixAgree = 0, excluded = 0;
     for (const row of review.reviews) {
       const key = `${row.repo}:${row.commit}:${row.findingId}`;
       if (!blocks.has(key) || labeled.has(key)) throw new Error(`Unknown or repeated review ${key}.`);
       labeled.add(key);
       if (standardHash && (!row.reuseOrExtendLabel || !row.reuseOrExtendReason)) throw new Error(`Missing reuse-or-extend review ${key}.`);
-      if ((standardHash ? row.reuseOrExtendLabel : row.label) === 'agree') agree++;
+      const agrees = (standardHash ? row.reuseOrExtendLabel : row.label) === 'agree';
+      if (agrees) preFixAgree++;
+      if (row.excluded) {
+        if (!standardHash || !testBlocks.has(key)) throw new Error(`Exclusion requires a default-classified test file in frozen expanded evidence: ${key}.`);
+        excluded++;
+      } else if (agrees) agree++;
     }
     if (labeled.size !== blocks.size) throw new Error(`${blocks.size - labeled.size} BLOCK findings are unreviewed.`);
-    const rate = blocks.size ? agree / blocks.size : 0;
+    const included = blocks.size - excluded, rate = included ? agree / included : 0;
     return {
-      ok: unavailable === 0 && blocks.size > 0 && rate >= 0.9,
-      detail: `Agent-reviewed, not human-approved: ${agree}/${blocks.size} BLOCKs agree (${(rate * 100).toFixed(1)}%); ${warnings} WARNs, ${commits} commits, ${unavailable} unavailable runs. ${blocks.size ? 'Required agreement >= 90%.' : 'Zero BLOCKs cannot establish the acceptance rate.'} Stored evidence only; no clones or network.`,
-      metrics: { agreement: rate, agree, disagree: blocks.size - agree, blocks: blocks.size, warnings, commits, unavailable },
+      ok: unavailable === 0 && included > 0 && rate >= 0.9,
+      detail: `Agent-reviewed, not human-approved: ${agree}/${included} BLOCKs agree (${included ? (rate * 100).toFixed(1) + '%' : 'n/a'}); ${warnings} raw WARNs, ${commits} commits, ${unavailable} unavailable runs. ${excluded} test-file BLOCKs excluded post-replay; pre-fix ${preFixAgree}/${blocks.size}. ${included ? 'Required agreement >= 90%.' : 'Zero BLOCKs cannot establish the acceptance rate.'} Stored evidence only; no clones or network.`,
+      metrics: { agreement: rate, agree, disagree: included - agree, blocks: included, preFixBlocks: blocks.size, preFixAgree, excludedBlocks: excluded, warnings, commits, unavailable },
     };
   } catch (error) { return { ok: false, detail: `Invalid real-repo review evidence: ${(error as Error).message}` }; }
 }
@@ -148,10 +160,12 @@ export function evaluateExpandedReview(directory: string): CheckResult {
     const blocks = sum('blocks'), agree = sum('agree'), heldoutBlocks = sum('blocks', 1), heldoutAgree = sum('agree', 1);
     const agreement = blocks ? agree / blocks : 0, heldoutAgreement = heldoutBlocks ? heldoutAgree / heldoutBlocks : 0;
     const unavailable = sum('unavailable'), interval = wilson(heldoutAgree, heldoutBlocks);
+    const heldoutExcludedBlocks = sum('excludedBlocks', 1), preFixHeldoutBlocks = sum('preFixBlocks', 1), preFixHeldoutAgree = sum('preFixAgree', 1);
     return { ok: blocks > 0 && heldoutBlocks > 0 && unavailable === 0 && Math.min(agreement, heldoutAgreement) >= 0.9,
-      detail: `Agent-reviewed, not human-approved: frozen reuse-or-extend standard; original ${results[0]!.metrics!.agree}/${results[0]!.metrics!.blocks}; held-out ${heldoutAgree}/${heldoutBlocks} (${heldoutBlocks ? (100 * heldoutAgreement).toFixed(1) + '%' : 'n/a'}; Wilson 95% ${interval ? interval.map((n) => (100 * n).toFixed(1) + '%').join('–') : 'undefined'}); combined ${agree}/${blocks}. Require held-out and combined >=90%; zero BLOCKs cannot establish agreement. ${unavailable} unavailable runs. ${heldoutBlocks < 20 ? `Only ${heldoutBlocks} held-out BLOCKs; target >=20 not met. ` : ''}Stored evidence only; no clones or network.`,
+      detail: `Agent-reviewed, not human-approved: frozen reuse-or-extend standard; original ${results[0]!.metrics!.agree}/${results[0]!.metrics!.blocks}; held-out ${heldoutAgree}/${heldoutBlocks} (${heldoutBlocks ? (100 * heldoutAgreement).toFixed(1) + '%' : 'n/a'}; Wilson 95% ${interval ? interval.map((n) => (100 * n).toFixed(1) + '%').join('–') : 'undefined'}); combined ${agree}/${blocks}. Require held-out and combined >=90%; zero BLOCKs cannot establish agreement. ${heldoutExcludedBlocks} held-out test-file BLOCKs excluded post-replay; pre-fix ${preFixHeldoutAgree}/${preFixHeldoutBlocks}. ${unavailable} unavailable runs. ${heldoutBlocks < 20 ? `Only ${heldoutBlocks} held-out BLOCKs; target >=20 not met. ` : ''}Stored evidence only; no clones or network.`,
       metrics: { blocks, agree, disagree: blocks - agree, agreement: Math.min(agreement, heldoutAgreement), combinedAgreement: agreement,
         heldoutBlocks, heldoutAgree, heldoutAgreement, unavailable, warnings: sum('warnings'), commits: sum('commits'),
+        excludedBlocks: sum('excludedBlocks'), heldoutExcludedBlocks, preFixHeldoutBlocks, preFixHeldoutAgree,
         ...(interval ? { wilsonLow: interval[0], wilsonHigh: interval[1] } : {}) } };
   } catch (error) { return { ok: false, detail: `Invalid expanded history evidence: ${(error as Error).message}` }; }
 }

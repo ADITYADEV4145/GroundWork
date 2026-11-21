@@ -1,41 +1,52 @@
 # Step-three frozen contract detector: agent-reviewed history
 
-**Acceptance gate NOT met.** Agent-reviewed, not human-approved: frozen reuse-or-extend standard; original 0/0; held-out 0/3 (0.0%; Wilson 95% 0.0%–56.1%); combined 0/3. Require held-out and combined >=90%; zero BLOCKs cannot establish agreement. 0 unavailable runs. Only 3 held-out BLOCKs; target >=20 not met. Stored evidence only; no clones or network.
+**Acceptance gate NOT met.** Agent-reviewed, not human-approved: frozen reuse-or-extend standard; original 0/0; held-out 0/0 (n/a; Wilson 95% undefined); combined 0/0. Require held-out and combined >=90%; zero BLOCKs cannot establish agreement. 3 held-out test-file BLOCKs excluded post-replay; pre-fix 0/3. 0 unavailable runs. Only 0 held-out BLOCKs; target >=20 not met. Stored evidence only; no clones or network.
 
 This is agent review, not human approval. Occurrence precision and its Wilson interval describe flagged commits in these selected pinned months, not an independent population estimate; repeated edits of one pair are correlated. Unavailable runs are not negatives. The target of at least 20 held-out BLOCKs is descriptive support, not a threshold silently lowered to claim success. Empty denominators are undefined.
 
 ## Frozen protocol and classifier
 
-Review standard committed first in 0138d34: [REUSE or EXTEND](../real-history/review-standard.md). Detector/models/windows frozen in **21f83a1277d7629de321b2274bbc455450291a60**, before all current captures; model SHA-256 1e9184b892b695a81dd5c2fb84ea967fab59233f6d9e1025507982ed6bc459a5. No detector/model/retrieval/threshold tuning after replay. The original and former held-out months were previously inspected; only the two additional consecutive months per repo were untouched evaluation. The held-out aggregate includes all three designated held-out months per repo; it is not all fresh evidence.
+Review standard committed first in 0138d34: [REUSE or EXTEND](../real-history/review-standard.md). Detector/models/windows frozen in **21f83a1277d7629de321b2274bbc455450291a60**, before all stored captures; model SHA-256 1e9184b892b695a81dd5c2fb84ea967fab59233f6d9e1025507982ed6bc459a5. No model, coefficient, retrieval or threshold tuning after replay. The post-replay test-file spec correction is disclosed below; stored captures still describe the pre-fix runtime. The original and former held-out months were previously inspected; only the two additional consecutive months per repo were untouched evaluation. The held-out aggregate includes all three designated held-out months per repo; it is not all fresh evidence.
 
 [Calibration](../real-history/calibration.md): planted 69 TP / 1 FP, precision 98.6%, recall 28.4%. Combined 73/75; dev-only 4/5. Planted clone recall: Type 1 24/24 (100.0%); Type 2 42/48 (87.5%); Type 3 3/72 (4.2%); Type 4 0/99 (0.0%). Pre-replay non-quick Stop: p50 179.23 ms, p95 **215.84 ms**, 35 fresh processes including startup, all really blocked under strict; default standard uses the same computation but only warns. [Freeze notes](../real-history/pre-replay.md).
 
-## All current captures
+## Post-replay spec correction: skip test files by default
 
-| Set | Repository / UTC month | Checked / eligible | BLOCK | Agree | Precision; Wilson 95% | WARN | Unavailable | Runtime incl. checkout | Recall |
-| --- | --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- |
-| original | got / 2025-02 | 3/3 | 0 | 0 | undefined (0/0); undefined | 3 | 0 | 3.04 s | not independently enumerable |
-| original | click / 2025-07 | 8/8 | 0 | 0 | undefined (0/0); undefined | 7 | 0 | 14.11 s | not independently enumerable |
-| original | pytest / 2025-07 | 17/17 | 0 | 0 | undefined (0/0); undefined | 3 | 0 | 142.37 s | not independently enumerable |
-| heldout | got / 2024-07 | 6/6 | 0 | 0 | undefined (0/0); undefined | 16 | 0 | 6.12 s | not independently enumerable |
-| heldout | click / 2025-08 | 21/21 | 0 | 0 | undefined (0/0); undefined | 6 | 0 | 35.16 s | not independently enumerable |
-| heldout | pytest / 2025-08 | 26/26 | 0 | 0 | undefined (0/0); undefined | 8 | 0 | 202.22 s | not independently enumerable |
-| new-1 | got / 2024-08 | 3/3 | 0 | 0 | undefined (0/0); undefined | 0 | 0 | 4.65 s | not independently enumerable |
-| new-1 | click / 2025-09 | 27/27 | 0 | 0 | undefined (0/0); undefined | 12 | 0 | 65.32 s | not independently enumerable |
-| new-1 | pytest / 2025-09 | 40/40 | 1 | 0 | 0.0%; 0.0%–79.3% | 69 | 0 | 487.23 s | not independently enumerable |
-| new-2 | got / 2024-09 | 2/2 | 0 | 0 | undefined (0/0); undefined | 0 | 0 | 2.94 s | not independently enumerable |
-| new-2 | click / 2025-10 | 17/17 | 0 | 0 | undefined (0/0); undefined | 0 | 0 | 44.16 s | not independently enumerable |
-| new-2 | pytest / 2025-10 | 80/80 | 2 | 0 | 0.0%; 0.0%–65.8% | 117 | 0 | 975.44 s | not independently enumerable |
+The default test globs omitted `testing/` (pytest's suite), `spec/` and `specs/` directories. They are now classified as tests at any depth, alongside the already-covered `test/`, `tests/`, `__tests__/`, `*.test.*`, `*.spec.*`, `test_*.py`, `*_test.py` and `conftest.py` conventions. Classification lives in src/config/sections/index.ts and src/index/discover.ts (makeTestMatcher), is stored during live/base indexing, and is consumed by reuse.skipTests (default true). index.testGlobs remains overridable and reuse.skipTests=false opts back in. The index-config hash changes automatically, rebuilding stale classifications without a schema or extractor-version bump.
 
-Held-out total: **0/3**; 0.0%, Wilson 95% 0.0%–56.1%. Full captures, pins and exit codes are under step3/. Every eligible non-merge commit was checked; no finding-dependent sampling.
+**This is a spec-compliance noise-filter fix, explicitly made post-replay, not model tuning. No held-out commits were re-replayed.** Only the three annotated test-file BLOCKs are analytically excluded from the stored BLOCK denominator. The gate validates each annotation against the default path matcher. Raw captures, statuses, exit codes, timings and all earlier labels are untouched; WARN counts below are raw pre-fix counts, not freshly measured post-fix results. Filtered zero support is vacuous and still fails the gate; neither precision nor a Wilson interval is defined for 0/0.
 
-## Current BLOCK reviews: strict and new-standard columns
+| Held-out evidence | BLOCK | Agree | Precision; Wilson 95% |
+| --- | ---: | ---: | --- |
+| Pre-fix stored replay | 3 | 0 | 0.0%; 0.0%–56.1% |
+| Post-replay analytical test-file exclusions | 0 | 0 | undefined (0/0); undefined |
 
-| Set / repo | Commit | Added → proposed X | Strict substitution | Reuse-or-extend / one-line reason |
-| --- | --- | --- | --- | --- |
-| new-1 / pytest | [779cecde7c](https://github.com/pytest-dev/pytest/commit/779cecde7caedd6cc59f2ee1c4f689a45246f3c5) | [`TestReportInfo.test_reportinfo_with_nasty_getattr`](https://github.com/pytest-dev/pytest/blob/779cecde7caedd6cc59f2ee1c4f689a45246f3c5/testing/python/collect.py#L1252) → [`TestReportInfo.test_class_reportinfo`](https://github.com/pytest-dev/pytest/blob/779cecde7caedd6cc59f2ee1c4f689a45246f3c5/testing/python/collect.py#L1237) | disagree | disagree: Normal-class location/path assertions and the nasty-getattr class/function robustness regression test different failure contracts. Both already use pytester's collection helpers; merging their fixture data/assertions would reorganize coverage, not remove a second implementation of reportinfo. |
-| new-2 / pytest | [b3f3263a83](https://github.com/pytest-dev/pytest/commit/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0) | [`test_assert_message`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L554) → [`test_message_indent`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L677) | disagree | disagree: These are independent expected-diagnostic cases (general mismatch reasons versus nested indentation), already using the shared fails_raises_group helper. Their different exception trees and exact expected messages are test data, not duplicate formatting implementations to consolidate. |
-| new-2 / pytest | [b3f3263a83](https://github.com/pytest-dev/pytest/commit/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0) | [`test_suggestion_on_nested_and_brief_error`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L745) → [`test_assert_message`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L554) | disagree | disagree: Suggestion placement after brief versus nested errors is a distinct regression contract from general mismatch diagnostics. Both already reuse fails_raises_group; relocating unique cases into the other test is not removal of duplicated implementation. |
+## Stored captures: pre-fix counts and explicit BLOCK exclusions
+
+| Set | Repository / UTC month | Checked / eligible | Pre-fix BLOCK | Excluded | Included BLOCK | Agree | Precision; Wilson 95% | Raw WARN | Unavailable | Pre-fix runtime incl. checkout | Recall |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- |
+| original | got / 2025-02 | 3/3 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 3 | 0 | 3.04 s | not independently enumerable |
+| original | click / 2025-07 | 8/8 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 7 | 0 | 14.11 s | not independently enumerable |
+| original | pytest / 2025-07 | 17/17 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 3 | 0 | 142.37 s | not independently enumerable |
+| heldout | got / 2024-07 | 6/6 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 16 | 0 | 6.12 s | not independently enumerable |
+| heldout | click / 2025-08 | 21/21 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 6 | 0 | 35.16 s | not independently enumerable |
+| heldout | pytest / 2025-08 | 26/26 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 8 | 0 | 202.22 s | not independently enumerable |
+| new-1 | got / 2024-08 | 3/3 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 0 | 0 | 4.65 s | not independently enumerable |
+| new-1 | click / 2025-09 | 27/27 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 12 | 0 | 65.32 s | not independently enumerable |
+| new-1 | pytest / 2025-09 | 40/40 | 1 | 1 | 0 | 0 | undefined (0/0); undefined | 69 | 0 | 487.23 s | not independently enumerable |
+| new-2 | got / 2024-09 | 2/2 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 0 | 0 | 2.94 s | not independently enumerable |
+| new-2 | click / 2025-10 | 17/17 | 0 | 0 | 0 | 0 | undefined (0/0); undefined | 0 | 0 | 44.16 s | not independently enumerable |
+| new-2 | pytest / 2025-10 | 80/80 | 2 | 2 | 0 | 0 | undefined (0/0); undefined | 117 | 0 | 975.44 s | not independently enumerable |
+
+Filtered held-out total: **0/0**; undefined (0/0), Wilson 95% undefined. 3 test-file BLOCKs excluded post-replay. Full pre-fix captures, pins and exit codes are under step3/. Every eligible non-merge commit was originally checked; no finding-dependent sampling and no new replay.
+
+## Pre-fix BLOCK reviews, retained with post-replay exclusion status
+
+| Set / repo | Commit | Added → proposed X | Strict substitution | Reuse-or-extend / one-line reason | Status |
+| --- | --- | --- | --- | --- | --- |
+| new-1 / pytest | [779cecde7c](https://github.com/pytest-dev/pytest/commit/779cecde7caedd6cc59f2ee1c4f689a45246f3c5) | [`TestReportInfo.test_reportinfo_with_nasty_getattr`](https://github.com/pytest-dev/pytest/blob/779cecde7caedd6cc59f2ee1c4f689a45246f3c5/testing/python/collect.py#L1252) → [`TestReportInfo.test_class_reportinfo`](https://github.com/pytest-dev/pytest/blob/779cecde7caedd6cc59f2ee1c4f689a45246f3c5/testing/python/collect.py#L1237) | disagree | disagree: Normal-class location/path assertions and the nasty-getattr class/function robustness regression test different failure contracts. Both already use pytester's collection helpers; merging their fixture data/assertions would reorganize coverage, not remove a second implementation of reportinfo. | excluded: test file (spec noise filter, fixed post-replay) |
+| new-2 / pytest | [b3f3263a83](https://github.com/pytest-dev/pytest/commit/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0) | [`test_assert_message`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L554) → [`test_message_indent`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L677) | disagree | disagree: These are independent expected-diagnostic cases (general mismatch reasons versus nested indentation), already using the shared fails_raises_group helper. Their different exception trees and exact expected messages are test data, not duplicate formatting implementations to consolidate. | excluded: test file (spec noise filter, fixed post-replay) |
+| new-2 / pytest | [b3f3263a83](https://github.com/pytest-dev/pytest/commit/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0) | [`test_suggestion_on_nested_and_brief_error`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L745) → [`test_assert_message`](https://github.com/pytest-dev/pytest/blob/b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0/testing/python/raises_group.py#L554) | disagree | disagree: Suggestion placement after brief versus nested errors is a distinct regression contract from general mismatch diagnostics. Both already reuse fails_raises_group; relocating unique cases into the other test is not removal of duplicated implementation. | excluded: test file (spec noise filter, fixed post-replay) |
 
 ## Historical BLOCKs re-reviewed, strict labels untouched
 
@@ -121,7 +132,7 @@ All held-out commits were also passed through the existing development consolida
 
 [Human review sheet](human-review.md) has one row per current, historical or supplemental dev-introduction BLOCK, links to commit/both source sites, proposed X, the claim and an intentionally empty human verdict. Development and historical rows do not increase held-out support. Grounding rows retain their actual grounding claim rather than being mislabeled duplicates. No human agreement is claimed.
 
-Build once; for each frozen manifest run scripts/replay-real-repos.ts with GW_REAL_REPOS_MANIFEST and GW_REAL_REPOS_RESULTS pointing to the corresponding step3/<set>/runs directory. Do not change coefficients or thresholds. scripts/capture-step3-sites.ts selects the review sites; review them before writing the separate labels. scripts/mine-heldout-history.ts <set> reuses the miner. scripts/real-history-introductions.ts --replay audits origin candidates; source review is mandatory before counting a birth. Run scripts/render-real-repo-review.ts to regenerate this report. The non-quick stored-evidence gate validates all four complete captures, distinct commits, consecutive new pins, classifier/standard hashes and frozen detector commit; it requires both held-out and combined agreement >=90%, and fails with zero BLOCKs. Runtime stays offline; no upstream code/tests were executed.
+Historical replay reproduction requires the frozen detector build at 21f83a1277d7629de321b2274bbc455450291a60, not the post-fix default patterns. For each frozen manifest, scripts/replay-real-repos.ts used GW_REAL_REPOS_MANIFEST and GW_REAL_REPOS_RESULTS pointing to the corresponding step3/<set>/runs directory. Those captures were NOT regenerated for this correction. scripts/capture-step3-sites.ts selected the review sites; scripts/mine-heldout-history.ts <set> reused the miner; scripts/real-history-introductions.ts --replay audited origin candidates. Run only scripts/render-real-repo-review.ts to regenerate this analytically filtered report. The non-quick stored-evidence gate validates all four complete captures, distinct commits, consecutive new pins, classifier/standard hashes, frozen detector commit and test-file exclusion annotations; it requires both held-out and combined agreement >=90%, and fails with zero BLOCKs. Runtime stays offline; no upstream code/tests were executed.
 
 <!-- archived-step-two -->
 # Archived earlier-detector report (not current-model evidence)

@@ -106,7 +106,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   }
   finally { db.close(); }
   await candidates.prepareMeaning(root, config, options.embeddingFactory, {
-    deadline: Date.now() + Math.max(0, Math.min(250, (deadline - Date.now()) / 10)),
+    deadline: options.timeoutMs === undefined ? undefined : Date.now() + Math.max(0, Math.min(250, (deadline - Date.now()) / 10)),
   });
   checkDeadline();
   const baseSymbols = new Map(base.state.symbols.map((s) => [s.id, s]));

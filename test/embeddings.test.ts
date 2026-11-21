@@ -230,6 +230,26 @@ describe('consented, offline-only optional meaning', () => {
     });
   });
 
+  it('lets a cold manual check finish loading meaning and caches all vectors for the next check', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await initializeEmbeddings(root, { consent: true, factory: fake().factory });
+      const embed = vi.fn(async (_text: string) => [1, 0]);
+      const factory = vi.fn<EmbedderFactory>(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        return { embed };
+      });
+      const report = await checkRepository(root, { embeddingFactory: factory });
+      expect(factory).toHaveBeenCalledOnce();
+      expect(embed.mock.calls.length).toBeGreaterThan(0);
+      expect(report.findings.find((f) => f.kind === 'duplicate')?.signals).toContainEqual({ name: 'meaning', value: 1 });
+      factory.mockClear(); embed.mockClear();
+      const cached = await checkRepository(root, { embeddingFactory: factory });
+      expect(cached.findings).toEqual(report.findings);
+      expect(factory).not.toHaveBeenCalled();
+      expect(embed).not.toHaveBeenCalled();
+    });
+  });
+
   it('retains completed vectors but starts no further embedding work after the optional budget', async () => {
     await withIndexedFixture('reuse-app', async (_db, root) => {
       await initializeEmbeddings(root, { consent: true, factory: fake().factory });

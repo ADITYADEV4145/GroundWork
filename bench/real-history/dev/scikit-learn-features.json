@@ -1,0 +1,3063 @@
+[
+  {
+    "id": "sklearn-backend-predicates-4f11033faf",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_numpy_array",
+      "line": 36,
+      "endLine": 65,
+      "kind": "function",
+      "sha256": "bcfca4f7d3c3e49adf49dd9ebbefea30f411e6cd6f41678fd0beba7ca6129858"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_cupy_array",
+      "line": 68,
+      "endLine": 96,
+      "kind": "function",
+      "sha256": "773a646164a68889de6942fcaad043206a55e779719c54dd5b2abfa96b57aa7a"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-4f11033faf",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_numpy_array / is_cupy_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.453125,
+        "exact": 0,
+        "vocabulary": 0.8213800985866114,
+        "bindingExact": 0,
+        "structureVocabulary": 0.3721878571720583,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.8383516768249902,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "np.generic",
+          "np.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "1f83a1bce27ddec8c25e126aedd98a6f3e8b490f41854f437ca33e4ff322a3e4"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "cp.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "57c2157109db6f9f2442f518c7ba7b60687d3c12517129630cdeecdddf67d370"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-1f3b4b759d",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_numpy_array",
+      "line": 36,
+      "endLine": 65,
+      "kind": "function",
+      "sha256": "bcfca4f7d3c3e49adf49dd9ebbefea30f411e6cd6f41678fd0beba7ca6129858"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_torch_array",
+      "line": 99,
+      "endLine": 124,
+      "kind": "function",
+      "sha256": "20744802e720748ac6e03e44944578b14eeb42335c12dd3af3ab083ed4ed14ac"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-1f3b4b759d",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_numpy_array / is_torch_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.375,
+        "exact": 0,
+        "vocabulary": 0.787892013637945,
+        "bindingExact": 0,
+        "structureVocabulary": 0.29545950511422936,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.8472495531468549,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "np.generic",
+          "np.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "1f83a1bce27ddec8c25e126aedd98a6f3e8b490f41854f437ca33e4ff322a3e4"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sys.modules",
+          "torch.Tensor"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "df0756bb4f226133820422a04cffdbadf9c80bd045d02247f285a5b12b30e5c5"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-c5f31629f6",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_numpy_array",
+      "line": 36,
+      "endLine": 65,
+      "kind": "function",
+      "sha256": "bcfca4f7d3c3e49adf49dd9ebbefea30f411e6cd6f41678fd0beba7ca6129858"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_ndonnx_array",
+      "line": 127,
+      "endLine": 152,
+      "kind": "function",
+      "sha256": "ebeef8eb84d49953ea8fb46a4bfae7e9da1aa69c87bbd86b51502c2fb2f1d69b"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-c5f31629f6",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_numpy_array / is_ndonnx_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.453125,
+        "exact": 0,
+        "vocabulary": 0.7294899931478922,
+        "bindingExact": 0,
+        "structureVocabulary": 0.33055015314513864,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.7510466844036805,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "np.generic",
+          "np.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "1f83a1bce27ddec8c25e126aedd98a6f3e8b490f41854f437ca33e4ff322a3e4"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "ndx.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "022c6b403f3cb92f662537f9022eeb8babd792d2211b2159fae0b94f4e71e6a6"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-cff53d6210",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_numpy_array",
+      "line": 36,
+      "endLine": 65,
+      "kind": "function",
+      "sha256": "bcfca4f7d3c3e49adf49dd9ebbefea30f411e6cd6f41678fd0beba7ca6129858"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_dask_array",
+      "line": 155,
+      "endLine": 180,
+      "kind": "function",
+      "sha256": "4edeaf9ee667f3f7290e5f8936eee8bb50675fc0e8b39f2599ef3f710ffda1cb"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-cff53d6210",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_numpy_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.3515625,
+        "exact": 0,
+        "vocabulary": 0.8152470484620294,
+        "bindingExact": 0,
+        "structureVocabulary": 0.28661029047493225,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.8761160054168889,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "np.generic",
+          "np.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "1f83a1bce27ddec8c25e126aedd98a6f3e8b490f41854f437ca33e4ff322a3e4"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "dask.array",
+          "dask.array.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "189d34eb53e76bb55ca6395cf58cb857ef4f1990d8c946fdf292f5d015320d2e"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.2,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-771cba7bd4",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_numpy_array",
+      "line": 36,
+      "endLine": 65,
+      "kind": "function",
+      "sha256": "bcfca4f7d3c3e49adf49dd9ebbefea30f411e6cd6f41678fd0beba7ca6129858"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_jax_array",
+      "line": 183,
+      "endLine": 209,
+      "kind": "function",
+      "sha256": "ec626a4db11f8fad92bd4d5bdfb19331c684c64e86ae40c985594e8f32a3a235"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-771cba7bd4",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_numpy_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.34375,
+        "exact": 0,
+        "vocabulary": 0.8474011778232753,
+        "bindingExact": 0,
+        "structureVocabulary": 0.29129415487675087,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.898006510297655,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "np.generic",
+          "np.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "1f83a1bce27ddec8c25e126aedd98a6f3e8b490f41854f437ca33e4ff322a3e4"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "jax.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "e4d2650b13d73cc6834b1cdbc89d0fc4823d8ad044d287334ce50c1507d33556"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-9101c17383",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_numpy_array",
+      "line": 36,
+      "endLine": 65,
+      "kind": "function",
+      "sha256": "bcfca4f7d3c3e49adf49dd9ebbefea30f411e6cd6f41678fd0beba7ca6129858"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_pydata_sparse_array",
+      "line": 212,
+      "endLine": 239,
+      "kind": "function",
+      "sha256": "0f200c1f9e937709eefd7f1bb54a75ffc661c9f622675c625014325ba26d4120"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-9101c17383",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_numpy_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.375,
+        "exact": 0,
+        "vocabulary": 0.8085070395379704,
+        "bindingExact": 0,
+        "structureVocabulary": 0.3031901398267389,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.4
+      },
+      "probability": 0.8935293071267063,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "np.generic",
+          "np.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "1f83a1bce27ddec8c25e126aedd98a6f3e8b490f41854f437ca33e4ff322a3e4"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sparse.SparseArray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "530a43b44f024e6f623a075565eb9f78f2817c03ca52f2ea540bf2813a3d32ee"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-298bf73340",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_cupy_array",
+      "line": 68,
+      "endLine": 96,
+      "kind": "function",
+      "sha256": "773a646164a68889de6942fcaad043206a55e779719c54dd5b2abfa96b57aa7a"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_torch_array",
+      "line": 99,
+      "endLine": 124,
+      "kind": "function",
+      "sha256": "20744802e720748ac6e03e44944578b14eeb42335c12dd3af3ab083ed4ed14ac"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-298bf73340",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_cupy_array / is_torch_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.765625,
+        "exact": 0,
+        "vocabulary": 0.7377467021395169,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5648373188255676,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.5267800233553475,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "cp.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "57c2157109db6f9f2442f518c7ba7b60687d3c12517129630cdeecdddf67d370"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sys.modules",
+          "torch.Tensor"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "df0756bb4f226133820422a04cffdbadf9c80bd045d02247f285a5b12b30e5c5"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-4a55e0fa15",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_cupy_array",
+      "line": 68,
+      "endLine": 96,
+      "kind": "function",
+      "sha256": "773a646164a68889de6942fcaad043206a55e779719c54dd5b2abfa96b57aa7a"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_ndonnx_array",
+      "line": 127,
+      "endLine": 152,
+      "kind": "function",
+      "sha256": "ebeef8eb84d49953ea8fb46a4bfae7e9da1aa69c87bbd86b51502c2fb2f1d69b"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-4a55e0fa15",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_cupy_array / is_ndonnx_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 1,
+        "exact": 1,
+        "vocabulary": 0.6828753013874015,
+        "bindingExact": 0,
+        "structureVocabulary": 0.6828753013874015,
+        "exactVocabulary": 0.6828753013874015,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.49533179295979135,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "cp.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "57c2157109db6f9f2442f518c7ba7b60687d3c12517129630cdeecdddf67d370"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "ndx.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "022c6b403f3cb92f662537f9022eeb8babd792d2211b2159fae0b94f4e71e6a6"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-2e17534ff6",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_cupy_array",
+      "line": 68,
+      "endLine": 96,
+      "kind": "function",
+      "sha256": "773a646164a68889de6942fcaad043206a55e779719c54dd5b2abfa96b57aa7a"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_dask_array",
+      "line": 155,
+      "endLine": 180,
+      "kind": "function",
+      "sha256": "4edeaf9ee667f3f7290e5f8936eee8bb50675fc0e8b39f2599ef3f710ffda1cb"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-2e17534ff6",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_cupy_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.703125,
+        "exact": 0,
+        "vocabulary": 0.7630137883678266,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5364940699461281,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.6130506225175734,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "cp.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "57c2157109db6f9f2442f518c7ba7b60687d3c12517129630cdeecdddf67d370"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "dask.array",
+          "dask.array.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "189d34eb53e76bb55ca6395cf58cb857ef4f1990d8c946fdf292f5d015320d2e"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-592fb792f2",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_cupy_array",
+      "line": 68,
+      "endLine": 96,
+      "kind": "function",
+      "sha256": "773a646164a68889de6942fcaad043206a55e779719c54dd5b2abfa96b57aa7a"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_jax_array",
+      "line": 183,
+      "endLine": 209,
+      "kind": "function",
+      "sha256": "ec626a4db11f8fad92bd4d5bdfb19331c684c64e86ae40c985594e8f32a3a235"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-592fb792f2",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_cupy_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.6484375,
+        "exact": 0,
+        "vocabulary": 0.7426501671106189,
+        "bindingExact": 0,
+        "structureVocabulary": 0.48156221773579194,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.6288935239652559,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "cp.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "57c2157109db6f9f2442f518c7ba7b60687d3c12517129630cdeecdddf67d370"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "jax.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "e4d2650b13d73cc6834b1cdbc89d0fc4823d8ad044d287334ce50c1507d33556"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-2391d309ff",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_cupy_array",
+      "line": 68,
+      "endLine": 96,
+      "kind": "function",
+      "sha256": "773a646164a68889de6942fcaad043206a55e779719c54dd5b2abfa96b57aa7a"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_pydata_sparse_array",
+      "line": 212,
+      "endLine": 239,
+      "kind": "function",
+      "sha256": "0f200c1f9e937709eefd7f1bb54a75ffc661c9f622675c625014325ba26d4120"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-2391d309ff",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_cupy_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.765625,
+        "exact": 0,
+        "vocabulary": 0.756930070726233,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5795245853997721,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.4
+      },
+      "probability": 0.6240229366606689,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "cp.ndarray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "57c2157109db6f9f2442f518c7ba7b60687d3c12517129630cdeecdddf67d370"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sparse.SparseArray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "530a43b44f024e6f623a075565eb9f78f2817c03ca52f2ea540bf2813a3d32ee"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-e61585ce5d",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_torch_array",
+      "line": 99,
+      "endLine": 124,
+      "kind": "function",
+      "sha256": "20744802e720748ac6e03e44944578b14eeb42335c12dd3af3ab083ed4ed14ac"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_ndonnx_array",
+      "line": 127,
+      "endLine": 152,
+      "kind": "function",
+      "sha256": "ebeef8eb84d49953ea8fb46a4bfae7e9da1aa69c87bbd86b51502c2fb2f1d69b"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-e61585ce5d",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_torch_array / is_ndonnx_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.765625,
+        "exact": 0,
+        "vocabulary": 0.6421862006591864,
+        "bindingExact": 0,
+        "structureVocabulary": 0.4916738098796896,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.3937151094703691,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "sys.modules",
+          "torch.Tensor"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "df0756bb4f226133820422a04cffdbadf9c80bd045d02247f285a5b12b30e5c5"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "ndx.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "022c6b403f3cb92f662537f9022eeb8babd792d2211b2159fae0b94f4e71e6a6"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-b62727e61c",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_torch_array",
+      "line": 99,
+      "endLine": 124,
+      "kind": "function",
+      "sha256": "20744802e720748ac6e03e44944578b14eeb42335c12dd3af3ab083ed4ed14ac"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_dask_array",
+      "line": 155,
+      "endLine": 180,
+      "kind": "function",
+      "sha256": "4edeaf9ee667f3f7290e5f8936eee8bb50675fc0e8b39f2599ef3f710ffda1cb"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-b62727e61c",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_torch_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.6953125,
+        "exact": 0,
+        "vocabulary": 0.8295046523441254,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5767649535830247,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.7037650068881263,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "sys.modules",
+          "torch.Tensor"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "df0756bb4f226133820422a04cffdbadf9c80bd045d02247f285a5b12b30e5c5"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "dask.array",
+          "dask.array.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "189d34eb53e76bb55ca6395cf58cb857ef4f1990d8c946fdf292f5d015320d2e"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-a4e54a9e06",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_torch_array",
+      "line": 99,
+      "endLine": 124,
+      "kind": "function",
+      "sha256": "20744802e720748ac6e03e44944578b14eeb42335c12dd3af3ab083ed4ed14ac"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_jax_array",
+      "line": 183,
+      "endLine": 209,
+      "kind": "function",
+      "sha256": "ec626a4db11f8fad92bd4d5bdfb19331c684c64e86ae40c985594e8f32a3a235"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-a4e54a9e06",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_torch_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.84375,
+        "exact": 0,
+        "vocabulary": 0.8084594864327794,
+        "bindingExact": 0,
+        "structureVocabulary": 0.6821376916776576,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.5597335947273876,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "sys.modules",
+          "torch.Tensor"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "df0756bb4f226133820422a04cffdbadf9c80bd045d02247f285a5b12b30e5c5"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "jax.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "e4d2650b13d73cc6834b1cdbc89d0fc4823d8ad044d287334ce50c1507d33556"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-2db3b685de",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_torch_array",
+      "line": 99,
+      "endLine": 124,
+      "kind": "function",
+      "sha256": "20744802e720748ac6e03e44944578b14eeb42335c12dd3af3ab083ed4ed14ac"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_pydata_sparse_array",
+      "line": 212,
+      "endLine": 239,
+      "kind": "function",
+      "sha256": "0f200c1f9e937709eefd7f1bb54a75ffc661c9f622675c625014325ba26d4120"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-2db3b685de",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_torch_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 1,
+        "exact": 1,
+        "vocabulary": 0.8193929779657138,
+        "bindingExact": 0,
+        "structureVocabulary": 0.8193929779657138,
+        "exactVocabulary": 0.8193929779657138,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.4
+      },
+      "probability": 0.7436689822452144,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "sys.modules",
+          "torch.Tensor"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "df0756bb4f226133820422a04cffdbadf9c80bd045d02247f285a5b12b30e5c5"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sparse.SparseArray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "530a43b44f024e6f623a075565eb9f78f2817c03ca52f2ea540bf2813a3d32ee"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-5e5afec392",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_ndonnx_array",
+      "line": 127,
+      "endLine": 152,
+      "kind": "function",
+      "sha256": "ebeef8eb84d49953ea8fb46a4bfae7e9da1aa69c87bbd86b51502c2fb2f1d69b"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_dask_array",
+      "line": 155,
+      "endLine": 180,
+      "kind": "function",
+      "sha256": "4edeaf9ee667f3f7290e5f8936eee8bb50675fc0e8b39f2599ef3f710ffda1cb"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-5e5afec392",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_ndonnx_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.703125,
+        "exact": 0,
+        "vocabulary": 0.8208033966490064,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5771273882688326,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.6876255045607766,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "ndx.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "022c6b403f3cb92f662537f9022eeb8babd792d2211b2159fae0b94f4e71e6a6"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "dask.array",
+          "dask.array.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "189d34eb53e76bb55ca6395cf58cb857ef4f1990d8c946fdf292f5d015320d2e"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-feda0b4b78",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_ndonnx_array",
+      "line": 127,
+      "endLine": 152,
+      "kind": "function",
+      "sha256": "ebeef8eb84d49953ea8fb46a4bfae7e9da1aa69c87bbd86b51502c2fb2f1d69b"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_jax_array",
+      "line": 183,
+      "endLine": 209,
+      "kind": "function",
+      "sha256": "ec626a4db11f8fad92bd4d5bdfb19331c684c64e86ae40c985594e8f32a3a235"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-feda0b4b78",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_ndonnx_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.6484375,
+        "exact": 0,
+        "vocabulary": 0.7990217466503601,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5181156638435929,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.7007393042531728,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "ndx.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "022c6b403f3cb92f662537f9022eeb8babd792d2211b2159fae0b94f4e71e6a6"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "jax.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "e4d2650b13d73cc6834b1cdbc89d0fc4823d8ad044d287334ce50c1507d33556"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-585e5b4fbe",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_ndonnx_array",
+      "line": 127,
+      "endLine": 152,
+      "kind": "function",
+      "sha256": "ebeef8eb84d49953ea8fb46a4bfae7e9da1aa69c87bbd86b51502c2fb2f1d69b"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_pydata_sparse_array",
+      "line": 212,
+      "endLine": 239,
+      "kind": "function",
+      "sha256": "0f200c1f9e937709eefd7f1bb54a75ffc661c9f622675c625014325ba26d4120"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-585e5b4fbe",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_ndonnx_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.765625,
+        "exact": 0,
+        "vocabulary": 0.8133514276906676,
+        "bindingExact": 0,
+        "structureVocabulary": 0.6227221868256674,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.4
+      },
+      "probability": 0.6952682639133008,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "ndx.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "022c6b403f3cb92f662537f9022eeb8babd792d2211b2159fae0b94f4e71e6a6"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sparse.SparseArray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "530a43b44f024e6f623a075565eb9f78f2817c03ca52f2ea540bf2813a3d32ee"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-99b66c7dfe",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_dask_array",
+      "line": 155,
+      "endLine": 180,
+      "kind": "function",
+      "sha256": "4edeaf9ee667f3f7290e5f8936eee8bb50675fc0e8b39f2599ef3f710ffda1cb"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_jax_array",
+      "line": 183,
+      "endLine": 209,
+      "kind": "function",
+      "sha256": "ec626a4db11f8fad92bd4d5bdfb19331c684c64e86ae40c985594e8f32a3a235"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-99b66c7dfe",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_dask_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.5859375,
+        "exact": 0,
+        "vocabulary": 0.8929178630281811,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5231940603680749,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.5
+      },
+      "probability": 0.8329251762449594,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": true,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "dask.array",
+          "dask.array.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "189d34eb53e76bb55ca6395cf58cb857ef4f1990d8c946fdf292f5d015320d2e"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "jax.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "e4d2650b13d73cc6834b1cdbc89d0fc4823d8ad044d287334ce50c1507d33556"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-77e709cd9f",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_dask_array",
+      "line": 155,
+      "endLine": 180,
+      "kind": "function",
+      "sha256": "4edeaf9ee667f3f7290e5f8936eee8bb50675fc0e8b39f2599ef3f710ffda1cb"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_pydata_sparse_array",
+      "line": 212,
+      "endLine": 239,
+      "kind": "function",
+      "sha256": "0f200c1f9e937709eefd7f1bb54a75ffc661c9f622675c625014325ba26d4120"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-77e709cd9f",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_dask_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.6953125,
+        "exact": 0,
+        "vocabulary": 0.9096551111325147,
+        "bindingExact": 0,
+        "structureVocabulary": 0.6324945694593267,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.4
+      },
+      "probability": 0.8338547854566256,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": true,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "dask.array",
+          "dask.array.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "189d34eb53e76bb55ca6395cf58cb857ef4f1990d8c946fdf292f5d015320d2e"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sparse.SparseArray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "530a43b44f024e6f623a075565eb9f78f2817c03ca52f2ea540bf2813a3d32ee"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "sklearn-backend-predicates-7c308c3d68",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_jax_array",
+      "line": 183,
+      "endLine": 209,
+      "kind": "function",
+      "sha256": "ec626a4db11f8fad92bd4d5bdfb19331c684c64e86ae40c985594e8f32a3a235"
+    },
+    "b": {
+      "revision": "ff6bf36f06ca80bf505f37a8c5c42047129952ec",
+      "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+      "symbol": "is_pydata_sparse_array",
+      "line": 212,
+      "endLine": 239,
+      "kind": "function",
+      "sha256": "0f200c1f9e937709eefd7f1bb54a75ffc661c9f622675c625014325ba26d4120"
+    },
+    "after": [
+      {
+        "revision": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+        "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+        "symbol": "_issubclass_fast",
+        "line": 65,
+        "endLine": 72,
+        "kind": "function",
+        "sha256": "a9946a5eca8e498e3a16ed33a7590e18df5a2daee02338cecaa05abf377b9aec"
+      }
+    ],
+    "review": {
+      "id": "sklearn-backend-predicates-7c308c3d68",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "sklearn-backend-predicates",
+      "reason": "is_jax_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.84375,
+        "exact": 0,
+        "vocabulary": 0.8860962313871646,
+        "bindingExact": 0,
+        "structureVocabulary": 0.7476436952329202,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 1,
+        "name": 0.4
+      },
+      "probability": 0.7239632171585406,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "jax.Array",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "_is_jax_zero_gradient_array",
+          "isinstance"
+        ],
+        "returns": [
+          "boolean"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "e4d2650b13d73cc6834b1cdbc89d0fc4823d8ad044d287334ce50c1507d33556"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "sparse.SparseArray",
+          "sys.modules"
+        ],
+        "writes": [],
+        "calls": [
+          "isinstance"
+        ],
+        "returns": [
+          "boolean",
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "530a43b44f024e6f623a075565eb9f78f2817c03ca52f2ea540bf2813a3d32ee"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.3333333333333333,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "scikit-learn-normal-119ade27a6-0",
+    "repo": "scikit-learn",
+    "commit": "119ade27a6a2179bed33a73ef0d1f6b3db602d79",
+    "subject": "FIX update deprecated param for example using class_likelihood_ratios (#30668)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "119ade27a6a2179bed33a73ef0d1f6b3db602d79",
+      "file": "examples/model_selection/plot_likelihood_ratios.py",
+      "symbol": "scoring",
+      "line": 82,
+      "endLine": 85,
+      "kind": "function",
+      "sha256": "7042819eed9b1f7f94390b9d4712259f734584fcbf72fcc4c16227336bc6dd08"
+    },
+    "b": {
+      "revision": "119ade27a6a2179bed33a73ef0d1f6b3db602d79",
+      "file": "sklearn/metrics/_classification.py",
+      "symbol": "class_likelihood_ratios",
+      "line": 1908,
+      "endLine": 2213,
+      "kind": "function",
+      "sha256": "731935d37e384e8f7184c78e8310f01427f5f6b8409b7a092b6b8c9921873e9a"
+    },
+    "legacy": {
+      "severity": "WARN",
+      "probability": 0.6202134898588377
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "scikit-learn-normal-119ade27a6-0",
+      "reason": "The example scoring adapter calls estimator.predict and returns a dictionary for cross-validation. class_likelihood_ratios consumes two label arrays, computes confusion-matrix ratios, and returns a numeric tuple. Caller and callee are not interchangeable.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "scikit-learn:119ade27a6a2179bed33a73ef0d1f6b3db602d79",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.0859375,
+        "exact": 0,
+        "vocabulary": 0.3920390344257975,
+        "bindingExact": 0,
+        "structureVocabulary": 0.03369085452096698,
+        "exactVocabulary": 0,
+        "paramCount": 0.5,
+        "paramNames": 0.07692307692307693,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.6202134898588377,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.predict"
+        ],
+        "writes": [],
+        "calls": [
+          "$0.predict",
+          "class_likelihood_ratios"
+        ],
+        "returns": [
+          "object:{negative_likelihood_ratio,positive_likelihood_ratio}"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "7116cdec2b17de09499f550a881d9c00b71a2f0f29b2887cb9a3060fbac48a17",
+          "d0ff5974b6aa52cf562bea5921840c032a860a91a3512f7fe8f768f6bbe005f6",
+          "ed27537936725c7cb3465828120039a8c9d4891fb612bcf457fce85a3e225f05"
+        ],
+        "arity": 3,
+        "parameterUse": [
+          1,
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "\"\".join",
+          "$5.get",
+          "cm.ravel",
+          "np.isnan",
+          "np.nan",
+          "warnings.warn"
+        ],
+        "writes": [],
+        "calls": [
+          "\"\".join",
+          "$5.get",
+          "ValueError",
+          "_check_targets",
+          "attach_unique",
+          "check_scalar",
+          "cm.ravel",
+          "confusion_matrix",
+          "isinstance",
+          "np.isnan",
+          "warnings.warn"
+        ],
+        "returns": [
+          "tuple:2"
+        ],
+        "raises": [
+          "ValueError"
+        ],
+        "guards": [
+          "comparison:raise",
+          "null:raise",
+          "type:raise"
+        ],
+        "literals": [
+          "083656bc63242ea15b48abe309ead643edb16bf09bedd34af8388e5891f79fdf",
+          "1080a60800d9e5bddc69f51489c636a776bacaadb5368f46db4aa0947c67e3ba",
+          "11923d47f6f250df43cadb0cc34162994861d83bcadf626b73856553fb45bb78",
+          "11c31ce91d81c981faba5685e5714c57bef718bc89f632eb18dd757d1613f34f",
+          "25fbb0750a87ad858969e2ca999508975a720c296071a611e392241a2a97f58a",
+          "2762624111c3da47973aff82b37109556d6ed2ac04a0817dd1fe84d31aed0d6a",
+          "2b2ef34a0c2223becd5d572cfebe48948cf51a7bc6b8aadae1a5e51375819292",
+          "2f9714d4ab4aeb3f4c3a2bbe55d2fff61049a8f22585af5723906dc86d0413bb",
+          "3eede0816c041c14f854abf368fdac872715841f8187d1726610f00e65a54227",
+          "485dd20b46583e2056327b61744bf941a3207adb7588b0eacbaffe5add6704d5",
+          "52109349dabf69106e04ec2f493fb8b6ade94ea100227cccce6559ab8b96553f",
+          "56db556fa1b05a9109c7a1fb06c05ca49ffdbd5bf4d54e181f446cb5e9c40c3c",
+          "5cd86706fcaf32e130b7f463f4edb449d2a81deb00d29b9af963abc3fdce61c4",
+          "5ee614ed7d996ef07c9342a60ee97b39d259a993cdf656deacf731af1a2364eb",
+          "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "6157fe4ca13ffd6bc0f6f9b2c22d24f59fd468886733d7bf389a2f73311e049b",
+          "6a4adbca11192a326f61110cda055762eb10de529ff037da568d56e23724242d",
+          "6f06acd6152c677cb64d751ddb6db0179cbb64d76bf4375a13d822b0e4a8ca99",
+          "7060ff76cd103a1f8f6bd97c488026de2ec888120d20607fe4e879c92f539754",
+          "7116cdec2b17de09499f550a881d9c00b71a2f0f29b2887cb9a3060fbac48a17",
+          "716d019b3035e9a83d9ae012c684d969197bc7b353903cfa74faf9fa9034b362",
+          "759be3d07aa13cb477b3b4a7516819a08fbbcc1379a05b91baf7ad2bd62506ed",
+          "7e94555f4766f006fb773067078f2f14ba8372eb574922bd35ddb250ec6f254e",
+          "83c037d64ec53e58485a4603c276774c8478df5a58f324aa15fc48f5d9b6685a",
+          "8aed642bf5118b9d3c859bd4be35ecac75b6e873cce34e7b6f554b06f75550d7",
+          "96a879aaecbbe54f0c44a9c1f0c74b66eccfc5e13d6b78690cec1bd5f7044dbc",
+          "9bfbb82b5408b866cc098c9adff33197ceb8cd374bfe3f5d343aea7f18d9199b",
+          "9d54bf8d7e3e35ee3f35a42a9bc6e402dce1a2b069b51e5133bdd4e5a9b2b894",
+          "a298e52c5929136ceaf76b26ed8413b6d58292cb16026de5a1043022a9ed6f25",
+          "ba83e3f7cdc21d0cc73d83ac09df81e641e76af0e62f6e7df2f095463ec4461e",
+          "c773a9d42ad6d8ca68f50e2f111e8e932a44cc5594d49d4096466897036b8ba9",
+          "c89702b7729d86140db799c4f3602d0762d67d659769a4e1ba34ffcba3aa1852",
+          "d0ff5974b6aa52cf562bea5921840c032a860a91a3512f7fe8f768f6bbe005f6",
+          "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "e7ad7c891e8f9283848eae14b9c9c41f251ca773805f4eafce3bbf3b3eb957cb",
+          "ed27537936725c7cb3465828120039a8c9d4891fb612bcf457fce85a3e225f05",
+          "f9188be4847cb5fb643bc597e0ca2b7cda9699707b85f35393b5ad8cb708d8ef"
+        ],
+        "arity": 6,
+        "parameterUse": [
+          5,
+          5,
+          2,
+          2,
+          4,
+          17
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": null,
+      "calls": 0,
+      "returnShape": 0,
+      "exceptions": 0,
+      "validation": 0,
+      "arity": 0.5,
+      "literals": 0.08108108108108109,
+      "parameterUse": 0.36363636363636365,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  }
+]

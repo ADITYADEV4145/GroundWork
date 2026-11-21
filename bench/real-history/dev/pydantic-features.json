@@ -1,0 +1,659 @@
+[
+  {
+    "id": "pydantic-normal-55a434c41b-0",
+    "repo": "pydantic",
+    "commit": "55a434c41b1ad2af95584ae8c8c17d364add181f",
+    "subject": "Preserve other steps when using the ellipsis in the pipeline API (#11626)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "55a434c41b1ad2af95584ae8c8c17d364add181f",
+      "file": "pydantic/experimental/pipeline.py",
+      "symbol": "_apply_parse",
+      "line": 396,
+      "endLine": 416,
+      "kind": "function",
+      "sha256": "d79e8477734586a615b5a930f034b700de6e5f2c3e5d7883b8885bef5df96479"
+    },
+    "b": {
+      "revision": "55a434c41b1ad2af95584ae8c8c17d364add181f",
+      "file": "pydantic/experimental/pipeline.py",
+      "symbol": "_check_func",
+      "line": 361,
+      "endLine": 374,
+      "kind": "function",
+      "sha256": "e2ff5af6de056c057d024c5102c4b41d124637538ad1d1f7f63426dbc73acb60"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.8218505616698949
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "pydantic-normal-55a434c41b-0",
+      "reason": "_apply_parse builds a parsing chain and handles strict annotations and the field-type marker; _check_func installs a value predicate that can raise ValueError. Their validators implement different contracts.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "pydantic:55a434c41b1ad2af95584ae8c8c17d364add181f",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.1015625,
+        "exact": 0,
+        "vocabulary": 0.48195241160575897,
+        "bindingExact": 0,
+        "structureVocabulary": 0.048948291803709895,
+        "exactVocabulary": 0,
+        "paramCount": 0.6,
+        "paramNames": 0.1111111111111111,
+        "returnType": 1,
+        "name": 0
+      },
+      "probability": 0.8218505616698949,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0[type]",
+          "Annotated[*]",
+          "cs.chain_schema"
+        ],
+        "writes": [],
+        "calls": [
+          "$3",
+          "Strict",
+          "cs.chain_schema"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [
+          "93a29d76ad073fe929cafa8f70fc5e9c1f8d75cf7f781346c998785d56e649d7",
+          "cf047f1c107a635b03b7d9c3faec33ea1211f5807657670b9e11729a39ad32c5"
+        ],
+        "arity": 5,
+        "parameterUse": [
+          6,
+          6,
+          1,
+          5,
+          2
+        ],
+        "earlyReturns": 3
+      },
+      "b": {
+        "reads": [
+          "cs.no_info_after_validator_function",
+          "cs.no_info_plain_validator_function"
+        ],
+        "writes": [],
+        "calls": [
+          "cs.no_info_after_validator_function",
+          "cs.no_info_plain_validator_function"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "null:return"
+        ],
+        "literals": [],
+        "arity": 3,
+        "parameterUse": [
+          0,
+          0,
+          2
+        ],
+        "earlyReturns": 2
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": null,
+      "calls": 0,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": 0,
+      "arity": 0.6,
+      "literals": 0,
+      "parameterUse": 0.09901475429766744,
+      "earlyReturns": 0.6666666666666666,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "pydantic-normal-588436ec26-2",
+    "repo": "pydantic",
+    "commit": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+    "subject": "Allow callable instances to be used as serializers (#11451)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "file": "pydantic/_internal/_decorators.py",
+      "symbol": "get_callable_return_type",
+      "line": 770,
+      "endLine": 801,
+      "kind": "function",
+      "sha256": "f4eba35da8e11360e3e5368fa386a135d8ab5da86d2afa626981e4bf38fc52a5"
+    },
+    "b": {
+      "revision": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "file": "pydantic/_internal/_typing_extra.py",
+      "symbol": "eval_type",
+      "line": 775,
+      "endLine": 789,
+      "kind": "function",
+      "sha256": "eb782854a76d090f3404172b9a0c12ab59466fcc4216913b0f1fa1a7031d75b4"
+    },
+    "legacy": {
+      "severity": "WARN",
+      "probability": 0.6750412096367467
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "pydantic-normal-588436ec26-2",
+      "reason": "get_callable_return_type unwraps callable objects, collects return hints and can return PydanticUndefined; eval_type converts and evaluates one annotation value. The latter does not perform the former's discovery.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "pydantic:588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.0703125,
+        "exact": 0,
+        "vocabulary": 0.4466366318701886,
+        "bindingExact": 0,
+        "structureVocabulary": 0.031404138178372634,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 0.4,
+        "returnType": 0,
+        "name": 0.2
+      },
+      "probability": 0.6750412096367467,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "hints.get"
+        ],
+        "writes": [],
+        "calls": [
+          "get_function_type_hints",
+          "getattr",
+          "hints.get",
+          "isinstance",
+          "type",
+          "unwrap_wrapped_function"
+        ],
+        "returns": [
+          "call",
+          "parameter:$0"
+        ],
+        "raises": [],
+        "guards": [
+          "type:return"
+        ],
+        "literals": [
+          "08633b69eed18c1b7599fa87e96c00565e3658ca3350b5827518d0f31e7f2049",
+          "37053a618d118705cf1c6e7b5c50a6d89c7725603caeaa8ed30ca1809fac8d59"
+        ],
+        "arity": 3,
+        "parameterUse": [
+          6,
+          2,
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [],
+        "writes": [],
+        "calls": [
+          "_type_convert",
+          "eval_type_backport"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 3,
+        "parameterUse": [
+          3,
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": null,
+      "calls": 0,
+      "returnShape": 0.5,
+      "exceptions": null,
+      "validation": 0,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 0,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "pydantic-normal-588436ec26-4",
+    "repo": "pydantic",
+    "commit": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+    "subject": "Allow callable instances to be used as serializers (#11451)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "file": "pydantic/_internal/_typing_extra.py",
+      "symbol": "get_function_type_hints",
+      "line": 903,
+      "endLine": 945,
+      "kind": "function",
+      "sha256": "623b5d1907667c5757910d244b48b7862dfaa14145989414442446b815a49f0d"
+    },
+    "b": {
+      "revision": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "file": "pydantic/_internal/_typing_extra.py",
+      "symbol": "try_eval_type",
+      "line": 750,
+      "endLine": 772,
+      "kind": "function",
+      "sha256": "7fb473e1f92198c8aa57c001dd314ad5009e87161561bd639d33ee718d259026"
+    },
+    "legacy": {
+      "severity": "WARN",
+      "probability": 0.5088044027469222
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "pydantic-normal-588436ec26-4",
+      "reason": "get_function_type_hints collects an annotation dictionary with namespace, partial and type-parameter handling; try_eval_type evaluates a single value and returns a value/success tuple with NameError recovery.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "pydantic:588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.0703125,
+        "exact": 0,
+        "vocabulary": 0.34618779192445104,
+        "bindingExact": 0,
+        "structureVocabulary": 0.024341329119687963,
+        "exactVocabulary": 0,
+        "paramCount": 0.75,
+        "paramNames": 0.3333333333333333,
+        "returnType": 0,
+        "name": 0.16666666666666666
+      },
+      "probability": 0.5088044027469222,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.__annotations__",
+          "$0.func",
+          "$0.func.__annotations__",
+          "annotations.items"
+        ],
+        "writes": [
+          "type_hints[*]"
+        ],
+        "calls": [
+          "_make_forward_ref",
+          "annotations.items",
+          "eval_type_backport",
+          "get_module_ns_of",
+          "getattr",
+          "isinstance"
+        ],
+        "returns": [
+          "object"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "9699265a7301a1ea0d1de5916f6018e8385ad257cfcb0624908a390cb4ecaa06"
+        ],
+        "arity": 4,
+        "parameterUse": [
+          5,
+          2,
+          3,
+          2
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [],
+        "writes": [],
+        "calls": [
+          "_type_convert",
+          "eval_type_backport"
+        ],
+        "returns": [
+          "tuple:2"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 3,
+        "parameterUse": [
+          4,
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": 0,
+      "calls": 0.14285714285714285,
+      "returnShape": 0,
+      "exceptions": null,
+      "validation": null,
+      "arity": 0.75,
+      "literals": 0,
+      "parameterUse": 0.909241209316635,
+      "earlyReturns": null,
+      "writePresenceMismatch": 1
+    }
+  },
+  {
+    "id": "pydantic-normal-1dcddac2c5-0",
+    "repo": "pydantic",
+    "commit": "1dcddac2c5e1ac2361fc897f804f44338a1d8067",
+    "subject": "Do not override `'definitions-ref'` schemas containing serialization schemas or metadata (#11644)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "1dcddac2c5e1ac2361fc897f804f44338a1d8067",
+      "file": "pydantic/_internal/_generate_schema.py",
+      "symbol": "_Definitions",
+      "line": 2675,
+      "endLine": 2824,
+      "kind": "class",
+      "sha256": "130e24d0c9e851c6fa8547fbda7b05ca5894cd48fd89121ac1ec616468cbdd17"
+    },
+    "b": {
+      "revision": "1dcddac2c5e1ac2361fc897f804f44338a1d8067",
+      "file": "pydantic/_internal/_generate_schema.py",
+      "symbol": "_Definitions.finalize_schema",
+      "line": 2752,
+      "endLine": 2806,
+      "kind": "method",
+      "sha256": "9cbdb193b55369dd33cc4eed2f97025630148f5889c5ae4398465dc29f858823"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.8745767836786755
+    },
+    "identity": {
+      "related": true,
+      "compatible": false
+    },
+    "review": {
+      "id": "pydantic-normal-1dcddac2c5-0",
+      "reason": "_Definitions contains finalize_schema in the same source range. The class owns definition storage and other operations; its own finalization method cannot replace that class.",
+      "label": "negative",
+      "mode": "containment",
+      "family": "pydantic:1dcddac2c5e1ac2361fc897f804f44338a1d8067",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.40625,
+        "exact": 0,
+        "vocabulary": 0.8539915077256794,
+        "bindingExact": 0,
+        "structureVocabulary": 0.34693405001355726,
+        "exactVocabulary": 0,
+        "paramCount": 0,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.8745767836786755,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": true,
+      "compatible": false,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": null,
+      "b": {
+        "reads": [
+          "*remaining_defs.values",
+          "SELF._definitions",
+          "SELF._resolve_definition",
+          "_discriminated_union.apply_discriminator",
+          "core_schema.definitions_schema",
+          "cs.clear",
+          "cs.copy",
+          "cs.update",
+          "cs[metadata]",
+          "cs[metadata].pop",
+          "gather_result[collected_references]",
+          "gather_result[collected_references].items",
+          "gather_result[deferred_discriminator_schemas]",
+          "inlinable_def_ref.clear",
+          "inlinable_def_ref.pop",
+          "inlinable_def_ref.update"
+        ],
+        "writes": [
+          "inlinable_def_ref[metadata]",
+          "mutate:cs",
+          "mutate:cs[metadata]",
+          "mutate:inlinable_def_ref",
+          "remaining_defs[*]"
+        ],
+        "calls": [
+          "*remaining_defs.values",
+          "SELF._resolve_definition",
+          "_discriminated_union.apply_discriminator",
+          "_inlining_behavior",
+          "core_schema.definitions_schema",
+          "cs.clear",
+          "cs.copy",
+          "cs.update",
+          "cs[metadata].pop",
+          "gather_result[collected_references].items",
+          "gather_schemas_for_cleaning",
+          "inlinable_def_ref.clear",
+          "inlinable_def_ref.pop",
+          "inlinable_def_ref.update"
+        ],
+        "returns": [
+          "parameter:$0"
+        ],
+        "raises": [
+          "InvalidSchemaError"
+        ],
+        "guards": [],
+        "literals": [
+          "01d2e2814e4405466c9a35b353089a04335bb725ff71ef0a17ea28f52baacf3e",
+          "6197679f8e7ae1b459b50bb50618934746289cbe84438f548b016664749c438c",
+          "63afe3bcab940c71db5d0dbccc354b3dbcb3a59ee29497c116ab869ce2860996",
+          "945bab874cd7b1a9a90c7bf99ad85a41409e23aeb044777a5b174e594cd640a6",
+          "b6696a8722cb0005cf76ba207ff0f73443678870bf4a861c36fa89fdba3234d2",
+          "c62bed2617fd091289b5c1b843b4d0d3c7ae14e999a05d195be7aa8928a63133",
+          "ee34fab4d1c373d489de8f1687172a4004b37f433356205224ad752b6daf606e"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          5
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0
+    }
+  },
+  {
+    "id": "pydantic-normal-cbf4202637-0",
+    "repo": "pydantic",
+    "commit": "cbf4202637a56fc5325ab4b18452e3f3ba910a84",
+    "subject": "Do not expand root type in the mypy plugin for variables (#11676)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "cbf4202637a56fc5325ab4b18452e3f3ba910a84",
+      "file": "pydantic/mypy.py",
+      "symbol": "PydanticModelField",
+      "line": 250,
+      "endLine": 391,
+      "kind": "class",
+      "sha256": "c51456d2d00d8ad1f2ddbee4bca2ea45b3abc54014146fda4ddd98ce52fb4697"
+    },
+    "b": {
+      "revision": "cbf4202637a56fc5325ab4b18452e3f3ba910a84",
+      "file": "pydantic/mypy.py",
+      "symbol": "PydanticModelField.to_argument",
+      "line": 277,
+      "endLine": 304,
+      "kind": "method",
+      "sha256": "20c9138672ca602cf0735ead653fd2cd8eac54ea4685323471d8e81c4067aa8f"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.8924680071110735
+    },
+    "identity": {
+      "related": true,
+      "compatible": false
+    },
+    "review": {
+      "id": "pydantic-normal-cbf4202637-0",
+      "reason": "PydanticModelField encloses to_argument. A field metadata class and its argument-conversion method are not independent interchangeable definitions.",
+      "label": "negative",
+      "mode": "containment",
+      "family": "pydantic:cbf4202637a56fc5325ab4b18452e3f3ba910a84",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.2265625,
+        "exact": 0,
+        "vocabulary": 0.6946609035491965,
+        "bindingExact": 0,
+        "structureVocabulary": 0.15738411096036484,
+        "exactVocabulary": 0,
+        "paramCount": 0.8,
+        "paramNames": 0.18181818181818182,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.8924680071110735,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": true,
+      "compatible": false,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": null,
+      "b": {
+        "reads": [
+          "SELF.expand_type",
+          "SELF.has_default",
+          "SELF.strict",
+          "SELF.to_var",
+          "TypeOfAny.explicit"
+        ],
+        "writes": [],
+        "calls": [
+          "AnyType",
+          "Argument",
+          "SELF.expand_type",
+          "SELF.to_var"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 8,
+        "parameterUse": [
+          2,
+          1,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0
+    }
+  }
+]

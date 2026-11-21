@@ -1,0 +1,141 @@
+{
+  "repo": "django",
+  "detector": "ca55316b9e09b3a90be8623e6a3864697e6f133a",
+  "sampling": "Up to 12 non-keyword commits with production changes (4 for Django/scikit-learn); smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+  "runs": [
+    {
+      "hash": "12b771a1ec4bbfe82405176f5601e6441855a303",
+      "parent": "25f97e7bcf2e5064258e07b970b4bdef5fddce51",
+      "date": "2025-04-05T20:43:50+02:00",
+      "subject": "Fixed #36299 -- Prevented field selection on QuerySet.alias() after values().",
+      "productionFiles": [
+        "django/db/models/sql/query.py"
+      ],
+      "keyword": false,
+      "proposals": 0,
+      "driver": "built checkRepository API, timeoutMs=120000 (decision logic unchanged)",
+      "ms": 121170.349795,
+      "exitCode": 0,
+      "report": {
+        "status": "UNAVAILABLE",
+        "findings": [],
+        "error": "reuse check timed out"
+      }
+    },
+    {
+      "hash": "1823a8011346afc280e0efaf8cb7c086b148f881",
+      "parent": "30e0a43937e685083fa1210c3594678a3b813806",
+      "date": "2025-03-17T15:45:08+01:00",
+      "subject": "Fixed #33537 -- Made test database cloning on MySQL reraise unexpected errors.",
+      "productionFiles": [
+        "django/db/backends/mysql/creation.py"
+      ],
+      "keyword": false,
+      "proposals": 0,
+      "driver": "built checkRepository API, timeoutMs=120000 (decision logic unchanged)",
+      "ms": 124896.106919,
+      "exitCode": 0,
+      "report": {
+        "status": "UNAVAILABLE",
+        "findings": [],
+        "error": "reuse check timed out"
+      }
+    },
+    {
+      "hash": "f920937c8a63df6bea220e4386f59cdb45b2e355",
+      "parent": "f66c79e93d41d2cd32be244170b54080c0796584",
+      "date": "2025-05-13T12:05:58+01:00",
+      "subject": "Fixed #35518 -- Optimized RoutePattern by using string operations for converter-less routes.",
+      "productionFiles": [
+        "django/urls/resolvers.py"
+      ],
+      "keyword": false,
+      "proposals": 0,
+      "driver": "built checkRepository API, timeoutMs=120000 (decision logic unchanged)",
+      "ms": 111972.04499899998,
+      "exitCode": 1,
+      "report": {
+        "status": "BLOCK",
+        "blocked": true,
+        "base": "f66c79e93d41d2cd32be244170b54080c0796584",
+        "findings": [
+          {
+            "id": "d23d58e3c832bca180d24bc35edbc0292bdc0058",
+            "kind": "duplicate",
+            "severity": "BLOCK",
+            "added": {
+              "file": "django/urls/resolvers.py",
+              "symbol": "RoutePattern",
+              "line": 314
+            },
+            "existing": {
+              "file": "django/urls/resolvers.py",
+              "symbol": "RoutePattern.check",
+              "line": 346
+            },
+            "probability": 0.8586214769284838,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.7296035339030359
+              },
+              {
+                "name": "bindingExact",
+                "value": 0
+              }
+            ],
+            "fix": "Replace the body of RoutePattern with a call to RoutePattern.check."
+          },
+          {
+            "id": "227a83e2876851f0ee03d8ac8c66318af5399753",
+            "kind": "duplicate",
+            "severity": "BLOCK",
+            "added": {
+              "file": "django/urls/resolvers.py",
+              "symbol": "RoutePattern.match",
+              "line": 324
+            },
+            "existing": {
+              "file": "django/urls/resolvers.py",
+              "symbol": "RoutePattern",
+              "line": 314
+            },
+            "probability": 0.7604463969018678,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.6353169732163286
+              },
+              {
+                "name": "paramCount",
+                "value": 0.33333333333333337
+              }
+            ],
+            "fix": "Replace the body of RoutePattern.match with a call to RoutePattern."
+          }
+        ],
+        "allows": [],
+        "ms": 111793.121939
+      }
+    },
+    {
+      "hash": "126417be439bc712dee2a60a24674adef011861f",
+      "parent": "02a5cbfe76382da2a0414df17017185be5bd47f9",
+      "date": "2025-03-31T13:44:54+02:00",
+      "subject": "Fixed #36265 -- Added support for serialization of ZoneInfo instances in migrations.",
+      "productionFiles": [
+        "django/db/migrations/serializer.py"
+      ],
+      "keyword": false,
+      "proposals": 0,
+      "driver": "built checkRepository API, timeoutMs=120000 (decision logic unchanged)",
+      "ms": 121428.83540099999,
+      "exitCode": 0,
+      "report": {
+        "status": "UNAVAILABLE",
+        "findings": [],
+        "error": "reuse check timed out"
+      }
+    }
+  ]
+}

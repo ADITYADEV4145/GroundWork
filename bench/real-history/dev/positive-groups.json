@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sklearn-backend-predicates",
+    "repo": "scikit-learn",
+    "commit": "9b40cbce33ed5c0ca7155c0dc4461e95c1de3943",
+    "file": "sklearn/externals/array_api_compat/common/_helpers.py",
+    "members": ["is_numpy_array", "is_cupy_array", "is_torch_array", "is_ndonnx_array", "is_dask_array", "is_jax_array", "is_pydata_sparse_array"],
+    "afterHelper": "_issubclass_fast",
+    "mode": "shared-helper",
+    "reason": "Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE)."
+  },
+  {
+    "id": "django-mail-recipients",
+    "repo": "django",
+    "commit": "90fc76294808b16a86acc9a073435250466932e3",
+    "file": "django/core/mail/__init__.py",
+    "members": ["mail_admins", "mail_managers"],
+    "afterHelper": "_send_server_message",
+    "mode": "shared-helper",
+    "reason": "The two functions duplicate recipient validation, EmailMultiAlternatives construction, HTML attachment and sending; ADMINS versus MANAGERS is the configuration difference. The commit extracts _send_server_message(setting_name=...) and both wrappers call it. Calling mail_managers from mail_admins unchanged would send to the wrong recipients, so this is helper-extraction evidence, not direct-call equivalence."
+  },
+  {
+    "id": "django-expression-resolution",
+    "repo": "django",
+    "commit": "a76035e925ff4e6d8676c65cb135c74b993b1039",
+    "file": "django/db/models/expressions.py",
+    "members": ["Func.resolve_expression", "BaseExpression.resolve_expression"],
+    "afterHelper": "BaseExpression.resolve_expression",
+    "mode": "extend-existing",
+    "reason": "Both before implementations copy self, set is_summary and resolve child expressions. The commit moves Func's composite-expression validation into BaseExpression and deletes Func's override, inheriting the generalized implementation. This is an author-performed consolidation, but before-state BaseExpression lacks Func's validation: direct replacement without extending it would be unsafe."
+  },
+  {
+    "id": "django-log-assertions",
+    "repo": "django",
+    "commit": "9d72e7daf7299ef1ece56fd657a02f77a469efe9",
+    "file": "tests/logging_tests/tests.py",
+    "members": ["LogResponseRealLoggerTests.assertResponseLogged", "LoggingAssertionMixin.assertLogRecord"],
+    "afterHelper": "LoggingAssertionMixin.assertLogRecord",
+    "mode": "extend-existing-test",
+    "reason": "Both before helpers validate one captured record, its message and status. The commit extends assertLogRecord with level/request checks and a return value, makes LogResponseRealLoggerTests inherit the mixin and replaces every assertResponseLogged call. Real duplicate assertion logic is consolidated; the old target alone lacks checks and a return value, so it is not a safe unchanged replacement. Test-only evidence, outside the production skipTests population."
+  }
+]

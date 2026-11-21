@@ -1,0 +1,654 @@
+{
+  "repo": "django",
+  "start": "8d9901c961bf9d5cfa6bddddbbcebfbf487a5125",
+  "end": "192bc7a7be92e20cc250907fb4083df689715679",
+  "sampling": "Test paths only, commits selected by refactor/parameterize/cleanup/helper/reduce keywords; supplementary, not production detector recall.",
+  "ms": 7020.233005,
+  "commits": [
+    {
+      "hash": "0cabed9efa2c7abd1693860069f20ec5db41fcd8",
+      "parent": "b3c5830769d8a5dbf2f974da7116fe503c9454d9",
+      "date": "2025-01-15T13:46:06-03:00",
+      "subject": "Simplified GeoIP2._query() when passing IPv4Address()/IPv6Address() instances.",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "a7af1e2756e99c51d4a43fe85f664be1a30795fe",
+      "parent": "37373d9ae969f3c3b8b1ffcec9ffb0e00ec267c3",
+      "date": "2025-01-16T13:12:33+01:00",
+      "subject": "Refs #35090 -- Fixed urlpatterns.tests.SimplifiedURLTests when run in reverse.",
+      "productionFiles": [
+        "tests/urlpatterns/tests.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "a76035e925ff4e6d8676c65cb135c74b993b1039",
+      "parent": "136a1e89278070fd100f27d9519529be8a8a8c10",
+      "date": "2025-01-22T08:56:18+01:00",
+      "subject": "Refs #36042 -- Consolidated composite expression checks in BaseExpression.",
+      "productionFiles": [
+        "tests/composite_pk/test_aggregate.py",
+        "tests/composite_pk/test_filter.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "8ff1399f0656b4ff8181fe7872e426c331d1b1ee",
+      "parent": "5f30fd2358fd60a514bdba31594bfc8122f30167",
+      "date": "2025-02-04T07:40:02Z",
+      "subject": "Fixed #36058 -- Refactored SpatialRefSysMixin.srs to use cached_property.",
+      "productionFiles": [
+        "tests/gis_tests/test_spatialrefsys.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "44ccd20375ba0d4da869ef994bc10a2311e9dc88",
+      "parent": "3839afb63ad5183cdf08e06e3a43a014ca4b7263",
+      "date": "2025-02-10T22:58:26-03:00",
+      "subject": "Refs #35515 -- Refactored internal `get_and_report_namespace` in the shell command.",
+      "productionFiles": [
+        "tests/shell/tests.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "parent": "05002c153c5018e4429a326a6699c7c45e5ea957",
+      "date": "2025-02-13T16:01:13+01:00",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "productionFiles": [
+        "tests/shell/tests.py"
+      ],
+      "keyword": true,
+      "proposals": 8
+    },
+    {
+      "hash": "c07ba43c4bc94272c3d4a13c8f468b94db1e655c",
+      "parent": "2d34ebe49a25d0974392583d5bbd954baf742a32",
+      "date": "2025-02-16T19:32:36+01:00",
+      "subject": "Refs #35704 -- Used copy.replace() in Operation.reduce() methods.",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "727731d76d9dfd5304d536478d862778f6dd6d9b",
+      "parent": "efb7f9ced2dcf71294353596a265e3fd67faffeb",
+      "date": "2025-02-18T08:58:49+01:00",
+      "subject": "Fixed #36179 -- Unhexed entries and removed duplicates in auth/common-passwords.txt.gz.",
+      "productionFiles": [
+        "tests/auth_tests/test_validators.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "f480d5d3ed8234aea876f7eaf8a9154e5bf09d16",
+      "parent": "9120a19c4ecb643111b073dd1069e6b410a03c23",
+      "date": "2025-03-10T13:01:02+01:00",
+      "subject": "Fixed #36201 -- Caught ValidationError in ModelChoiceField/ModelMultipleChoiceField.clean().",
+      "productionFiles": [
+        "tests/model_forms/test_uuid.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "955b7c6ba105b328f387a9d63540dbabd4a05828",
+      "parent": "2ae3044d9d4dfb8371055513e440e0384f211963",
+      "date": "2025-03-12T11:04:21+01:00",
+      "subject": "Removed duplicate entries in docs/releases/5.2.txt.",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "e804a07d76fc85468f27f7130ae1442fabcd650d",
+      "parent": "1823a8011346afc280e0efaf8cb7c086b148f881",
+      "date": "2025-03-17T16:29:28-03:00",
+      "subject": "Fixed #36252 -- Handled duplicate automatic imports in the shell command.",
+      "productionFiles": [
+        "tests/shell/tests.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "90fc76294808b16a86acc9a073435250466932e3",
+      "parent": "62ad970c39c067dd30b068cb9ad04a93963bebb4",
+      "date": "2025-03-18T10:08:09+01:00",
+      "subject": "Refs #36138 -- Cleaned up duplicate code in mail_admins()/mail_managers().",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "9aabe7eae3eeb3e64c5a0f3687118cd806158550",
+      "parent": "0d92428d77fafff373e05dd5a6cdb62bd1dfbda0",
+      "date": "2025-03-27T08:57:03-03:00",
+      "subject": "Fixed #35440 -- Simplified parse_header_parameters by leveraging stdlid's Message.",
+      "productionFiles": [
+        "tests/utils_tests/test_http.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "5df512e53ab12fd8a0c92421a45aa1b664adb166",
+      "parent": "6e54e20cc3908d4eb103678db14e1e02e05069dd",
+      "date": "2025-03-28T09:36:13+01:00",
+      "subject": "Simplified Intersphinx configuration example.",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "c972af69e2021b75b89d8bc47e214ef875bbdc06",
+      "parent": "6888375c53476011754f778deabc6cdbfa327011",
+      "date": "2025-03-31T22:43:13-03:00",
+      "subject": "Refs #28909 -- Simplified code using unpacking generalizations.",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "e715b07cf32f9d913f10efe87db7b4b0d793237a",
+      "parent": "019acad112da3d00bb81b3022fd25ccd8457e5d9",
+      "date": "2025-04-04T15:55:07-03:00",
+      "subject": "Improved \"fetch\" translations helper to restrict the resulting set by date.",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d4a2809c2b878317a4fa0e1cbaf07322ffd7f2fb",
+      "parent": "12b771a1ec4bbfe82405176f5601e6441855a303",
+      "date": "2025-04-06T09:40:12+02:00",
+      "subject": "Added supports_expression_defaults check in DefaultTests.test_full_clean() test.",
+      "productionFiles": [
+        "tests/field_defaults/tests.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "21f8be76d43aa1ee5ae41c1e0a428cfea1f231c1",
+      "parent": "2d1ac1dce8a1c169def5af01fc871e33f93c27c3",
+      "date": "2025-04-11T09:04:49+02:00",
+      "subject": "Fixed #36288 -- Addressed improper handling of duplicates in values_list().",
+      "productionFiles": [
+        "tests/composite_pk/test_values.py",
+        "tests/queries/tests.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "ac16d2876da296d8e50450bf7d776f92d1e16b0d",
+      "parent": "21f8be76d43aa1ee5ae41c1e0a428cfea1f231c1",
+      "date": "2025-04-12T19:39:07+02:00",
+      "subject": "Fixed #36320 -- Ignored \"duplicated_toc_entry\" for ePub docs build.",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "19067fe85a32a51703b7ed29626a30e00899007f",
+      "parent": "1bc805e23b73a580b82a1d416ab0fb59a1073047",
+      "date": "2025-04-23T13:01:19+01:00",
+      "subject": "Simplified UserManager.with_perm() by using get_backends().",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "2722cb61ccae84f593e6d2c28814e3c628743994",
+      "parent": "65bbdbd10b25700d1166b1a698e672a4695281bc",
+      "date": "2025-04-29T13:45:05-03:00",
+      "subject": "Used addCleanup() instead of try-finally blocks in inspectdb tests.",
+      "productionFiles": [
+        "tests/inspectdb/tests.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f7d97dd11819be8996798a7197c5695a317334a0",
+      "parent": "dd133054cb98f77577c06d7ef1f2391a865784bc",
+      "date": "2025-05-06T11:11:40-03:00",
+      "subject": "Simplified artifact building steps in docs/internals/howto-release-django.txt.",
+      "productionFiles": [],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "37f2a77c729ccb71059c8e66c49b07499d2edf60",
+      "parent": "fdabda4e05587347aeb3382a442d7e77c1a0c3e5",
+      "date": "2025-05-07T11:36:05-03:00",
+      "subject": "Cleaned up CVE-2025-32873 security archive description.",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "384cdf0f7a2c8d1793b120d82a1584776c064f44",
+      "parent": "358fd21c47cdf7bda520ce73c5cfd82bba57827b",
+      "date": "2025-05-08T11:38:13+01:00",
+      "subject": "Fixed #36363 -- Added field names to admin duplicated fields error hint.",
+      "productionFiles": [
+        "tests/admin_checks/tests.py",
+        "tests/modeladmin/test_checks.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "897046815944cc9a2da7ed9e8082f45ffe8110e3",
+      "parent": "8c279113864c31cef539c6384a683e6ed832adca",
+      "date": "2025-05-22T15:39:31-03:00",
+      "subject": "Refs #26688 -- Added tests for `log_response()` internal helper.",
+      "productionFiles": [
+        "tests/logging_tests/tests.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "ad6f99889838ccc2c30b3c02ed3868c9b565e81b",
+      "parent": "897046815944cc9a2da7ed9e8082f45ffe8110e3",
+      "date": "2025-05-22T15:39:31-03:00",
+      "subject": "Added helpers in csrf_tests and logging_tests to assert logs from `log_response()`.",
+      "productionFiles": [
+        "tests/csrf_tests/tests.py",
+        "tests/logging_tests/tests.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "9d72e7daf7299ef1ece56fd657a02f77a469efe9",
+      "parent": "b762a6ab3c036b66986ee3fbc99bb7962419b48f",
+      "date": "2025-06-06T09:05:32-03:00",
+      "subject": "Refactored logging_tests to reuse assertions for log records.",
+      "productionFiles": [
+        "tests/logging_tests/tests.py"
+      ],
+      "keyword": true,
+      "proposals": 1
+    },
+    {
+      "hash": "f2f6046c0f92ff1faed057da0711ac478eef439c",
+      "parent": "e80b33ae4d6f93375b10b2fe50bd6f588f1246ad",
+      "date": "2025-06-12T17:35:14-03:00",
+      "subject": "Fixed #25706 -- Refactored geometry widgets to remove inline JavaScript.",
+      "productionFiles": [
+        "tests/gis_tests/test_geoforms.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "56f468681aaedefcdada1b86c441c12ae96e7fea",
+      "parent": "bc1bfe12b613334bd625aeb36fd44af96d186c10",
+      "date": "2025-06-19T12:22:23+02:00",
+      "subject": "Refs #35038 -- Reduced CreateModel/AlterConstraint operations when optimizing migrations.",
+      "productionFiles": [
+        "tests/migrations/test_optimizer.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    }
+  ],
+  "proposals": [
+    {
+      "id": "django-3dc395112c3a",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_overridden.TestCommand.get_namespace",
+        "line": 192,
+        "endLine": 199,
+        "kind": "method",
+        "sha256": "524fd0bff38e473ee4348951bd0b7e3e0653ac9469df8f060d26ace8ca60a2a7"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0.0625,
+      "exact": 0
+    },
+    {
+      "id": "django-344ec0aa4873",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_message_with_stdout_listing_objects_with_isort_not_installed.TestCommand.get_namespace",
+        "line": 256,
+        "endLine": 266,
+        "kind": "method",
+        "sha256": "48e2aa5cb46ecce7f2548a8977ed6969437edaa7bee3c8f6ce89945b6ab6aac2"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0.0703125,
+      "exact": 0
+    },
+    {
+      "id": "django-c8be1e9c6c01",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_message_with_stdout_one_object.TestCommand.get_namespace",
+        "line": 280,
+        "endLine": 281,
+        "kind": "method",
+        "sha256": "9486bed59c4a5eef88c625b59d01b6c591a03493b342dc88627f246625d62d2d"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0.046875,
+      "exact": 0
+    },
+    {
+      "id": "django-dfa93b4816b5",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_message_with_stdout_zero_objects.TestCommand.get_namespace",
+        "line": 302,
+        "endLine": 303,
+        "kind": "method",
+        "sha256": "79b641162a1ccb995f0aadfdec46ab3b8883c32326d33c30348242652347a907"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0,
+      "exact": 0
+    },
+    {
+      "id": "django-ec8ddc9a134c",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_message_with_stdout_listing_objects_with_isort.TestCommand.get_namespace",
+        "line": 325,
+        "endLine": 335,
+        "kind": "method",
+        "sha256": "48e2aa5cb46ecce7f2548a8977ed6969437edaa7bee3c8f6ce89945b6ab6aac2"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0.0703125,
+      "exact": 0
+    },
+    {
+      "id": "django-108d0e470fea",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "django/core/management/commands/shell.py",
+        "symbol": "Command.get_namespace",
+        "line": 178,
+        "endLine": 184,
+        "kind": "method",
+        "sha256": "7eb8a2df0921a822715bf79dee1fe2680313e8dd4c765864f49f65b8ca9a6b18"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0.046875,
+      "exact": 0
+    },
+    {
+      "id": "django-700830a887d4",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "django/http/response.py",
+        "symbol": "HttpResponseBase.get",
+        "line": 211,
+        "endLine": 212,
+        "kind": "method",
+        "sha256": "b329e81e4b8ca36c388992b30d79b6469b4756afa37218b6480ea5b7a960c306"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0.046875,
+      "exact": 0
+    },
+    {
+      "id": "django-c193ce13d941",
+      "repo": "django",
+      "commit": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+      "subject": "Fixed #36158 -- Refactored shell command to improve auto-imported objects reporting.",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "tests/shell/tests.py",
+        "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+        "line": 170,
+        "endLine": 185,
+        "kind": "method",
+        "sha256": "dcdfb0bfc0572db043f510e83ccc22b8c3f13e9ab34d68d793e6a523a65cfb1e"
+      },
+      "b": {
+        "revision": "05002c153c5018e4429a326a6699c7c45e5ea957",
+        "file": "django/test/utils.py",
+        "symbol": "ContextList.get",
+        "line": 88,
+        "endLine": 92,
+        "kind": "method",
+        "sha256": "de2735a1bdd472deda68dcb47ad097f23959c2280a943b5bc950c57214a59102"
+      },
+      "after": [
+        {
+          "revision": "56e23b2319cc29e6f8518f8f21f95a530dddb930",
+          "file": "tests/shell/tests.py",
+          "symbol": "ShellCommandAutoImportsTestCase.test_get_namespace_precedence",
+          "line": 164,
+          "endLine": 173,
+          "kind": "method",
+          "sha256": "4d5ed44b8bc7ec2ee866e3f2751ae7ce8e121c8c4cca487f9875ade8a3b80ac0"
+        }
+      ],
+      "structure": 0.0390625,
+      "exact": 0
+    },
+    {
+      "id": "django-d2c2bdc90141",
+      "repo": "django",
+      "commit": "9d72e7daf7299ef1ece56fd657a02f77a469efe9",
+      "subject": "Refactored logging_tests to reuse assertions for log records.",
+      "method": "removed-with-existing-call-added",
+      "a": {
+        "revision": "b762a6ab3c036b66986ee3fbc99bb7962419b48f",
+        "file": "tests/logging_tests/tests.py",
+        "symbol": "LogResponseRealLoggerTests.assertResponseLogged",
+        "line": 714,
+        "endLine": 726,
+        "kind": "method",
+        "sha256": "f4bb9f91043159622f76080b75fc6b701c3b559a232d502d79d41892ce3859ad"
+      },
+      "b": {
+        "revision": "b762a6ab3c036b66986ee3fbc99bb7962419b48f",
+        "file": "tests/logging_tests/tests.py",
+        "symbol": "LoggingAssertionMixin.assertLogRecord",
+        "line": 98,
+        "endLine": 117,
+        "kind": "method",
+        "sha256": "b86b96de88515022f3802266db38fb844e9fda8d068bcb2d7c34499f404fa9ee"
+      },
+      "after": [
+        {
+          "revision": "9d72e7daf7299ef1ece56fd657a02f77a469efe9",
+          "file": "tests/logging_tests/tests.py",
+          "symbol": "LoggingAssertionMixin.assertLogRecord",
+          "line": 98,
+          "endLine": 122,
+          "kind": "method",
+          "sha256": "643992f90c5d54170b9836b9c621ec7c6bbb50e745aa2dd80e0faf193b4ead77"
+        }
+      ],
+      "structure": 0.6953125,
+      "exact": 0
+    }
+  ]
+}

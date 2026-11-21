@@ -1,0 +1,3320 @@
+{
+  "repo": "pydantic",
+  "start": "59b35de6564af0a971aae99807f0f562fa051e3e",
+  "end": "42298a08b4cb999242b2ce231adda03539858567",
+  "sampling": "All eligible non-merge commits, production TS/Python paths.",
+  "ms": 71645.47468999999,
+  "commits": [
+    {
+      "hash": "bc54449c65698a9f2bb7581585d55f3b1e116729",
+      "parent": "59b35de6564af0a971aae99807f0f562fa051e3e",
+      "date": "2025-01-02T11:41:34+01:00",
+      "subject": "👥 Update Pydantic People (#11204)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d494f6cbec2cf5a6d549aa8dddc4554ad53e7ad6",
+      "parent": "bc54449c65698a9f2bb7581585d55f3b1e116729",
+      "date": "2025-01-02T13:20:28+01:00",
+      "subject": "Bump astral-sh/setup-uv from 4 to 5 (#11205)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "9553fa41c2b307e8d7b8d551dc66400110cd9760",
+      "parent": "d494f6cbec2cf5a6d549aa8dddc4554ad53e7ad6",
+      "date": "2025-01-02T10:31:06-05:00",
+      "subject": "Copy `WithJsonSchema` schema to avoid sharing mutated data (#11014)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "aad4c43479400b03a5e14795aedc9c5e11a7838e",
+      "parent": "9553fa41c2b307e8d7b8d551dc66400110cd9760",
+      "date": "2025-01-02T16:46:06Z",
+      "subject": "Fix linting for docs deploy (#11206)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "aa85c3a14d109fabc9c6ca972b5c2f4bce733fac",
+      "parent": "aad4c43479400b03a5e14795aedc9c5e11a7838e",
+      "date": "2025-01-02T12:25:07-05:00",
+      "subject": "Move core schema generation logic for path types inside the `GenerateSchema` class (#10846)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_std_types_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "0b810630f8a85ad89384802ac69090a0c1c292e0",
+      "parent": "aa85c3a14d109fabc9c6ca972b5c2f4bce733fac",
+      "date": "2025-01-07T09:34:32-05:00",
+      "subject": "Do not cache parametrized models when in the process of parametrizing another model (#10704)",
+      "productionFiles": [
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "3edf80bcb987ec0d59b335b62abb3529189d0cec",
+      "parent": "0b810630f8a85ad89384802ac69090a0c1c292e0",
+      "date": "2025-01-07T09:36:33-05:00",
+      "subject": "Re-enable Beanie third-party tests (#11214)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "9dc7d0bd2b6eb68d8afd569ac43102be30b69f81",
+      "parent": "3edf80bcb987ec0d59b335b62abb3529189d0cec",
+      "date": "2025-01-07T09:40:06-05:00",
+      "subject": "Add discriminated union related metadata entries to the `CoreMetadata` definition (#11216)",
+      "productionFiles": [
+        "pydantic/_internal/_core_metadata.py",
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_discriminated_union.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/types.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "da0449e00fa1ed203c18e81adae9775c4bbbad6f",
+      "parent": "9dc7d0bd2b6eb68d8afd569ac43102be30b69f81",
+      "date": "2025-01-07T09:41:15-05:00",
+      "subject": "Do not error if `PYDANTIC_PRIVATE_ALLOW_UNHANDLED_SCHEMA_TYPES` environment variable is not set (#11215)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a2eb22bd42d919eef82461a1a77ae6d23a191b48",
+      "parent": "da0449e00fa1ed203c18e81adae9775c4bbbad6f",
+      "date": "2025-01-07T12:38:51-05:00",
+      "subject": "Reorganize `extra` configuration documentation (#11213)",
+      "productionFiles": [
+        "pydantic/config.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f0cff7bfe73887e1803d8035c7a2cc8c0723c50b",
+      "parent": "a2eb22bd42d919eef82461a1a77ae6d23a191b48",
+      "date": "2025-01-07T21:08:40+01:00",
+      "subject": "Change `GenerateJsonSchema.resolve_ref_schema` implementation to not use recursive calls (#11228)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "3d768e7d221b804b0df91eb2a69f259b455286c1",
+      "parent": "f0cff7bfe73887e1803d8035c7a2cc8c0723c50b",
+      "date": "2025-01-07T21:09:30+01:00",
+      "subject": "Simplify logic in `check_validator_fields_against_field_name` (#11229)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "796fed951ad8146f0a96d6aab3590b4638c86e66",
+      "parent": "3d768e7d221b804b0df91eb2a69f259b455286c1",
+      "date": "2025-01-07T21:13:09+01:00",
+      "subject": "Consolidate schema definitions logic in the `_Definitions` class (#11208)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_schema_generation_shared.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "5d92c05af13fc932c49a2d73ed74a4e6b5734c1c",
+      "parent": "796fed951ad8146f0a96d6aab3590b4638c86e66",
+      "date": "2025-01-08T10:56:28-05:00",
+      "subject": "Fix url serialization for unions (#11227)",
+      "productionFiles": [
+        "pydantic/networks.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "bfeca9b926bc7596858e27af341d0199f1aa3ae2",
+      "parent": "5d92c05af13fc932c49a2d73ed74a4e6b5734c1c",
+      "date": "2025-01-08T17:02:35+01:00",
+      "subject": "Support initializing root model fields with values of the `root` type in the mypy plugin (#11212)",
+      "productionFiles": [
+        "pydantic/mypy.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "8fc509d4a69983f64d8090ee6ebb0733da1f6d16",
+      "parent": "bfeca9b926bc7596858e27af341d0199f1aa3ae2",
+      "date": "2025-01-08T22:12:15+01:00",
+      "subject": "Prepare release v2.10.5 (#11237)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "4e055d56471651bca5ce8907c671bc6339d309fe",
+      "parent": "8fc509d4a69983f64d8090ee6ebb0733da1f6d16",
+      "date": "2025-01-09T15:10:07-05:00",
+      "subject": "Move `deque` schema gen to `GenerateSchema` class (#11239)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_std_types_schema.py",
+        "pydantic/_internal/_validators.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "aac7a534934ffaf0c57475f662877b986161b6f3",
+      "parent": "4e055d56471651bca5ce8907c671bc6339d309fe",
+      "date": "2025-01-10T12:39:01-05:00",
+      "subject": "Move `Mapping` schema gen to `GenerateSchema` to complete removal of `prepare_annotations_for_known_type` workaround (#11247)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_std_types_schema.py",
+        "pydantic/_internal/_validators.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e9ff00c91dda4a85a29cc4cece1b6a97b97167a1",
+      "parent": "aac7a534934ffaf0c57475f662877b986161b6f3",
+      "date": "2025-01-10T18:10:02Z",
+      "subject": "Bump `ruff` to v0.9.0 (#11254)",
+      "productionFiles": [
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_typing_extra.py",
+        "pydantic/json_schema.py",
+        "pydantic/type_adapter.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "8ef33a0bf51988b4364db14a9732e5eeb0617652",
+      "parent": "e9ff00c91dda4a85a29cc4cece1b6a97b97167a1",
+      "date": "2025-01-10T20:13:06+01:00",
+      "subject": "Improve performance of `_typing_extra` module (#11255)",
+      "productionFiles": [
+        "pydantic/_internal/_typing_extra.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "db061c2c520568bdd19e00acc491da184b5ea3a9",
+      "parent": "8ef33a0bf51988b4364db14a9732e5eeb0617652",
+      "date": "2025-01-14T09:42:39Z",
+      "subject": "Fix various issues with dataclasses and `use_attribute_docstrings` (#11246)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/config.py",
+        "pydantic/dataclasses.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "7506b1c9d1aa72ab988501a88c9884748ba4fe7a",
+      "parent": "db061c2c520568bdd19e00acc491da184b5ea3a9",
+      "date": "2025-01-14T12:30:26+01:00",
+      "subject": "Properly wrap custom `model_post_init` implementation when private attributes are defined (#11251)",
+      "productionFiles": [
+        "pydantic/_internal/_model_construction.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "c371bd1202e0238778c62641064e8bfd45647e67",
+      "parent": "7506b1c9d1aa72ab988501a88c9884748ba4fe7a",
+      "date": "2025-01-15T15:24:56Z",
+      "subject": "Remove Python 3.8 Support (#11258)",
+      "productionFiles": [
+        ".github/actions/people/people.py",
+        "pydantic/_internal/_config.py",
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_decorators.py",
+        "pydantic/_internal/_decorators_v1.py",
+        "pydantic/_internal/_discriminated_union.py",
+        "pydantic/_internal/_fields.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_generics.py",
+        "pydantic/_internal/_import_utils.py",
+        "pydantic/_internal/_known_annotated_metadata.py",
+        "pydantic/_internal/_mock_val_ser.py",
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/_internal/_namespace_utils.py",
+        "pydantic/_internal/_schema_generation_shared.py",
+        "pydantic/_internal/_serializers.py",
+        "pydantic/_internal/_typing_extra.py",
+        "pydantic/_internal/_utils.py",
+        "pydantic/_internal/_validate_call.py",
+        "pydantic/_internal/_validators.py",
+        "pydantic/_migration.py",
+        "pydantic/color.py",
+        "pydantic/config.py",
+        "pydantic/dataclasses.py",
+        "pydantic/deprecated/class_validators.py",
+        "pydantic/deprecated/config.py",
+        "pydantic/deprecated/copy_internals.py",
+        "pydantic/deprecated/decorator.py",
+        "pydantic/deprecated/json.py",
+        "pydantic/deprecated/tools.py",
+        "pydantic/errors.py",
+        "pydantic/experimental/pipeline.py",
+        "pydantic/fields.py",
+        "pydantic/functional_serializers.py",
+        "pydantic/functional_validators.py",
+        "pydantic/json_schema.py",
+        "pydantic/main.py",
+        "pydantic/mypy.py",
+        "pydantic/networks.py",
+        "pydantic/plugin/__init__.py",
+        "pydantic/plugin/_loader.py",
+        "pydantic/plugin/_schema_validator.py",
+        "pydantic/root_model.py",
+        "pydantic/type_adapter.py",
+        "pydantic/types.py",
+        "release/make_history.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "dac74dc1f87104b9ad47c8d2aae7e0d44ed05c77",
+      "parent": "c371bd1202e0238778c62641064e8bfd45647e67",
+      "date": "2025-01-15T17:20:49+01:00",
+      "subject": "Optimize calls to `get_type_ref` (#10863)",
+      "productionFiles": [
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_dataclasses.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "46f30755fbd977c23527094f455ac6a1c4380481",
+      "parent": "dac74dc1f87104b9ad47c8d2aae7e0d44ed05c77",
+      "date": "2025-01-16T12:07:48+01:00",
+      "subject": "Only compute normalized decimal places if necessary in `decimal_places_validator` (#11281)",
+      "productionFiles": [
+        "pydantic/_internal/_validators.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e7abf5169049230addc686196a8f99f9ff960a94",
+      "parent": "46f30755fbd977c23527094f455ac6a1c4380481",
+      "date": "2025-01-16T14:48:50Z",
+      "subject": "Fix validators documentation example (#11285)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "fa61ff8c220206fc4d0f02e0d36524350fd52bb3",
+      "parent": "e7abf5169049230addc686196a8f99f9ff960a94",
+      "date": "2025-01-16T14:57:02Z",
+      "subject": "Add documentation about removal smart_union in v2 (#11275)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "968d64f809a260e31fab8a8f7925ea6b4af2aecc",
+      "parent": "fa61ff8c220206fc4d0f02e0d36524350fd52bb3",
+      "date": "2025-01-19T21:48:54+01:00",
+      "subject": "Fix two misplaced sentences in validation errors documentation (#11302)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "4358800a2ed69f5822af098cbdcb7b7506fb3d19",
+      "parent": "968d64f809a260e31fab8a8f7925ea6b4af2aecc",
+      "date": "2025-01-20T11:10:47+01:00",
+      "subject": "Enable anchor validation in MkDocs (#11301)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "61fdb1838d1b6c5a22b43b0d1abc31161d02505c",
+      "parent": "4358800a2ed69f5822af098cbdcb7b7506fb3d19",
+      "date": "2025-01-21T16:06:08+01:00",
+      "subject": "Add note about mutating values in before validators documentation (#11310)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a3fd33f3ccacea0bc874fb054851d78d357870a8",
+      "parent": "61fdb1838d1b6c5a22b43b0d1abc31161d02505c",
+      "date": "2025-01-21T16:07:37+01:00",
+      "subject": "Add documentation about Pydantic Sphinx documentation inventory (#11291)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e400287fe6bc2a3172ca69c36bb5912b2eae12b7",
+      "parent": "a3fd33f3ccacea0bc874fb054851d78d357870a8",
+      "date": "2025-01-21T16:56:39+01:00",
+      "subject": "Fix mkdocstrings inventory example in documentation (#11311)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "42b932822fb42a1393f57234f7eb9d79781d875a",
+      "parent": "e400287fe6bc2a3172ca69c36bb5912b2eae12b7",
+      "date": "2025-01-21T18:49:13+01:00",
+      "subject": "Add support for `validation_alias` in the mypy plugin (#11295)",
+      "productionFiles": [
+        "pydantic/mypy.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "8311d1ac6d23e82e96045c933f4d67ef2b2b5693",
+      "parent": "42b932822fb42a1393f57234f7eb9d79781d875a",
+      "date": "2025-01-21T14:00:05-05:00",
+      "subject": "Fix JSON Schema reference collection with `\"examples\"` keys (#11305)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "1c698d7a6e3159070884bb8ba1a14ef7476e8194",
+      "parent": "8311d1ac6d23e82e96045c933f4d67ef2b2b5693",
+      "date": "2025-01-21T16:08:36-05:00",
+      "subject": "Disable `pydantic-core` core schema validation (#11271)",
+      "productionFiles": [
+        "pydantic/_internal/_core_utils.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6a5b64090fcd4e4d454726bc5185ec1a3ffa5825",
+      "parent": "1c698d7a6e3159070884bb8ba1a14ef7476e8194",
+      "date": "2025-01-22T14:12:18+01:00",
+      "subject": "Do not transform model serializer functions as class methods in the mypy plugin (#11298)",
+      "productionFiles": [
+        "pydantic/mypy.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "14d14b03abaeaa3a470d9f77980d8ef81a12d14c",
+      "parent": "6a5b64090fcd4e4d454726bc5185ec1a3ffa5825",
+      "date": "2025-01-23T10:03:17+01:00",
+      "subject": "Simplify `GenerateJsonSchema.literal_schema()` implementation (#11321)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "55dd8daeb6091b9317b92836765f3f1396b3e9ba",
+      "parent": "14d14b03abaeaa3a470d9f77980d8ef81a12d14c",
+      "date": "2025-01-23T12:05:09-05:00",
+      "subject": "Fix url python serialization (#11330)",
+      "productionFiles": [
+        "pydantic/networks.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6f7691b5c1e1838aedf88414a41cd6a9a0caf1d6",
+      "parent": "55dd8daeb6091b9317b92836765f3f1396b3e9ba",
+      "date": "2025-01-23T12:34:12-05:00",
+      "subject": "Add note in documentation regarding type variable bounds and constraints not being validated during model parametrization (#11326)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "b0ef7d043f0c63c9cf25781e34597f43348aaafb",
+      "parent": "6f7691b5c1e1838aedf88414a41cd6a9a0caf1d6",
+      "date": "2025-01-23T13:20:21-05:00",
+      "subject": "Regular `uv.lock` deps update (#11333)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_generics.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "221275f22c5205f53fca84be57e594e5d0cb85bc",
+      "parent": "b0ef7d043f0c63c9cf25781e34597f43348aaafb",
+      "date": "2025-01-23T20:22:15-05:00",
+      "subject": "Bump version to v2.10.6 (#11334)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "192845dc8901f2a653940ed7569bfd50eaa1f2f7",
+      "parent": "221275f22c5205f53fca84be57e594e5d0cb85bc",
+      "date": "2025-01-24T10:56:41Z",
+      "subject": "Add additional allowed schemes for `ClickHouseDsn` (#11319)",
+      "productionFiles": [
+        "pydantic/networks.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "be3b3c0bc998bdcb63de55c1e9f4833ff41afe11",
+      "parent": "192845dc8901f2a653940ed7569bfd50eaa1f2f7",
+      "date": "2025-01-24T15:55:17+01:00",
+      "subject": "Properly support type variable defaults (#11332)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_generics.py",
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "ea3f18dea95e253d300c0a90095bb7005b1da90b",
+      "parent": "be3b3c0bc998bdcb63de55c1e9f4833ff41afe11",
+      "date": "2025-01-24T17:44:07+01:00",
+      "subject": "Add a `check_pydantic_core_version()` function (#11324)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "5f40fe4e3464643348f3256bd22c9a92f96cf22a",
+      "parent": "ea3f18dea95e253d300c0a90095bb7005b1da90b",
+      "date": "2025-01-28T11:08:51+01:00",
+      "subject": "Coerce decimal constraints to `Decimal` instances (#11350)",
+      "productionFiles": [
+        "pydantic/_internal/_known_annotated_metadata.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "47222838a71ec6cd8272085c718ad02221087f20",
+      "parent": "5f40fe4e3464643348f3256bd22c9a92f96cf22a",
+      "date": "2025-01-28T18:13:32+01:00",
+      "subject": "Remove `greenlet` development dependency (#11351)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "8fe3aae8378ad268301c58143d3d9701638d1237",
+      "parent": "47222838a71ec6cd8272085c718ad02221087f20",
+      "date": "2025-01-29T18:55:51+01:00",
+      "subject": "Refactor and optimize schema cleaning logic (#11244)",
+      "productionFiles": [
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_dataclasses.py",
+        "pydantic/_internal/_discriminated_union.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/_internal/_schema_gather.py",
+        "pydantic/type_adapter.py"
+      ],
+      "keyword": true,
+      "proposals": 1
+    },
+    {
+      "hash": "4a7ec17b5f8bcdd151ee35e4585fec3fb65bdf1a",
+      "parent": "8fe3aae8378ad268301c58143d3d9701638d1237",
+      "date": "2025-01-30T19:25:25+01:00",
+      "subject": "Bump `pydantic-core` to v2.28.0 (#11364)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "5e368925f607d47c4d98a709b170ea13615b05f2",
+      "parent": "4a7ec17b5f8bcdd151ee35e4585fec3fb65bdf1a",
+      "date": "2025-01-30T18:31:46Z",
+      "subject": "Prepare release v2.11.0a1 (#11357)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d783945c5fad6755e4487f4d99b0ef6705aaa465",
+      "parent": "5e368925f607d47c4d98a709b170ea13615b05f2",
+      "date": "2025-01-31T11:09:08+01:00",
+      "subject": "Fix typo in JSON Schema documentation (#11369)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "1893af06bb744415ba0545d868685e1c56b384d4",
+      "parent": "d783945c5fad6755e4487f4d99b0ef6705aaa465",
+      "date": "2025-01-31T11:26:45+01:00",
+      "subject": "Use `uv run` consistently in Makefile (#11353)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "b88bf661c9922411e1aee0df7d1b297cfab634dc",
+      "parent": "1893af06bb744415ba0545d868685e1c56b384d4",
+      "date": "2025-01-31T19:36:21+01:00",
+      "subject": "Fix `AllowInfNan` code example formatting (#11375)",
+      "productionFiles": [
+        "pydantic/types.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "be262010b28972f500b4648e9fb947f51a660c59",
+      "parent": "b88bf661c9922411e1aee0df7d1b297cfab634dc",
+      "date": "2025-02-01T10:28:31+01:00",
+      "subject": "Use the correct JSON Schema mode when handling function schemas (#11367)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f5d1e3e7379ad59b3d674108d881c091abf5c879",
+      "parent": "be262010b28972f500b4648e9fb947f51a660c59",
+      "date": "2025-02-01T10:28:47+01:00",
+      "subject": "Fix JSON Schema reference logic with `examples` keys (#11366)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "89d97688d34927c05bef0a7046dd4369fe401210",
+      "parent": "f5d1e3e7379ad59b3d674108d881c091abf5c879",
+      "date": "2025-02-01T10:29:07+01:00",
+      "subject": "Fix code annotation in strict mode documentation (#11354)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "05daaa968b4a77b6a995a4f68d8ce14d7a0d3333",
+      "parent": "89d97688d34927c05bef0a7046dd4369fe401210",
+      "date": "2025-02-01T09:38:13Z",
+      "subject": "Enable pytest colored output in CI (#11373)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "54710a1e7f44a9897f93eecd75fc9f1442c86e59",
+      "parent": "05daaa968b4a77b6a995a4f68d8ce14d7a0d3333",
+      "date": "2025-02-01T10:31:58Z",
+      "subject": "Improve exception message when encountering recursion errors during type evaluation (#11356)",
+      "productionFiles": [
+        "pydantic/_internal/_typing_extra.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "61cfdad7c80dafb3094620fd8b7610aab291f8ac",
+      "parent": "54710a1e7f44a9897f93eecd75fc9f1442c86e59",
+      "date": "2025-02-01T10:33:57Z",
+      "subject": "Improve documentation about type aliases (#11355)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "79d6008ea3549bcd62fb94d709b80b0ea5768046",
+      "parent": "61cfdad7c80dafb3094620fd8b7610aab291f8ac",
+      "date": "2025-02-02T12:59:35+01:00",
+      "subject": "Bump supercharge/mongodb-github-action from 1.11.0 to 1.12.0 (#11378)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "929e8f47ede2f895290714a6de96e6fb7b4c926c",
+      "parent": "79d6008ea3549bcd62fb94d709b80b0ea5768046",
+      "date": "2025-02-02T13:00:09+01:00",
+      "subject": "Bump dawidd6/action-download-artifact from 7 to 8 (#11379)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "50eb5d731ab015ca606aa504dc0b932fc8709a07",
+      "parent": "929e8f47ede2f895290714a6de96e6fb7b4c926c",
+      "date": "2025-02-05T16:29:28-05:00",
+      "subject": "use locally-built rust with symbols & pgo (#11403)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "1b625f2d47ff36616047668b196dc67792880e59",
+      "parent": "50eb5d731ab015ca606aa504dc0b932fc8709a07",
+      "date": "2025-02-06T14:21:21Z",
+      "subject": "Build `llms.txt` in documentation (#11405)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e354fd431d2512e3670c8a3740ed03d69ee3465f",
+      "parent": "1b625f2d47ff36616047668b196dc67792880e59",
+      "date": "2025-02-06T12:52:02-05:00",
+      "subject": "Create a single dictionary when creating a `CoreConfig` instance (#11384)",
+      "productionFiles": [
+        "pydantic/_internal/_config.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "deb9f96c6f36bc8f1f34c1ba9d8df5e61a49f79e",
+      "parent": "e354fd431d2512e3670c8a3740ed03d69ee3465f",
+      "date": "2025-02-07T11:53:01+01:00",
+      "subject": "Add benchmark for failed model rebuild (#11412)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "931d217ea8b5c1a4f0855be7c6cf540e7c669516",
+      "parent": "deb9f96c6f36bc8f1f34c1ba9d8df5e61a49f79e",
+      "date": "2025-02-07T18:10:28+01:00",
+      "subject": "Update ecosystem usage documentation (#11393)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a932510ecb63bec254af976331eb43564195cfd5",
+      "parent": "931d217ea8b5c1a4f0855be7c6cf540e7c669516",
+      "date": "2025-02-07T18:10:54+01:00",
+      "subject": "Fix type hints involving `typevars_map` (#11409)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_generics.py",
+        "pydantic/fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "bf610677638acd58488d69209ba1d787d471e010",
+      "parent": "a932510ecb63bec254af976331eb43564195cfd5",
+      "date": "2025-02-07T18:11:20+01:00",
+      "subject": "Always include `additionalProperties: True` for arbitrary dictionary schemas (#11392)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "cb9f5a0704ff8466ab0a3abc5f09705e240548e5",
+      "parent": "bf610677638acd58488d69209ba1d787d471e010",
+      "date": "2025-02-07T18:11:34+01:00",
+      "subject": "Expose `fallback` parameter in serialization methods (#11398)",
+      "productionFiles": [
+        "pydantic/main.py",
+        "pydantic/type_adapter.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "044d685765a4d208addaf2edd580317b15edc1d2",
+      "parent": "cb9f5a0704ff8466ab0a3abc5f09705e240548e5",
+      "date": "2025-02-07T18:11:51+01:00",
+      "subject": "Bump ruff from 0.9.2 to 0.9.5 (#11407)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "61feb9981777a0c2c10713bba05cdc8eaca7ba64",
+      "parent": "044d685765a4d208addaf2edd580317b15edc1d2",
+      "date": "2025-02-07T12:44:30-05:00",
+      "subject": "Fix path serialization behavior (#11416)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "53a86ed3582882f632464f269e09349c8e8f112d",
+      "parent": "61feb9981777a0c2c10713bba05cdc8eaca7ba64",
+      "date": "2025-02-07T18:47:23+01:00",
+      "subject": "Update configuration documentation (#11394)",
+      "productionFiles": [
+        "pydantic/config.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "398b4bbeccc1acaf463595d995490fa93f347f9c",
+      "parent": "53a86ed3582882f632464f269e09349c8e8f112d",
+      "date": "2025-02-07T13:05:15-05:00",
+      "subject": "Upgrade upgrade documentation plugin supported Python versions (#11417)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "144e426fa003ae2cdff979cd6ea2b6229291eb83",
+      "parent": "398b4bbeccc1acaf463595d995490fa93f347f9c",
+      "date": "2025-02-07T18:27:55Z",
+      "subject": "Bump `pydantic-core` to v2.29.0 (#11402)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "5aa6d914963af4e86d10c0e8e49ce64f98f4d64d",
+      "parent": "144e426fa003ae2cdff979cd6ea2b6229291eb83",
+      "date": "2025-02-07T13:45:41-05:00",
+      "subject": "Fix typo in `set_item_not_hashable` error documentation (#11418)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a1f12c710c99d13f64becf696bf18ce49c5ea07c",
+      "parent": "5aa6d914963af4e86d10c0e8e49ce64f98f4d64d",
+      "date": "2025-02-10T06:28:59-05:00",
+      "subject": "Prepare release v2.11.0a2 (#11425)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "53f8eced2b3f79a8571106a9fc5160e6e27702b5",
+      "parent": "a1f12c710c99d13f64becf696bf18ce49c5ea07c",
+      "date": "2025-02-12T17:27:46+01:00",
+      "subject": "Do not reuse validators and serializers during model rebuild (#11429)",
+      "productionFiles": [
+        "pydantic/dataclasses.py",
+        "pydantic/main.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "72c77bfff341b447b26f0d129aa0d5134da3037b",
+      "parent": "53f8eced2b3f79a8571106a9fc5160e6e27702b5",
+      "date": "2025-02-12T17:41:45+01:00",
+      "subject": "Collect model fields when rebuilding a model (#11388)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_generics.py",
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/fields.py",
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "134bea6efc82e047665780d646fae08264baad7d",
+      "parent": "72c77bfff341b447b26f0d129aa0d5134da3037b",
+      "date": "2025-02-12T21:02:03+01:00",
+      "subject": "Allow cached properties to be altered on frozen models (#11432)",
+      "productionFiles": [
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "ff3789d4cc06ee024b7253b919d3e36748a72829",
+      "parent": "134bea6efc82e047665780d646fae08264baad7d",
+      "date": "2025-02-12T15:21:38-05:00",
+      "subject": "Fix tuple serialization for `Sequence` types (#11435)",
+      "productionFiles": [
+        "pydantic/_internal/_serializers.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "0abe442f54a985cbe9d441d581a5c816ae1e9d0b",
+      "parent": "ff3789d4cc06ee024b7253b919d3e36748a72829",
+      "date": "2025-02-13T13:07:29-05:00",
+      "subject": "Improve release automation process (#11427)",
+      "productionFiles": [
+        "release/make_history.py",
+        "release/prepare.py",
+        "release/push.py",
+        "release/shared.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "2f3e1ac12b86f57a401a9421bb15747395f56cdf",
+      "parent": "0abe442f54a985cbe9d441d581a5c816ae1e9d0b",
+      "date": "2025-02-13T20:30:46+01:00",
+      "subject": "Reuse cached core schemas for parameterized generic Pydantic models (#11434)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/main.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "6b0ba1105a93faf2eea4531c923221ce593e77a1",
+      "parent": "2f3e1ac12b86f57a401a9421bb15747395f56cdf",
+      "date": "2025-02-17T08:46:01-05:00",
+      "subject": "Integrate Algolia through UI replacement (#11442)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "c2102b7c2d76b626eb153eb4556d0af71bd14a77",
+      "parent": "6b0ba1105a93faf2eea4531c923221ce593e77a1",
+      "date": "2025-02-17T10:49:40-05:00",
+      "subject": "Ffix: do not check for `__get_validators__` on classes where `__get_pydantic_core_schema__` is also defined (#11444)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "aa59d5307ac8b9a4de34b1e22acfed6614bc7fc2",
+      "parent": "c2102b7c2d76b626eb153eb4556d0af71bd14a77",
+      "date": "2025-02-17T18:43:32+02:00",
+      "subject": "Fix algolia workflow (#11452)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "parent": "aa59d5307ac8b9a4de34b1e22acfed6614bc7fc2",
+      "date": "2025-02-19T16:36:51+01:00",
+      "subject": "Allow callable instances to be used as serializers (#11451)",
+      "productionFiles": [
+        "pydantic/_internal/_decorators.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_typing_extra.py",
+        "pydantic/functional_serializers.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "7ccad67149c3b97b7aa7d7c892a3e64db0d80e10",
+      "parent": "588436ec2609ce488e3810a91a55cf29b9dd81d6",
+      "date": "2025-02-19T17:12:31Z",
+      "subject": "Improve error thrown when overriding field with a property (#11459)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py",
+        "pydantic/fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "980d2763eb24d972221c847bda61f1049fdbeeb1",
+      "parent": "7ccad67149c3b97b7aa7d7c892a3e64db0d80e10",
+      "date": "2025-02-20T21:26:55+01:00",
+      "subject": "Add BentoML and Semantic Kernel third-party tests (#11469)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+      "parent": "980d2763eb24d972221c847bda61f1049fdbeeb1",
+      "date": "2025-02-21T17:50:06-05:00",
+      "subject": "Adding `langchain` third party tests (#11474)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+      "parent": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+      "date": "2025-02-24T16:45:14+01:00",
+      "subject": "Fix JSON Schema generation with referenceable core schemas holding JSON metadata (#11475)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_typing_extra.py",
+        "pydantic/fields.py",
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 4
+    },
+    {
+      "hash": "0f54b6f78c975cc458da715c03e45b84dbb18ee4",
+      "parent": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+      "date": "2025-02-25T17:09:33+01:00",
+      "subject": "Only run documentation build hooks in CI (#11486)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "85655e2e8ec4230fd34ef42db2c3e125f90987ee",
+      "parent": "0f54b6f78c975cc458da715c03e45b84dbb18ee4",
+      "date": "2025-02-25T17:16:34+01:00",
+      "subject": "Fix workflow conditionals syntax (#11487)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d4fac869bb4ee003ea62f056526b0dcbbd1e566f",
+      "parent": "85655e2e8ec4230fd34ef42db2c3e125f90987ee",
+      "date": "2025-02-25T14:32:06-08:00",
+      "subject": "Bump `pydantic-core` to v2.30.0 (#11488)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "c8acbec9c75a837bbece2dda1d786efa8f1dab56",
+      "parent": "d4fac869bb4ee003ea62f056526b0dcbbd1e566f",
+      "date": "2025-02-25T14:39:16-08:00",
+      "subject": "Support strict specification on union member types (#11481)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/types.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e22661205ae26bf38644a09ac6da5d4661e0ed67",
+      "parent": "c8acbec9c75a837bbece2dda1d786efa8f1dab56",
+      "date": "2025-02-25T17:43:26-05:00",
+      "subject": "Add support for validating v6, v7, v8 UUIDs (#11436)",
+      "productionFiles": [
+        "pydantic/__init__.py",
+        "pydantic/types.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "50aeeacb8324642df6ab73016e9a4ea91029046c",
+      "parent": "e22661205ae26bf38644a09ac6da5d4661e0ed67",
+      "date": "2025-02-25T17:43:41-05:00",
+      "subject": "Improve errors documentation (#11473)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "52fe6854ec3fd6440c8523c54341acb637ffa258",
+      "parent": "50aeeacb8324642df6ab73016e9a4ea91029046c",
+      "date": "2025-02-26T09:03:44-05:00",
+      "subject": "Fix various CI issues (#11490)",
+      "productionFiles": [
+        "pydantic/types.py",
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "acb0f10fda1c78441e052c57b4288bc91431f852",
+      "parent": "52fe6854ec3fd6440c8523c54341acb637ffa258",
+      "date": "2025-02-26T10:11:45-05:00",
+      "subject": "Improve alias configutation APIs (#11468)",
+      "productionFiles": [
+        "pydantic/_internal/_config.py",
+        "pydantic/_internal/_dataclasses.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/_internal/_signature.py",
+        "pydantic/config.py",
+        "pydantic/errors.py",
+        "pydantic/json_schema.py",
+        "pydantic/main.py",
+        "pydantic/mypy.py",
+        "pydantic/plugin/__init__.py",
+        "pydantic/root_model.py",
+        "pydantic/type_adapter.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "75609f19be11a498685c770bb7aea13445c81c87",
+      "parent": "acb0f10fda1c78441e052c57b4288bc91431f852",
+      "date": "2025-02-27T11:02:28Z",
+      "subject": "Move `test_repeated_custom_type()` test to a correct location (#11498)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6a06fcc2257ab4bc5fbd382fb58280d28ff97f5c",
+      "parent": "75609f19be11a498685c770bb7aea13445c81c87",
+      "date": "2025-02-27T09:32:23-05:00",
+      "subject": "Fix syntax error in CI workflow conditional (#11499)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f9f26e8e05ac6054a77ad39d1d95a61636404203",
+      "parent": "6a06fcc2257ab4bc5fbd382fb58280d28ff97f5c",
+      "date": "2025-02-27T09:32:43-05:00",
+      "subject": "Run Beanie third-party tests on a single Python version (#11502)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "789819da86a6b1084f647ebf708f79b3e84a219b",
+      "parent": "f9f26e8e05ac6054a77ad39d1d95a61636404203",
+      "date": "2025-02-27T16:10:08Z",
+      "subject": "Implicitly set `validate_by_name` to `True` when `validate_by_alias` is `False` (#11503)",
+      "productionFiles": [
+        "pydantic/_internal/_config.py",
+        "pydantic/config.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "b257df40c957cae69ee563ab6868ff5c3fcd0f65",
+      "parent": "789819da86a6b1084f647ebf708f79b3e84a219b",
+      "date": "2025-02-28T12:00:22-05:00",
+      "subject": "Fix no cover coverage branches (#11507)",
+      "productionFiles": [
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_docs_extraction.py",
+        "pydantic/_internal/_git.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+      "parent": "b257df40c957cae69ee563ab6868ff5c3fcd0f65",
+      "date": "2025-02-28T18:01:37+01:00",
+      "subject": "Change type of `Any` when synthesizing `BaseSettings.__init__` signature in the mypy plugin (#11497)",
+      "productionFiles": [
+        "pydantic/mypy.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "parent": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+      "date": "2025-02-28T20:11:48+01:00",
+      "subject": "Use the `typing-inspection` library (#11479)",
+      "productionFiles": [
+        "pydantic/__init__.py",
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_fields.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_generics.py",
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/_internal/_repr.py",
+        "pydantic/_internal/_typing_extra.py",
+        "pydantic/_internal/_validators.py",
+        "pydantic/errors.py",
+        "pydantic/fields.py",
+        "pydantic/json_schema.py",
+        "pydantic/types.py"
+      ],
+      "keyword": false,
+      "proposals": 6
+    },
+    {
+      "hash": "39bab2ef0e543f182977b23f2cc720d24e467901",
+      "parent": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "date": "2025-03-02T17:12:34+01:00",
+      "subject": "Bump dawidd6/action-download-artifact from 8 to 9 (#11513)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f6725ba21e4409cbd867427203adf85c39e42630",
+      "parent": "39bab2ef0e543f182977b23f2cc720d24e467901",
+      "date": "2025-03-02T16:44:57Z",
+      "subject": "👥 Update Pydantic People (#11511)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "023d9ca4ae75ba546eea18551092d265827e901b",
+      "parent": "f6725ba21e4409cbd867427203adf85c39e42630",
+      "date": "2025-03-04T18:10:43Z",
+      "subject": "fix(docs): correct note in docs examples (#11522)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "50a726944de13094fc45eb52a8e8c3451e0a1079",
+      "parent": "023d9ca4ae75ba546eea18551092d265827e901b",
+      "date": "2025-03-04T19:49:21+01:00",
+      "subject": "Support type variable defaults referencing other type variables (#11520)",
+      "productionFiles": [
+        "pydantic/_internal/_generics.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "475aa800f31ebfd7dd8827e6ab86e7abc870e0dc",
+      "parent": "50a726944de13094fc45eb52a8e8c3451e0a1079",
+      "date": "2025-03-06T10:41:14-05:00",
+      "subject": "Bump `pydantic-core` to `v2.31.1`, fix related tests (#11526)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "bff747748e57c0db384dbd0df886fa623fa3a703",
+      "parent": "475aa800f31ebfd7dd8827e6ab86e7abc870e0dc",
+      "date": "2025-03-06T16:18:19Z",
+      "subject": "Prep for v2.11.0b1 release (#11529)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "10af6a808c81f15eaac98eb6affe415b726dccb1",
+      "parent": "bff747748e57c0db384dbd0df886fa623fa3a703",
+      "date": "2025-03-11T16:25:46+01:00",
+      "subject": "Add experimental support for free threading (#11516)",
+      "productionFiles": [
+        "pydantic/_internal/_generics.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "b9fb3f110d6653653fb48a44430e7d2fca886ae9",
+      "parent": "10af6a808c81f15eaac98eb6affe415b726dccb1",
+      "date": "2025-03-13T23:35:55+01:00",
+      "subject": "Suggest using `prop-decorator` error code to ignore mypy errors with `@computed_field` (#11547)",
+      "productionFiles": [
+        "pydantic/fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d85f5118e3b3a09544167bd31de471662359210b",
+      "parent": "b9fb3f110d6653653fb48a44430e7d2fca886ae9",
+      "date": "2025-03-17T10:49:03+01:00",
+      "subject": "Fix `NotRequired` qualifier not taken into account in stringified annotation (#11559)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "12554318bbc3efe1ff40a2c20e5735e11249fb88",
+      "parent": "d85f5118e3b3a09544167bd31de471662359210b",
+      "date": "2025-03-17T12:07:30+01:00",
+      "subject": "Update documentation of `allow_inf_nan` (#11568)",
+      "productionFiles": [
+        "pydantic/fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "13c345ed2e71ac0dd9250f746e81374dbf8a0df3",
+      "parent": "12554318bbc3efe1ff40a2c20e5735e11249fb88",
+      "date": "2025-03-17T12:07:58+01:00",
+      "subject": "Bump `pydantic-core` to v2.32.0 (#11567)",
+      "productionFiles": [
+        "pydantic/json_schema.py",
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d76d942e5fe2ddabf60f58a89b24709277a9feb8",
+      "parent": "13c345ed2e71ac0dd9250f746e81374dbf8a0df3",
+      "date": "2025-03-17T17:16:02+01:00",
+      "subject": "Prepare release 2.11.0b2 (#11569)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "9ebcf01cf5b6a373d3f2d328d7deb744838eeeaf",
+      "parent": "d76d942e5fe2ddabf60f58a89b24709277a9feb8",
+      "date": "2025-03-18T10:43:18+01:00",
+      "subject": "Allow generic typed dictionaries to be used for unpacked variadic keyword parameters (#11571)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a2846da63905181ad3c98b2c87a68165e0193233",
+      "parent": "9ebcf01cf5b6a373d3f2d328d7deb744838eeeaf",
+      "date": "2025-03-18T10:03:36Z",
+      "subject": "Improve documentation about PEP 695 type aliases (#11570)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "7b8fd9a4f05300bcdd8eb751a9de0dd5094b7510",
+      "parent": "a2846da63905181ad3c98b2c87a68165e0193233",
+      "date": "2025-03-19T15:24:00+01:00",
+      "subject": "Briefly describe arguments for `model.model_dump()` (#11562)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "87cb27f5fb8ce6436483e75a1d9714a59f10a853",
+      "parent": "7b8fd9a4f05300bcdd8eb751a9de0dd5094b7510",
+      "date": "2025-03-19T22:09:34+01:00",
+      "subject": "Add `encoded_string()` method to the URL types (#11580)",
+      "productionFiles": [
+        "pydantic/networks.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "69b2b63aacfd2dee4a48a82ea303efbf710f11be",
+      "parent": "87cb27f5fb8ce6436483e75a1d9714a59f10a853",
+      "date": "2025-03-19T23:32:53+01:00",
+      "subject": "Fix runtime error when computing model string representation involving cached properties and self-referenced models (#11579)",
+      "productionFiles": [
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "8e98bc0a66379e693780eb6edd611f4177c60c30",
+      "parent": "69b2b63aacfd2dee4a48a82ea303efbf710f11be",
+      "date": "2025-03-20T14:38:10+01:00",
+      "subject": "Add support for `defer_build` with `@validate_call` decorator (#11584)",
+      "productionFiles": [
+        "pydantic/_internal/_validate_call.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6433ea747d86f2b8074a27ab68e4cc6e573ae92f",
+      "parent": "8e98bc0a66379e693780eb6edd611f4177c60c30",
+      "date": "2025-03-25T13:46:20Z",
+      "subject": "Fix inaccurate docstring example in `_BaseMultiHostUrl.query_params()` (#11611)",
+      "productionFiles": [
+        "pydantic/networks.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "55a434c41b1ad2af95584ae8c8c17d364add181f",
+      "parent": "6433ea747d86f2b8074a27ab68e4cc6e573ae92f",
+      "date": "2025-03-26T17:24:23Z",
+      "subject": "Preserve other steps when using the ellipsis in the pipeline API (#11626)",
+      "productionFiles": [
+        "pydantic/experimental/pipeline.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "ed2764b08076183f213dbc19807fb9e422a373ca",
+      "parent": "55a434c41b1ad2af95584ae8c8c17d364add181f",
+      "date": "2025-03-26T20:33:07+01:00",
+      "subject": "Fix deferred discriminator application logic (#11591)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "86491ccf3c9655bad721c4ad2f4120cfff9446e2",
+      "parent": "ed2764b08076183f213dbc19807fb9e422a373ca",
+      "date": "2025-03-26T20:33:29+01:00",
+      "subject": "Allow `@with_config` decorator to be used with keyword arguments (#11608)",
+      "productionFiles": [
+        "pydantic/config.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f5226d294664788d1fbea13bec2dbc1ce6305c8e",
+      "parent": "86491ccf3c9655bad721c4ad2f4120cfff9446e2",
+      "date": "2025-03-26T20:49:07Z",
+      "subject": "Bump `pydantic-core` to v2.33.0 (#11631)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "7917b11bd28706d77a5d0180381bc96b6b61b044",
+      "parent": "f5226d294664788d1fbea13bec2dbc1ce6305c8e",
+      "date": "2025-03-26T22:12:13+01:00",
+      "subject": "Disable third-party workflow issue report (#11629)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6f11161524e495f6ed7597abcd4006f19a7cd2c1",
+      "parent": "7917b11bd28706d77a5d0180381bc96b6b61b044",
+      "date": "2025-03-26T23:02:21+01:00",
+      "subject": "Add support for extra keys validation for models (#11578)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "fcba83291a8fe7e1dcfde9bbcc8ea57f8ef322c0",
+      "parent": "6f11161524e495f6ed7597abcd4006f19a7cd2c1",
+      "date": "2025-03-27T17:44:41+01:00",
+      "subject": "Simplify customization of default value inclusion in JSON Schema generation (#11634)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+      "parent": "fcba83291a8fe7e1dcfde9bbcc8ea57f8ef322c0",
+      "date": "2025-03-27T17:44:57+01:00",
+      "subject": "Add `mkdocs-llmstxt` documentation plugin (#11632)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+      "parent": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+      "date": "2025-03-27T18:13:54+01:00",
+      "subject": "Add `generate_arguments_schema()` experimental function (#11572)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_schema_gather.py",
+        "pydantic/experimental/arguments_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 5
+    },
+    {
+      "hash": "58e61fa3c60ffb8140d01ca9f74ff7528326a0c6",
+      "parent": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+      "date": "2025-03-27T18:43:13+01:00",
+      "subject": "Prepare release v2.11.0 (#11635)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "024fdae2b55bd41866418586d48009956cfa9e1b",
+      "parent": "58e61fa3c60ffb8140d01ca9f74ff7528326a0c6",
+      "date": "2025-03-28T15:36:59+01:00",
+      "subject": "Fix small typos (#11643)",
+      "productionFiles": [
+        "pydantic/_internal/_generics.py",
+        "pydantic/dataclasses.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "1dcddac2c5e1ac2361fc897f804f44338a1d8067",
+      "parent": "024fdae2b55bd41866418586d48009956cfa9e1b",
+      "date": "2025-03-28T15:52:05+01:00",
+      "subject": "Do not override `'definitions-ref'` schemas containing serialization schemas or metadata (#11644)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6c38dc93f40a47f4d1350adca9ec0d72502e223f",
+      "parent": "1dcddac2c5e1ac2361fc897f804f44338a1d8067",
+      "date": "2025-03-28T21:57:21+01:00",
+      "subject": "Prepare release v2.11.1 (#11648)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "0cfe85396a9aa9f96113a7c3cba1feedb518a364",
+      "parent": "6c38dc93f40a47f4d1350adca9ec0d72502e223f",
+      "date": "2025-04-02T16:49:09+02:00",
+      "subject": "Bump `pydantic-core` to v2.33.1 (#11678)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "da841493831c86229ce5d5dd4dfbc482bfea3ddb",
+      "parent": "0cfe85396a9aa9f96113a7c3cba1feedb518a364",
+      "date": "2025-04-02T16:49:26+02:00",
+      "subject": "Make sure `__pydantic_private__` exists before setting private attributes (#11666)",
+      "productionFiles": [
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "86c5703a2d4afe43f2adea9b2c5450b178ce5121",
+      "parent": "da841493831c86229ce5d5dd4dfbc482bfea3ddb",
+      "date": "2025-04-02T16:51:57+02:00",
+      "subject": "Do not override `FieldInfo._complete` when using field from parent class (#11668)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "8b0825add81e53daefba83e5a147cd13ca57a63b",
+      "parent": "86c5703a2d4afe43f2adea9b2c5450b178ce5121",
+      "date": "2025-04-02T16:55:47+02:00",
+      "subject": "Provide the available definitions when applying discriminated unions (#11670)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "cbf4202637a56fc5325ab4b18452e3f3ba910a84",
+      "parent": "8b0825add81e53daefba83e5a147cd13ca57a63b",
+      "date": "2025-04-02T17:01:28+02:00",
+      "subject": "Do not expand root type in the mypy plugin for variables (#11676)",
+      "productionFiles": [
+        "pydantic/mypy.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "dfa6c6715df831c2eba3c4c96c231b66e0fc3d4a",
+      "parent": "cbf4202637a56fc5325ab4b18452e3f3ba910a84",
+      "date": "2025-04-02T17:01:46+02:00",
+      "subject": "Mention the attribute name in model fields deprecation message (#11674)",
+      "productionFiles": [
+        "pydantic/_internal/_utils.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "34095c7523371e04b6b8fd9b55680845dd7dd279",
+      "parent": "dfa6c6715df831c2eba3c4c96c231b66e0fc3d4a",
+      "date": "2025-04-02T20:48:07Z",
+      "subject": "Properly validate parameterized mappings (#11658)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f70f2917913e53adfb82700f348bf8e3fae21357",
+      "parent": "34095c7523371e04b6b8fd9b55680845dd7dd279",
+      "date": "2025-04-02T15:49:41-06:00",
+      "subject": "Add integration documentation for llms.txt (#11677)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "bd1f8cf44a271e7313026faab318f3c37f23b3f4",
+      "parent": "f70f2917913e53adfb82700f348bf8e3fae21357",
+      "date": "2025-04-03T14:14:34+02:00",
+      "subject": "Prepare release v2.11.2 (#11684)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "04fd6395c7165232785992a6ad0e817e9db6e590",
+      "parent": "bd1f8cf44a271e7313026faab318f3c37f23b3f4",
+      "date": "2025-04-07T15:20:32+02:00",
+      "subject": "Update V1 copy to v1.10.21 (#11706)",
+      "productionFiles": [
+        "pydantic/v1/main.py",
+        "pydantic/v1/typing.py",
+        "pydantic/v1/utils.py",
+        "pydantic/v1/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f14b7da9cf7f5f802ca5b8076ba7d9fcde1352cf",
+      "parent": "04fd6395c7165232785992a6ad0e817e9db6e590",
+      "date": "2025-04-08T14:07:57+02:00",
+      "subject": "Preserve field description when rebuilding model fields (#11698)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a8b8b5f6f34f27ef721d4d1f85a3747847762db9",
+      "parent": "f14b7da9cf7f5f802ca5b8076ba7d9fcde1352cf",
+      "date": "2025-04-08T14:56:53+02:00",
+      "subject": "Fix source locations in documentation for external packages (#11710)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "4a8c9297052534c33411f0268527ab9bcb55bc1b",
+      "parent": "a8b8b5f6f34f27ef721d4d1f85a3747847762db9",
+      "date": "2025-04-08T14:58:26+02:00",
+      "subject": "Fix code annotation in `@computed_field` documentation (#11693)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "876bf76f34f9ab313923a3428a4d4aaf00144f43",
+      "parent": "4a8c9297052534c33411f0268527ab9bcb55bc1b",
+      "date": "2025-04-08T13:12:02Z",
+      "subject": "Prepare release v2.11.3 (#11716)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a43b3467e544c2e94a47636ee0cebdeb9391c80c",
+      "parent": "876bf76f34f9ab313923a3428a4d4aaf00144f43",
+      "date": "2025-04-08T15:29:16+02:00",
+      "subject": "Fix ImportError message for `email-validator` (#11695)",
+      "productionFiles": [
+        "pydantic/networks.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "2bf985f3f9efe374433219d28271c3f4763fb211",
+      "parent": "a43b3467e544c2e94a47636ee0cebdeb9391c80c",
+      "date": "2025-04-08T15:29:37+02:00",
+      "subject": "Update project metadata to use PEP 639 (#11694)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "8f6508a93222f3a6a7fe25c67118d065a9d707b9",
+      "parent": "2bf985f3f9efe374433219d28271c3f4763fb211",
+      "date": "2025-04-09T11:35:27+02:00",
+      "subject": "Allow config and bases to be specified together in `create_model()` (#11714)",
+      "productionFiles": [
+        "pydantic/errors.py",
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "2e7cddb6a7600311c4a29763efd55596a826edde",
+      "parent": "8f6508a93222f3a6a7fe25c67118d065a9d707b9",
+      "date": "2025-04-09T11:57:39+02:00",
+      "subject": "Properly fetch plain serializer function when serializing default value in JSON Schema (#11721)",
+      "productionFiles": [
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "c79f9e2de210e6aaca00e449e5ff40271f0e1cd1",
+      "parent": "2e7cddb6a7600311c4a29763efd55596a826edde",
+      "date": "2025-04-13T19:23:42+02:00",
+      "subject": "Fix typos in documentation (#11739)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "121651b22da3a09e82a1c6605eee2475cbcd4948",
+      "parent": "c79f9e2de210e6aaca00e449e5ff40271f0e1cd1",
+      "date": "2025-04-13T21:36:13+02:00",
+      "subject": "Remove unecessary note in errors documentation (#11722)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "16ce1ef3860b18ba0d2261d2b6c26b79700767b7",
+      "parent": "121651b22da3a09e82a1c6605eee2475cbcd4948",
+      "date": "2025-04-15T15:40:25+02:00",
+      "subject": "Remove install path from version info (#11754)",
+      "productionFiles": [
+        "pydantic/_internal/_git.py",
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "72a76efff8e98d0b616394a4444306dabd755d7b",
+      "parent": "16ce1ef3860b18ba0d2261d2b6c26b79700767b7",
+      "date": "2025-04-15T15:41:15+02:00",
+      "subject": "Fix race condition in documentation deployment workflow (#11743)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "625dd4284b266c17f0b70d282f237dd3ee7ec9f2",
+      "parent": "72a76efff8e98d0b616394a4444306dabd755d7b",
+      "date": "2025-04-15T13:57:24Z",
+      "subject": "Remove generics cache workaround (#11755)",
+      "productionFiles": [
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "a3f42a4d6e1765d03a9ad49f9f2ae83c4c525794",
+      "parent": "625dd4284b266c17f0b70d282f237dd3ee7ec9f2",
+      "date": "2025-04-17T10:18:06+02:00",
+      "subject": "Fix example in `populate_by_name` documentation (#11766)",
+      "productionFiles": [
+        "pydantic/config.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "cc30e6d0e3b24c3c0e9ac6d0e3f020e8d89e1d81",
+      "parent": "a3f42a4d6e1765d03a9ad49f9f2ae83c4c525794",
+      "date": "2025-04-17T18:30:19+02:00",
+      "subject": "Remove coercion of decimal constraints (#11772)",
+      "productionFiles": [
+        "pydantic/_internal/_known_annotated_metadata.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "6821a7a3dba92e64bcc615124d65b5f6555460df",
+      "parent": "cc30e6d0e3b24c3c0e9ac6d0e3f020e8d89e1d81",
+      "date": "2025-04-17T18:30:32+02:00",
+      "subject": "Update Pandera third-party tests (#11767)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "c477e46e8d808d20f29d3b610af12e4d435a1420",
+      "parent": "6821a7a3dba92e64bcc615124d65b5f6555460df",
+      "date": "2025-04-17T18:31:39+02:00",
+      "subject": "Fix crash when expanding root type in the mypy plugin (#11735)",
+      "productionFiles": [
+        "pydantic/mypy.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "eb295f2a4bd7953787630daba56a782927b1785e",
+      "parent": "c477e46e8d808d20f29d3b610af12e4d435a1420",
+      "date": "2025-04-17T18:31:54+02:00",
+      "subject": "Bump `mkdocs-llmstxt` to v0.2.0 (#11725)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "b77ad7335f146dc60e23987fa35492046cbd473c",
+      "parent": "eb295f2a4bd7953787630daba56a782927b1785e",
+      "date": "2025-04-17T22:05:48+02:00",
+      "subject": "Only mark model as complete once all fields are complete (#11759)",
+      "productionFiles": [
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "07b33c3f3c099e682bb97752fbeb89718242b32f",
+      "parent": "b77ad7335f146dc60e23987fa35492046cbd473c",
+      "date": "2025-04-18T15:01:00+02:00",
+      "subject": "Add Dify third-party tests (#11719)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "bce81efdeac1cbefd0196b478a32aa2586bd595a",
+      "parent": "07b33c3f3c099e682bb97752fbeb89718242b32f",
+      "date": "2025-04-18T16:51:21+02:00",
+      "subject": "Do not provide `field_name` in validator core schemas (#11761)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/functional_validators.py",
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "248fba664397dd1e04bcfa8743f213106f5951a1",
+      "parent": "bce81efdeac1cbefd0196b478a32aa2586bd595a",
+      "date": "2025-04-22T08:35:12+02:00",
+      "subject": "Fix typos (#11784)",
+      "productionFiles": [
+        "pydantic/_internal/_namespace_utils.py",
+        "pydantic/v1/types.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "bf068661cf3fdadb93881762abe6fdc8a2592966",
+      "parent": "248fba664397dd1e04bcfa8743f213106f5951a1",
+      "date": "2025-04-24T13:25:54+02:00",
+      "subject": "Update information about maintainers (#11790)",
+      "productionFiles": [
+        ".github/actions/people/people.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "7df0816017c20a7714507f61e83572cd77259ea4",
+      "parent": "bf068661cf3fdadb93881762abe6fdc8a2592966",
+      "date": "2025-04-28T09:40:51+02:00",
+      "subject": "Update monthly download count in documentation (#11799)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "455b43680c7c8b5ac21abee94d8095fe92fe4720",
+      "parent": "7df0816017c20a7714507f61e83572cd77259ea4",
+      "date": "2025-04-28T12:53:50-06:00",
+      "subject": "Fix issue with recursive generic models (#11775)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "14a239cac9a6bd9593f8a9411366f132e6302915",
+      "parent": "455b43680c7c8b5ac21abee94d8095fe92fe4720",
+      "date": "2025-04-28T19:22:04Z",
+      "subject": "Fix qualified name comparison of private attributes during namespace inspection (#11803)",
+      "productionFiles": [
+        "pydantic/_internal/_model_construction.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "34bba45a676f4b68e533caac31c26100500a7562",
+      "parent": "14a239cac9a6bd9593f8a9411366f132e6302915",
+      "date": "2025-04-28T14:00:59-06:00",
+      "subject": "Add `__pydantic_on_complete__()` hook that is called once model is fully ready to be used (#11762)",
+      "productionFiles": [
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d912c412adf7bc22c9b178245e8385c5ddfb74e9",
+      "parent": "34bba45a676f4b68e533caac31c26100500a7562",
+      "date": "2025-04-29T09:12:33+02:00",
+      "subject": "Make sure Pydantic dataclasses with slots and `validate_assignment` can be unpickled (#11769)",
+      "productionFiles": [
+        "pydantic/_internal/_dataclasses.py",
+        "pydantic/dataclasses.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "5e300c333fd3b2edb989b8a6d116073fe737cc15",
+      "parent": "d912c412adf7bc22c9b178245e8385c5ddfb74e9",
+      "date": "2025-04-29T13:33:16+02:00",
+      "subject": "Traverse `function-before` schemas during schema gathering (#11801)",
+      "productionFiles": [
+        "pydantic/_internal/_schema_gather.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "5d9203db01de7fcfaab443ea28d2027a2881dc75",
+      "parent": "5e300c333fd3b2edb989b8a6d116073fe737cc15",
+      "date": "2025-04-29T22:04:16+02:00",
+      "subject": "Add documentation note about common pitfall with the annotated pattern (#11811)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+      "parent": "5d9203db01de7fcfaab443ea28d2027a2881dc75",
+      "date": "2025-04-29T20:20:15Z",
+      "subject": "Prepare release v2.11.4 (#11810)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+      "parent": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+      "date": "2025-04-30T12:28:28+02:00",
+      "subject": "Move some field logic out of the `GenerateSchema` class (#11733)",
+      "productionFiles": [
+        "pydantic/_internal/_dataclasses.py",
+        "pydantic/_internal/_decorators.py",
+        "pydantic/_internal/_fields.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/_internal/_model_construction.py",
+        "pydantic/_internal/_utils.py",
+        "pydantic/config.py",
+        "pydantic/dataclasses.py",
+        "pydantic/fields.py"
+      ],
+      "keyword": false,
+      "proposals": 2
+    },
+    {
+      "hash": "477e67c06c468d3f88f003ad2af76c5c93ab1b1a",
+      "parent": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+      "date": "2025-04-30T14:10:55Z",
+      "subject": "Fix typo in documentation (#11815)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "0d33ece12cd7c03af997c2ecde6dd7718d1bd044",
+      "parent": "477e67c06c468d3f88f003ad2af76c5c93ab1b1a",
+      "date": "2025-05-01T22:23:14+02:00",
+      "subject": "Fix check for stdlib dataclasses (#11822)",
+      "productionFiles": [
+        "pydantic/_internal/_dataclasses.py",
+        "pydantic/dataclasses.py",
+        "pydantic/json_schema.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "accb281469b7037d940cd9ff131a6aeed92b3806",
+      "parent": "0d33ece12cd7c03af997c2ecde6dd7718d1bd044",
+      "date": "2025-05-02T10:30:32+02:00",
+      "subject": "Bump astral-sh/setup-uv from 5 to 6 (#11826)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "15a4faa673c90a232886b08c2a5423653dd3820b",
+      "parent": "accb281469b7037d940cd9ff131a6aeed92b3806",
+      "date": "2025-05-02T11:20:39+02:00",
+      "subject": "Reduce documentation images size and remove some unused images (#11825)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "b0d701fb1c16608afd83503363999dc0b98aa961",
+      "parent": "15a4faa673c90a232886b08c2a5423653dd3820b",
+      "date": "2025-05-02T17:41:35+02:00",
+      "subject": "Add docstrings and update type hints in the `people.py` action (#11831)",
+      "productionFiles": [
+        ".github/actions/people/people.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "fdaaeb0a9eb96722cdc7b3d6debf12a02b349fb1",
+      "parent": "b0d701fb1c16608afd83503363999dc0b98aa961",
+      "date": "2025-05-02T22:47:17+02:00",
+      "subject": "Use `typing.Dict` for `BaseModel` annotations (#11834)",
+      "productionFiles": [
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "883e6b2d2b828771251440f69f0ac13cb6b31d01",
+      "parent": "fdaaeb0a9eb96722cdc7b3d6debf12a02b349fb1",
+      "date": "2025-05-04T15:14:04+02:00",
+      "subject": "Install uv while running `family integration` tests (#11840)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "d6f00d66ee125473155c4505e2f9628360a3552c",
+      "parent": "883e6b2d2b828771251440f69f0ac13cb6b31d01",
+      "date": "2025-05-04T15:16:14+02:00",
+      "subject": "Don't run `third-party` tests for `FastAPI` on contributors' forks (#11841)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "c4f0262bd64734751a68846a10edd6cdc6acc6f6",
+      "parent": "d6f00d66ee125473155c4505e2f9628360a3552c",
+      "date": "2025-05-08T10:48:47+02:00",
+      "subject": "Lint Markdown files using markdownlint (#11307)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "3382fb1b356ffd649f75dfa790226bd017495639",
+      "parent": "c4f0262bd64734751a68846a10edd6cdc6acc6f6",
+      "date": "2025-05-09T19:17:43+02:00",
+      "subject": "Always make use of `inspect.getsourcelines()` for docstring extraction on Python 3.13 and greater (#11829)",
+      "productionFiles": [
+        "pydantic/_internal/_docs_extraction.py",
+        "pydantic/config.py",
+        "pydantic/dataclasses.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "56b340ae2aa5fb6e6e37b1cabd4d6eeaed208e4c",
+      "parent": "3382fb1b356ffd649f75dfa790226bd017495639",
+      "date": "2025-05-12T04:56:31-06:00",
+      "subject": "Ignore Markdown lint commit in git blame (#11856)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "103f64da67ad23dfdc7406187db32019a0204d70",
+      "parent": "56b340ae2aa5fb6e6e37b1cabd4d6eeaed208e4c",
+      "date": "2025-05-13T04:47:28-06:00",
+      "subject": "Improve documentation regarding `json_schema_input_type` (#11858)",
+      "productionFiles": [
+        "pydantic/functional_validators.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "15c37539e094808584711816b46e68b51112e343",
+      "parent": "103f64da67ad23dfdc7406187db32019a0204d70",
+      "date": "2025-05-16T15:44:44+02:00",
+      "subject": "Only support the latest Mypy version (#11832)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "18050bdad7a6fc57198680d785fc880509195f5d",
+      "parent": "15c37539e094808584711816b46e68b51112e343",
+      "date": "2025-05-18T19:31:15+02:00",
+      "subject": "Fix light/dark mode documentation toggle (#11871)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "aadf00e2904767488cb98e2f5aa933fc274fe0e7",
+      "parent": "18050bdad7a6fc57198680d785fc880509195f5d",
+      "date": "2025-05-18T19:31:25+02:00",
+      "subject": "Fix missing link in documentation (#11869)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "53f460c9b0b36755f8044efe744551f29cb71b1c",
+      "parent": "aadf00e2904767488cb98e2f5aa933fc274fe0e7",
+      "date": "2025-05-19T10:36:00Z",
+      "subject": "Add cadwyn to the third-party test suite (#11861)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f165eacd6e5e142f6c1fa537c7efbcc429634f25",
+      "parent": "53f460c9b0b36755f8044efe744551f29cb71b1c",
+      "date": "2025-05-20T14:52:56+02:00",
+      "subject": "Update documentation about `@dataclass_transform` support (#11860)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "944674a5c0e89f34a91f0bbefd524c89a4196403",
+      "parent": "f165eacd6e5e142f6c1fa537c7efbcc429634f25",
+      "date": "2025-05-20T12:59:59Z",
+      "subject": "Remove `typing_extensions` version check in tests (#11830)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e92ad791031e60b791d9c724be688f7adc3b336a",
+      "parent": "944674a5c0e89f34a91f0bbefd524c89a4196403",
+      "date": "2025-05-21T10:06:36+02:00",
+      "subject": "Check if `FieldInfo` is complete after applying type variable map (#11855)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py",
+        "pydantic/fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "0a21ab14ecc200923102e3f831cb26b0282899e9",
+      "parent": "e92ad791031e60b791d9c724be688f7adc3b336a",
+      "date": "2025-05-21T10:11:12+02:00",
+      "subject": "Do not delete mock validator/serializer in `model_rebuild()` (#11890)",
+      "productionFiles": [
+        "pydantic/main.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "1f967d7ae1003c9c8cd8baefaff41535e4f81b70",
+      "parent": "0a21ab14ecc200923102e3f831cb26b0282899e9",
+      "date": "2025-05-22T17:45:13+02:00",
+      "subject": "Add YAML, XML, INI file format and RabbitMQ & ARQ queue documentation examples (#11838)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "2c38bf402c2a7ebadfcf2d1ccf8718513f9dc969",
+      "parent": "1f967d7ae1003c9c8cd8baefaff41535e4f81b70",
+      "date": "2025-05-23T10:59:12+02:00",
+      "subject": "Prepare release v2.11.5 (#11904)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "c597a9db285b340f372869a03a8204afd9e211c8",
+      "parent": "2c38bf402c2a7ebadfcf2d1ccf8718513f9dc969",
+      "date": "2025-06-01T10:43:19+02:00",
+      "subject": "Cleanup `core_schema` import in `functional_validators.py` (#11928)",
+      "productionFiles": [
+        "pydantic/functional_validators.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "88c75cd5adbfbfea4ff1aceb597c93f238db8dcb",
+      "parent": "c597a9db285b340f372869a03a8204afd9e211c8",
+      "date": "2025-06-02T10:18:03+02:00",
+      "subject": "Bump dawidd6/action-download-artifact from 9 to 10 (#11938)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "e1f9d15a5ed59d4b6f495154e2410823bdf55a3a",
+      "parent": "88c75cd5adbfbfea4ff1aceb597c93f238db8dcb",
+      "date": "2025-06-11T18:23:03+02:00",
+      "subject": "Bump `pydantic-core` to v2.35.1 (#11963)",
+      "productionFiles": [
+        "pydantic/_internal/_core_utils.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/functional_serializers.py",
+        "pydantic/functional_validators.py",
+        "pydantic/main.py",
+        "pydantic/type_adapter.py",
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 1
+    },
+    {
+      "hash": "43bbdc00373cdd7b208d67cfb61ec0c1678e4073",
+      "parent": "e1f9d15a5ed59d4b6f495154e2410823bdf55a3a",
+      "date": "2025-06-12T21:25:04+02:00",
+      "subject": "Rebuild dataclass fields before schema generation (#11949)",
+      "productionFiles": [
+        "pydantic/_internal/_dataclasses.py",
+        "pydantic/_internal/_fields.py",
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/dataclasses.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "bcd10f7e93ea06137a904dde3834b35c0ee941bb",
+      "parent": "43bbdc00373cdd7b208d67cfb61ec0c1678e4073",
+      "date": "2025-06-12T21:25:50+02:00",
+      "subject": "Always store the original field assignment on `FieldInfo` (#11946)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "de217f484600973c8bcba6a0f149ce2d5322739c",
+      "parent": "bcd10f7e93ea06137a904dde3834b35c0ee941bb",
+      "date": "2025-06-12T21:43:36+02:00",
+      "subject": "Improve `PlainValidator` example (#11954)",
+      "productionFiles": [
+        "pydantic/functional_validators.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+      "parent": "de217f484600973c8bcba6a0f149ce2d5322739c",
+      "date": "2025-06-12T19:49:18Z",
+      "subject": "Do not implicitly convert after model validators to class methods (#11957)",
+      "productionFiles": [
+        "pydantic/functional_validators.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+      "parent": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+      "date": "2025-06-12T21:50:38+02:00",
+      "subject": "Remove unneeded logic in `UuidVersion` (#11940)",
+      "productionFiles": [
+        "pydantic/types.py"
+      ],
+      "keyword": false,
+      "proposals": 5
+    },
+    {
+      "hash": "9d6b2bfd74c8f42cac5a17c8031ff08d50bf5579",
+      "parent": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+      "date": "2025-06-13T07:55:01Z",
+      "subject": "Prepare release v2.11.6 (#11974)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "638d04757f18aa8157c0fd3890127f5a7fac3aa1",
+      "parent": "9d6b2bfd74c8f42cac5a17c8031ff08d50bf5579",
+      "date": "2025-06-13T09:55:11-06:00",
+      "subject": "Do not use deprecated methods as default field values (#11914)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "11a24efffa70f0cd7447ff9ef897d329b9f2a184",
+      "parent": "638d04757f18aa8157c0fd3890127f5a7fac3aa1",
+      "date": "2025-06-14T08:17:22Z",
+      "subject": "Prepare release v2.11.7 (#11981)",
+      "productionFiles": [
+        "pydantic/version.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "565cea9547bd36238ce155087785042e2f976f35",
+      "parent": "11a24efffa70f0cd7447ff9ef897d329b9f2a184",
+      "date": "2025-06-14T10:45:01+02:00",
+      "subject": "Refactor `FieldInfo` creation implementation (#11898)",
+      "productionFiles": [
+        "pydantic/_internal/_fields.py",
+        "pydantic/fields.py"
+      ],
+      "keyword": true,
+      "proposals": 0
+    },
+    {
+      "hash": "ddb1a68118f6c4e1d5bc4c59a2479afe36bb5165",
+      "parent": "565cea9547bd36238ce155087785042e2f976f35",
+      "date": "2025-06-14T10:45:37+02:00",
+      "subject": "Allow callable discriminator to be applied on PEP 695 type aliases (#11941)",
+      "productionFiles": [
+        "pydantic/types.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "0c4a22b64b23dfad27387750cf07487efc45eb05",
+      "parent": "ddb1a68118f6c4e1d5bc4c59a2479afe36bb5165",
+      "date": "2025-06-15T20:08:01+02:00",
+      "subject": "Add `flake8-pie` Ruff rules (#11982)",
+      "productionFiles": [
+        "pydantic/main.py",
+        "pydantic/plugin/__init__.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "188dc9a0bc3424102ecfab6624c28a80bbdcf81f",
+      "parent": "0c4a22b64b23dfad27387750cf07487efc45eb05",
+      "date": "2025-06-23T09:42:50Z",
+      "subject": "Suppress core schema generation warning when using `SkipValidation` (#12002)",
+      "productionFiles": [
+        "pydantic/_internal/_generate_schema.py",
+        "pydantic/functional_validators.py",
+        "pydantic/warnings.py"
+      ],
+      "keyword": false,
+      "proposals": 0
+    },
+    {
+      "hash": "42298a08b4cb999242b2ce231adda03539858567",
+      "parent": "188dc9a0bc3424102ecfab6624c28a80bbdcf81f",
+      "date": "2025-06-26T08:45:23+02:00",
+      "subject": "Set back default target of Makefile (#12015)",
+      "productionFiles": [],
+      "keyword": false,
+      "proposals": 0
+    }
+  ],
+  "proposals": [
+    {
+      "id": "pydantic-49b2bb3071e4",
+      "repo": "pydantic",
+      "commit": "8fe3aae8378ad268301c58143d3d9701638d1237",
+      "subject": "Refactor and optimize schema cleaning logic (#11244)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "47222838a71ec6cd8272085c718ad02221087f20",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema.clean_schema",
+        "line": 642,
+        "endLine": 649,
+        "kind": "method",
+        "sha256": "5958d7ae038416229e7d66372a2f6a9649434c6a74d4f0a6702cbd707b7d7d61"
+      },
+      "b": {
+        "revision": "47222838a71ec6cd8272085c718ad02221087f20",
+        "file": "pydantic/_internal/_core_utils.py",
+        "symbol": "validate_core_schema",
+        "line": 603,
+        "endLine": 606,
+        "kind": "function",
+        "sha256": "df0235b8d901f468c538c8ce7951eda559b46158e31cda6c875dd542456d05d7"
+      },
+      "after": [
+        {
+          "revision": "8fe3aae8378ad268301c58143d3d9701638d1237",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema.clean_schema",
+          "line": 641,
+          "endLine": 644,
+          "kind": "method",
+          "sha256": "f7a5e6fbeeba8f8c5a5927936299aeabb0f13f320a8ca21ef27b08763dc48dec"
+        }
+      ],
+      "structure": 0.078125,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-c15219dd0b92",
+      "repo": "pydantic",
+      "commit": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+      "subject": "Fix JSON Schema generation with referenceable core schemas holding JSON metadata (#11475)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._annotated_schema",
+        "line": 2050,
+        "endLine": 2077,
+        "kind": "method",
+        "sha256": "ffb10d8719de08e8528ae69ecf388384dbccda0fb467613acaf36ea7d67037b8"
+      },
+      "b": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._get_args_resolving_forward_refs",
+        "line": 913,
+        "endLine": 914,
+        "kind": "method",
+        "sha256": "1b31cd49c90783bd98c83255c766c3be304a8f0757c221e29e1b910e32f6ba9e"
+      },
+      "after": [
+        {
+          "revision": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._annotated_schema",
+          "line": 2050,
+          "endLine": 2063,
+          "kind": "method",
+          "sha256": "5f9efd4dd6d2cab5013c5c10cc30b05627c21cc6573875ddf3f96d306261ab22"
+        }
+      ],
+      "structure": 0,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-4e5941df8ca4",
+      "repo": "pydantic",
+      "commit": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+      "subject": "Fix JSON Schema generation with referenceable core schemas holding JSON metadata (#11475)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._annotated_schema",
+        "line": 2050,
+        "endLine": 2077,
+        "kind": "method",
+        "sha256": "ffb10d8719de08e8528ae69ecf388384dbccda0fb467613acaf36ea7d67037b8"
+      },
+      "b": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._apply_annotations",
+        "line": 2079,
+        "endLine": 2121,
+        "kind": "method",
+        "sha256": "2fd9ed9b84a82a8321c64ac8a633893b6593b280171bbe1dd8be93598147d81b"
+      },
+      "after": [
+        {
+          "revision": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._annotated_schema",
+          "line": 2050,
+          "endLine": 2063,
+          "kind": "method",
+          "sha256": "5f9efd4dd6d2cab5013c5c10cc30b05627c21cc6573875ddf3f96d306261ab22"
+        }
+      ],
+      "structure": 0.25,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-cf1020ab2e31",
+      "repo": "pydantic",
+      "commit": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+      "subject": "Fix JSON Schema generation with referenceable core schemas holding JSON metadata (#11475)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._annotated_schema",
+        "line": 2050,
+        "endLine": 2077,
+        "kind": "method",
+        "sha256": "ffb10d8719de08e8528ae69ecf388384dbccda0fb467613acaf36ea7d67037b8"
+      },
+      "b": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "wrap_default",
+        "line": 2421,
+        "endLine": 2443,
+        "kind": "function",
+        "sha256": "2b7acb18990d9f43a46099ad62ed2e7a91bf03290b28611547a6a806412a885b"
+      },
+      "after": [
+        {
+          "revision": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._annotated_schema",
+          "line": 2050,
+          "endLine": 2063,
+          "kind": "method",
+          "sha256": "5f9efd4dd6d2cab5013c5c10cc30b05627c21cc6573875ddf3f96d306261ab22"
+        }
+      ],
+      "structure": 0.09375,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-5d6f7fbf041b",
+      "repo": "pydantic",
+      "commit": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+      "subject": "Fix JSON Schema generation with referenceable core schemas holding JSON metadata (#11475)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._annotated_schema",
+        "line": 2050,
+        "endLine": 2077,
+        "kind": "method",
+        "sha256": "ffb10d8719de08e8528ae69ecf388384dbccda0fb467613acaf36ea7d67037b8"
+      },
+      "b": {
+        "revision": "6eeb99b224ea8acf2a47a5b649ade8fac3f2d9a6",
+        "file": "pydantic/_internal/_import_utils.py",
+        "symbol": "import_cached_field_info",
+        "line": 16,
+        "endLine": 20,
+        "kind": "function",
+        "sha256": "2983009fb6d8a4abd1566dcd7889baab9f9f73260594800ec17870b0030863fd"
+      },
+      "after": [
+        {
+          "revision": "67e4f597028635b73baaaf65fb50db7fda34c92b",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._annotated_schema",
+          "line": 2050,
+          "endLine": 2063,
+          "kind": "method",
+          "sha256": "5f9efd4dd6d2cab5013c5c10cc30b05627c21cc6573875ddf3f96d306261ab22"
+        }
+      ],
+      "structure": 0,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-e3fa2de990b2",
+      "repo": "pydantic",
+      "commit": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "subject": "Use the `typing-inspection` library (#11479)",
+      "method": "removed-with-existing-call-added",
+      "a": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_union",
+        "line": 56,
+        "endLine": 67,
+        "kind": "function",
+        "sha256": "a2f0a2d62f9fd1a89eee764d784b96b85ea305dd3b20eb19bbe39f21a5118a52"
+      },
+      "b": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_annotated",
+        "line": 114,
+        "endLine": 123,
+        "kind": "function",
+        "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+      },
+      "after": [
+        {
+          "revision": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+          "file": "pydantic/_internal/_typing_extra.py",
+          "symbol": "is_annotated",
+          "line": 42,
+          "endLine": 51,
+          "kind": "function",
+          "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+        }
+      ],
+      "structure": 1,
+      "exact": 1
+    },
+    {
+      "id": "pydantic-0d26f8f9962d",
+      "repo": "pydantic",
+      "commit": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "subject": "Use the `typing-inspection` library (#11479)",
+      "method": "removed-with-existing-call-added",
+      "a": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_literal",
+        "line": 74,
+        "endLine": 83,
+        "kind": "function",
+        "sha256": "8906f0b419eac18efd21d5724efc42af85acd98b9f8f13021ecefbd8d12e1797"
+      },
+      "b": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_annotated",
+        "line": 114,
+        "endLine": 123,
+        "kind": "function",
+        "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+      },
+      "after": [
+        {
+          "revision": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+          "file": "pydantic/_internal/_typing_extra.py",
+          "symbol": "is_annotated",
+          "line": 42,
+          "endLine": 51,
+          "kind": "function",
+          "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+        }
+      ],
+      "structure": 1,
+      "exact": 1
+    },
+    {
+      "id": "pydantic-6ecc5434bccd",
+      "repo": "pydantic",
+      "commit": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "subject": "Use the `typing-inspection` library (#11479)",
+      "method": "removed-with-existing-call-added",
+      "a": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_unpack",
+        "line": 144,
+        "endLine": 153,
+        "kind": "function",
+        "sha256": "5b1f68d023a7196cdde25ed132d130af0ac4af2c2b41ccd65cfe52335cd3adf2"
+      },
+      "b": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_annotated",
+        "line": 114,
+        "endLine": 123,
+        "kind": "function",
+        "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+      },
+      "after": [
+        {
+          "revision": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+          "file": "pydantic/_internal/_typing_extra.py",
+          "symbol": "is_annotated",
+          "line": 42,
+          "endLine": 51,
+          "kind": "function",
+          "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+        }
+      ],
+      "structure": 1,
+      "exact": 1
+    },
+    {
+      "id": "pydantic-ebca4e56736c",
+      "repo": "pydantic",
+      "commit": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "subject": "Use the `typing-inspection` library (#11479)",
+      "method": "removed-with-existing-call-added",
+      "a": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_required",
+        "line": 165,
+        "endLine": 173,
+        "kind": "function",
+        "sha256": "3ebe410b23160cb3131858db7195e7c4b8090fc6a50f35c55ee5046ee490eac1"
+      },
+      "b": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_annotated",
+        "line": 114,
+        "endLine": 123,
+        "kind": "function",
+        "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+      },
+      "after": [
+        {
+          "revision": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+          "file": "pydantic/_internal/_typing_extra.py",
+          "symbol": "is_annotated",
+          "line": 42,
+          "endLine": 51,
+          "kind": "function",
+          "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+        }
+      ],
+      "structure": 1,
+      "exact": 1
+    },
+    {
+      "id": "pydantic-d984bcb44832",
+      "repo": "pydantic",
+      "commit": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "subject": "Use the `typing-inspection` library (#11479)",
+      "method": "removed-with-existing-call-added",
+      "a": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_not_required",
+        "line": 175,
+        "endLine": 183,
+        "kind": "function",
+        "sha256": "7a0d859ebd6681605df9dbe9a58b284afcbec158ce16918af919f3b9efd6698f"
+      },
+      "b": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_annotated",
+        "line": 114,
+        "endLine": 123,
+        "kind": "function",
+        "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+      },
+      "after": [
+        {
+          "revision": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+          "file": "pydantic/_internal/_typing_extra.py",
+          "symbol": "is_annotated",
+          "line": 42,
+          "endLine": 51,
+          "kind": "function",
+          "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+        }
+      ],
+      "structure": 1,
+      "exact": 1
+    },
+    {
+      "id": "pydantic-0ed0bb5ea256",
+      "repo": "pydantic",
+      "commit": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+      "subject": "Use the `typing-inspection` library (#11479)",
+      "method": "removed-with-existing-call-added",
+      "a": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_classvar",
+        "line": 349,
+        "endLine": 366,
+        "kind": "function",
+        "sha256": "99705665c40bf89718d9348c0504ca3f8598d6029c87c6e9c1d76dcaf52c27a1"
+      },
+      "b": {
+        "revision": "98348d0ce8e26c42ac9d32278ef97f6545446dd9",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "is_annotated",
+        "line": 114,
+        "endLine": 123,
+        "kind": "function",
+        "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+      },
+      "after": [
+        {
+          "revision": "6558a2b1f569a25984d14d6af4b484fe27dc4d17",
+          "file": "pydantic/_internal/_typing_extra.py",
+          "symbol": "is_annotated",
+          "line": 42,
+          "endLine": 51,
+          "kind": "function",
+          "sha256": "cf6f2769e4455e604516a3286502bc9f65e3ab4286dc3eab12cb7596badafb4d"
+        }
+      ],
+      "structure": 0.5625,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-c28983ce94c3",
+      "repo": "pydantic",
+      "commit": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+      "subject": "Add `generate_arguments_schema()` experimental function (#11572)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._call_schema",
+        "line": 1908,
+        "endLine": 1987,
+        "kind": "method",
+        "sha256": "8efe2aa39737d05749355ee5d60bc2ab5c77f8f62bda5c507e0c0d90af615635"
+      },
+      "b": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema.generate_schema",
+        "line": 671,
+        "endLine": 708,
+        "kind": "method",
+        "sha256": "4db814c4e8f3870f98fc0b9766f9dd94a721b3d285fea0914347c1d2b9eea558"
+      },
+      "after": [
+        {
+          "revision": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._call_schema",
+          "line": 1962,
+          "endLine": 1985,
+          "kind": "method",
+          "sha256": "2acc6f8de231b1b91eceeceb5071045f8c3584248668e35ce9544649fc8c602c"
+        }
+      ],
+      "structure": 0.1875,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-a737ade3ace0",
+      "repo": "pydantic",
+      "commit": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+      "subject": "Add `generate_arguments_schema()` experimental function (#11572)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._call_schema",
+        "line": 1908,
+        "endLine": 1987,
+        "kind": "method",
+        "sha256": "8efe2aa39737d05749355ee5d60bc2ab5c77f8f62bda5c507e0c0d90af615635"
+      },
+      "b": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_schema_generation_shared.py",
+        "symbol": "CallbackGetCoreSchemaHandler.generate_schema",
+        "line": 95,
+        "endLine": 96,
+        "kind": "method",
+        "sha256": "57d6139f431d3eac98180e9d959bb402d81ff89c0df71d3b55a53853d802d08d"
+      },
+      "after": [
+        {
+          "revision": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._call_schema",
+          "line": 1962,
+          "endLine": 1985,
+          "kind": "method",
+          "sha256": "2acc6f8de231b1b91eceeceb5071045f8c3584248668e35ce9544649fc8c602c"
+        }
+      ],
+      "structure": 0.0390625,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-7b73754c4460",
+      "repo": "pydantic",
+      "commit": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+      "subject": "Add `generate_arguments_schema()` experimental function (#11572)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._call_schema",
+        "line": 1908,
+        "endLine": 1987,
+        "kind": "method",
+        "sha256": "8efe2aa39737d05749355ee5d60bc2ab5c77f8f62bda5c507e0c0d90af615635"
+      },
+      "b": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_typing_extra.py",
+        "symbol": "get_function_type_hints",
+        "line": 511,
+        "endLine": 553,
+        "kind": "function",
+        "sha256": "623b5d1907667c5757910d244b48b7862dfaa14145989414442446b815a49f0d"
+      },
+      "after": [
+        {
+          "revision": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._call_schema",
+          "line": 1962,
+          "endLine": 1985,
+          "kind": "method",
+          "sha256": "2acc6f8de231b1b91eceeceb5071045f8c3584248668e35ce9544649fc8c602c"
+        }
+      ],
+      "structure": 0.125,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-0adfe4d084bb",
+      "repo": "pydantic",
+      "commit": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+      "subject": "Add `generate_arguments_schema()` experimental function (#11572)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._call_schema",
+        "line": 1908,
+        "endLine": 1987,
+        "kind": "method",
+        "sha256": "8efe2aa39737d05749355ee5d60bc2ab5c77f8f62bda5c507e0c0d90af615635"
+      },
+      "b": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/annotated_handlers.py",
+        "symbol": "GetCoreSchemaHandler.generate_schema",
+        "line": 84,
+        "endLine": 97,
+        "kind": "method",
+        "sha256": "afe3ae7369bf18d113e87dae6265bc6ffa54d409de1eb9190a6f6a5049972c0d"
+      },
+      "after": [
+        {
+          "revision": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._call_schema",
+          "line": 1962,
+          "endLine": 1985,
+          "kind": "method",
+          "sha256": "2acc6f8de231b1b91eceeceb5071045f8c3584248668e35ce9544649fc8c602c"
+        }
+      ],
+      "structure": 0,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-95ea45b0f772",
+      "repo": "pydantic",
+      "commit": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+      "subject": "Add `generate_arguments_schema()` experimental function (#11572)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._call_schema",
+        "line": 1908,
+        "endLine": 1987,
+        "kind": "method",
+        "sha256": "8efe2aa39737d05749355ee5d60bc2ab5c77f8f62bda5c507e0c0d90af615635"
+      },
+      "b": {
+        "revision": "72bea3f22f8d5380cb10af017deae4a0e16709c0",
+        "file": "pydantic/json_schema.py",
+        "symbol": "GenerateJsonSchema.call_schema",
+        "line": 1871,
+        "endLine": 1880,
+        "kind": "method",
+        "sha256": "8a2b3969380c4640a1c903db4e7c8a20adc833f661a1306271b389dcd16b3373"
+      },
+      "after": [
+        {
+          "revision": "e2c2e811e3cafb35d376c22e8830f2773d65ee58",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema._call_schema",
+          "line": 1962,
+          "endLine": 1985,
+          "kind": "method",
+          "sha256": "2acc6f8de231b1b91eceeceb5071045f8c3584248668e35ce9544649fc8c602c"
+        }
+      ],
+      "structure": 0.0234375,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-b0c9da6b6df4",
+      "repo": "pydantic",
+      "commit": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+      "subject": "Move some field logic out of the `GenerateSchema` class (#11733)",
+      "method": "removed-bodies-merged-to-new-helper",
+      "a": {
+        "revision": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._apply_alias_generator_to_field_info",
+        "line": 1230,
+        "endLine": 1278,
+        "kind": "method",
+        "sha256": "d6aaf5e3ba208d6f902847dc0368e858bd51cbc6517611ba00030fd1c4c5dfc4"
+      },
+      "b": {
+        "revision": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._apply_alias_generator_to_computed_field_info",
+        "line": 1280,
+        "endLine": 1321,
+        "kind": "method",
+        "sha256": "f265fa7dfb0e6ce73aa83ac52395221f5858536c2880302f0c6a07c445e42b4a"
+      },
+      "after": [
+        {
+          "revision": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+          "file": "pydantic/_internal/_fields.py",
+          "symbol": "_apply_alias_generator_to_field_info",
+          "line": 135,
+          "endLine": 182,
+          "kind": "function",
+          "sha256": "760fa735acb8eae1aa37970fa59b439cafbfcd4d606a886bdb58a01bd53ecd2b"
+        }
+      ],
+      "structure": 0.859375,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-be46c392027a",
+      "repo": "pydantic",
+      "commit": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+      "subject": "Move some field logic out of the `GenerateSchema` class (#11733)",
+      "method": "removed-bodies-merged-to-new-helper",
+      "a": {
+        "revision": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._apply_alias_generator_to_computed_field_info",
+        "line": 1280,
+        "endLine": 1321,
+        "kind": "method",
+        "sha256": "f265fa7dfb0e6ce73aa83ac52395221f5858536c2880302f0c6a07c445e42b4a"
+      },
+      "b": {
+        "revision": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema._apply_alias_generator_to_field_info",
+        "line": 1230,
+        "endLine": 1278,
+        "kind": "method",
+        "sha256": "d6aaf5e3ba208d6f902847dc0368e858bd51cbc6517611ba00030fd1c4c5dfc4"
+      },
+      "after": [
+        {
+          "revision": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+          "file": "pydantic/fields.py",
+          "symbol": "ComputedFieldInfo._apply_alias_generator",
+          "line": 1316,
+          "endLine": 1345,
+          "kind": "method",
+          "sha256": "e54b993d87bd17a4c0e237c1cdbb73b954ff0d99367f98fafbac80832b38f6e6"
+        }
+      ],
+      "structure": 0.859375,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-4467ccc3a203",
+      "repo": "pydantic",
+      "commit": "e1f9d15a5ed59d4b6f495154e2410823bdf55a3a",
+      "subject": "Bump `pydantic-core` to v2.35.1 (#11963)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "88c75cd5adbfbfea4ff1aceb597c93f238db8dcb",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "GenerateSchema.clean_schema",
+        "line": 657,
+        "endLine": 660,
+        "kind": "method",
+        "sha256": "f7a5e6fbeeba8f8c5a5927936299aeabb0f13f320a8ca21ef27b08763dc48dec"
+      },
+      "b": {
+        "revision": "88c75cd5adbfbfea4ff1aceb597c93f238db8dcb",
+        "file": "pydantic/_internal/_generate_schema.py",
+        "symbol": "_Definitions.finalize_schema",
+        "line": 2631,
+        "endLine": 2687,
+        "kind": "method",
+        "sha256": "9c6fc465b261e1986e033b8cd8309bd9166d99b7278612319e9657cd20fe2f19"
+      },
+      "after": [
+        {
+          "revision": "e1f9d15a5ed59d4b6f495154e2410823bdf55a3a",
+          "file": "pydantic/_internal/_generate_schema.py",
+          "symbol": "GenerateSchema.clean_schema",
+          "line": 656,
+          "endLine": 657,
+          "kind": "method",
+          "sha256": "12a1e2265b285d379cb8518f0e498aeea663a82972718951179d8c3881e8ecd0"
+        }
+      ],
+      "structure": 0.0703125,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-09df1126f890",
+      "repo": "pydantic",
+      "commit": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+      "subject": "Remove unneeded logic in `UuidVersion` (#11940)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/types.py",
+        "symbol": "UuidVersion.__get_pydantic_core_schema__",
+        "line": 1168,
+        "endLine": 1177,
+        "kind": "method",
+        "sha256": "624d08137876627c521cac208f5cc0e83c36f1117a621f750809668892ceef85"
+      },
+      "b": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/types.py",
+        "symbol": "_check_annotated_type",
+        "line": 2193,
+        "endLine": 2195,
+        "kind": "function",
+        "sha256": "ee65cdbd2ef88105676cec48d30f53e5beb40e7c83546655aecfc6cda165663d"
+      },
+      "after": [
+        {
+          "revision": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+          "file": "pydantic/types.py",
+          "symbol": "UuidVersion.__get_pydantic_core_schema__",
+          "line": 1168,
+          "endLine": 1172,
+          "kind": "method",
+          "sha256": "768bad29888fb84425dc7432869b36e3675b9d9b49b5b17ab80715f0476be165"
+        }
+      ],
+      "structure": 0,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-16fac0a55d1b",
+      "repo": "pydantic",
+      "commit": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+      "subject": "Remove unneeded logic in `UuidVersion` (#11940)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/types.py",
+        "symbol": "UuidVersion.__get_pydantic_core_schema__",
+        "line": 1168,
+        "endLine": 1177,
+        "kind": "method",
+        "sha256": "624d08137876627c521cac208f5cc0e83c36f1117a621f750809668892ceef85"
+      },
+      "b": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/_internal/_mock_val_ser.py",
+        "symbol": "set_type_adapter_mocks.attempt_rebuild_fn.handler",
+        "line": 125,
+        "endLine": 128,
+        "kind": "function",
+        "sha256": "d7df6a4d3e458af7b59dc7b388de745bb7df5337c85dab580a6fbad8b8ae5aa5"
+      },
+      "after": [
+        {
+          "revision": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+          "file": "pydantic/types.py",
+          "symbol": "UuidVersion.__get_pydantic_core_schema__",
+          "line": 1168,
+          "endLine": 1172,
+          "kind": "method",
+          "sha256": "768bad29888fb84425dc7432869b36e3675b9d9b49b5b17ab80715f0476be165"
+        }
+      ],
+      "structure": 0.0703125,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-ece05b9413be",
+      "repo": "pydantic",
+      "commit": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+      "subject": "Remove unneeded logic in `UuidVersion` (#11940)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/types.py",
+        "symbol": "UuidVersion.__get_pydantic_core_schema__",
+        "line": 1168,
+        "endLine": 1177,
+        "kind": "method",
+        "sha256": "624d08137876627c521cac208f5cc0e83c36f1117a621f750809668892ceef85"
+      },
+      "b": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/_internal/_mock_val_ser.py",
+        "symbol": "set_model_mocks.attempt_rebuild_fn.handler",
+        "line": 164,
+        "endLine": 167,
+        "kind": "function",
+        "sha256": "c0d4d989128b55f50eda9d2e44149d2b06e928210055a13d71b3c68bd64e16f3"
+      },
+      "after": [
+        {
+          "revision": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+          "file": "pydantic/types.py",
+          "symbol": "UuidVersion.__get_pydantic_core_schema__",
+          "line": 1168,
+          "endLine": 1172,
+          "kind": "method",
+          "sha256": "768bad29888fb84425dc7432869b36e3675b9d9b49b5b17ab80715f0476be165"
+        }
+      ],
+      "structure": 0.0703125,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-3b0fdcd7bf9b",
+      "repo": "pydantic",
+      "commit": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+      "subject": "Remove unneeded logic in `UuidVersion` (#11940)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/types.py",
+        "symbol": "UuidVersion.__get_pydantic_core_schema__",
+        "line": 1168,
+        "endLine": 1177,
+        "kind": "method",
+        "sha256": "624d08137876627c521cac208f5cc0e83c36f1117a621f750809668892ceef85"
+      },
+      "b": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/_internal/_mock_val_ser.py",
+        "symbol": "set_dataclass_mocks.attempt_rebuild_fn.handler",
+        "line": 205,
+        "endLine": 208,
+        "kind": "function",
+        "sha256": "95a51a90cd62352dd0ab89db7b5c23c398d4fd5864b8b16920b4f8593cba2c5e"
+      },
+      "after": [
+        {
+          "revision": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+          "file": "pydantic/types.py",
+          "symbol": "UuidVersion.__get_pydantic_core_schema__",
+          "line": 1168,
+          "endLine": 1172,
+          "kind": "method",
+          "sha256": "768bad29888fb84425dc7432869b36e3675b9d9b49b5b17ab80715f0476be165"
+        }
+      ],
+      "structure": 0.015625,
+      "exact": 0
+    },
+    {
+      "id": "pydantic-4774764e449a",
+      "repo": "pydantic",
+      "commit": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+      "subject": "Remove unneeded logic in `UuidVersion` (#11940)",
+      "method": "shortened-to-existing-call",
+      "a": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/types.py",
+        "symbol": "UuidVersion.__get_pydantic_core_schema__",
+        "line": 1168,
+        "endLine": 1177,
+        "kind": "method",
+        "sha256": "624d08137876627c521cac208f5cc0e83c36f1117a621f750809668892ceef85"
+      },
+      "b": {
+        "revision": "f0e1d049fde6f9c4c0ce9b873b9f3a2040e4d7b2",
+        "file": "pydantic/experimental/pipeline.py",
+        "symbol": "_check_func.handler",
+        "line": 366,
+        "endLine": 369,
+        "kind": "function",
+        "sha256": "32404c9ef285d1a2cf4443485bbf1482ba5e6b426ca7f2b367625e85e11d0bc1"
+      },
+      "after": [
+        {
+          "revision": "fb6117acda60ea9ea0e933eb9df1ddf95aa646e7",
+          "file": "pydantic/types.py",
+          "symbol": "UuidVersion.__get_pydantic_core_schema__",
+          "line": 1168,
+          "endLine": 1172,
+          "kind": "method",
+          "sha256": "768bad29888fb84425dc7432869b36e3675b9d9b49b5b17ab80715f0476be165"
+        }
+      ],
+      "structure": 0.078125,
+      "exact": 0
+    }
+  ]
+}

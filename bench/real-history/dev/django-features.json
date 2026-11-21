@@ -1,0 +1,721 @@
+[
+  {
+    "id": "django-mail-recipients-b05123b724",
+    "repo": "django",
+    "commit": "90fc76294808b16a86acc9a073435250466932e3",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "62ad970c39c067dd30b068cb9ad04a93963bebb4",
+      "file": "django/core/mail/__init__.py",
+      "symbol": "mail_admins",
+      "line": 122,
+      "endLine": 139,
+      "kind": "function",
+      "sha256": "2e11a821c1b8db5aff367e48c16ac3ebef6ba734bbae157c9dc954fcdda8f142"
+    },
+    "b": {
+      "revision": "62ad970c39c067dd30b068cb9ad04a93963bebb4",
+      "file": "django/core/mail/__init__.py",
+      "symbol": "mail_managers",
+      "line": 142,
+      "endLine": 159,
+      "kind": "function",
+      "sha256": "4d1742885c81854fea314581b4e832edb3328b5ab35319fa4af560afe730c8fc"
+    },
+    "after": [
+      {
+        "revision": "90fc76294808b16a86acc9a073435250466932e3",
+        "file": "django/core/mail/__init__.py",
+        "symbol": "_send_server_message",
+        "line": 122,
+        "endLine": 147,
+        "kind": "function",
+        "sha256": "e54a7bb91ba4026d4ac56408e9e2f148cc5f7cf0923628236ee8d74a5b77e775"
+      }
+    ],
+    "review": {
+      "id": "django-mail-recipients-b05123b724",
+      "label": "positive",
+      "mode": "shared-helper",
+      "family": "django-mail-recipients",
+      "reason": "mail_admins / mail_managers: The two functions duplicate recipient validation, EmailMultiAlternatives construction, HTML attachment and sending; ADMINS versus MANAGERS is the configuration difference. The commit extracts _send_server_message(setting_name=...) and both wrappers call it. Calling mail_managers from mail_admins unchanged would send to the wrong recipients, so this is helper-extraction evidence, not direct-call equivalence.",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 1,
+        "exact": 1,
+        "vocabulary": 0.9091348821756151,
+        "bindingExact": 0,
+        "structureVocabulary": 0.9091348821756151,
+        "exactVocabulary": 0.9091348821756151,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 0,
+        "name": 0.3333333333333333
+      },
+      "probability": 0.7894443963471338,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": true,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "a[1]",
+          "mail.attach_alternative",
+          "mail.send",
+          "settings.ADMINS",
+          "settings.EMAIL_SUBJECT_PREFIX",
+          "settings.SERVER_EMAIL"
+        ],
+        "writes": [],
+        "calls": [
+          "EmailMultiAlternatives",
+          "ValueError",
+          "all",
+          "isinstance",
+          "len",
+          "mail.attach_alternative",
+          "mail.send"
+        ],
+        "returns": [
+          "void"
+        ],
+        "raises": [
+          "ValueError"
+        ],
+        "guards": [
+          "truth:return",
+          "type:raise"
+        ],
+        "literals": [
+          "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "72bd541af7cdfda8a99b98a6b0555d36c02cef871d6b64e012748da78ea8273b",
+          "d13ae7f87f63a2ff3d69dc35f74f653a0e3b6ab0f631dc288b81e3e0217211b3",
+          "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "dd0c676ecfc5c8ae9a6c1bb4b4068ee59ed3dc2b8d4009e1605c83c5c8fa617d"
+        ],
+        "arity": 5,
+        "parameterUse": [
+          1,
+          1,
+          2,
+          2,
+          2
+        ],
+        "earlyReturns": 1
+      },
+      "b": {
+        "reads": [
+          "a[1]",
+          "mail.attach_alternative",
+          "mail.send",
+          "settings.EMAIL_SUBJECT_PREFIX",
+          "settings.MANAGERS",
+          "settings.SERVER_EMAIL"
+        ],
+        "writes": [],
+        "calls": [
+          "EmailMultiAlternatives",
+          "ValueError",
+          "all",
+          "isinstance",
+          "len",
+          "mail.attach_alternative",
+          "mail.send"
+        ],
+        "returns": [
+          "void"
+        ],
+        "raises": [
+          "ValueError"
+        ],
+        "guards": [
+          "truth:return",
+          "type:raise"
+        ],
+        "literals": [
+          "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "72bd541af7cdfda8a99b98a6b0555d36c02cef871d6b64e012748da78ea8273b",
+          "d13ae7f87f63a2ff3d69dc35f74f653a0e3b6ab0f631dc288b81e3e0217211b3",
+          "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "fbaea202effb889600de31ac451106cd5e172243b1753effa1fe6eecd043b7cd"
+        ],
+        "arity": 5,
+        "parameterUse": [
+          1,
+          1,
+          2,
+          2,
+          2
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.7142857142857143,
+      "writes": null,
+      "calls": 1,
+      "returnShape": 1,
+      "exceptions": 1,
+      "validation": 1,
+      "arity": 1,
+      "literals": 0.6666666666666666,
+      "parameterUse": 1,
+      "earlyReturns": 1,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "django-expression-resolution-25a6fa82bb",
+    "repo": "django",
+    "commit": "a76035e925ff4e6d8676c65cb135c74b993b1039",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "136a1e89278070fd100f27d9519529be8a8a8c10",
+      "file": "django/db/models/expressions.py",
+      "symbol": "Func.resolve_expression",
+      "line": 1073,
+      "endLine": 1088,
+      "kind": "method",
+      "sha256": "35b43f07e33dce1505897d24a5cbeaf4f4029a576d2373fc0838759ba7485c5d"
+    },
+    "b": {
+      "revision": "136a1e89278070fd100f27d9519529be8a8a8c10",
+      "file": "django/db/models/expressions.py",
+      "symbol": "BaseExpression.resolve_expression",
+      "line": 276,
+      "endLine": 305,
+      "kind": "method",
+      "sha256": "9119615156f74309514bfa1229d4de339082b56b927013739b4d5a3c2a0ee0d5"
+    },
+    "after": [
+      {
+        "revision": "a76035e925ff4e6d8676c65cb135c74b993b1039",
+        "file": "django/db/models/expressions.py",
+        "symbol": "BaseExpression.resolve_expression",
+        "line": 276,
+        "endLine": 311,
+        "kind": "method",
+        "sha256": "cae563db85cc56733a4f3f5ddbf70ff932b1c65496b0f14ba87a9c818bb0572d"
+      }
+    ],
+    "review": {
+      "id": "django-expression-resolution-25a6fa82bb",
+      "label": "positive",
+      "mode": "extend-existing",
+      "family": "django-expression-resolution",
+      "reason": "Func.resolve_expression / BaseExpression.resolve_expression: Both before implementations copy self, set is_summary and resolve child expressions. The commit moves Func's composite-expression validation into BaseExpression and deletes Func's override, inheriting the generalized implementation. This is an author-performed consolidation, but before-state BaseExpression lacks Func's validation: direct replacement without extending it would be unsafe.",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.2578125,
+        "exact": 0,
+        "vocabulary": 0.578945365007687,
+        "bindingExact": 0,
+        "structureVocabulary": 0.1492593519160443,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 0,
+        "name": 1
+      },
+      "probability": 0.255345227017991,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "SELF.__class__",
+          "SELF.__class__.__name__",
+          "SELF.allows_composite_expressions",
+          "SELF.copy",
+          "arg.resolve_expression",
+          "c.get_source_expressions",
+          "c.source_expressions"
+        ],
+        "writes": [
+          "c.is_summary",
+          "c.source_expressions[*]"
+        ],
+        "calls": [
+          "SELF.copy",
+          "ValueError",
+          "any",
+          "arg.resolve_expression",
+          "c.get_source_expressions",
+          "enumerate",
+          "isinstance"
+        ],
+        "returns": [],
+        "raises": [
+          "ValueError"
+        ],
+        "guards": [
+          "type:raise"
+        ],
+        "literals": [
+          "2b85392ecc40804cf5ed8e5fee505aa44b016fcf3f1101bb3d13ffb7dbcea574"
+        ],
+        "arity": 5,
+        "parameterUse": [
+          1,
+          1,
+          1,
+          2,
+          1
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "SELF.copy",
+          "c.get_source_expressions",
+          "c.set_source_expressions",
+          "expr.resolve_expression"
+        ],
+        "writes": [
+          "c.is_summary"
+        ],
+        "calls": [
+          "SELF.copy",
+          "c.get_source_expressions",
+          "c.set_source_expressions",
+          "expr.resolve_expression"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 5,
+        "parameterUse": [
+          1,
+          1,
+          1,
+          2,
+          0
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.2222222222222222,
+      "writes": 0.5,
+      "calls": 0.2222222222222222,
+      "returnShape": null,
+      "exceptions": 0,
+      "validation": 0,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 0.9354143466934852,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "django-log-assertions-a85dcca1d0",
+    "repo": "django",
+    "commit": "9d72e7daf7299ef1ece56fd657a02f77a469efe9",
+    "origin": "refactor-test",
+    "a": {
+      "revision": "b762a6ab3c036b66986ee3fbc99bb7962419b48f",
+      "file": "tests/logging_tests/tests.py",
+      "symbol": "LogResponseRealLoggerTests.assertResponseLogged",
+      "line": 714,
+      "endLine": 726,
+      "kind": "method",
+      "sha256": "f4bb9f91043159622f76080b75fc6b701c3b559a232d502d79d41892ce3859ad"
+    },
+    "b": {
+      "revision": "b762a6ab3c036b66986ee3fbc99bb7962419b48f",
+      "file": "tests/logging_tests/tests.py",
+      "symbol": "LoggingAssertionMixin.assertLogRecord",
+      "line": 98,
+      "endLine": 117,
+      "kind": "method",
+      "sha256": "b86b96de88515022f3802266db38fb844e9fda8d068bcb2d7c34499f404fa9ee"
+    },
+    "after": [
+      {
+        "revision": "9d72e7daf7299ef1ece56fd657a02f77a469efe9",
+        "file": "tests/logging_tests/tests.py",
+        "symbol": "LoggingAssertionMixin.assertLogRecord",
+        "line": 98,
+        "endLine": 122,
+        "kind": "method",
+        "sha256": "643992f90c5d54170b9836b9c621ec7c6bbb50e745aa2dd80e0faf193b4ead77"
+      }
+    ],
+    "review": {
+      "id": "django-log-assertions-a85dcca1d0",
+      "label": "positive",
+      "mode": "extend-existing-test",
+      "family": "django-log-assertions",
+      "reason": "LogResponseRealLoggerTests.assertResponseLogged / LoggingAssertionMixin.assertLogRecord: Both before helpers validate one captured record, its message and status. The commit extends assertLogRecord with level/request checks and a return value, makes LogResponseRealLoggerTests inherit the mixin and replaces every assertResponseLogged call. Real duplicate assertion logic is consolidated; the old target alone lacks checks and a return value, so it is not a safe unchanged replacement. Test-only evidence, outside the production skipTests population.",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.6953125,
+        "exact": 0,
+        "vocabulary": 0.7285903166605061,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5065979545530082,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 0.5,
+        "returnType": 0,
+        "name": 0.2
+      },
+      "probability": 0.6099624451695582,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.records",
+          "$0.records[0]",
+          "SELF.assertEqual",
+          "record.getMessage",
+          "record.levelno",
+          "record.request",
+          "record.status_code"
+        ],
+        "writes": [],
+        "calls": [
+          "SELF.assertEqual",
+          "len",
+          "record.getMessage"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "09d2d90cde050497acb008b978566d32e99689d3d4e5407c8e50ae60e493d0ea",
+          "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "acae6bc4da8c4b4fa8b7796d199f9a14a93b6f3d76fd11152b93d7aaa0ee161c"
+        ],
+        "arity": 5,
+        "parameterUse": [
+          3,
+          1,
+          2,
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "$0.records",
+          "$0.records[0]",
+          "SELF.assertEqual",
+          "SELF.assertIsNotNone",
+          "record.exc_info",
+          "record.exc_info[0]",
+          "record.getMessage",
+          "record.status_code"
+        ],
+        "writes": [],
+        "calls": [
+          "SELF.assertEqual",
+          "SELF.assertIsNotNone",
+          "len",
+          "record.getMessage"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "299d4b1e8dc56e95678fb7b7db5b94273c173ba00ecefa5b399255f928851566",
+          "3ad8a43cb0e198e11e898395804301ffd82f2e2d289013336c8ce1e823ed0bdd",
+          "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+        ],
+        "arity": 5,
+        "parameterUse": [
+          3,
+          1,
+          1,
+          1,
+          2
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.5,
+      "writes": null,
+      "calls": 0.75,
+      "returnShape": null,
+      "exceptions": null,
+      "validation": null,
+      "arity": 1,
+      "literals": 0.3333333333333333,
+      "parameterUse": 0.9375,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "django-normal-f920937c8a-0",
+    "repo": "django",
+    "commit": "f920937c8a63df6bea220e4386f59cdb45b2e355",
+    "subject": "Fixed #35518 -- Optimized RoutePattern by using string operations for converter-less routes.",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "f920937c8a63df6bea220e4386f59cdb45b2e355",
+      "file": "django/urls/resolvers.py",
+      "symbol": "RoutePattern",
+      "line": 314,
+      "endLine": 383,
+      "kind": "class",
+      "sha256": "9c627449be3bb6155bdded688f9f1551935ebf5bcba6e3eaf0a3411f5bfb8dcf"
+    },
+    "b": {
+      "revision": "f920937c8a63df6bea220e4386f59cdb45b2e355",
+      "file": "django/urls/resolvers.py",
+      "symbol": "RoutePattern.check",
+      "line": 346,
+      "endLine": 361,
+      "kind": "method",
+      "sha256": "7fe488eb98aead29a90784fc3759e135f11fd54aaa516a6cba4a3e9e08097fba"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.8586214769284838
+    },
+    "identity": {
+      "related": true,
+      "compatible": false
+    },
+    "review": {
+      "id": "django-normal-f920937c8a-0",
+      "reason": "RoutePattern encloses check, verified by source ranges and qualified names. A validation method cannot replace the route-pattern class and its matching interface.",
+      "label": "negative",
+      "mode": "containment",
+      "family": "django:f920937c8a63df6bea220e4386f59cdb45b2e355",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.2265625,
+        "exact": 0,
+        "vocabulary": 0.7296035339030359,
+        "bindingExact": 0,
+        "structureVocabulary": 0.16530080064990657,
+        "exactVocabulary": 0,
+        "paramCount": 0,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.8586214769284838,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": true,
+      "compatible": false,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": null,
+      "b": {
+        "reads": [
+          "\"YourURLpattern{}hasaroutethatcontains'(?P<',begins\"\"witha'^',orendswitha'$'.Thiswaslikelyanoversigh.format",
+          "SELF._check_pattern_startswith_slash",
+          "SELF._check_pattern_unmatched_angle_brackets",
+          "SELF._route",
+          "SELF.describe",
+          "route.endswith",
+          "route.startswith",
+          "warnings.append"
+        ],
+        "writes": [
+          "mutate:warnings"
+        ],
+        "calls": [
+          "\"YourURLpattern{}hasaroutethatcontains'(?P<',begins\"\"witha'^',orendswitha'$'.Thiswaslikelyanoversigh.format",
+          "SELF._check_pattern_startswith_slash",
+          "SELF._check_pattern_unmatched_angle_brackets",
+          "SELF.describe",
+          "Warning",
+          "route.endswith",
+          "route.startswith",
+          "warnings.append"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "06acab321522f3d8e30c93ace350e0407b4d176f9b3669e1116dc927bcdc665e",
+          "12ad8c77886f5b71d37db3958145745f9c5006c763264789746acbe99b8e7f3a",
+          "142d62fa29273b8233cd231723d117d67013f85b743205802e6b161f29a85806",
+          "75baea780125bab6143fa3ff878d70d5c144f20f97b725af04c348fe818fb984",
+          "7d94fa1a89dc4b75264c21da835b61327349b46655a72d794d196a4c971e6630",
+          "bd230a632e8ab8dd956e72352c2e7c6d1df6b61413bb586fa125515ef9ebeaef",
+          "e7fe1c59f7729d69e47c09e0aa3a3e5e9244e8ee5c0e6eee1023abce5a09901b"
+        ],
+        "arity": 0,
+        "parameterUse": [],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0
+    }
+  },
+  {
+    "id": "django-normal-f920937c8a-1",
+    "repo": "django",
+    "commit": "f920937c8a63df6bea220e4386f59cdb45b2e355",
+    "subject": "Fixed #35518 -- Optimized RoutePattern by using string operations for converter-less routes.",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "f920937c8a63df6bea220e4386f59cdb45b2e355",
+      "file": "django/urls/resolvers.py",
+      "symbol": "RoutePattern.match",
+      "line": 324,
+      "endLine": 344,
+      "kind": "method",
+      "sha256": "74dd482fcaf69a59a4ebf2bbebee2069da3df30d3825cd5ff806826b2c492a06"
+    },
+    "b": {
+      "revision": "f920937c8a63df6bea220e4386f59cdb45b2e355",
+      "file": "django/urls/resolvers.py",
+      "symbol": "RoutePattern",
+      "line": 314,
+      "endLine": 383,
+      "kind": "class",
+      "sha256": "9c627449be3bb6155bdded688f9f1551935ebf5bcba6e3eaf0a3411f5bfb8dcf"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.7604463969018678
+    },
+    "identity": {
+      "related": true,
+      "compatible": false
+    },
+    "review": {
+      "id": "django-normal-f920937c8a-1",
+      "reason": "RoutePattern.match is contained by its proposed target RoutePattern. A method cannot be replaced by the class containing its own implementation.",
+      "label": "negative",
+      "mode": "containment",
+      "family": "django:f920937c8a63df6bea220e4386f59cdb45b2e355",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.3046875,
+        "exact": 0,
+        "vocabulary": 0.6353169732163286,
+        "bindingExact": 0,
+        "structureVocabulary": 0.19357314027685013,
+        "exactVocabulary": 0,
+        "paramCount": 0.33333333333333337,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.7604463969018678,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": true,
+      "compatible": false,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.removeprefix",
+          "$0.startswith",
+          "$0[*]",
+          "SELF._is_endpoint",
+          "SELF._route",
+          "SELF.converters",
+          "SELF.converters[*]",
+          "SELF.regex",
+          "SELF.regex.search",
+          "converter.to_python",
+          "kwargs.items",
+          "match.end",
+          "match.groupdict"
+        ],
+        "writes": [
+          "kwargs[*]"
+        ],
+        "calls": [
+          "$0.removeprefix",
+          "$0.startswith",
+          "SELF.regex.search",
+          "converter.to_python",
+          "kwargs.items",
+          "match.end",
+          "match.groupdict"
+        ],
+        "returns": [
+          "null",
+          "tuple:3"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return",
+          "truth:return"
+        ],
+        "literals": [
+          "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          5
+        ],
+        "earlyReturns": 4
+      },
+      "b": null
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0
+    }
+  }
+]

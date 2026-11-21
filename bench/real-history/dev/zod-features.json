@@ -1,0 +1,1338 @@
+[
+  {
+    "id": "zod-normal-d9f76e1122-1",
+    "repo": "zod",
+    "commit": "d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+    "subject": "Fix shadowed generic",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodTuple.rest",
+      "line": 3453,
+      "endLine": 3458,
+      "kind": "method",
+      "sha256": "760153e33d460a4013fa4c6025747ca1de9d193250e241cacbeb83e2306c0b81"
+    },
+    "b": {
+      "revision": "d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+      "file": "packages/zod/src/v4/core/api.ts",
+      "symbol": "_tuple",
+      "line": 1127,
+      "endLine": 1142,
+      "kind": "function",
+      "sha256": "d7f20611baf0de3ebabb3403243e0cf51997068e184a39cb320904f713494ec3"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.9041171149779581
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-d9f76e1122-1",
+      "reason": "rest preserves an existing v3 tuple definition while changing its rest schema; _tuple constructs a v4 schema from a Class and item list. Inputs, definition format and version boundary differ.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.078125,
+        "exact": 0,
+        "vocabulary": 0.6822624060325497,
+        "bindingExact": 0,
+        "structureVocabulary": 0.053301750471292944,
+        "exactVocabulary": 0,
+        "paramCount": 0.25,
+        "paramNames": 0.2,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.9041171149779581,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "SELF._def"
+        ],
+        "writes": [],
+        "calls": [
+          "ZodTuple"
+        ],
+        "returns": [
+          "new:ZodTuple"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 1,
+        "parameterUse": [
+          0
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "schemas.$ZodType",
+          "util.normalizeParams"
+        ],
+        "writes": [],
+        "calls": [
+          "$0",
+          "util.normalizeParams"
+        ],
+        "returns": [
+          "new:$0"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "f614f097777ac2441e247db87db9301019e86205ddff588b16dca24ea5560240"
+        ],
+        "arity": 4,
+        "parameterUse": [
+          1,
+          0,
+          3,
+          1
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": null,
+      "calls": 0,
+      "returnShape": 0,
+      "exceptions": null,
+      "validation": null,
+      "arity": 0.25,
+      "literals": 0,
+      "parameterUse": null,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "zod-normal-d9f76e1122-0",
+    "repo": "zod",
+    "commit": "d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+    "subject": "Fix shadowed generic",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodTuple",
+      "line": 3392,
+      "endLine": 3474,
+      "kind": "class",
+      "sha256": "9c9deabfec062ddba8cc1e2b91d997785d5c7f10019dacaea6dd20e06379265a"
+    },
+    "b": {
+      "revision": "d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodTuple._parse",
+      "line": 3396,
+      "endLine": 3447,
+      "kind": "method",
+      "sha256": "a8552583517e1117083328efc13c897d58598fc87843f989e445aad92d89e100"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.8296313023076182
+    },
+    "identity": {
+      "related": true,
+      "compatible": false
+    },
+    "review": {
+      "id": "zod-normal-d9f76e1122-0",
+      "reason": "The AST/source ranges show ZodTuple contains ZodTuple._parse. Replacing the enclosing class with its parsing method destroys the class interface and is not independent duplicate code.",
+      "label": "negative",
+      "mode": "containment",
+      "family": "zod:d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.625,
+        "exact": 0,
+        "vocabulary": 0.9224168242314964,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5765105151446852,
+        "exactVocabulary": 0,
+        "paramCount": 0,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.8296313023076182,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": true,
+      "compatible": false,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": null,
+      "b": {
+        "reads": [
+          "([...ctx.data]asany[]).map",
+          "([...ctx.data]asany[]).map((item,itemIndex)=>{constschema=this._def.items[itemIndex]||this._def.rest.filter",
+          "ParseStatus.mergeArray",
+          "Promise.all",
+          "Promise.all(items).then",
+          "SELF._def",
+          "SELF._def.items",
+          "SELF._def.items.length",
+          "SELF._def.rest",
+          "SELF._processInputParams",
+          "ZodIssueCode.invalid_type",
+          "ZodIssueCode.too_big",
+          "ZodIssueCode.too_small",
+          "ZodParsedType.array",
+          "ctx.common",
+          "ctx.common.async",
+          "ctx.data",
+          "ctx.data.length",
+          "ctx.parsedType",
+          "status.dirty"
+        ],
+        "writes": [],
+        "calls": [
+          "([...ctx.data]asany[]).map",
+          "([...ctx.data]asany[]).map((item,itemIndex)=>{constschema=this._def.items[itemIndex]||this._def.rest.filter",
+          "ParseStatus.mergeArray",
+          "Promise.all",
+          "Promise.all(items).then",
+          "SELF._processInputParams",
+          "addIssueToContext",
+          "status.dirty"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return",
+          "truth:return"
+        ],
+        "literals": [
+          "9b2a344820da3e82bfe8dba723e10565e30024d9cd391b853fbadc55f585c909"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 4
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0
+    }
+  },
+  {
+    "id": "zod-normal-1780c67e9c-0",
+    "repo": "zod",
+    "commit": "1780c67e9cfeb1c94ef4e18fc8e93f22a3e114c0",
+    "subject": "fix: rewrite $constructor to be compatible with Hermes (#4482)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "1780c67e9cfeb1c94ef4e18fc8e93f22a3e114c0",
+      "file": "packages/zod/src/v4/core/core.ts",
+      "symbol": "$constructor.init",
+      "line": 17,
+      "endLine": 34,
+      "kind": "function",
+      "sha256": "caff7810dd678612c7ac5ba6b74e2f5f737cc1bb51f3fb3715ec441220ab07cc"
+    },
+    "b": {
+      "revision": "1780c67e9cfeb1c94ef4e18fc8e93f22a3e114c0",
+      "file": "packages/treeshake/out.js",
+      "symbol": "initializer$1",
+      "line": 51,
+      "endLine": 74,
+      "kind": "function",
+      "sha256": "a67afb33b9ada5533935db74614514f6ac099bb2bc840e5db03b70e08c896f13"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.9373458252744473
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-1780c67e9c-0",
+      "reason": "init registers traits, invokes the initializer and binds prototype methods; the bundled initializer installs error issues. Their writes and responsibilities differ, and source must not depend on a generated bundle.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:1780c67e9cfeb1c94ef4e18fc8e93f22a3e114c0",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.203125,
+        "exact": 0,
+        "vocabulary": 0.691608003314467,
+        "bindingExact": 0,
+        "structureVocabulary": 0.14048287567325113,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.9373458252744473,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0._zod",
+          "$0._zod.traits",
+          "$0._zod.traits.add",
+          "(_.prototypeasany)[*]",
+          "(_.prototypeasany)[*].bind",
+          "Object.defineProperty",
+          "_.prototype"
+        ],
+        "writes": [
+          "$0._zod.constr",
+          "$0._zod.def",
+          "$0._zod.traits",
+          "mutate:$0._zod.traits"
+        ],
+        "calls": [
+          "$0._zod.traits.add",
+          "(_.prototypeasany)[*].bind",
+          "Object.defineProperty",
+          "Set",
+          "initializer"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "790e46c373a83ddf1107d46ea09e864125a6a36e1ac07f42710ae73c0d13e425"
+        ],
+        "arity": 2,
+        "parameterUse": [
+          9,
+          2
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "$0._zod",
+          "Object.defineProperty"
+        ],
+        "writes": [],
+        "calls": [
+          "Object.defineProperty"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "790e46c373a83ddf1107d46ea09e864125a6a36e1ac07f42710ae73c0d13e425",
+          "8f09be03f82c6e9d519f718f700a169a2474c1d9c194ac7a74181a42bcc3abec"
+        ],
+        "arity": 2,
+        "parameterUse": [
+          3,
+          1
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0.2857142857142857,
+      "writes": 0,
+      "calls": 0.2,
+      "returnShape": null,
+      "exceptions": null,
+      "validation": null,
+      "arity": 1,
+      "literals": 0.5,
+      "parameterUse": 0.9946917938265513,
+      "earlyReturns": null,
+      "writePresenceMismatch": 1
+    }
+  },
+  {
+    "id": "zod-normal-3a8edd7470-1",
+    "repo": "zod",
+    "commit": "3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+    "subject": "Revert \"Use output type for preprocess (#4552)\"",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodEnum._parse",
+      "line": 4079,
+      "endLine": 4107,
+      "kind": "method",
+      "sha256": "c83adfef19aaa5853de625ab3fd88251bfb1dabae895799c16308f5bb57de419"
+    },
+    "b": {
+      "revision": "3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodBigInt._getInvalidInput",
+      "line": 1694,
+      "endLine": 1702,
+      "kind": "method",
+      "sha256": "3aeb94b9065e9f856fff5c2fb111a02ab82f257e8bb569ffc63e0748ed91abe7"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.9172920321407335
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-3a8edd7470-1",
+      "reason": "Enum parsing validates strings and membership, caches allowed values and can succeed; the BigInt helper unconditionally reports an invalid bigint and returns INVALID.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.328125,
+        "exact": 0,
+        "vocabulary": 0.7106481992180494,
+        "bindingExact": 0,
+        "structureVocabulary": 0.23318144036842248,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.9172920321407335,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.data",
+          "SELF.#cache",
+          "SELF.#cache.has",
+          "SELF._def",
+          "SELF._def.values",
+          "SELF._getOrReturnCtx",
+          "ZodIssueCode.invalid_enum_value",
+          "ZodIssueCode.invalid_type",
+          "ctx.data",
+          "ctx.parsedType",
+          "util.joinValues"
+        ],
+        "writes": [
+          "SELF.#cache"
+        ],
+        "calls": [
+          "OK",
+          "SELF.#cache.has",
+          "SELF._getOrReturnCtx",
+          "Set",
+          "addIssueToContext",
+          "util.joinValues"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "truth:return",
+          "type:return"
+        ],
+        "literals": [
+          "e9e5c1c9e4f6277339d1bcde0733a59bd42f8731f449da6dc13010a916930d48"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          5
+        ],
+        "earlyReturns": 2
+      },
+      "b": {
+        "reads": [
+          "SELF._getOrReturnCtx",
+          "ZodIssueCode.invalid_type",
+          "ZodParsedType.bigint",
+          "ctx.parsedType"
+        ],
+        "writes": [],
+        "calls": [
+          "SELF._getOrReturnCtx",
+          "addIssueToContext"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.25,
+      "writes": 0,
+      "calls": 0.3333333333333333,
+      "returnShape": 0,
+      "exceptions": null,
+      "validation": 0,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 1,
+      "earlyReturns": 0,
+      "writePresenceMismatch": 1
+    }
+  },
+  {
+    "id": "zod-normal-3a8edd7470-2",
+    "repo": "zod",
+    "commit": "3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+    "subject": "Revert \"Use output type for preprocess (#4552)\"",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodNativeEnum",
+      "line": 4174,
+      "endLine": 4218,
+      "kind": "class",
+      "sha256": "54f13e6cd971b5c4ad40e103bbc031374546017bb18c508bbcd74902191312d5"
+    },
+    "b": {
+      "revision": "3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodNativeEnum._parse",
+      "line": 4176,
+      "endLine": 4205,
+      "kind": "method",
+      "sha256": "6404b0eb36e63a5908af1173d7845bac058085bb96b8c6bec20c722d3d66cd2a"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.8623742480501753
+    },
+    "identity": {
+      "related": true,
+      "compatible": false
+    },
+    "review": {
+      "id": "zod-normal-3a8edd7470-2",
+      "reason": "ZodNativeEnum is the enclosing class of ZodNativeEnum._parse, verified from the AST ranges and qualified names. Class construction and its own method are not alternative implementations.",
+      "label": "negative",
+      "mode": "containment",
+      "family": "zod:3a8edd7470a550b55aeefa365c6d3ebbd6583910",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.546875,
+        "exact": 0,
+        "vocabulary": 0.9187872297991135,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5024617662963902,
+        "exactVocabulary": 0,
+        "paramCount": 0,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.8623742480501753,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": true,
+      "compatible": false,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": null,
+      "b": {
+        "reads": [
+          "$0.data",
+          "SELF.#cache",
+          "SELF.#cache.has",
+          "SELF._def",
+          "SELF._def.values",
+          "SELF._getOrReturnCtx",
+          "ZodIssueCode.invalid_enum_value",
+          "ZodIssueCode.invalid_type",
+          "ZodParsedType.number",
+          "ZodParsedType.string",
+          "ctx.data",
+          "ctx.parsedType",
+          "util.getValidEnumValues",
+          "util.joinValues",
+          "util.objectValues"
+        ],
+        "writes": [
+          "SELF.#cache"
+        ],
+        "calls": [
+          "OK",
+          "SELF.#cache.has",
+          "SELF._getOrReturnCtx",
+          "Set",
+          "addIssueToContext",
+          "util.getValidEnumValues",
+          "util.joinValues",
+          "util.objectValues"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return",
+          "truth:return"
+        ],
+        "literals": [
+          "e9e5c1c9e4f6277339d1bcde0733a59bd42f8731f449da6dc13010a916930d48"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          3
+        ],
+        "earlyReturns": 2
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0
+    }
+  },
+  {
+    "id": "zod-normal-24a5e4f329-6",
+    "repo": "zod",
+    "commit": "24a5e4f329378ebd035a19a678e7b24e52036829",
+    "subject": "v3.25.4. Fix T_1 bug.",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "24a5e4f329378ebd035a19a678e7b24e52036829",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodIntersection.create",
+      "line": 3344,
+      "endLine": 3355,
+      "kind": "method",
+      "sha256": "7d17d685c36054d45ab5bb98ddd0491870d33139ea65a1d002b471d14c199327"
+    },
+    "b": {
+      "revision": "24a5e4f329378ebd035a19a678e7b24e52036829",
+      "file": "packages/treeshake/out.js",
+      "symbol": "intersection",
+      "line": 2145,
+      "endLine": 2151,
+      "kind": "function",
+      "sha256": "13341f79347b33a163df5a54ec10e7898fba176edd674e89ee077922d85bdce0"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.9523258985630004
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-24a5e4f329-6",
+      "reason": "The v3 factory processes error parameters and creates a v3 typeName definition; the generated v4 bundle uses a different definition contract and omits those parameters. Sharing an intersection name is insufficient.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:24a5e4f329378ebd035a19a678e7b24e52036829",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.25,
+        "exact": 0,
+        "vocabulary": 0.822874435395053,
+        "bindingExact": 0,
+        "structureVocabulary": 0.20571860884876325,
+        "exactVocabulary": 0,
+        "paramCount": 0.6666666666666667,
+        "paramNames": 0.6666666666666666,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.9523258985630004,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "ZodFirstPartyTypeKind.ZodIntersection"
+        ],
+        "writes": [],
+        "calls": [
+          "ZodIntersection",
+          "processCreateParams"
+        ],
+        "returns": [
+          "new:ZodIntersection"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 3,
+        "parameterUse": [
+          1,
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [],
+        "writes": [],
+        "calls": [
+          "ZodIntersection"
+        ],
+        "returns": [
+          "new:ZodIntersection"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "4ce99865364b4472f833aec1606940ab60a9fe2a0d20df7b7852ec07d22adb13"
+        ],
+        "arity": 2,
+        "parameterUse": [
+          0,
+          0
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": null,
+      "calls": 0.5,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": null,
+      "arity": 0.6666666666666666,
+      "literals": 0,
+      "parameterUse": null,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "zod-normal-24a5e4f329-36",
+    "repo": "zod",
+    "commit": "24a5e4f329378ebd035a19a678e7b24e52036829",
+    "subject": "v3.25.4. Fix T_1 bug.",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "24a5e4f329378ebd035a19a678e7b24e52036829",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodMap.create",
+      "line": 3655,
+      "endLine": 3666,
+      "kind": "method",
+      "sha256": "bf9dfe91edf3baa97485deb064199c19d24d807bee60d516a002734681937010"
+    },
+    "b": {
+      "revision": "24a5e4f329378ebd035a19a678e7b24e52036829",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodType.default",
+      "line": 481,
+      "endLine": 490,
+      "kind": "method",
+      "sha256": "7e7d634be8e31a8efea06b03ca79936d8318ae345cff8a7d677e81d793827f47"
+    },
+    "legacy": {
+      "severity": "WARN",
+      "probability": 0.7351646285680933
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-24a5e4f329-36",
+      "reason": "The map factory constructs key/value schema storage; default wraps an existing schema with a default-value thunk. The classes, stored fields and accepted arguments differ.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:24a5e4f329378ebd035a19a678e7b24e52036829",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.0859375,
+        "exact": 0,
+        "vocabulary": 0.49853675094347527,
+        "bindingExact": 0,
+        "structureVocabulary": 0.04284300203420491,
+        "exactVocabulary": 0,
+        "paramCount": 0.33333333333333337,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.7351646285680933,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "ZodFirstPartyTypeKind.ZodMap"
+        ],
+        "writes": [],
+        "calls": [
+          "ZodMap",
+          "processCreateParams"
+        ],
+        "returns": [
+          "new:ZodMap"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 3,
+        "parameterUse": [
+          0,
+          0,
+          1
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "SELF._def",
+          "ZodFirstPartyTypeKind.ZodDefault"
+        ],
+        "writes": [],
+        "calls": [
+          "ZodDefault",
+          "processCreateParams"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "a99c4de307066c6f4355786f498a1d99badc0fe63272ae7752b192ec41da16d4"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          2
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": null,
+      "calls": 0.3333333333333333,
+      "returnShape": 0,
+      "exceptions": null,
+      "validation": null,
+      "arity": 0.3333333333333333,
+      "literals": 0,
+      "parameterUse": 0,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "zod-normal-24a5e4f329-37",
+    "repo": "zod",
+    "commit": "24a5e4f329378ebd035a19a678e7b24e52036829",
+    "subject": "v3.25.4. Fix T_1 bug.",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "24a5e4f329378ebd035a19a678e7b24e52036829",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodPromise.create",
+      "line": 4264,
+      "endLine": 4270,
+      "kind": "method",
+      "sha256": "bb85abc8df718cdf69cfd0187454a92dbd63b2d2eb758bc8d0f89225e22465c4"
+    },
+    "b": {
+      "revision": "24a5e4f329378ebd035a19a678e7b24e52036829",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "ZodType.transform",
+      "line": 468,
+      "endLine": 477,
+      "kind": "method",
+      "sha256": "c919b25b82a9ced3c4e1593290c15e679859827e885845df095bb2deda0329ec"
+    },
+    "legacy": {
+      "severity": "WARN",
+      "probability": 0.7332234578241466
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-24a5e4f329-37",
+      "reason": "The promise factory wraps an inner schema as ZodPromise; transform builds ZodEffects around this with an executable callback. These are different schema operations, not duplicate factories.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:24a5e4f329378ebd035a19a678e7b24e52036829",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.15625,
+        "exact": 0,
+        "vocabulary": 0.5183645051488265,
+        "bindingExact": 0,
+        "structureVocabulary": 0.08099445392950413,
+        "exactVocabulary": 0,
+        "paramCount": 0.5,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.7332234578241466,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "ZodFirstPartyTypeKind.ZodPromise"
+        ],
+        "writes": [],
+        "calls": [
+          "ZodPromise",
+          "processCreateParams"
+        ],
+        "returns": [
+          "new:ZodPromise"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 2,
+        "parameterUse": [
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "SELF._def",
+          "ZodFirstPartyTypeKind.ZodEffects"
+        ],
+        "writes": [],
+        "calls": [
+          "ZodEffects",
+          "processCreateParams"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "5450ffb2cf8a5e7b988a0940e5406a7ee690f9ac7891843d1bf3e80c03ca70cf"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          0
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": null,
+      "calls": 0.3333333333333333,
+      "returnShape": 0,
+      "exceptions": null,
+      "validation": null,
+      "arity": 0.5,
+      "literals": 0,
+      "parameterUse": null,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "zod-normal-7ed0c3694d-0",
+    "repo": "zod",
+    "commit": "7ed0c3694d324f5c02d5b224e7e3163d2fd84c52",
+    "subject": "Allow hours-only offsets. Normalize. (#4676)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "7ed0c3694d324f5c02d5b224e7e3163d2fd84c52",
+      "file": "packages/zod/src/v4/core/regexes.ts",
+      "symbol": "datetime",
+      "line": 101,
+      "endLine": 115,
+      "kind": "function",
+      "sha256": "074f77981b2ec0987e6d7c82199b844781dc453e23d907f4d8dd99cc5a818d81"
+    },
+    "b": {
+      "revision": "7ed0c3694d324f5c02d5b224e7e3163d2fd84c52",
+      "file": "packages/zod/src/v3/types.ts",
+      "symbol": "datetimeRegex",
+      "line": 673,
+      "endLine": 685,
+      "kind": "function",
+      "sha256": "eeac719ebad5c31b11a6848e2344f8bd3826a5de6763a0695a1142ce82632e90"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.7938792388974425
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-7ed0c3694d-0",
+      "reason": "The changed v4 datetime accepts hours-only offsets using ([+-]\\d{2}(?::?\\d{2})?), whereas v3 datetimeRegex requires minutes. They also call different time/date sources. Their normalized structure is identical but substituting the old regex would undo the commit's fix.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:7ed0c3694d324f5c02d5b224e7e3163d2fd84c52",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 1,
+        "exact": 1,
+        "vocabulary": 0.9973783915952238,
+        "bindingExact": 0,
+        "structureVocabulary": 0.9973783915952238,
+        "exactVocabulary": 0.9973783915952238,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 0,
+        "name": 0.5
+      },
+      "probability": 0.7938792388974425,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": true,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.local",
+          "$0.offset",
+          "opts.join",
+          "opts.push"
+        ],
+        "writes": [
+          "mutate:opts"
+        ],
+        "calls": [
+          "RegExp",
+          "opts.join",
+          "opts.push",
+          "timeSource"
+        ],
+        "returns": [
+          "new:RegExp"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "4fcd12d43918f7f1af92493ae421bd5ab4059ca0e468fa7d0e2358aec7c4250e",
+          "6c43890a32286913e13c097b81b17392fd15dc971ee6e8b3ce59a1dfba570c04",
+          "72a2e3247bdaefd113088f784e9044a7991186ca00412fa29b59056de6eabf47",
+          "ac1695758efa7c245a8fe910d076b3f0dd1ebb93e9040c2ff87589f56223dd50",
+          "c556c2daf200754df07714914e6d25cf7d0b541e8808f5a0bb5b3800a3e09156",
+          "cbf6de6dcae78aa90540c5e238b5230626263c574d96f3485bdda16b56473a6b",
+          "f9bd547d880692e619155af9f96c8d13b2930773be3c6170631fa73c25f5cac0"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          3
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "$0.local",
+          "$0.offset",
+          "opts.join",
+          "opts.push"
+        ],
+        "writes": [
+          "mutate:opts"
+        ],
+        "calls": [
+          "RegExp",
+          "opts.join",
+          "opts.push",
+          "timeRegexSource"
+        ],
+        "returns": [
+          "new:RegExp"
+        ],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "27f368c0d1b2ddc2b7e1510e84cef3f89d573ad5e7db468a19afb2905fcbc913",
+          "4fcd12d43918f7f1af92493ae421bd5ab4059ca0e468fa7d0e2358aec7c4250e",
+          "6c43890a32286913e13c097b81b17392fd15dc971ee6e8b3ce59a1dfba570c04",
+          "72a2e3247bdaefd113088f784e9044a7991186ca00412fa29b59056de6eabf47",
+          "ac1695758efa7c245a8fe910d076b3f0dd1ebb93e9040c2ff87589f56223dd50",
+          "bc59875c4665067e2c21936f4a3cd9d5e348a619a7853e40685d4372f1bf01d1",
+          "f9bd547d880692e619155af9f96c8d13b2930773be3c6170631fa73c25f5cac0"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          3
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 1,
+      "writes": 1,
+      "calls": 0.6,
+      "returnShape": 1,
+      "exceptions": null,
+      "validation": null,
+      "arity": 1,
+      "literals": 0.5555555555555556,
+      "parameterUse": 1,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
+    "id": "zod-normal-11477ae593-0",
+    "repo": "zod",
+    "commit": "11477ae593b0a01ab7e701f39d69ce170936a216",
+    "subject": "Add test",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "11477ae593b0a01ab7e701f39d69ce170936a216",
+      "file": "packages/zod/src/v4/core/errors.ts",
+      "symbol": "formatError",
+      "line": 249,
+      "endLine": 288,
+      "kind": "function",
+      "sha256": "4f917dbd6ca38d77f6eb13521bc014dd8ef64455b58ac6b6a9bdbb41cc60b307"
+    },
+    "b": {
+      "revision": "11477ae593b0a01ab7e701f39d69ce170936a216",
+      "file": "packages/zod/src/v3/ZodError.ts",
+      "symbol": "ZodError.format.processError",
+      "line": 224,
+      "endLine": 260,
+      "kind": "function",
+      "sha256": "71c3b68c26dca4a45ccc458af0e47da00b2e1a537322d9520371adcb23d87291"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.784325056591849
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "zod-normal-11477ae593-0",
+      "reason": "The full v4 formatter creates and returns fieldErrors and maps new union/key/element issue layouts; the v3 nested processError returns void, requires captured mapper/fieldErrors, and reads unionErrors/returnTypeError/argumentsError. Shared traversal is not the same callable contract.",
+      "label": "negative",
+      "mode": "different-contract",
+      "family": "zod:11477ae593b0a01ab7e701f39d69ce170936a216",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.59375,
+        "exact": 0,
+        "vocabulary": 0.9296824660268449,
+        "bindingExact": 0,
+        "structureVocabulary": 0.5519989642034392,
+        "exactVocabulary": 0,
+        "paramCount": 0.5,
+        "paramNames": 0.5,
+        "returnType": 0,
+        "name": 0.3333333333333333
+      },
+      "probability": 0.784325056591849,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": true,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [],
+        "writes": [],
+        "calls": [
+          "processError"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 2,
+        "parameterUse": [
+          1,
+          1
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "$0.issues",
+          "(fieldErrorsasany)._errors",
+          "(fieldErrorsasany)._errors.push",
+          "curr[*]",
+          "curr[*]._errors",
+          "curr[*]._errors.push",
+          "issue.argumentsError",
+          "issue.code",
+          "issue.path",
+          "issue.path.length",
+          "issue.path[*]",
+          "issue.returnTypeError",
+          "issue.unionErrors",
+          "issue.unionErrors.map"
+        ],
+        "writes": [
+          "curr[*]",
+          "mutate:(fieldErrorsasany)._errors",
+          "mutate:curr[*]._errors"
+        ],
+        "calls": [
+          "(fieldErrorsasany)._errors.push",
+          "curr[*]._errors.push",
+          "issue.unionErrors.map",
+          "mapper",
+          "processError"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [
+          "0e1f9c3c3244c823f9e69c84c8c81a762e4b0be5974ed432cd62f0a961f7cee3",
+          "307072eb16f012e29a2410ca53c983235c1b84920fa09e294e2fff161c977eec",
+          "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "873619587f771b2cb58006ad0a4432281dbff3a6495ab05d7daa58b1e1e96342"
+        ],
+        "arity": 1,
+        "parameterUse": [
+          1
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": 0,
+      "calls": 0.2,
+      "returnShape": null,
+      "exceptions": null,
+      "validation": null,
+      "arity": 0.5,
+      "literals": 0,
+      "parameterUse": 0.7071067811865475,
+      "earlyReturns": null,
+      "writePresenceMismatch": 1
+    }
+  }
+]

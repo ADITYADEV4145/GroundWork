@@ -32,7 +32,39 @@ Instead of filling the context window with grep results and whole files, the age
 
 ## Install
 
-Requires **Node.js 22 or later**. Groundwork is **not published to npm yet**; install from source:
+Requires **Node.js 22 or later**. Choose an install method:
+
+**Homebrew** installs Node.js too:
+
+```sh
+brew install ADITYADEV4145/groundwork/groundwork
+```
+
+**npm, pnpm or Bun:**
+
+```sh
+npm install -g groundwork-agent
+# or
+pnpm add -g groundwork-agent
+# or
+bun add -g groundwork-agent
+```
+
+**Install script:**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/ADITYADEV4145/GroundWork/main/scripts/install.sh | sh
+```
+
+**One-off, without installing globally:**
+
+```sh
+npx groundwork-agent doctor
+# or
+bunx groundwork-agent doctor
+```
+
+**From source:**
 
 ```sh
 git clone https://github.com/ADITYADEV4145/GroundWork.git
@@ -78,12 +110,10 @@ To uninstall the integrations, run `gw setup --remove`. To remove the local inde
 <details>
 <summary><strong>Claude Code plugin and other MCP clients</strong></summary>
 
-After installing from source, these integrations use the `gw` already on your PATH; npm publication is not required:
+These integrations use the `gw` on your PATH from any install above. One-off runs do not put `gw` on PATH:
 
 - **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
 - **Any MCP client:** run `gw mcp` as a stdio server from the repository root.
-
-The npm package itself is still unpublished, so do not use `npx groundwork-agent` or `npm install -g groundwork-agent` yet.
 
 </details>
 

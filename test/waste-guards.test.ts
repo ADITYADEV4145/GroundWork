@@ -64,10 +64,16 @@ describe('session ledger', () => {
     writeFileSync(path.join(root, '.groundwork/sessions/test.json.lock'), 'busy');
     expect(() => updateSessionLedger(root, 'test', (l) => ({ ...l }))).toThrow('locked');
     expect(() => updateLedger(root, 'test', (l) => { l.step++; })).not.toThrow();
+    expect(updateLedger(root, 'test', (l) => { l.step++; })).toBe(false);
     expect(readLedger(root, 'test').step).toBe(0);
     utimesSync(path.join(root, '.groundwork/sessions/test.json.lock'), new Date(0), new Date(0));
-    updateLedger(root, 'test', (l) => { l.step++; });
+    expect(updateLedger(root, 'test', (l) => { l.step++; })).toBe(true);
     expect(readLedger(root, 'test').step).toBe(1);
+  });
+  it('returns false on absent ids, invalid ids and callback errors', () => {
+    expect(updateLedger(root, null, () => {})).toBe(false);
+    expect(updateLedger(root, 'bad/id', () => {})).toBe(false);
+    expect(updateLedger(root, 'test', () => { throw new Error('failed'); })).toBe(false);
   });
   it('uses the locked callback snapshot rather than a second read', () => {
     const snapshot = emptyLedger('test'); snapshot.step = 42;
@@ -232,6 +238,18 @@ describe('exploration and summary', () => {
 describe('waste CLI', () => {
   const cli = fileURLToPath(new URL('../src/cli/main.ts', import.meta.url));
   const invoke = (args: string[]) => execFileSync(process.execPath, ['--import', 'tsx', cli, '--root', root, '--json', ...args], { encoding: 'utf8' });
+  it('hook allows with empty stdout when the ledger is locked', async () => {
+    initGit();
+    await wasteGuards.run(event('post_tool'), ctx());
+    writeFileSync(path.join(root, '.groundwork/sessions/test.json.lock'), 'held');
+    for (const command of ['ls', 'npm test']) {
+      expect(await wasteGuards.run(event('pre_tool', 'Bash', { command }), ctx())).toBeNull();
+      const result = spawnSync(process.execPath, ['--import', 'tsx', cli, 'hook', 'claude', 'pre_tool'], {
+        encoding: 'utf8', input: JSON.stringify({ session_id: 'test', cwd: root, tool_name: 'Bash', tool_input: { command } }),
+      });
+      expect(result.status).toBe(0); expect(result.stdout).toBe(''); expect(result.stderr).toBe('');
+    }
+  });
   it('hooks allow invalid session ids with clean stdout and exit zero', () => {
     for (const id of ['bad/id', 'bad.id']) {
       const result = spawnSync(process.execPath, ['--import', 'tsx', cli, 'hook', 'claude', 'pre_tool'], {

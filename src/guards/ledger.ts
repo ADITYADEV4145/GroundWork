@@ -39,15 +39,16 @@ export function readLedger(root: string, id: string): Ledger {
     return parseLedger(readSessionLedger(root, id).guards, id);
   } catch { return emptyLedger(id); }
 }
-export function updateLedger(root: string, id: string | null | undefined, update: (ledger: Ledger) => void): void {
-  if (!id) return;
+export function updateLedger(root: string, id: string | null | undefined, update: (ledger: Ledger) => void): boolean {
+  if (!id) return false;
   try {
     updateSessionLedger(root, id, (document) => {
       const ledger = parseLedger(document.guards, id);
       update(ledger);
       return { ...document, guards: ledger };
     });
-  } catch (error) { log(root, 'warn', 'guards_ledger_failed', { error: String(error) }); }
+    return true;
+  } catch (error) { log(root, 'warn', 'guards_ledger_failed', { error: String(error) }); return false; }
 }
 export function stats(ledger: Ledger, guard: string): GuardStats {
   return ledger.guards[guard] ??= { interventions: 0, tokensSaved: 0, forced: 0 };

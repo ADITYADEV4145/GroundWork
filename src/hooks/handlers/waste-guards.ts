@@ -23,7 +23,7 @@ export const wasteGuards: HookHandler = {
       if (ev.tool === 'Bash' && command && ev.event === 'pre_tool') {
         const rawFingerprint = cfg.repeatCommand.enabled ? workspaceFingerprint(root) : 'unknown';
         const fingerprint = rawFingerprint === 'unknown' ? 'unknown' : `${ev.cwd}:${rawFingerprint}`;
-        updateLedger(root, ev.sessionId, (l) => {
+        const recorded = updateLedger(root, ev.sessionId, (l) => {
           l.step++;
           const previous = Object.hasOwn(l.commands, info.normalized) ? l.commands[info.normalized] : undefined;
           if (cfg.repeatCommand.enabled && info.forced) stats(l, 'repeatCommand').forced++;
@@ -33,6 +33,7 @@ export const wasteGuards: HookHandler = {
             result = { action: 'deny', message: `Same command, nothing changed since step ${previous.step}. Last result: ${previous.summary}. Change something first, or rerun with force.` };
           }
         });
+        if (!recorded) return null;
         if (result) return result;
         if (ev.agent === 'claude' && cfg.outputTrimmer.enabled && isSimpleNoisyCommand(info.command)) {
           return { action: 'allow', updatedInput: { ...ev.input, command: `GW_SESSION_ID=${shellQuote(ev.sessionId)} GW_ROOT=${shellQuote(root)} ${invokingGw()} run -- ${shellQuote(info.command)}` } };

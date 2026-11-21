@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="docs/assets/groundwork-hero.webp" alt="Groundwork — give your coding agent solid ground. A live, local map of your codebase. Local, offline and open source." width="100%">
+  <picture>
+    <source media="(max-width: 600px)" srcset="docs/assets/groundwork-hero-mobile.webp">
+    <img src="docs/assets/groundwork-hero.webp" alt="Groundwork: find code, reuse it, and verify calls. A live, local map of your codebase for coding agents. Local, offline and MIT licensed." width="100%">
+  </picture>
 </p>
 
 <h1 align="center">Less searching. More building.</h1>
@@ -313,6 +316,6 @@ To work on Groundwork itself: `npm test`, `npm run typecheck`, `npm run build`, 
 
 <p align="center">
   <strong>Give your agent solid ground.</strong><br>
-  Built by <a href="https://github.com/ADITYADEV4145">Aditya Punjani</a> · <a href="LICENSE">MIT licensed</a><br>
+  Built by <a href="https://github.com/ADITYADEV4145">Aditya</a> · <a href="LICENSE">MIT licensed</a><br>
   <sub>The generated illustrations are conceptual artwork, not product screenshots.</sub>
 </p>

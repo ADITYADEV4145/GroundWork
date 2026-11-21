@@ -35,7 +35,7 @@ describe('reuse signals and candidates', () => {
         expect(value).toBeGreaterThanOrEqual(0);
         expect(value).toBeLessThanOrEqual(1);
       }
-      expect(model.status).toContain('not-calibrated');
+      expect(model.status).toBe('calibrated-grouped-oof');
       const candidates = new CandidateIndex(db);
       expect(candidates.find(a).map((s) => s.name)).toContain('decodeTimestamp');
       expect(candidates.find(a).map((s) => s.name)).not.toContain(a.name);
@@ -50,7 +50,7 @@ describe('reuse signals and candidates', () => {
     const empty: ComparableSymbol = { name: '', fingerprint: null, docstring: null, params: null, returnType: null };
     const signals = pairSignals(empty, empty, buildIdf([]));
     expect(Object.values(signals)).toEqual([0, 0, 0, 0, 0, 0, 0]);
-    expect(probability(signals)).toBeLessThan(0.01);
+    expect(probability(signals)).toBeCloseTo(1 / (1 + Math.exp(-model.intercept)));
     const high = Object.fromEntries(Object.keys(signals).map((k) => [k, 1])) as unknown as Signals;
     expect(probability(high)).toBeGreaterThan(probability(signals));
   });

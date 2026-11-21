@@ -1,19 +1,20 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultConfig } from '../src/config/load.js';
 import { runCommand } from '../src/cli/commands/run.js';
-import { bumpCounter, readLedger, report, sessionIds, stats, summary, tokens, updateLedger } from '../src/guards/ledger.js';
+import { bumpCounter, emptyLedger, readLedger, report, sessionIds, stats, summary, tokens, updateLedger } from '../src/guards/ledger.js';
 import { commandInfo, lastSummary, workspaceFingerprint } from '../src/guards/repeat.js';
 import { compactOutput, failurePattern, noisyTool, shellQuote } from '../src/guards/trimmer.js';
 import { wasteGuards } from '../src/hooks/handlers/waste-guards.js';
 import { normalise, render, dispatch } from '../src/hooks/run.js';
 import { readSessionLedger, updateSessionLedger } from '../src/hooks/session-ledger.js';
+import * as sessionLedger from '../src/hooks/session-ledger.js';
 import type { HookEvent } from '../src/hooks/types.js';
-import { failureCorpus, repeatScenario } from '../src/selftest/checks/phase5.js';
+import { analyzeCorpus, failureCorpus, repeatScenario } from '../src/selftest/checks/phase5.js';
 
 let root: string;
 const git = (args: string[]) => execFileSync('git', args, { cwd: root, stdio: 'ignore' });
@@ -34,6 +35,10 @@ describe('session ledger', () => {
     mkdirSync(path.join(root, '.groundwork/sessions'), { recursive: true });
     writeFileSync(path.join(root, '.groundwork/sessions/test.json'), '{broken');
     expect(readLedger(root, 'test').step).toBe(0);
+    updateLedger(root, 'test', (l) => { l.step++; });
+    expect(readLedger(root, 'test').step).toBe(0);
+    expect(readFileSync(path.join(root, '.groundwork/sessions/test.json'), 'utf8')).toBe('{broken');
+    rmSync(path.join(root, '.groundwork/sessions/test.json'));
     updateLedger(root, 'test', (l) => { l.step++; });
     expect(readLedger(root, 'test').step).toBe(1);
   });
@@ -57,8 +62,50 @@ describe('session ledger', () => {
   it('fails open on an occupied session lock and unwritable state', () => {
     mkdirSync(path.join(root, '.groundwork/sessions'), { recursive: true });
     writeFileSync(path.join(root, '.groundwork/sessions/test.json.lock'), 'busy');
+    expect(() => updateSessionLedger(root, 'test', (l) => ({ ...l }))).toThrow('locked');
     expect(() => updateLedger(root, 'test', (l) => { l.step++; })).not.toThrow();
     expect(readLedger(root, 'test').step).toBe(0);
+    utimesSync(path.join(root, '.groundwork/sessions/test.json.lock'), new Date(0), new Date(0));
+    updateLedger(root, 'test', (l) => { l.step++; });
+    expect(readLedger(root, 'test').step).toBe(1);
+  });
+  it('uses the locked callback snapshot rather than a second read', () => {
+    const snapshot = emptyLedger('test'); snapshot.step = 42;
+    let result: Record<string, unknown> | undefined;
+    const spy = vi.spyOn(sessionLedger, 'updateSessionLedger').mockImplementation((_root, _id, update) => {
+      result = update({ navigation: { untouched: true }, guards: snapshot });
+    });
+    try {
+      updateLedger(root, 'test', (l) => { l.step++; }); expect(spy).toHaveBeenCalledOnce();
+      expect(result).toMatchObject({ navigation: { untouched: true }, guards: { step: 43 } });
+    }
+    finally { spy.mockRestore(); }
+  });
+  it('validates malformed guard state and fails open for invalid ids in every wrapper', () => {
+    updateSessionLedger(root, 'test', () => ({ navigation: { intact: true }, guards: { sessionId: 'test', step: 'broken' } }));
+    updateLedger(root, 'test', (l) => { l.step++; });
+    expect(readLedger(root, 'test').step).toBe(1);
+    expect(readSessionLedger(root, 'test').navigation).toEqual({ intact: true });
+    for (const id of ['bad/id', 'bad.id']) {
+      expect(() => readSessionLedger(root, id)).toThrow();
+      expect(() => updateSessionLedger(root, id, (l) => l)).toThrow();
+      expect(() => updateLedger(root, id, () => { throw new Error('must not execute'); })).not.toThrow();
+      expect(() => bumpCounter(root, id, 'ignores')).not.toThrow();
+      expect(readLedger(root, id).step).toBe(0);
+      expect(report(root, [id]).forced).toBe(0);
+    }
+    writeFileSync(path.join(root, '.groundwork/sessions/bad%2Fid.json'), '{}');
+    expect(sessionIds(root)).toEqual(['test']);
+  });
+  it('shared reader throws on corrupt or nonobject JSON, but missing files are empty', () => {
+    expect(readSessionLedger(root, 'missing')).toEqual({});
+    mkdirSync(path.join(root, '.groundwork/sessions'), { recursive: true });
+    for (const value of ['{broken', '[]', 'null']) {
+      writeFileSync(path.join(root, '.groundwork/sessions/test.json'), value);
+      expect(() => readSessionLedger(root, 'test')).toThrow();
+      expect(readLedger(root, 'test').step).toBe(0);
+      expect(report(root, ['test']).forced).toBe(0);
+    }
   });
 });
 
@@ -98,12 +145,18 @@ describe('output trimmer', () => {
   it('retains small and empty output exactly', () => { expect(compactOutput('')).toBe(''); expect(compactOutput('hello\n')).toBe('hello\n'); });
   it('preserves every failure in the 50-output corpus', () => {
     const corpus = failureCorpus(); expect(corpus).toHaveLength(50);
+    const proof = analyzeCorpus(corpus); expect(proof.issues).toEqual([]); expect(proof.averageByteReduction).toBeGreaterThanOrEqual(0.5);
     for (const f of corpus) {
       const compact = compactOutput(f.output, f.tool);
       for (const line of f.expected) expect(compact).toContain(line);
       for (const line of f.output.split('\n').filter((line) => failurePattern.test(line))) expect(compact).toContain(line);
       expect(compact.length).toBeLessThan(f.output.length);
     }
+  });
+  it('rejects vacuous short fixtures and outputs that do not compact', () => {
+    expect(analyzeCorpus([{ tool: 'generic', output: 'FAIL small\n', expected: ['FAIL small'] }]).issues.join('\n')).toContain('input lines');
+    expect(analyzeCorpus([{ tool: 'generic', output: 'FAIL error\n'.repeat(70), expected: ['FAIL error'] }]).issues.join('\n')).toContain('not compacted');
+    expect(analyzeCorpus([]).averageByteReduction).toBe(0);
   });
   it('generic fallback keeps failures plus three context lines and final summary', () => {
     const lines = Array.from({ length: 100 }, (_, i) => `line ${i}`); lines[40] = '✗ unexpected failure';
@@ -149,6 +202,14 @@ describe('exploration and summary', () => {
 describe('waste CLI', () => {
   const cli = fileURLToPath(new URL('../src/cli/main.ts', import.meta.url));
   const invoke = (args: string[]) => execFileSync(process.execPath, ['--import', 'tsx', cli, '--root', root, '--json', ...args], { encoding: 'utf8' });
+  it('hooks allow invalid session ids with clean stdout and exit zero', () => {
+    for (const id of ['bad/id', 'bad.id']) {
+      const result = spawnSync(process.execPath, ['--import', 'tsx', cli, 'hook', 'claude', 'pre_tool'], {
+        encoding: 'utf8', input: JSON.stringify({ session_id: id, cwd: root, tool_name: 'Bash', tool_input: { command: 'npm test' } }),
+      });
+      expect(result.status).toBe(0); expect(result.stdout).toBe(''); expect(result.stderr).toBe('');
+    }
+  });
   it('reports latest, explicit and aggregate sessions as JSON, including empty state', () => {
     expect(JSON.parse(invoke(['report'])).forced).toBe(0);
     bumpCounter(root, 'first', 'duplicatesPrevented', 2); bumpCounter(root, 'second', 'inventedCallsCaught', 3);

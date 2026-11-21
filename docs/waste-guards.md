@@ -59,6 +59,9 @@ path. Exploration hints make no unmeasured token-saving claims.
 
 Waste state lives only in the top-level `guards` key of
 `.groundwork/sessions/<session-id>.json`. Locked read/modify/atomic-rename writes
-preserve navigation and unknown keys. Other feature streams can use
+preserve navigation and unknown keys. Session IDs must match
+`[A-Za-z0-9_-]{1,128}`; invalid IDs disable waste hooks. A corrupt session file or
+a writer lock timeout is ignored by guards without overwriting shared state.
+Other feature streams can use
 `bumpCounter(root, sessionId, 'duplicatesPrevented' | 'inventedCallsCaught' |
 'ignores', amount)` from `src/guards/ledger.ts` without knowing its storage shape.

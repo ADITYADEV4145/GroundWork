@@ -10,7 +10,7 @@ export const wasteGuards: HookHandler = {
   name: 'waste_guards',
   events: ['pre_tool', 'post_tool', 'stop'],
   run(ev, { root, config }) {
-    if (!ev.sessionId) return null;
+    if (!ev.sessionId || !/^[A-Za-z0-9_-]{1,128}$/.test(ev.sessionId)) return null;
     try {
       const cfg = config.guards;
       if (ev.event === 'stop') {

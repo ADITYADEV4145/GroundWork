@@ -12,7 +12,7 @@ const parsers: Record<NoisyTool, RegExp> = {
   vitest: /[❯×✗]|Assertion|Expected:|Received:|Test Files|Tests\s|\.\w+:[0-9]+/,
   jest: /●|Expected:|Received:|Test Suites:|Tests:|Snapshots:|\bat .+:\d+/,
   tsc: /\(\d+,\d+\)|error TS|Found \d+ error/,
-  eslint: /\.[cm]?[jt]sx?$|\d+:\d+|problems? \(/,
+  eslint: /^\S+\.[cm]?[jt]sx?$|^\s*\d+:\d+\s+(?:error|warning)\b|problems? \(/,
   ruff: /\w+\.py:\d+:\d+|Found \d+ error|\[\*\]/,
   install: /ERR!|ERROR|error|npm warn|Resolution|Could not|No matching|Failed/i,
   generic: /\S+:\d+(?::\d+)?|Expected:|Received:|Assertion/,

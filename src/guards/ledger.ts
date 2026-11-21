@@ -1,6 +1,8 @@
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { z } from 'zod';
 import { readSessionLedger, updateSessionLedger } from '../hooks/session-ledger.js';
+import { log } from '../util/log.js';
 
 export interface GuardStats { interventions: number; tokensSaved: number; forced: number }
 export interface CommandRecord { step: number; fingerprint: string; summary: string; logPath: string | null; outputBytes: number }
@@ -16,24 +18,36 @@ export interface Ledger {
   ignores: number;
 }
 const dir = (root: string) => path.join(root, '.groundwork', 'sessions');
+const count = z.number().finite().nonnegative();
+const ledgerSchema = z.object({
+  sessionId: z.string(), method: z.literal('bytes/4'), step: count,
+  guards: z.record(z.string(), z.object({ interventions: count, tokensSaved: count, forced: count })),
+  commands: z.record(z.string(), z.object({ step: count, fingerprint: z.string(), summary: z.string(), logPath: z.string().nullable(), outputBytes: count })),
+  exploration: z.object({ files: z.array(z.string()), hinted: z.boolean() }),
+  duplicatesPrevented: count, inventedCallsCaught: count, ignores: count,
+});
+function parseLedger(value: unknown, id: string): Ledger {
+  const parsed = ledgerSchema.safeParse(value);
+  return parsed.success && parsed.data.sessionId === id ? parsed.data : emptyLedger(id);
+}
 export const tokens = (text: string) => Buffer.byteLength(text) / 4;
 export function emptyLedger(sessionId: string): Ledger {
   return { sessionId, method: 'bytes/4', step: 0, guards: {}, commands: {}, exploration: { files: [], hinted: false }, duplicatesPrevented: 0, inventedCallsCaught: 0, ignores: 0 };
 }
 export function readLedger(root: string, id: string): Ledger {
   try {
-    const x = readSessionLedger(root, id).guards as Ledger;
-    if (x.sessionId !== id || x.method !== 'bytes/4' || !Number.isFinite(x.step) || !x.guards || !x.commands || !Array.isArray(x.exploration.files)) throw new Error('invalid ledger');
-    return x;
+    return parseLedger(readSessionLedger(root, id).guards, id);
   } catch { return emptyLedger(id); }
 }
 export function updateLedger(root: string, id: string | null | undefined, update: (ledger: Ledger) => void): void {
   if (!id) return;
-  updateSessionLedger(root, id, (document) => {
-    const ledger = readLedger(root, id);
-    update(ledger);
-    return { ...document, guards: ledger };
-  });
+  try {
+    updateSessionLedger(root, id, (document) => {
+      const ledger = parseLedger(document.guards, id);
+      update(ledger);
+      return { ...document, guards: ledger };
+    });
+  } catch (error) { log(root, 'warn', 'guards_ledger_failed', { error: String(error) }); }
 }
 export function stats(ledger: Ledger, guard: string): GuardStats {
   return ledger.guards[guard] ??= { interventions: 0, tokensSaved: 0, forced: 0 };
@@ -42,7 +56,7 @@ export function bumpCounter(root: string, id: string | null, counter: 'duplicate
   updateLedger(root, id, (l) => { l[counter] += amount; });
 }
 export function sessionIds(root: string): string[] {
-  try { return readdirSync(dir(root)).filter((f) => f.endsWith('.json')).sort((a, b) => statSync(path.join(dir(root), b)).mtimeMs - statSync(path.join(dir(root), a)).mtimeMs).map((f) => decodeURIComponent(f.slice(0, -5))); }
+  try { return readdirSync(dir(root)).filter((f) => /^[A-Za-z0-9_-]{1,128}\.json$/.test(f)).sort((a, b) => statSync(path.join(dir(root), b)).mtimeMs - statSync(path.join(dir(root), a)).mtimeMs).map((f) => f.slice(0, -5)); }
   catch { return []; }
 }
 export function report(root: string, ids: string[]): Ledger & { forced: number; forceRate: number } {

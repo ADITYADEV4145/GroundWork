@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { addedLines, aggregateReview, applyOverride, labelReuse, renderBlockReport, renderReport, renderReview, summarize } from './bench-v2-lib.js';
 import type { Arm, BlockTask, Override, Result, ReviewRow, Run, Suite, Task } from './bench-v2-lib.js';
 
-const project = fileURLToPath(new URL('../', import.meta.url));
+const project = path.resolve(fileURLToPath(new URL('../', import.meta.url)));
 const defaults = path.join(project, 'bench/reuse-v2');
 const options = new Command().description('Score Benchmark v2 patches; executes submitted code locally, use a disposable VM for untrusted runs.')
   .option('--suite <suite>', 'reuse (acceptance + check) or block (check only)', 'reuse')

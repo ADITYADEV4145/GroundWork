@@ -262,10 +262,45 @@ describe('consented, offline-only optional meaning', () => {
       expect([...vectors.keys()]).toEqual(['one']);
       expect(embed).toHaveBeenCalledTimes(2);
       factory.mockClear();
-      expect((await embedSources(root, config, sources, factory, { deadline: 0 })).size).toBe(0);
+      expect([...(await embedSources(root, config, sources, factory, { deadline: 0 })).keys()]).toEqual(['one']);
       expect(factory).not.toHaveBeenCalled();
       expect((await embedSources(root, config, sources.slice(0, 1), factory)).get('one')?.vector).toEqual([1, 0]);
       expect(factory).not.toHaveBeenCalled();
+    });
+  });
+
+  it('loads every cached vector even when source preparation has exhausted the inference budget', async () => {
+    await withIndexedFixture('reuse-app', async (db, root) => {
+      const { factory } = fake();
+      await initializeEmbeddings(root, { consent: true, factory });
+      const config = loadConfig(root);
+      await new CandidateIndex(db).prepareMeaning(root, config, factory);
+      factory.mockClear();
+      const cached = new CandidateIndex(db);
+      await cached.prepareMeaning(root, config, factory, { deadline: 0 });
+      expect(cached.symbols.length).toBeGreaterThan(0);
+      expect(cached.symbols.every((s) => s.embedding?.vector.length === 2)).toBe(true);
+      expect(factory).not.toHaveBeenCalled();
+    });
+  });
+
+  it('prioritizes changed files and persists completed inference so bounded reruns advance past the prefix', async () => {
+    await withIndexedFixture('reuse-app', async (db, root) => {
+      await initializeEmbeddings(root, { consent: true, factory: fake().factory });
+      const config = loadConfig(root), index = new CandidateIndex(db);
+      const priority = index.symbols.at(-1)!;
+      const infer = async (candidate: CandidateIndex) => {
+        const embed = vi.fn(async (_text: string): Promise<number[]> => new Promise(() => {}));
+        embed.mockResolvedValueOnce([1, 0]);
+        await candidate.prepareMeaning(root, config, async () => ({ embed }), { deadline: Date.now() + 100, priorityFiles: new Set([priority.file]) });
+        return embed;
+      };
+      const first = await infer(index);
+      const initial = first.mock.calls[0]![0];
+      expect(readFileSync(path.join(root, priority.file), 'utf8')).toContain(initial);
+      const next = new CandidateIndex(db), second = await infer(next);
+      expect(second.mock.calls[0]![0]).not.toBe(initial);
+      expect(next.symbols.filter((s) => s.embedding).length).toBeGreaterThan(index.symbols.filter((s) => s.embedding).length);
     });
   });
 

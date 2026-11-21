@@ -105,14 +105,15 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
   }
   finally { db.close(); }
+  const oldFiles = new Map(base.state.files.map((f) => [f.file, f]));
+  const changedFiles = new Set(state.files.filter((f) => f.hash !== oldFiles.get(f.file)?.hash).map((f) => f.file));
   await candidates.prepareMeaning(root, config, options.embeddingFactory, {
     deadline: options.timeoutMs === undefined ? undefined : Date.now() + Math.max(0, Math.min(250, (deadline - Date.now()) / 10)),
+    priorityFiles: changedFiles,
   });
   checkDeadline();
   const baseSymbols = new Map(base.state.symbols.map((s) => [s.id, s]));
   const symbols = new Map(state.symbols.map((s) => [s.id, s]));
-  const oldFiles = new Map(base.state.files.map((f) => [f.file, f]));
-  const changedFiles = new Set(state.files.filter((f) => f.hash !== oldFiles.get(f.file)?.hash).map((f) => f.file));
   const texts = new Map<string, string>();
   const inspections = new Map<string, ReturnType<typeof inspectSource>>();
   const text = (file: string) => {

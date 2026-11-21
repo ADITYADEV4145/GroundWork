@@ -117,7 +117,6 @@ export async function embedSources(root: string, config: GroundworkConfig, sourc
     const db = openDb(indexDbPath(root), { readonly: true });
     try {
       for (const source of sources) {
-        if (Date.now() >= (options.deadline ?? Infinity)) break;
         const hash = embeddingHash(source.text);
         const vector = readEmbedding(db, model, hash);
         if (vector) vectors.set(hash, vector);

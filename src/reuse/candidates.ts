@@ -55,13 +55,16 @@ export class CandidateIndex {
     }
   }
 
-  async prepareMeaning(root: string, config: GroundworkConfig, factory?: EmbedderFactory, options: { deadline?: number } = {}): Promise<void> {
+  async prepareMeaning(root: string, config: GroundworkConfig, factory?: EmbedderFactory, options: { deadline?: number; priorityFiles?: ReadonlySet<string> } = {}): Promise<void> {
     if (!config.reuse.embeddings.enabled) return;
     const { DEFAULT_EMBEDDING_MODEL, embedSources, warnMeaning } = await import('./embeddings.js');
     this.meaningContext = { root, config, factory };
-    const sources = this.symbols.flatMap((s) => {
-      if (Date.now() >= (options.deadline ?? Infinity)) return [];
-      try { return [{ id: s.id, text: readFileSync(path.join(root, s.file), 'utf8').slice(s.startByte, s.endByte) }]; }
+    const files = new Map<string, string>();
+    const sources = [...this.symbols].sort((a, b) => Number(!!options.priorityFiles?.has(b.file)) - Number(!!options.priorityFiles?.has(a.file))).flatMap((s) => {
+      try {
+        if (!files.has(s.file)) files.set(s.file, readFileSync(path.join(root, s.file), 'utf8'));
+        return [{ id: s.id, text: files.get(s.file)!.slice(s.startByte, s.endByte) }];
+      }
       catch { return []; }
     });
     const vectors = await embedSources(root, config, sources, factory, options);

@@ -5,6 +5,11 @@ import type { CheckFinding } from '../src/reuse/check.js';
 
 export type Arm = 'baseline' | 'groundwork';
 export type Label = 'reused' | 'duplicate' | 'unknown';
+export type Suite = 'reuse-v2' | 'block-v2';
+export interface BlockTask {
+  id: string; repo: string; url: string; commit: string; prompt: string;
+  kind: 'clone-prone' | 'hard-negative'; reference_symbol: { file: string; name: string }; why: string;
+}
 export interface Task {
   id: string; repo: string; url: string; commit: string; prompt: string;
   helpers: { file: string; name: string }[];
@@ -18,8 +23,9 @@ export interface Run {
 export interface Override { task_id: string; arm: Arm; label: Label; reviewer: string; reasoning: string }
 export interface ReuseLabel { label: Label; reason: string; source: 'automated' | 'human' }
 export interface Result {
+  suite?: Suite; task_kind?: BlockTask['kind'];
   task_id: string; arm: Arm; session_id: string; acus: number | null;
-  status: 'scored' | 'apply_failed' | 'execution_failed'; success: boolean;
+  status: 'scored' | 'apply_failed' | 'execution_failed'; success: boolean | null;
   acceptance: { exitCode: number | null; output: string } | null;
   check: { status: string; findings: CheckFinding[]; error?: string };
   reuse: ReuseLabel; error?: string;
@@ -164,19 +170,22 @@ export function applyOverride(result: ReuseLabel, override?: Override): ReuseLab
 }
 
 export interface ReviewRow {
+  suite?: Suite; kind?: CheckFinding['kind'];
   task_id: string; arm: Arm; added: CheckFinding['added']; existing: CheckFinding['existing'];
   probability?: number; signals: CheckFinding['signals']; verdict: 'agree' | 'disagree' | null;
   reviewer: string | null; reasoning: string | null;
 }
-export const reviewKey = (row: Pick<ReviewRow, 'task_id' | 'arm' | 'added' | 'existing'>) => JSON.stringify([row.task_id, row.arm, row.added, row.existing]);
-export function aggregateReview(results: Result[], previous: ReviewRow[]): ReviewRow[] {
+const reviewIdentity = (row: Pick<ReviewRow, 'suite' | 'task_id' | 'arm' | 'added' | 'existing'>) => JSON.stringify([row.suite ?? 'reuse-v2', row.task_id, row.arm, row.added, row.existing]);
+export const reviewKey = (row: Pick<ReviewRow, 'suite' | 'kind' | 'task_id' | 'arm' | 'added' | 'existing'>) => JSON.stringify([reviewIdentity(row), row.kind ?? 'duplicate']);
+export function aggregateReview(results: Result[], previous: ReviewRow[], suite: Suite = 'reuse-v2'): ReviewRow[] {
   const old = new Map(previous.map(row => [reviewKey(row), row]));
-  const rows = new Map<string, ReviewRow>();
+  const legacy = new Map(previous.filter(row => !row.kind).map(row => [reviewIdentity(row), row]));
+  const rows = new Map(previous.filter(row => (row.suite ?? 'reuse-v2') !== suite).map(row => [reviewKey(row), row]));
   for (const result of results) for (const finding of result.check.findings) {
-    if (finding.severity !== 'BLOCK' || !['duplicate', 'duplicate-constant', 'duplicate-file'].includes(finding.kind)) continue;
-    const row: ReviewRow = { task_id: result.task_id, arm: result.arm, added: finding.added, existing: finding.existing,
+    if (result.check.status === 'UNAVAILABLE' || finding.severity !== 'BLOCK' || (suite === 'reuse-v2' && !['duplicate', 'duplicate-constant', 'duplicate-file'].includes(finding.kind))) continue;
+    const row: ReviewRow = { suite, kind: finding.kind, task_id: result.task_id, arm: result.arm, added: finding.added, existing: finding.existing,
       probability: finding.probability, signals: finding.signals, verdict: null, reviewer: null, reasoning: null };
-    const key = reviewKey(row), prior = old.get(key);
+    const key = reviewKey(row), prior = old.get(key) ?? legacy.get(reviewIdentity(row));
     if (prior && prior.probability === row.probability && JSON.stringify(prior.signals) === JSON.stringify(row.signals)) {
       row.verdict = prior.verdict; row.reviewer = prior.reviewer; row.reasoning = prior.reasoning;
     }
@@ -234,6 +243,17 @@ export function renderReview(rows: ReviewRow[]): string {
   const agree = reviewed.filter(r => r.verdict === 'agree').length;
   const escape = (s: unknown) => String(s ?? '').replace(/\|/g, '\\|').replace(/[\r\n]/g, ' ');
   return ['# BLOCK review', '', `${agree}/${reviewed.length} reviewed agree (${percent(reviewed.length ? agree / reviewed.length : null)}); ${rows.length - reviewed.length} pending. Agreement requires a verdict, reviewer and reasoning.`, '',
-    '| Task | Arm | Added | Existing | Probability | Signals | Verdict | Reviewer | Reasoning |', '| --- | --- | --- | --- | ---: | --- | --- | --- | --- |',
-    ...rows.map(r => `| ${[r.task_id, r.arm, `${r.added.file}:${r.added.line} ${r.added.symbol}`, r.existing ? `${r.existing.file}:${r.existing.line} ${r.existing.symbol}` : '', r.probability ?? '', JSON.stringify(r.signals), r.verdict, r.reviewer, r.reasoning].map(escape).join(' | ')} |`), ''].join('\n');
+    '| Suite | Task | Arm | Kind | Added | Existing | Probability | Signals | Verdict | Reviewer | Reasoning |', '| --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- | --- |',
+    ...rows.map(r => `| ${[r.suite ?? 'reuse-v2', r.task_id, r.arm, r.kind ?? '', `${r.added.file}:${r.added.line} ${r.added.symbol}`, r.existing ? `${r.existing.file}:${r.existing.line} ${r.existing.symbol}` : '', r.probability ?? '', JSON.stringify(r.signals), r.verdict, r.reviewer, r.reasoning].map(escape).join(' | ')} |`), ''].join('\n');
+}
+
+export function renderBlockReport(results: Result[], expectedTasks: number): string {
+  const unavailable = results.filter(r => r.check.status === 'UNAVAILABLE').length;
+  return ['# BLOCK evidence wave', '', `${results.length}/${expectedTasks} baseline runs scored; ${unavailable} GW checks UNAVAILABLE.`, '',
+    'Check-only suite: acceptance and task success are not evaluated. Task kinds are sampling annotations, not duplicate verdicts. Every BLOCK requires review, especially hard negatives. UNAVAILABLE is not zero-finding evidence.', '',
+    '| Task | Kind | Patch/execution | GW | BLOCK | WARN |', '| --- | --- | --- | --- | ---: | ---: |',
+    ...results.map(r => {
+      const count = (severity: string) => r.check.status === 'UNAVAILABLE' ? 'n/a' : r.check.findings.filter(f => f.severity === severity).length;
+      return `| ${r.task_id} | ${r.task_kind ?? ''} | ${r.status} | ${r.check.status} | ${count('BLOCK')} | ${count('WARN')} |`;
+    }), '', 'See block-results/ for patches\' application/check errors and block-review.json for the shared, suite-attributed review queue.', ''].join('\n');
 }

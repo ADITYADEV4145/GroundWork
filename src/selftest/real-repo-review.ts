@@ -5,6 +5,8 @@ import type { CheckResult } from './registry.js';
 
 const location = z.object({ file: z.string(), symbol: z.string(), line: z.number().int().positive() });
 const rowSchema = z.object({
+  suite: z.enum(['reuse-v2', 'block-v2']).optional(),
+  kind: z.enum(['duplicate', 'dead-after-change', 'duplicate-constant', 'duplicate-file', 'invalid-allow', 'grounding']).optional(),
   task_id: z.string(), arm: z.enum(['baseline', 'groundwork']), added: location, existing: location.nullable(),
   probability: z.number().finite().min(0).max(1).optional(), signals: z.array(z.object({ name: z.string(), value: z.number().finite() })),
   verdict: z.enum(['agree', 'disagree']).nullable(), reviewer: z.string().nullable(), reasoning: z.string().nullable(),
@@ -15,7 +17,7 @@ export function evaluateRealRepoReview(directory: string): CheckResult {
   if (!existsSync(file)) return { ok: true, skipped: true, detail: 'skipped: Benchmark v2 block-review.json absent; no BLOCK agreement evidence' };
   try {
     const rows = z.array(rowSchema).parse(JSON.parse(readFileSync(file, 'utf8')));
-    const identities = rows.map(r => JSON.stringify([r.task_id, r.arm, r.added, r.existing]));
+    const identities = rows.map(r => JSON.stringify([r.suite ?? 'reuse-v2', r.kind ?? 'duplicate', r.task_id, r.arm, r.added, r.existing]));
     if (new Set(identities).size !== rows.length) throw new Error('duplicate review rows');
     const reviewed = rows.filter(r => r.verdict !== null && r.reviewer?.trim() && r.reasoning?.trim());
     const agree = reviewed.filter(r => r.verdict === 'agree').length;

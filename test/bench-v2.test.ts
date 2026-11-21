@@ -18,7 +18,7 @@ const result = (arm: 'baseline' | 'groundwork' = 'baseline'): Result => ({ task_
 const finding = { id: 'f', kind: 'duplicate' as const, severity: 'BLOCK' as const,
   added: { file: 'src/new.py', symbol: 'new', line: 1 }, existing: { file: 'src/old.py', symbol: 'old', line: 2 },
   probability: 0.99, signals: [{ name: 'exact', value: 1 }], fix: 'reuse' };
-const row = (): ReviewRow => ({ task_id: 'task', arm: 'baseline', added: finding.added, existing: finding.existing,
+const row = (): ReviewRow => ({ suite: 'reuse-v2', kind: 'duplicate', task_id: 'task', arm: 'baseline', added: finding.added, existing: finding.existing,
   probability: finding.probability, signals: finding.signals, verdict: 'agree', reviewer: 'Human', reasoning: 'same behavior' });
 
 describe('Benchmark v2 intervals', () => {

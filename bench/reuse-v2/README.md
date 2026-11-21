@@ -24,6 +24,23 @@ Results go to `results/<task>/<arm>.json`, with acceptance output, session/ACU d
 
 Fresh pytest worktrees also need generated version metadata. The scorer builds this from an unpatched pinned worktree once, caches it by commit, injects it for acceptance only, then removes it before GW indexing. This metadata build can fetch build dependencies even with `--no-install` (which only suppresses runtime dependency installation); prewarm the cache before offline scoring.
 
+## Check-only BLOCK evidence wave
+
+`block-tasks.json` contains 16 separate tasks at the same real-repository pins: 12 clone-prone siblings and 4 hard negatives (6 got, 5 Click, 5 pytest). Give baseline agents only the prompt and repository pin, not the sampling kind, reference annotation or rationale. No acceptance tests are supplied for this wave. These tasks solicit independent patches, not predetermined positive findings; hard negatives must receive the same scrutiny as clone-prone tasks.
+
+Place baseline runs in `block-runs/<task_id>/baseline.json` using the same run JSON shape, then run:
+
+```sh
+npm run build
+npm run bench:v2 -- --suite block
+```
+
+This selects `block-tasks.json` and `block-runs/` by default; `--tasks`, `--runs`, `--out` and `--cache` still override paths. Only baseline runs are accepted, and task IDs must be distinct between suites. The scorer prepares fresh pinned worktrees, applies patches and runs GW init/check only. It does not install repository test dependencies, inject pytest version metadata or execute acceptance tests. Cloning may still require network access on first setup. Each result retains apply/execution failures and explicit `UNAVAILABLE` checks; `acceptance` and `success` are null, not inferred from GW status. Task kinds do not determine duplicate labels or review verdicts.
+
+Outputs are `block-results/<task>/baseline.json` and `block-report.{json,md}`. These never overwrite the reuse-wave results or success/duplicate-rate reports. Every available BLOCK finding (including non-duplicate kinds) enters the shared `block-review.{json,md}` with `suite: "block-v2"` and finding `kind`. Reuse-wave rows are attributed to `reuse-v2`; legacy rows without a suite are treated as reuse-wave rows. Rerunning either suite replaces only that suite's queue, preserves unchanged verdicts, and retains the other suite's rows. Changed evidence clears its verdict. Reviewers must inspect actual behavior, especially any BLOCK on a hard negative; the task annotation is not itself evidence. Authoring or scoring this wave does not establish the ten-reviewed-BLOCK gate.
+
+Keep synthetic smoke-test runs and outputs outside the committed evidence directory using `--runs` and `--out`.
+
 ## Labels and human review
 
 Automated labels use added production call sites and static import resolution, including import aliases. A resolved helper call is provisionally `reused`; added implementations without such a call are provisionally `duplicate`; no implementation or unavailable analysis is `unknown`. This is a heuristic, not semantic analysis: indirect calls, shadowed names, dead calls or mixed reused/duplicated implementations need review. Agent `decisions` are not trusted. Unknowns are excluded from duplicate-rate denominators and separately counted; they prevent a passing benchmark gate.

@@ -3,6 +3,7 @@ import ts from 'typescript';
 import { spawnSync } from 'node:child_process';
 import type { CheckFinding } from '../src/reuse/check.js';
 import { summarizeBlockReview } from '../src/selftest/real-repo-review.js';
+import { shellQuote } from '../src/guards/trimmer.js';
 
 export type Arm = 'baseline' | 'groundwork';
 export type Label = 'reused' | 'duplicate' | 'unknown';
@@ -54,6 +55,9 @@ export function newcombe(a: number, na: number, b: number, nb: number): Interval
 }
 
 export interface AddedFile { file: string; source: string; addedLines: Set<number> }
+export function pythonAcceptanceCommand(command: string, python: string): string {
+  return `python() { ${shellQuote(python)} "$@"; }\n${command}`;
+}
 export function addedLines(patch: string): Map<string, Set<number>> {
   const files = new Map<string, Set<number>>();
   let current: Set<number> | undefined, line = 0;

@@ -1,8 +1,8 @@
-import { checkRepository } from '../../dist/reuse/check.js';
-import { defaultConfig } from '../../dist/config/load.js';
-import { changedFromGit, verifyChanged } from '../../dist/grounding/index.js';
-import { indexDbPath } from '../../dist/index/store.js';
-import { openDb } from '../../dist/store/db.js';
+const { checkRepository } = await import(new URL('../../dist/reuse/check.js', import.meta.url));
+const { defaultConfig } = await import(new URL('../../dist/config/load.js', import.meta.url));
+const { changedFromGit, verifyChanged } = await import(new URL('../../dist/grounding/index.js', import.meta.url));
+const { indexDbPath } = await import(new URL('../../dist/index/store.js', import.meta.url));
+const { openDb } = await import(new URL('../../dist/store/db.js', import.meta.url));
 
 const root = process.argv[2];
 if (!root) throw new Error('Expected step worktree path');

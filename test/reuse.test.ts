@@ -37,6 +37,7 @@ describe('reuse signals and candidates', () => {
       }
       expect(model.status).toBe('calibrated-grouped-oof');
       const candidates = new CandidateIndex(db);
+      expect(candidates.symbols.every((s) => typeof s.bindingHash === 'string')).toBe(true);
       expect(candidates.find(a).map((s) => s.name)).toContain('decodeTimestamp');
       expect(candidates.find(a).map((s) => s.name)).not.toContain(a.name);
       expect(candidates.symbols.map((s) => s.name)).not.toEqual(expect.arrayContaining(['tiny', '__repr__', 'testOnlyDateParser', 'generatedDateParser']));
@@ -49,7 +50,7 @@ describe('reuse signals and candidates', () => {
   it('handles absent signals without treating missing data as a match', () => {
     const empty: ComparableSymbol = { name: '', fingerprint: null, docstring: null, params: null, returnType: null };
     const signals = pairSignals(empty, empty, buildIdf([]));
-    expect(Object.values(signals)).toEqual([0, 0, 0, 0, 0, 0, 0]);
+    expect(Object.values(signals).every((value) => value === 0)).toBe(true);
     expect(probability(signals)).toBeCloseTo(1 / (1 + Math.exp(-model.intercept)));
     const high = Object.fromEntries(Object.keys(signals).map((k) => [k, 1])) as unknown as Signals;
     expect(probability(high)).toBeGreaterThan(probability(signals));

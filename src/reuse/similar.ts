@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { vocabulary } from '../extract/fingerprint.js';
-import { adapterFor, initParsers } from '../lang/index.js';
+import { initParsers } from '../lang/index.js';
 import { estimateTokens, fitToBudget } from '../util/tokens.js';
 import { CandidateIndex } from './candidates.js';
 import { probability, thresholds } from './model.js';
 import { pairSignals, type ComparableSymbol } from './signals.js';
+import { extractReuseSource } from './source.js';
 
 export const similarInputSchema = z.object({
   description: z.string().trim().min(1).max(10000),
@@ -40,7 +41,7 @@ export async function findSimilar(index: CandidateIndex, input: SimilarInput): P
     const declaration = python ? (/^(async\s+)?def\s/.test(signature) ? signature : `def ${signature}`)
       : (/^(export\s+)?(async\s+)?function\s/.test(signature) ? signature : `function ${signature}`);
     const source = args.code ?? `${declaration}${python ? ':\n    pass' : ' {}'}`;
-    const extracted = adapterFor(args.language).extract(source, args.language);
+    const extracted = extractReuseSource(source, args.language);
     const symbol = extracted.symbols[0];
     if (extracted.hasErrors || !symbol) throw new Error('Draft must contain a valid symbol; set language for Python drafts.');
     query = { ...symbol, name: args.name ?? symbol.name, fingerprint: args.code ? symbol.fingerprint : null,

@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
-import { adapterFor, initParsers, languageForPath } from '../lang/index.js';
+import { initParsers, languageForPath } from '../lang/index.js';
 import { sha1 } from '../util/hash.js';
 import { buildIdf, pairSignals, type ComparableSymbol, type Signals } from './signals.js';
+import { extractReuseSource } from './source.js';
 
 const refSchema = z.object({ file: z.string().startsWith('corpus/'), symbol: z.string().min(1) });
 export const labelSchema = z.object({
@@ -14,12 +15,14 @@ export const labelSchema = z.object({
 export type Label = z.infer<typeof labelSchema>;
 export interface Example { label: Label; a: ComparableSymbol; b: ComparableSymbol; group: string; signals: Signals }
 export interface Dataset { examples: Example[]; digest: string; symbols: ComparableSymbol[] }
-export const SIGNAL_KEYS: (keyof Signals)[] = ['structure', 'exact', 'vocabulary', 'paramCount', 'paramNames', 'returnType', 'name'];
+export const SIGNAL_KEYS: (keyof Signals)[] = ['structure', 'exact', 'vocabulary', 'paramCount', 'paramNames', 'returnType', 'name', 'bindingExact', 'structureVocabulary', 'exactVocabulary'];
 export const COMBINATIONS: Record<string, (keyof Signals)[]> = {
   structure: ['structure', 'exact'], vocabulary: ['vocabulary'],
   'signature+name': ['paramCount', 'paramNames', 'returnType', 'name'],
   'structure+vocabulary': ['structure', 'exact', 'vocabulary'],
   'vocabulary+signature+name': ['vocabulary', 'paramCount', 'paramNames', 'returnType', 'name'],
+  'structure+vocabulary+interactions': ['structure', 'exact', 'vocabulary', 'structureVocabulary', 'exactVocabulary'],
+  'binding-aware': ['bindingExact'],
   all: SIGNAL_KEYS,
 };
 
@@ -38,7 +41,7 @@ export async function loadDataset(directory: string): Promise<Dataset> {
     if (!language) throw new Error(`Unsupported corpus file ${file}`);
     const source = readFileSync(absolute, 'utf8');
     sources.push(`${file}\n${source}`);
-    const extraction = adapterFor(language).extract(source, language);
+    const extraction = extractReuseSource(source, language);
     if (extraction.hasErrors) throw new Error(`Parse error in ${file}`);
     for (const symbol of extraction.symbols) {
       const key = `${file}:${symbol.qualifiedName}`;

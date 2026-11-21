@@ -40,12 +40,14 @@ const report = `# Reuse calibration report
 - ${dataset.examples.length} labeled pairs: ${positives} duplicates, ${dataset.examples.length - positives} negatives; TypeScript/JavaScript and Python.
 - 12 task families; both languages, every variant, and the array-uniq history snapshots of a family stay in one fold. Five deterministic folds (sorted family names, index modulo five). No symbol/task family appears in both training and validation in a fold.
 - Full-batch logistic regression: 1800 iterations, learning rate 0.4, L2 0.002 on weights, unpenalized intercept, no class weighting. Each fold computes IDF only on its training symbols; final weights use whole-corpus IDF.
+- Features retain the seven original signals and add a reuse-only binding-aware exact hash, structure×vocabulary and normalized-exact×vocabulary. The complementary hash preserves literals, external/member names and repeated local-identifier roles; it does not replace the coarse Phase 1 fingerprints. Missing/unparseable source supplies zero, never an assumed match. See diagnosis.md for all high-structure negatives and the prior failure's causal checks.
 - BLOCK is the lowest distinct OOF score whose inclusive selection has nonzero true positives and >=95% precision. Equal scores are never split. WARN maximizes OOF F1 among lower thresholds (ties choose lower). Thresholds are selected on these OOF predictions, not on an independent final test set.
 - Dataset/source SHA-1: \`${dataset.digest}\`. Reproduce offline with \`npm run calibrate\`; regenerate planted corpus with \`node --import tsx scripts/calibrate-corpus.ts\`.
 - All labels are authored/reviewed by the coding agent from explicit domains and behavioral differences; no independent human review has occurred. Type 1 formatting, Type 2 identifier rename, Type 3 control-flow refactor, Type 4 alternate implementation. Short bodies are retained for signal evaluation, including bodies the runtime candidate filter would skip.
 - Hard negatives include changed policy/boundaries, operator changes, same-name textual overloads, and same-purpose implementations with differing NaN equality. Some are deliberately indistinguishable after token normalization. Repeated template variants and overload scaffolds limit diversity despite family grouping.
 - Six real history pairs from MIT-licensed sindresorhus/array-uniq are included (see corpus/unique-values/oss/LICENSE and oss-pairs.jsonl). These are compatibility implementations and their modern replacement, not six independently discovered refactorings. Both commits are pinned; \`node --import tsx scripts/calibrate-mine.ts\` fetches snapshots into a home-directory cache. Calibration/selftests make no network calls.
 - This is a small planted-corpus operating point, NOT a claim of >=95% production precision, language-general semantic equivalence, or independent benchmark success. Selection uncertainty and the small number of task families matter; Phase 3's other gate checks are not implemented here.
+- No corpus sources or labels were changed to improve the score. Previous seven-feature model: 14 TP / 0 FP, 5.8% recall, Type 1 0%, Type 2 25%, Type 3 1.4%. Binding-aware hashing is a lexical approximation rather than scope-resolved equivalence; shadowing and dynamic dispatch remain limitations. Multiple feature designs have now been examined on these OOF folds; an independent evaluation set is still needed.
 
 ## Operating point
 
@@ -76,9 +78,13 @@ ${runs.map((r) => `| ${r.name} | ${r.threshold?.toFixed(6) ?? 'no safe threshold
 | --- | ---: | ---: | ---: | ---: |
 ${runs.map((r) => `| ${r.name} | ${recallByType(r.predictions, r.threshold ?? 2).map((m) => pct(m.recall)).join(' | ')} |`).join('\n')}
 
-## Selected false positives / missed examples
+## False positives at BLOCK
 
-${full.predictions.filter((p) => (p.probability >= block) !== (p.example.label.label === 'dup')).slice(0, 15).map((p) => `- ${p.example.label.id}: ${p.probability.toFixed(6)}, ${p.example.label.label}; ${p.example.label.reasoning}`).join('\n') || 'None.'}
+${full.predictions.filter((p) => p.probability >= block && p.example.label.label === 'not').map((p) => `- ${p.example.label.id}: ${p.probability.toFixed(6)}; ${p.example.label.reasoning}`).join('\n') || 'None.'}
+
+## First 15 missed positive examples
+
+${full.predictions.filter((p) => p.probability < block && p.example.label.label === 'dup').slice(0, 15).map((p) => `- ${p.example.label.id}: ${p.probability.toFixed(6)}; ${p.example.label.reasoning}`).join('\n') || 'None.'}
 `;
 writeFileSync(path.join(root, 'bench/dupes/report.md'), report);
 console.log(`Calibration: ${dataset.examples.length} pairs, ${model.calibration.groups} task-family groups, 5 folds (family-disjoint).`);

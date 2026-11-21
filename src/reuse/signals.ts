@@ -7,6 +7,7 @@ export interface ComparableSymbol {
   docstring: string | null;
   params: Param[] | null;
   returnType: string | null;
+  bindingHash?: string | null;
 }
 
 export interface Signals {
@@ -17,6 +18,9 @@ export interface Signals {
   paramNames: number;
   returnType: number;
   name: number;
+  bindingExact: number;
+  structureVocabulary: number;
+  exactVocabulary: number;
 }
 
 export interface OptionalSignal {
@@ -50,10 +54,14 @@ export function pairSignals(a: ComparableSymbol, b: ComparableSymbol, idf: Map<s
     const vx = Math.log1p(x[w] ?? 0) * weight, vy = Math.log1p(y[w] ?? 0) * weight;
     dot += vx * vy; nx += vx * vx; ny += vy * vy;
   }
+  const structure = a.fingerprint && b.fingerprint ? minhashSimilarity(a.fingerprint.minhash, b.fingerprint.minhash) : 0;
+  const exact = a.fingerprint && b.fingerprint && a.fingerprint.normHash === b.fingerprint.normHash ? 1 : 0;
+  const cosine = nx && ny ? Math.min(1, dot / Math.sqrt(nx * ny)) : 0;
   return {
-    structure: a.fingerprint && b.fingerprint ? minhashSimilarity(a.fingerprint.minhash, b.fingerprint.minhash) : 0,
-    exact: a.fingerprint && b.fingerprint && a.fingerprint.normHash === b.fingerprint.normHash ? 1 : 0,
-    vocabulary: nx && ny ? Math.min(1, dot / Math.sqrt(nx * ny)) : 0,
+    structure, exact, vocabulary: cosine,
+    bindingExact: a.fingerprint && b.fingerprint && a.bindingHash && b.bindingHash && a.bindingHash === b.bindingHash ? 1 : 0,
+    structureVocabulary: structure * cosine,
+    exactVocabulary: exact * cosine,
     paramCount: a.params && b.params ? 1 - Math.abs(a.params.length - b.params.length) / Math.max(1, a.params.length, b.params.length) : 0,
     paramNames: overlap((a.params ?? []).flatMap((p) => splitWords(p.name)), (b.params ?? []).flatMap((p) => splitWords(p.name))),
     returnType: a.returnType && b.returnType && a.returnType.replace(/\s/g, '') === b.returnType.replace(/\s/g, '') ? 1 : 0,

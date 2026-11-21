@@ -93,7 +93,7 @@ export const PHASE2_CHECKS: Check[] = [
           const ctx = { root, db, config: defaultConfig() };
           for (const [name, args, signature] of [
             ['find_code', { query: 'index', limit: 100 }, 'Next: find_code'],
-            ['outline', { file: 'src/lang/typescript.ts' }, 'typescriptAdapter'],
+            ['outline', { file: 'src/lang/typescript.ts' }, 'Next: outline('],
             ['read_symbol', { symbol: 'refreshIndex' }, 'function refreshIndex'],
             ['callers', { symbol: 'refreshIndex' }, '[import-resolved]'],
             ['callees', { symbol: 'refreshIndex' }, 'indexed callees'],

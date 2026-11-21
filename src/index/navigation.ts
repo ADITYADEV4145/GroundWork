@@ -17,11 +17,14 @@ const CALLERS = '(SELECT COUNT(*) FROM calls c WHERE c.callee_id = s.id)';
 const lowerName = (column: string) =>
   `CASE WHEN length(${column}) = length(CAST(${column} AS BLOB)) THEN lower(${column}) ELSE gw_unicode_lower(${column}) END`;
 
+function lexicalWords(value: string): string[] {
+  return value.match(/[\p{L}\p{N}\p{M}]+/gu) ?? [];
+}
+
 function searchWords(value: string): string[] {
-  return value
+  return lexicalWords(value
     .replace(/([\p{Ll}\p{N}])(\p{Lu})/gu, '$1 $2')
-    .replace(/(\p{Lu}+)(\p{Lu}\p{Ll})/gu, '$1 $2')
-    .match(/[\p{L}\p{N}\p{M}]+/gu) ?? [];
+    .replace(/(\p{Lu}+)(\p{Lu}\p{Ll})/gu, '$1 $2'));
 }
 
 function separateLetterNumber(value: string, keepLeadingNumericWord = false): string {
@@ -43,6 +46,26 @@ function matchesTerm(tokens: string[], parts: string[]): boolean {
     j === parts.length - 1 && isPrefixTerm(part) ? tokens[i + j]?.startsWith(part) : tokens[i + j] === part));
 }
 
+interface SearchTerm {
+  word: string;
+  parts: string[];
+}
+
+function matchWeight(value: string, terms: SearchTerm[]): number {
+  const raw = lexicalWords(value.toLowerCase());
+  let normalized: string[] | undefined;
+  return terms.reduce((weight, { word, parts }) => {
+    if (raw.includes(word)) return weight + 1;
+    const compound = parts.length > 1;
+    if (raw.some((token) => token.startsWith(word) &&
+      (isPrefixTerm(word) || (compound && !/^\p{N}/u.test(token.slice(word.length)))))) {
+      return weight + (compound ? 0.75 : 1);
+    }
+    normalized ??= rankingTokens(value);
+    return weight + (matchesTerm(normalized, parts) ? (compound ? 0.5 : 1) : 0);
+  }, 0);
+}
+
 function toSymbol(r: Row): NavigationSymbol {
   return {
     id: String(r.id),
@@ -59,7 +82,7 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
   const q = query.toLowerCase();
   const termsByCase = searchWords(query).slice(0, 24);
   const words = [...new Set(termsByCase.map((w) => w.toLowerCase()))];
-  const scoringWords = words.map((w) => separateLetterNumber(w).split(' '));
+  const scoringWords = words.map((word) => ({ word, parts: separateLetterNumber(word).split(' ') }));
   const select = `SELECT ${SYMBOL}, s.name, s.docstring, s.exported, f.is_test, ${CALLERS} caller_count`;
   const filter = (kind ? ' AND s.kind = ?' : '') + (file ? ' AND f.path = ?' : '');
   const filterArgs = [...(kind ? [kind] : []), ...(file ? [file] : [])];
@@ -84,26 +107,19 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
     const numbered = (w: string) => !isPrefixTerm(w) && /\p{L}/u.test(w);
     const expanded = variants(tokens.filter(numbered)).map(prefix).join(' OR ');
     if (expanded) {
-      const required = words.filter(numbered).map((w) => separateLetterNumber(w).split(' '));
+      const required = scoringWords.filter(({ word }) => numbered(word));
       for (const r of search.all(expanded, ...filterArgs)) {
         const id = String(r.id);
         if (candidates.has(id)) continue;
         const fields = [r.qualified_name, r.docstring, r.signature, r.path];
-        if (fields.some((field) => {
-          const fieldTokens = rankingTokens(String(field ?? ''));
-          return required.some((parts) => matchesTerm(fieldTokens, parts));
-        })) candidates.set(id, r);
+        if (fields.some((field) => matchWeight(String(field ?? ''), required) > 0)) candidates.set(id, r);
       }
     }
   }
   return [...candidates.values()].map((r) => {
     const s = toSymbol(r);
     const doc = String(r.docstring ?? '').trim();
-    const overlap = (value: string) => {
-      const tokens = rankingTokens(value);
-      const matched = scoringWords.filter((parts) => matchesTerm(tokens, parts));
-      return matched.length / Math.max(1, scoringWords.length);
-    };
+    const overlap = (value: string) => matchWeight(value, scoringWords) / Math.max(1, scoringWords.length);
     const name = String(r.name).toLowerCase();
     const qualified = s.name.toLowerCase();
     const lexical = Math.max(0, -Number(r.rank ?? 0));

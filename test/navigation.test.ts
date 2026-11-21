@@ -156,6 +156,7 @@ describe('MCP navigation', () => {
       writeFileSync(path.join(root, 'app.py'), [
         'def negotiate():\n    """Negotiate HTTP/2."""\n    pass\n',
         'def multiplex():\n    """Multiplex HTTP2."""\n    pass\n',
+        'def different_version():\n    """Support HTTP/20 and HTTP20."""\n    pass\n',
         'def retry():\n    """Retry HTTP 3 times."""\n    pass\n',
       ].join('\n'));
       await initSqlBackend();
@@ -165,6 +166,7 @@ describe('MCP navigation', () => {
         const result = await runNavigationTool('find_code', { query: 'HTTP2' }, { root, db, config });
         expect(result).toContain('negotiate (function)');
         expect(result).toContain('multiplex (function)');
+        expect(result).not.toContain('different_version (function)');
         expect(result).not.toContain('retry (function)');
       } finally {
         db.close();

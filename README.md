@@ -86,6 +86,12 @@ gw setup      # preview project-level changes, then confirm
 
 Restart your agent after setup. Codex asks you to trust the new hooks once, under `/hooks`.
 
+Codex setup also installs the skill and references in `.agents/skills/groundwork/`,
+the [repository skill location Codex discovers](https://developers.openai.com/codex/skills/).
+Removal preserves pre-existing or subsequently edited skill files.
+For a skill-only install (no MCP or hooks), use `npx skills add ADITYADEV4145/GroundWork`;
+the repository's root `SKILL.md` and `references/` follow the Agent Skills layout.
+
 Want to see exactly what setup would do first?
 
 ```sh

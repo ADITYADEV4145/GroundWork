@@ -45,11 +45,30 @@ describe('gw setup', () => {
     expect(readFileSync(path.join(root, '.codex', 'config.toml'), 'utf8')).toContain('[mcp_servers.groundwork]');
     expect(readFileSync(path.join(home, '.codex', 'config.toml'), 'utf8')).toBe('model = "o4"\n');
     expect(JSON.parse(readFileSync(path.join(root, '.cursor', 'hooks.json'), 'utf8')).hooks.preToolUse[0].command).toBe('gw hook cursor pre_tool');
+    expect(readFileSync(path.join(root, '.agents/skills/groundwork/SKILL.md'), 'utf8')).toContain('name: groundwork');
+    expect(readFileSync(path.join(root, '.agents/skills/groundwork/references/navigation.md'), 'utf8')).toContain('repo_map');
     expect(planSetup(root, targets, 'add').every((c) => c.action === 'unchanged')).toBe(true);
 
     applySetup(root, planSetup(root, targets, 'remove'), 'remove');
     expect(snapshot(root)).toEqual(before.root);
     expect(snapshot(home)).toEqual(before.home);
+  });
+});
+
+describe('Codex skill ownership', () => {
+  it('preserves pre-existing skills and user edits to installed references on removal', () => {
+    const root = tempDir('gw-skill-root-'); dirs.push(root);
+    const skill = path.join(root, '.agents/skills/groundwork');
+    mkdirSync(skill, { recursive: true });
+    writeFileSync(path.join(skill, 'SKILL.md'), '# My Groundwork skill\n');
+    const targets = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === 'codex');
+    applySetup(root, planSetup(root, targets, 'add'), 'add');
+    expect(readFileSync(path.join(skill, 'SKILL.md'), 'utf8')).toBe('# My Groundwork skill\n');
+    const reference = path.join(skill, 'references/navigation.md');
+    writeFileSync(reference, '# My edited navigation\n');
+    applySetup(root, planSetup(root, targets, 'remove'), 'remove');
+    expect(readFileSync(path.join(skill, 'SKILL.md'), 'utf8')).toBe('# My Groundwork skill\n');
+    expect(readFileSync(reference, 'utf8')).toBe('# My edited navigation\n');
   });
 });
 

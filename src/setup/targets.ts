@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import type { AgentName } from '../hooks/types.js';
@@ -24,7 +25,13 @@ export interface BlockEdit {
   block: string;
 }
 
-export type Edit = JsonEdit | BlockEdit;
+export interface SkillEdit {
+  kind: 'skill';
+  file: string;
+  content: string;
+}
+
+export type Edit = JsonEdit | BlockEdit | SkillEdit;
 
 export interface AgentTarget {
   agent: AgentName | 'groundwork';
@@ -169,6 +176,8 @@ export interface TargetOptions {
 
 export function targetsFor(opts: TargetOptions): AgentTarget[] {
   const { root, gw } = opts;
+  const packageRoot = fileURLToPath(new URL('../../', import.meta.url));
+  const skillFiles = ['SKILL.md', ...readdirSync(path.join(packageRoot, 'references')).filter((f) => f.endsWith('.md')).map((f) => `references/${f}`)];
   return [
     {
       agent: 'claude',
@@ -180,6 +189,7 @@ export function targetsFor(opts: TargetOptions): AgentTarget[] {
       agent: 'codex',
       label: 'Codex',
       edits: [
+        ...skillFiles.map((file): SkillEdit => ({ kind: 'skill', file: path.join(root, '.agents/skills/groundwork', file), content: readFileSync(path.join(packageRoot, file), 'utf8') })),
         nestedHooks(path.join(root, '.codex', 'hooks.json'), {
           PreToolUse: [{ matcher: 'Bash', command: `${gw} hook codex pre_tool` }],
           PostToolUse: [{ matcher: ['apply_patch', 'Bash', ...FIND_CODE_TOOLS].join('|'), command: `${gw} hook codex post_tool` }],

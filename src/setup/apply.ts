@@ -21,6 +21,7 @@ interface Manifest {
   createdDirs: string[];
   /** Hook commands and MCP entries setup wrote, so removal never touches look-alikes. */
   installed?: string[];
+  originals?: Record<string, { before: string | null; after: string | null }>;
 }
 
 function manifestPath(root: string): string {
@@ -54,6 +55,10 @@ function stripBlock(text: string): string {
 }
 
 function transform(edit: Edit, before: string | null, mode: 'add' | 'remove', known: Set<string>): string | null {
+  if (edit.kind === 'skill') {
+    if (mode === 'remove') return known.has(`skill:${before}`) ? null : before;
+    return before === null || known.has(`skill:${before}`) ? edit.content : before;
+  }
   if (edit.kind === 'block') {
     const base = stripBlock(before ?? '');
     if (mode === 'remove') return before === null ? null : base;
@@ -97,13 +102,15 @@ export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'r
     for (const edit of t.edits) {
       const before = read(edit.file);
       const installed = new Set(installedIn(manifest, edit.file));
-      const owned = edit.kind !== 'json' ? [] : typeof edit.owned === 'function' ? edit.owned(parseOrEmpty(before), installed) : edit.owned;
+      const owned = edit.kind === 'skill' ? (before === null || installed.has(`skill:${before}`) ? [`skill:${edit.content}`] : []) : edit.kind !== 'json' ? [] : typeof edit.owned === 'function' ? edit.owned(parseOrEmpty(before), installed) : edit.owned;
       const known = new Set([...installed, ...owned]);
       let after = transform(edit, before, mode, known);
+      const original = manifest.originals?.[edit.file];
+      if (mode === 'remove' && original && before === original.after) after = original.before;
       let action: PlannedChange['action'];
       if (mode === 'add') action = before === null ? 'create' : after === before ? 'unchanged' : 'update';
       else {
-        const empty = after !== null && (after.trim() === '{}' || after.trim() === '');
+        const empty = after === null || after.trim() === '{}' || after.trim() === '';
         if (before === null) action = 'unchanged';
         else if (empty && manifest.created.includes(edit.file)) {
           action = 'delete';
@@ -125,8 +132,11 @@ function mkdirTracked(dir: string, manifest: Manifest): void {
 
 export function applySetup(root: string, changes: PlannedChange[], mode: 'add' | 'remove'): void {
   const manifest = readManifest(root);
+  manifest.originals ??= {};
   for (const c of changes) {
     if (c.action === 'unchanged') continue;
+    if (mode === 'add') manifest.originals[c.file] = { before: manifest.originals[c.file] ? manifest.originals[c.file]!.before : c.before, after: c.after };
+    else delete manifest.originals[c.file];
     if (c.action === 'delete') {
       rmSync(c.file, { force: true });
       manifest.created = manifest.created.filter((f) => f !== c.file);

@@ -190,6 +190,10 @@ describe('output trimmer', () => {
     expect(readFileSync(result.logPath, 'utf8')).toContain('progress 0'); expect(readLedger(root, 'test').guards.outputTrimmer?.tokensSaved).toBeGreaterThan(0);
     const failed = await runCommand(root, 'this_command_does_not_exist_gw', undefined, root); expect(failed.exitCode).not.toBe(0); expect(failed.output).toMatch(/not found/);
   });
+  it('run uses bash for bash-specific shell syntax', async () => {
+    const result = await runCommand(root, '[[ 2 -gt 1 ]] && printf bash-ok', undefined, root);
+    expect(result.exitCode).toBe(0); expect(result.output).toContain('bash-ok');
+  });
 });
 
 describe('exploration and summary', () => {

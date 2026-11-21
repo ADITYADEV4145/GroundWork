@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { closeSync, mkdirSync, openSync, readFileSync } from 'node:fs';
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Command } from 'commander';
 import { loadConfig } from '../../config/load.js';
@@ -20,7 +20,7 @@ export async function runCommand(root: string, command: string, sessionId?: stri
   let signal: NodeJS.Signals | null = null;
   try {
     const result = await new Promise<{ code: number; signal: NodeJS.Signals | null }>((resolve, reject) => {
-      const child = spawn(info.command, { shell: true, cwd, stdio: ['inherit', fd, fd] });
+      const child = spawn(info.command, { shell: existsSync('/bin/bash') ? '/bin/bash' : true, cwd, stdio: ['inherit', fd, fd] });
       child.on('error', reject);
       child.on('close', (code, sig) => resolve({ code: code ?? (sig ? 128 + ({ SIGINT: 2, SIGTERM: 15, SIGKILL: 9 }[sig as 'SIGINT'] ?? 1) : 1), signal: sig }));
     });

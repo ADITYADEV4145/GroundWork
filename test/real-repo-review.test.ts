@@ -5,13 +5,13 @@ import { evaluateRealRepoReview } from '../src/selftest/real-repo-review.js';
 import { PHASE3_CHECKS } from '../src/selftest/checks/phase3.js';
 import { monthBounds, project, sampleCommits } from '../scripts/real-repos.js';
 
-describe('deferred real-history gate', () => {
+describe('real-history gate', () => {
   it('reports a skip, without metrics or an acceptance claim, even with only summary/manifests', async () => {
-    const expected = { ok: true, skipped: true, detail: 'skipped: evidence not stored; gate deferred to Benchmark v2' };
+    const expected = { ok: true, skipped: true, detail: 'skipped: Benchmark v2 block-review.json absent; no BLOCK agreement evidence' };
     expect(evaluateRealRepoReview(path.join(project, 'bench/real-repos'))).toEqual(expected);
     expect(evaluateRealRepoReview(path.join(project, 'missing-evidence'))).toEqual(expected);
     const check = PHASE3_CHECKS.find((c) => c.name.startsWith('real-repo BLOCK agreement'))!;
-    expect(check.slow).toBe(true);
+    expect(check.slow).not.toBe(true);
     expect(await check.run({ quick: false, sequences: 1 })).toEqual(expected);
   });
   it('keeps UTC calendar bounds and deterministic endpoint-inclusive sampling reproducible', () => {

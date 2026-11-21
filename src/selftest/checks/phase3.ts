@@ -13,7 +13,7 @@ import { findRepoRoot } from '../../util/paths.js';
 import { checkRepository } from '../../reuse/check.js';
 import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, withCheckScenario, writeScenarioFile } from '../../reuse/scenarios.js';
 import type { Check } from '../registry.js';
-import { evaluateRealRepoReview } from '../real-repo-review.js';
+import { evaluateBenchmarkV2, evaluateRealRepoReview } from '../real-repo-review.js';
 
 export const PHASE3_CHECKS: Check[] = [{
   phase: 3,
@@ -50,10 +50,15 @@ export const PHASE3_CHECKS: Check[] = [{
   },
 }, {
   phase: 3,
-  slow: true,
-  name: 'real-repo BLOCK agreement (deferred to Benchmark v2)',
+  name: 'real-repo BLOCK agreement >= 90% on >=10 reviewed findings',
   async run() {
-    return evaluateRealRepoReview(fileURLToPath(new URL('../../../bench/real-repos/', import.meta.url)));
+    return evaluateRealRepoReview(fileURLToPath(new URL('../../../bench/reuse-v2/', import.meta.url)));
+  },
+}, {
+  phase: 3,
+  name: 'Benchmark v2: duplicates drop, success holds',
+  async run() {
+    return evaluateBenchmarkV2(fileURLToPath(new URL('../../../bench/reuse-v2/', import.meta.url)));
   },
 }, ...CHECK_SCENARIOS.map((name): Check => ({
   phase: 3,

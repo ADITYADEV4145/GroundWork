@@ -12,8 +12,10 @@ const text = z.string().trim().min(1).max(256).refine(printable, 'Control charac
 const pathInput = z.string().min(1).refine((s) => printable(s) && Buffer.byteLength(JSON.stringify(s)) <= 900, 'Use a short printable repository path');
 const offset = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0);
 const symbol = text.describe('Exact symbol name, repo-relative file:qualifiedName, or indexed symbol ID.');
-const limit = (n: number) => z.number().int().min(1).max(100).default(n);
+const pageSize = z.number().int().min(1).max(100);
+const limit = (n: number) => pageSize.default(n);
 const kinds = z.enum(['function', 'method', 'class', 'interface', 'type', 'enum', 'constant', 'variable', 'component', 'dataclass']);
+const locationsOnly = z.boolean().default(false).describe('Return only symbol locations and IDs, without signatures or documentation.');
 
 function compact(s: string, length = 180): string {
   const val = s.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -73,23 +75,24 @@ function oneSymbol<T extends { symbol: string; offset: number }>(
 
 const findCodeTool = defineTool({
   name: 'find_code',
-  description: 'Find code by name, signature, documentation or path before grepping; returns ranked symbols and their IDs.',
-  inputSchema: { query: text, kind: kinds.optional(), limit: limit(8), offset },
+  description: 'Find code by name, signature, documentation or path. Use locations_only for a short ranked list when locating definitions.',
+  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, offset },
   handler(args, { db }) {
     const items = findCode(db, args.query, args.kind);
     return page({
       items, title: items.length ? `Code matches (${items.length}):` : 'No indexed matches. Try a different name or search plain text with your normal tools.',
-      start: args.offset, count: args.limit, budget: NAVIGATION_BUDGETS.find_code,
-      render: (s) => `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
-      next: (offset) => call('find_code', { ...args, offset }),
+      start: args.offset, count: args.limit ?? (args.locations_only ? 3 : 8), budget: NAVIGATION_BUDGETS.find_code,
+      render: (s) => args.locations_only ? choice(s) :
+        `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
+      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only || undefined, offset }),
     });
   },
 });
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List a file’s indexed symbol signatures and line ranges without reading bodies. Use a repository-relative path.',
-  inputSchema: { file: pathInput, offset },
+  description: 'List a file’s symbols and line ranges without reading bodies. Use locations_only to omit signatures.',
+  inputSchema: { file: pathInput, locations_only: locationsOnly, offset },
   handler(args, { root, db }) {
     const file = repoRelative(root, args.file);
     const entry = file ? fileOutline(db, file) : null;
@@ -97,8 +100,8 @@ const outlineTool = defineTool({
     const title = `${prefixBytes(compact(file!, 100), 250)} (${entry.lines} lines; ${entry.symbols.length} symbols${entry.status === 'ok' ? '' : `; ${entry.status}${entry.reason ? `: ${entry.reason}` : ''}`})`;
     return page({
       items: entry.symbols, title, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
-      render: (s) => `[${s.id}] ${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind}): ${compact(s.signature)}`,
-      next: (offset) => call('outline', { ...args, offset }),
+      render: (s) => `[${s.id}] ${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind})${args.locations_only ? '' : ': ' + compact(s.signature)}`,
+      next: (offset) => call('outline', { ...args, locations_only: args.locations_only || undefined, offset }),
     });
   },
 });
@@ -186,8 +189,8 @@ interface MapEntry {
 
 const repoMapTool = defineTool({
   name: 'repo_map',
-  description: 'Orient in the indexed repo with a ranked directory tree and each file’s top symbols. Narrow by path to explore.',
-  inputSchema: { path: pathInput.optional(), depth: z.number().int().min(1).max(8).default(2), offset },
+  description: 'Orient in an unfamiliar area with a ranked tree and top symbols. Use depth 1 for a quick overview, or narrow by path.',
+  inputSchema: { path: pathInput.optional(), depth: z.number().int().min(1).max(8).default(2), limit: limit(12), offset },
   handler(args, { root, db }) {
     const scope = repoRelative(root, args.path ?? '.');
     if (scope === null) return 'Use a path inside the repository.';
@@ -217,9 +220,9 @@ const repoMapTool = defineTool({
       }
     }
     visit(top, 0);
-    const title = `Map: ${compact(scope || '.', 90)} (${files.length} indexed files, depth ${args.depth}). Narrow with repo_map({"path":"folder"}).`;
+    const title = `Map: ${compact(scope || '.', 90)} (${files.length} indexed files, depth ${args.depth}). Narrow by path.`;
     return page({
-      items, title, start: args.offset, budget: NAVIGATION_BUDGETS.repo_map,
+      items, title, start: args.offset, count: args.limit, budget: NAVIGATION_BUDGETS.repo_map,
       render: ({ node, depth }) => `${'  '.repeat(depth)}${compact(node.path, 160)}${node.symbols ? (node.symbols.length ? ` — ${node.symbols.map((s) => compact(s, 60)).join(', ')}` : '') : '/'}`,
       next: (offset) => call('repo_map', { ...args, offset }),
     });

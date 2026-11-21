@@ -62,6 +62,7 @@ export const packagingChecks: Check[] = [
     } finally { rmSync(s.base, { recursive: true, force: true }); }
   } },
   { phase: 5, name: 'packed fresh-prefix install + three-agent setup + doctor < 180 s', slow: true, async run() {
+    if (process.env.GW_SELFTEST_INSTALL !== '1') return { ok: true, skipped: true, detail: 'requires network for an empty-cache npm install; opt in with GW_SELFTEST_INSTALL=1 (enabled by the source npm run selftest gate)' };
     const s = sandbox();
     const start = performance.now();
     const run = (command: string, args: string[], cwd = s.root) => execFileSync(command, args, { cwd, env: s.env, encoding: 'utf8', timeout: Math.max(1, Math.floor(180000 - (performance.now() - start))), maxBuffer: 10 * 1024 * 1024 });

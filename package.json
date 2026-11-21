@@ -39,7 +39,7 @@
     "typecheck": "tsc -p tsconfig.scripts.json",
     "test": "vitest run",
     "gw": "node --import tsx src/cli/main.ts",
-    "selftest": "node --import tsx src/cli/main.ts selftest",
+    "selftest": "GW_SELFTEST_INSTALL=1 node --import tsx src/cli/main.ts selftest",
     "golden": "node --import tsx scripts/update-golden.ts",
     "calibrate": "node --import tsx scripts/calibrate.ts",
     "prepublishOnly": "npm run build && npm test"

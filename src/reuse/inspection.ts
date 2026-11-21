@@ -24,7 +24,7 @@ export function inspectSource(source: string, language: Language) {
       const statement = statements[0];
       const expression = statement?.firstNamedChild ?? null;
       if (statements.length === 1 && ((statement?.type === 'return_statement' && plainReference(expression)) ||
-        (statement?.type === 'expression_statement' && expression?.type === 'assignment_expression' &&
+        (statement?.type === 'expression_statement' && !!expression && ['assignment_expression', 'assignment'].includes(expression.type) &&
           plainReference(expression.childForFieldName('left')) && plainReference(expression.childForFieldName('right')))))
         trivialAccessors.push({ start: n.startIndex, end: n.endIndex });
     }

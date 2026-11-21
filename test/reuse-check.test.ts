@@ -10,6 +10,7 @@ import { readFingerprintedSymbols } from '../src/index/query.js';
 import { indexDbPath } from '../src/index/store.js';
 import { checkRepository, formatCheck, formatFinding } from '../src/reuse/check.js';
 import { CandidateIndex } from '../src/reuse/candidates.js';
+import { inspectSource } from '../src/reuse/inspection.js';
 import { thresholds } from '../src/reuse/model.js';
 import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, scenarioGit, stopEvent, withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
 import { openDb } from '../src/store/db.js';
@@ -53,6 +54,19 @@ describe('git-scripted reuse check scenarios (also exercised by selftest)', () =
     await withCheckScenario('generated', async (root) => {
       const config = defaultConfig(); config.index.skipGenerated = false;
       expect((await checkRepository(root, { config })).findings).toEqual([]);
+    });
+  });
+
+  it('skips trivial Python property getters and setters, not validating setters', async () => {
+    await withCheckScenario('clean', async (root) => {
+      await checkRepository(root);
+      const source = 'class Settings:\n    @property\n    def current(self):\n        return self.workspace.runtime.profile.preferences.appearance.color.primary.active\n    @current.setter\n    def current(self, value):\n        self.workspace.runtime.profile.preferences.appearance.color.primary.active = value\n';
+      expect(inspectSource(source, 'python').trivialAccessors).toHaveLength(2);
+      const validating = source.replace('        self.workspace', '        assert value is not None\n        self.workspace');
+      expect(inspectSource(validating, 'python').trivialAccessors).toHaveLength(1);
+      expect(inspectSource('class Empty:\n    pass\n', 'python').trivialAccessors).toEqual([]);
+      writeScenarioFile(root, 'settings.py', source + '\n' + source.replace('class Settings:', 'class OtherSettings:'));
+      expect((await checkRepository(root)).findings.filter((f) => f.added.file === 'settings.py')).toEqual([]);
     });
   });
 

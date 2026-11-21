@@ -1,0 +1,225 @@
+import picomatch from 'picomatch';
+import type { Db, Row } from '../store/db.js';
+import { splitWords } from '../extract/fingerprint.js';
+import type { Param, SymbolKind } from '../types.js';
+
+// Read-side API over the index. Every later phase (MCP tools, hooks, gates) should go through here.
+
+export interface SymbolHit {
+  id: string;
+  name: string;
+  qualifiedName: string;
+  kind: SymbolKind;
+  file: string;
+  line: number;
+  endLine: number;
+  signature: string;
+  exported: boolean;
+  isTest: boolean;
+  score: number;
+}
+
+export interface SearchOptions {
+  kinds?: SymbolKind[];
+  limit?: number;
+  pathGlob?: string;
+  includeTests?: boolean;
+}
+
+const HIT_COLS = `s.id, s.name, s.qualified_name, s.kind, s.start_line, s.end_line, s.signature, s.exported, f.path, f.is_test`;
+
+function toHit(r: Row, score = 0): SymbolHit {
+  return {
+    id: String(r.id),
+    name: String(r.name),
+    qualifiedName: String(r.qualified_name),
+    kind: String(r.kind) as SymbolKind,
+    file: String(r.path),
+    line: Number(r.start_line),
+    endLine: Number(r.end_line),
+    signature: String(r.signature),
+    exported: Number(r.exported) === 1,
+    isTest: Number(r.is_test) === 1,
+    score,
+  };
+}
+
+function ftsQuery(words: string[]): string {
+  return words.map((w) => `"${w.replace(/"/g, '')}"*`).join(' OR ');
+}
+
+/** Ranked symbol search: exact and prefix name matches first, then word overlap over names, docs and paths. */
+export function searchSymbols(db: Db, query: string, opts: SearchOptions = {}): SymbolHit[] {
+  const q = query.trim();
+  if (!q) return [];
+  const limit = opts.limit ?? 20;
+  const words = [...new Set(splitWords(q))];
+  const rows = new Map<string, Row>();
+  const add = (rs: Row[]) => rs.forEach((r) => rows.set(String(r.id), r));
+  add(db.prepare(`SELECT ${HIT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.name = ? OR s.qualified_name = ? LIMIT 200`).all(q, q));
+  add(db.prepare(`SELECT ${HIT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.name LIKE ? ESCAPE '\\' LIMIT 200`).all(`${q.replace(/[%_\\]/g, (c) => `\\${c}`)}%`));
+  if (words.length) {
+    try {
+      add(
+        db
+          .prepare(`SELECT ${HIT_COLS} FROM symbols_fts x JOIN symbols s ON s.rowid = x.rowid JOIN files f ON f.id = s.file_id WHERE symbols_fts MATCH ? LIMIT 500`)
+          .all(ftsQuery(words)),
+      );
+    } catch {
+      // malformed FTS query: fall back to name matches only
+    }
+  }
+  const ql = q.toLowerCase();
+  const glob = opts.pathGlob ? picomatch(opts.pathGlob, { dot: true }) : null;
+  const hits: SymbolHit[] = [];
+  for (const r of rows.values()) {
+    const h = toHit(r);
+    if (opts.kinds && !opts.kinds.includes(h.kind)) continue;
+    if (glob && !glob(h.file)) continue;
+    if (h.isTest && opts.includeTests === false) continue;
+    const name = h.name.toLowerCase();
+    let score = 0;
+    if (name === ql || h.qualifiedName.toLowerCase() === ql) score += 100;
+    else if (name.startsWith(ql)) score += 60;
+    else if (h.qualifiedName.toLowerCase().includes(ql)) score += 40;
+    const nameWords = new Set(splitWords(h.qualifiedName));
+    const pathWords = new Set(splitWords(h.file));
+    if (words.length) {
+      const inName = words.filter((w) => [...nameWords].some((n) => n.startsWith(w))).length;
+      const inPath = words.filter((w) => pathWords.has(w)).length;
+      score += (30 * inName) / words.length + (8 * inPath) / words.length;
+    }
+    if (h.exported) score += 3;
+    if (h.isTest) score -= 10;
+    if (h.kind === 'variable') score -= 2;
+    h.score = Math.round(score * 10) / 10;
+    if (h.score > 0) hits.push(h);
+  }
+  hits.sort((a, b) => b.score - a.score || a.file.localeCompare(b.file) || a.line - b.line);
+  return hits.slice(0, limit);
+}
+
+export interface SymbolDetail extends SymbolHit {
+  params: Param[];
+  returnType: string | null;
+  minArity: number;
+  maxArity: number | null;
+  docstring: string | null;
+  decorators: string[];
+  isAsync: boolean;
+  isDefaultExport: boolean;
+  parent: string | null;
+  members: { name: string; kind: SymbolKind; line: number }[];
+  callers: { file: string; line: number; caller: string | null; confidence: string | null }[];
+  callersTotal: number;
+  callees: { name: string; line: number; target: string | null; confidence: string | null }[];
+}
+
+/**
+ * Look a symbol up by id, `file:name`, qualified name or plain name. Returns every match when the
+ * reference is ambiguous so the caller can list them.
+ */
+export function findSymbols(db: Db, ref: string): SymbolHit[] {
+  const byId = db.prepare(`SELECT ${HIT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.id = ?`).all(ref);
+  if (byId.length) return byId.map((r) => toHit(r));
+  const colon = ref.lastIndexOf(':');
+  if (colon > 0) {
+    const file = ref.slice(0, colon);
+    const name = ref.slice(colon + 1);
+    const rs = db
+      .prepare(`SELECT ${HIT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE (f.path = ? OR f.path LIKE ?) AND (s.qualified_name = ? OR s.name = ?)`)
+      .all(file, `%/${file}`, name, name);
+    if (rs.length) return rs.map((r) => toHit(r));
+  }
+  const q = db.prepare(`SELECT ${HIT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.qualified_name = ? ORDER BY f.is_test, f.path`).all(ref);
+  if (q.length) return q.map((r) => toHit(r));
+  return db.prepare(`SELECT ${HIT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.name = ? ORDER BY f.is_test, s.exported DESC, f.path`).all(ref).map((r) => toHit(r));
+}
+
+export function getSymbolDetail(db: Db, id: string, maxCallers = 20): SymbolDetail | null {
+  const r = db.prepare(`SELECT s.*, f.path, f.is_test FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.id = ?`).get(id);
+  if (!r) return null;
+  const parent = r.parent_id ? db.prepare('SELECT qualified_name FROM symbols WHERE id = ?').get(String(r.parent_id)) : undefined;
+  const callersTotal = Number(db.prepare('SELECT COUNT(*) n FROM calls WHERE callee_id = ?').get(id)?.n ?? 0);
+  return {
+    ...toHit(r),
+    params: JSON.parse(String(r.params_json)) as Param[],
+    returnType: r.return_type === null ? null : String(r.return_type),
+    minArity: Number(r.min_arity),
+    maxArity: r.max_arity === null ? null : Number(r.max_arity),
+    docstring: r.docstring === null ? null : String(r.docstring),
+    decorators: JSON.parse(String(r.decorators_json)) as string[],
+    isAsync: Number(r.is_async) === 1,
+    isDefaultExport: Number(r.is_default_export) === 1,
+    parent: parent ? String(parent.qualified_name) : null,
+    members: db
+      .prepare('SELECT name, kind, start_line FROM symbols WHERE parent_id = ? ORDER BY start_line')
+      .all(id)
+      .map((m) => ({ name: String(m.name), kind: String(m.kind) as SymbolKind, line: Number(m.start_line) })),
+    callers: db
+      .prepare(
+        `SELECT f.path, c.line, s.qualified_name caller, c.confidence FROM calls c JOIN files f ON f.id = c.file_id
+         LEFT JOIN symbols s ON s.id = c.caller_id WHERE c.callee_id = ? ORDER BY f.is_test, f.path, c.line LIMIT ?`,
+      )
+      .all(id, maxCallers)
+      .map((c) => ({ file: String(c.path), line: Number(c.line), caller: c.caller === null ? null : String(c.caller), confidence: c.confidence === null ? null : String(c.confidence) })),
+    callersTotal,
+    callees: db
+      .prepare(
+        `SELECT c.callee_text, c.line, t.qualified_name target, c.confidence FROM calls c LEFT JOIN symbols t ON t.id = c.callee_id
+         WHERE c.caller_id = ? ORDER BY c.line LIMIT 50`,
+      )
+      .all(id)
+      .map((c) => ({ name: String(c.callee_text), line: Number(c.line), target: c.target === null ? null : String(c.target), confidence: c.confidence === null ? null : String(c.confidence) })),
+  };
+}
+
+export interface IndexStats {
+  files: number;
+  filesByLanguage: Record<string, number>;
+  filesSkipped: number;
+  filesPartial: number;
+  lines: number;
+  symbols: number;
+  symbolsByKind: Record<string, number>;
+  imports: number;
+  importsInternal: number;
+  importsResolved: number;
+  importsExternal: number;
+  calls: number;
+  callsByConfidence: Record<string, number>;
+  literals: number;
+  lastRefresh: number | null;
+  backend: string;
+}
+
+function groupCount(db: Db, sql: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const r of db.prepare(sql).all()) out[String(r.k ?? 'null')] = Number(r.n);
+  return out;
+}
+
+export function indexStats(db: Db): IndexStats {
+  const one = (sql: string) => Number(db.prepare(sql).get()?.n ?? 0);
+  const last = db.prepare("SELECT value FROM meta WHERE key = 'last_refresh'").get();
+  const importsExternal = one("SELECT COUNT(*) n FROM imports WHERE unresolved_reason = 'external'");
+  const imports = one('SELECT COUNT(*) n FROM imports');
+  return {
+    files: one('SELECT COUNT(*) n FROM files'),
+    filesByLanguage: groupCount(db, 'SELECT language k, COUNT(*) n FROM files GROUP BY language'),
+    filesSkipped: one("SELECT COUNT(*) n FROM files WHERE status = 'skipped'"),
+    filesPartial: one("SELECT COUNT(*) n FROM files WHERE status = 'partial'"),
+    lines: one('SELECT COALESCE(SUM(lines), 0) n FROM files'),
+    symbols: one('SELECT COUNT(*) n FROM symbols'),
+    symbolsByKind: groupCount(db, 'SELECT kind k, COUNT(*) n FROM symbols GROUP BY kind'),
+    imports,
+    importsInternal: imports - importsExternal,
+    importsResolved: one('SELECT COUNT(*) n FROM imports WHERE resolved_file_id IS NOT NULL'),
+    importsExternal,
+    calls: one('SELECT COUNT(*) n FROM calls'),
+    callsByConfidence: groupCount(db, 'SELECT confidence k, COUNT(*) n FROM calls GROUP BY confidence'),
+    literals: one('SELECT COUNT(*) n FROM literals'),
+    lastRefresh: last ? Number(last.value) : null,
+    backend: db.backend,
+  };
+}

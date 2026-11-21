@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +10,7 @@ import { refreshIndex } from '../src/index/refresh.js';
 import { indexDbPath } from '../src/index/store.js';
 import { FIXTURE_NAVIGATION, runNavigationTool } from '../src/selftest/checks/phase2.js';
 import { tempDir, withIndexedFixture } from '../src/selftest/fixtures.js';
-import { initSqlBackend, openDb } from '../src/store/db.js';
+import { initSqlBackend, openDb, sqliteBackendAvailable } from '../src/store/db.js';
 
 const config = defaultConfig();
 
@@ -102,4 +103,25 @@ describe('MCP navigation', () => {
       rmSync(root, { recursive: true, force: true });
     }
   }, 15_000);
+
+  it.skipIf(sqliteBackendAvailable() !== 'node:sqlite')('searches an FTS4 index built by sql.js after switching to native SQLite', async () => {
+    const root = tempDir('gw-nav-backend-');
+    try {
+      writeFileSync(path.join(root, 'app.py'), 'def send():\n    """Deliver the message."""\n    pass\n');
+      execFileSync(process.execPath, ['--import', import.meta.resolve('tsx'),
+        fileURLToPath(new URL('../src/cli/main.ts', import.meta.url)), '--root', root, 'index'], {
+        env: { ...process.env, GW_FORCE_SQLJS: '1' },
+      });
+      await initSqlBackend();
+      await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        expect(await runNavigationTool('find_code', { query: 'deliv' }, { root, db, config })).toContain('Deliver the message.');
+      } finally {
+        db.close();
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
 });

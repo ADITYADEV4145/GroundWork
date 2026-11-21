@@ -1,6 +1,5 @@
 import { splitWords } from '../extract/fingerprint.js';
 import type { Db, Row } from '../store/db.js';
-import { readMeta } from '../store/schema.js';
 import type { SymbolKind } from '../types.js';
 
 export interface NavigationSymbol {
@@ -41,7 +40,9 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
     ORDER BY f.path, s.start_line, s.id`).all(q, escaped + '%', ...filterArgs);
   const candidates = new Map(names.map((r) => [String(r.id), r]));
   if (words.length) {
-    const fts5 = readMeta(db, 'fts') === 'fts5';
+    // A sql.js-created FTS4 table can survive a switch to native SQLite even when refresh labels it FTS5.
+    const schema = db.prepare("SELECT sql FROM sqlite_master WHERE name = 'symbols_fts' AND type = 'table'").get();
+    const fts5 = /\bUSING\s+fts5\s*\(/i.test(String(schema?.sql ?? ''));
     // splitWords emits alphanumerics only; FTS4 expects the wildcard inside the quoted token.
     const terms = words.map((w) => fts5 ? `"${w}"*` : `"${w}*"`).join(' OR ');
     const rows = db.prepare(`${select}, ${fts5 ? 'bm25(symbols_fts, 0, 5, 2, 2, 1)' : '0'} rank

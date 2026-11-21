@@ -223,3 +223,162 @@ export function indexStats(db: Db): IndexStats {
     backend: db.backend,
   };
 }
+
+// --- Grounding reads (Phase 4): raw per-file facts the call verifier needs.
+
+export interface FileFacts {
+  id: number;
+  path: string;
+  language: string | null;
+  status: string;
+  isTest: boolean;
+  isGenerated: boolean;
+}
+
+export interface ImportFact {
+  module: string;
+  name: string;
+  alias: string | null;
+  kind: string;
+  line: number;
+  isTypeOnly: boolean;
+  resolvedFileId: number | null;
+  unresolvedReason: string | null;
+}
+
+export interface CallFact {
+  callerId: string | null;
+  calleeText: string;
+  calleeName: string;
+  line: number;
+  column: number;
+  argCount: number;
+  keywordArgs: string[];
+  hasSpread: boolean;
+  calleeId: string | null;
+  confidence: string | null;
+}
+
+export interface SymbolFact {
+  id: string;
+  fileId: number;
+  file: string;
+  name: string;
+  qualifiedName: string;
+  kind: SymbolKind;
+  line: number;
+  endLine: number;
+  startByte: number;
+  endByte: number;
+  signature: string;
+  params: Param[];
+  minArity: number;
+  maxArity: number | null;
+  decorators: string[];
+  exported: boolean;
+  isDefaultExport: boolean;
+  parentId: string | null;
+}
+
+const FACT_COLS = `s.id, s.file_id, f.path, s.name, s.qualified_name, s.kind, s.start_line, s.end_line, s.start_byte, s.end_byte, s.signature,
+  s.params_json, s.min_arity, s.max_arity, s.decorators_json, s.exported, s.is_default_export, s.parent_id`;
+
+function toFact(r: Row): SymbolFact {
+  return {
+    id: String(r.id),
+    fileId: Number(r.file_id),
+    file: String(r.path),
+    name: String(r.name),
+    qualifiedName: String(r.qualified_name),
+    kind: String(r.kind) as SymbolKind,
+    line: Number(r.start_line),
+    endLine: Number(r.end_line),
+    startByte: Number(r.start_byte),
+    endByte: Number(r.end_byte),
+    signature: String(r.signature),
+    params: JSON.parse(String(r.params_json)) as Param[],
+    minArity: Number(r.min_arity),
+    maxArity: r.max_arity === null ? null : Number(r.max_arity),
+    decorators: JSON.parse(String(r.decorators_json)) as string[],
+    exported: Number(r.exported) === 1,
+    isDefaultExport: Number(r.is_default_export) === 1,
+    parentId: r.parent_id === null ? null : String(r.parent_id),
+  };
+}
+
+function toFileFacts(r: Row): FileFacts {
+  return {
+    id: Number(r.id),
+    path: String(r.path),
+    language: r.language === null ? null : String(r.language),
+    status: String(r.status),
+    isTest: Number(r.is_test) === 1,
+    isGenerated: Number(r.is_generated) === 1,
+  };
+}
+
+export function fileFacts(db: Db, ref: string | number): FileFacts | null {
+  const r =
+    typeof ref === 'number'
+      ? db.prepare('SELECT id, path, language, status, is_test, is_generated FROM files WHERE id = ?').get(ref)
+      : db.prepare('SELECT id, path, language, status, is_test, is_generated FROM files WHERE path = ?').get(ref);
+  return r ? toFileFacts(r) : null;
+}
+
+export function importFacts(db: Db, fileId: number): ImportFact[] {
+  return db
+    .prepare('SELECT module, name, alias, kind, line, is_type_only, resolved_file_id, unresolved_reason FROM imports WHERE file_id = ? ORDER BY line, id')
+    .all(fileId)
+    .map((r) => ({
+      module: String(r.module),
+      name: String(r.name),
+      alias: r.alias === null ? null : String(r.alias),
+      kind: String(r.kind),
+      line: Number(r.line),
+      isTypeOnly: Number(r.is_type_only) === 1,
+      resolvedFileId: r.resolved_file_id === null ? null : Number(r.resolved_file_id),
+      unresolvedReason: r.unresolved_reason === null ? null : String(r.unresolved_reason),
+    }));
+}
+
+export function callFacts(db: Db, fileId: number): CallFact[] {
+  return db
+    .prepare('SELECT caller_id, callee_text, callee_name, line, col, arg_count, keyword_args_json, has_spread, callee_id, confidence FROM calls WHERE file_id = ? ORDER BY line, col')
+    .all(fileId)
+    .map((r) => ({
+      callerId: r.caller_id === null ? null : String(r.caller_id),
+      calleeText: String(r.callee_text),
+      calleeName: String(r.callee_name),
+      line: Number(r.line),
+      column: Number(r.col),
+      argCount: Number(r.arg_count),
+      keywordArgs: JSON.parse(String(r.keyword_args_json)) as string[],
+      hasSpread: Number(r.has_spread) === 1,
+      calleeId: r.callee_id === null ? null : String(r.callee_id),
+      confidence: r.confidence === null ? null : String(r.confidence),
+    }));
+}
+
+export function symbolFact(db: Db, id: string): SymbolFact | null {
+  const r = db.prepare(`SELECT ${FACT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.id = ?`).get(id);
+  return r ? toFact(r) : null;
+}
+
+/** Top-level symbols of a file (parent_id IS NULL), in source order. */
+export function topLevelFacts(db: Db, fileId: number): SymbolFact[] {
+  return db.prepare(`SELECT ${FACT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.file_id = ? AND s.parent_id IS NULL ORDER BY s.start_line`).all(fileId).map(toFact);
+}
+
+export function memberFacts(db: Db, parentId: string): SymbolFact[] {
+  return db.prepare(`SELECT ${FACT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.parent_id = ? ORDER BY s.start_line`).all(parentId).map(toFact);
+}
+
+export function exportAliasFacts(db: Db, fileId: number): { local: string; exported: string }[] {
+  return db.prepare('SELECT local_name, exported_name FROM export_aliases WHERE file_id = ?').all(fileId).map((r) => ({ local: String(r.local_name), exported: String(r.exported_name) }));
+}
+
+/** Every named symbol, for "did you mean" ranking. Cheap enough to scan: ~10k rows on a 100k-line repo. */
+export function suggestionPool(db: Db, kinds: SymbolKind[]): SymbolFact[] {
+  const marks = kinds.map(() => '?').join(',');
+  return db.prepare(`SELECT ${FACT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.kind IN (${marks}) AND f.is_test = 0`).all(...kinds).map(toFact);
+}

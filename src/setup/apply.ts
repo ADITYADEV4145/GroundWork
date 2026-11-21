@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, rmdirSync, rmSync, writeFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 import { BLOCK_END, BLOCK_START, type AgentTarget, type Edit } from './targets.js';
 import { gwPath } from '../util/paths.js';
 
@@ -14,6 +15,7 @@ export interface PlannedChange {
   after: string | null;
   /** Entry keys this change writes, recorded so later runs recognise them. */
   owned: string[];
+  restoreBefore: string | null;
 }
 
 interface Manifest {
@@ -21,6 +23,7 @@ interface Manifest {
   createdDirs: string[];
   /** Hook commands and MCP entries setup wrote, so removal never touches look-alikes. */
   installed?: string[];
+  originals?: Record<string, { before: string | null; after: string | null }>;
 }
 
 function manifestPath(root: string): string {
@@ -54,6 +57,10 @@ function stripBlock(text: string): string {
 }
 
 function transform(edit: Edit, before: string | null, mode: 'add' | 'remove', known: Set<string>): string | null {
+  if (edit.kind === 'skill') {
+    if (mode === 'remove') return known.has(`skill:${before}`) ? null : before;
+    return before === null || known.has(`skill:${before}`) ? edit.content : before;
+  }
   if (edit.kind === 'block') {
     const base = stripBlock(before ?? '');
     if (mode === 'remove') return before === null ? null : base;
@@ -75,6 +82,10 @@ function transform(edit: Edit, before: string | null, mode: 'add' | 'remove', kn
   else edit.remove(doc, known);
   if (mode === 'remove' && before === null) return null;
   if (before !== null && JSON.stringify(doc) === original) return before;
+  return formatJson(doc, before);
+}
+
+function formatJson(doc: unknown, before: string | null): string {
   // Keep the file's own indentation and trailing newline so add + remove round-trips byte for byte.
   const indent = before ? (/\n([ \t]+)\S/.exec(before)?.[1] ?? 2) : 2;
   const eol = before === null || before.endsWith('\n') ? '\n' : '';
@@ -90,6 +101,56 @@ function parseOrEmpty(text: string | null): Record<string, unknown> {
   }
 }
 
+function mergeEdits(original: unknown, previous: unknown, current: unknown): unknown {
+  if (isDeepStrictEqual(previous, current)) return original;
+  if (isDeepStrictEqual(original, previous)) return current;
+  if (Array.isArray(current) && (previous === undefined || Array.isArray(previous)) && (original === undefined || Array.isArray(original))) {
+    const prior: unknown[] = previous ?? [];
+    const kept: unknown[] = [...(original ?? [])];
+    const remaining = [...current];
+    for (const item of prior) {
+      const present = remaining.findIndex((value) => isDeepStrictEqual(value, item));
+      if (present >= 0) remaining.splice(present, 1);
+      else {
+        const removed = kept.findIndex((value) => isDeepStrictEqual(value, item));
+        if (removed >= 0) kept.splice(removed, 1);
+      }
+    }
+    const ordered: unknown[] = [];
+    for (const item of current) {
+      const retained = kept.findIndex((value) => isDeepStrictEqual(value, item));
+      const added = remaining.findIndex((value) => isDeepStrictEqual(value, item));
+      if (retained >= 0) {
+        ordered.push(...kept.splice(retained, 1));
+      } else if (added >= 0) {
+        ordered.push(...remaining.splice(added, 1));
+      }
+    }
+    for (const item of kept) {
+      const index = (original ?? []).findIndex((value: unknown) => isDeepStrictEqual(value, item));
+      ordered.splice(Math.min(index, ordered.length), 0, item);
+    }
+    return ordered;
+  }
+  const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
+  if (object(current) && (previous === undefined || object(previous)) && (original === undefined || object(original))) {
+    const base = original ?? {}, prior = previous ?? {};
+    return Object.fromEntries([...new Set([...Object.keys(base), ...Object.keys(prior), ...Object.keys(current)])].flatMap((key) => {
+      const value = mergeEdits(base[key], prior[key], current[key]);
+      return value === undefined ? [] : [[key, value]];
+    }));
+  }
+  return current;
+}
+
+function restoration(edit: Edit, before: string | null, original: { before: string | null; after: string | null }, installed: Set<string>): string | null {
+  if (before === original.after) return original.before;
+  const current = transform(edit, before, 'remove', installed);
+  if (edit.kind !== 'json') return current;
+  const previous = transform(edit, original.after, 'remove', installed);
+  return formatJson(mergeEdits(parseOrEmpty(original.before), parseOrEmpty(previous), parseOrEmpty(current)), before);
+}
+
 export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'remove'): PlannedChange[] {
   const manifest = readManifest(root);
   const out: PlannedChange[] = [];
@@ -97,20 +158,23 @@ export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'r
     for (const edit of t.edits) {
       const before = read(edit.file);
       const installed = new Set(installedIn(manifest, edit.file));
-      const owned = edit.kind !== 'json' ? [] : typeof edit.owned === 'function' ? edit.owned(parseOrEmpty(before), installed) : edit.owned;
+      const owned = edit.kind === 'skill' ? (before === null || installed.has(`skill:${before}`) ? [`skill:${edit.content}`] : []) : edit.kind !== 'json' ? [] : typeof edit.owned === 'function' ? edit.owned(parseOrEmpty(before), installed) : edit.owned;
       const known = new Set([...installed, ...owned]);
       let after = transform(edit, before, mode, known);
+      const original = manifest.originals?.[edit.file];
+      const restoreBefore = original ? restoration(edit, before, original, installed) : before;
+      if (mode === 'remove' && original) after = restoreBefore;
       let action: PlannedChange['action'];
       if (mode === 'add') action = before === null ? 'create' : after === before ? 'unchanged' : 'update';
       else {
-        const empty = after !== null && (after.trim() === '{}' || after.trim() === '');
+        const empty = after === null || after.trim() === '{}' || after.trim() === '';
         if (before === null) action = 'unchanged';
         else if (empty && manifest.created.includes(edit.file)) {
           action = 'delete';
           after = null;
         } else action = after === before ? 'unchanged' : 'remove';
       }
-      out.push({ agent: t.label, file: edit.file, action, before, after, owned });
+      out.push({ agent: t.label, file: edit.file, action, before, after, owned, restoreBefore });
     }
   return out;
 }
@@ -125,8 +189,11 @@ function mkdirTracked(dir: string, manifest: Manifest): void {
 
 export function applySetup(root: string, changes: PlannedChange[], mode: 'add' | 'remove'): void {
   const manifest = readManifest(root);
+  manifest.originals ??= {};
   for (const c of changes) {
     if (c.action === 'unchanged') continue;
+    if (mode === 'add') manifest.originals[c.file] = { before: c.restoreBefore, after: c.after };
+    else delete manifest.originals[c.file];
     if (c.action === 'delete') {
       rmSync(c.file, { force: true });
       manifest.created = manifest.created.filter((f) => f !== c.file);

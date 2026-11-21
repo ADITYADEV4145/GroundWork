@@ -30,6 +30,28 @@ describe('MCP navigation', () => {
     });
   });
 
+  it('keeps locator views short and pages without switching to signatures', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const query = { query: 'format date', kind: 'function' };
+      const full = await runNavigationTool('find_code', query, ctx);
+      expect(full).toContain('formatDate(d: Date');
+      const locations = await runNavigationTool('find_code', { ...query, locations_only: true }, ctx);
+      expect(locations).toContain('formatDate (function) — src/utils/date.ts:4');
+      expect(locations).not.toContain('formatDate(d: Date');
+      expect(locations.split('\n').filter((row) => row.startsWith('['))).toHaveLength(3);
+      const next = JSON.parse(locations.split('Next: find_code(')[1]!.slice(0, -1));
+      expect(await runNavigationTool('find_code', next, ctx)).toMatch(/joinParts \(function\).*date\.ts:18$/);
+      const outline = await runNavigationTool('outline', { file: 'src/utils/date.ts', locations_only: true }, ctx);
+      expect(outline).toContain('4-6 formatDate (function)');
+      expect(outline).not.toContain('formatDate(d: Date');
+      const map = await runNavigationTool('repo_map', { limit: 1 }, ctx);
+      const cursor = JSON.parse(map.split('Next: repo_map(')[1]!.slice(0, -1));
+      expect(cursor).toMatchObject({ limit: 1, offset: 1 });
+      expect(await runNavigationTool('repo_map', cursor, ctx)).not.toBe(map);
+    });
+  });
+
   it('bounds every response, returns usable cursors, and reads exact UTF-16 ranges', async () => {
     const root = tempDir('gw-nav-budget-');
     try {

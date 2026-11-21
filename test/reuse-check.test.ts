@@ -66,6 +66,18 @@ describe('git-scripted reuse check scenarios (also exercised by selftest)', () =
 });
 
 describe('scope, call provenance and literal provenance', () => {
+  it('never recommends mutable bindings as reusable constants', async () => {
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'mutable.ts', "export let endpoint = 'https://mutable.test/api';\nendpoint = 'https://changed.test/api';\nexport var region = 'mutable-region';\nexport const API_URL = 'https://constant.test/api';\n");
+      writeScenarioFile(root, 'mutable.py', "endpoint = 'https://python.test/api'\nDEFAULT_REGION = 'constant-region'\n");
+      scenarioGit(root, 'add', 'mutable.ts', 'mutable.py');
+      scenarioGit(root, 'commit', '-qm', 'literal binding baseline');
+      writeScenarioFile(root, 'consumer.ts', "const endpoint = 'https://mutable.test/api';\nconst region = 'mutable-region';\nconst pythonEndpoint = 'https://python.test/api';\nconst fixedEndpoint = 'https://constant.test/api';\nconst fixedRegion = 'constant-region';\n");
+      const findings = (await checkRepository(root)).findings.filter((f) => f.kind === 'duplicate-constant');
+      expect(findings.map((f) => f.existing?.symbol)).toEqual(['API_URL', 'DEFAULT_REGION']);
+    });
+  });
+
   it('compares staged, untracked and modified bodies to HEAD; explicit base includes committed changes', async () => {
     await withCheckScenario('duplicate', async (root) => {
       expect((await checkRepository(root)).blocked).toBe(true);

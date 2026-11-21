@@ -204,8 +204,12 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   const beforeLiterals = new Map<string, number>();
   const literalKey = (l: Literal) => `${l.file}\0${l.symbolId ?? '<module>'}\0${literalValue(l)}`;
   for (const l of literalsIn(base.state, base.root)) { const key = literalKey(l); beforeLiterals.set(key, (beforeLiterals.get(key) ?? 0) + 1); }
-  const baseConstants = new Set(base.state.literals.filter((l) => l.constName).map((l) => `${l.file}\0${l.constName}\0${literalValue(l)}`));
-  const constants = state.literals.filter((l) => l.constName && usableFile(l.file) && baseConstants.has(`${l.file}\0${l.constName}\0${literalValue(l)}`));
+  const isConstant = (l: Literal, owners: Map<string, IndexedSymbol>): boolean => {
+    const owner = l.symbolId ? owners.get(l.symbolId) : null;
+    return !!l.constName && owner?.kind === 'constant' && owner.parentId === null;
+  };
+  const baseConstants = new Set(base.state.literals.filter((l) => isConstant(l, baseSymbols)).map((l) => `${l.file}\0${l.constName}\0${literalValue(l)}`));
+  const constants = state.literals.filter((l) => isConstant(l, symbols) && usableFile(l.file) && baseConstants.has(`${l.file}\0${l.constName}\0${literalValue(l)}`));
   for (const l of literalsIn(state, root)) {
     checkDeadline();
     const key = literalKey(l), previous = beforeLiterals.get(key) ?? 0;

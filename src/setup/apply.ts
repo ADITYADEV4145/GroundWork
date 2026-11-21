@@ -103,6 +103,7 @@ function parseOrEmpty(text: string | null): Record<string, unknown> {
 
 function mergeEdits(original: unknown, previous: unknown, current: unknown): unknown {
   if (isDeepStrictEqual(previous, current)) return original;
+  if (isDeepStrictEqual(original, previous)) return current;
   if (Array.isArray(current) && (previous === undefined || Array.isArray(previous)) && (original === undefined || Array.isArray(original))) {
     const prior: unknown[] = previous ?? [];
     const kept: unknown[] = [...(original ?? [])];
@@ -115,7 +116,21 @@ function mergeEdits(original: unknown, previous: unknown, current: unknown): unk
         if (removed >= 0) kept.splice(removed, 1);
       }
     }
-    return [...kept, ...remaining];
+    const ordered: unknown[] = [];
+    for (const item of current) {
+      const retained = kept.findIndex((value) => isDeepStrictEqual(value, item));
+      const added = remaining.findIndex((value) => isDeepStrictEqual(value, item));
+      if (retained >= 0) {
+        ordered.push(...kept.splice(retained, 1));
+      } else if (added >= 0) {
+        ordered.push(...remaining.splice(added, 1));
+      }
+    }
+    for (const item of kept) {
+      const index = (original ?? []).findIndex((value: unknown) => isDeepStrictEqual(value, item));
+      ordered.splice(Math.min(index, ordered.length), 0, item);
+    }
+    return ordered;
   }
   const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
   if (object(current) && (previous === undefined || object(previous)) && (original === undefined || object(original))) {

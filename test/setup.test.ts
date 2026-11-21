@@ -82,18 +82,21 @@ describe('gw setup edge cases', () => {
     const matching = hook(`gw hook ${agent} stop`);
     const removed = hook('echo remove me');
     const added = hook('echo added later');
-    writeFileSync(file, JSON.stringify({ model: 'initial', hooks: { [event]: [matching, removed] } }, null, 2) + '\n');
+    const retainedFirst = hook('echo first');
+    const retainedLast = hook('echo last');
+    writeFileSync(file, JSON.stringify({ model: 'initial', hooks: { [event]: [matching, removed, retainedFirst, retainedLast] } }, null, 2) + '\n');
     const first = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === agent);
     applySetup(root, planSetup(root, first, 'add'), 'add');
     const settings = JSON.parse(readFileSync(file, 'utf8'));
     settings.model = 'later';
     settings.hooks[event] = settings.hooks[event].filter((entry: unknown) => JSON.stringify(entry) !== JSON.stringify(removed));
+    settings.hooks[event].reverse();
     settings.hooks[event].push(added);
     writeFileSync(file, JSON.stringify(settings, null, 2) + '\n');
     const second = targetsFor({ root, gw: 'npx groundwork-agent' }).filter((t) => t.agent === agent);
     applySetup(root, planSetup(root, second, 'add'), 'add');
     applySetup(root, planSetup(root, second, 'remove'), 'remove');
-    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ model: 'later', hooks: { [event]: [matching, added] } });
+    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ model: 'later', hooks: { [event]: [matching, retainedLast, retainedFirst, added] } });
   });
 
   it('keeps user edits made between setup runs with different commands', () => {

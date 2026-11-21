@@ -5,13 +5,11 @@ import { readFile } from 'node:fs/promises';
 const types = new Map([
   ['/', ['index.html', 'text/html; charset=utf-8']],
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
-  ['/style.css', ['style.css', 'text/css; charset=utf-8']],
-  ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/favicon.svg', ['favicon.svg', 'image/svg+xml']],
   ['/icon-192.png', ['icon-192.png', 'image/png']],
   ['/icon-512.png', ['icon-512.png', 'image/png']],
   ['/site.webmanifest', ['site.webmanifest', 'application/manifest+json']],
-  ...['hero', 'navigate', 'reuse', 'ground'].map(name => [`/${name}-art.webp`, [`${name}-art.webp`, 'image/webp']]),
+  ...['poster', 'workflow'].map(name => [`/groundwork-${name}.webp`, [`groundwork-${name}.webp`, 'image/webp']]),
 ]);
 const port = Number(process.env.PORT || 4173);
 createServer(async (request, response) => {
@@ -38,7 +36,7 @@ createServer(async (request, response) => {
       'Content-Length': body.length,
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Content-Security-Policy': "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'",
+      'Content-Security-Policy': "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://d2ol7oe51mr4n9.cloudfront.net; media-src https://d8j0ntlcm91z4.cloudfront.net; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'none'",
       'Cache-Control': 'no-cache',
     });
     response.end(request.method === 'HEAD' ? undefined : body);

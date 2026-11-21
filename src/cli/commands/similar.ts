@@ -14,8 +14,10 @@ export function register(program: Command): void {
     .action(async (description: string, options: Record<string, string>, cmd: Command) => {
       const opts = globalOpts(cmd);
       const input = similarInputSchema.parse({ description, name: options.name, signature: options.signature, code: options.code, language: options.language });
-      await withIndex(opts, async ({ db, config }) => {
-        const result = await findSimilar(new CandidateIndex(db, config.reuse.skipTests), input);
+      await withIndex(opts, async ({ root, db, config }) => {
+        const index = new CandidateIndex(db, config.reuse.skipTests);
+        await index.prepareMeaning(root, config);
+        const result = await findSimilar(index, input);
         emit(opts, result, () => renderSimilar(result));
       });
     });

@@ -66,8 +66,9 @@ describe('reuse calibration', () => {
     expect(check.metrics?.precision).toBeGreaterThanOrEqual(0.95);
     expect(check.metrics?.recallType1).toBe(1);
     expect(check.metrics?.recallType2).toBeGreaterThanOrEqual(0.95);
-    expect(check.metrics?.recallType3).toBeGreaterThanOrEqual(0.25);
-    expect(check.metrics?.recall).toBeGreaterThanOrEqual(0.5);
+    expect(check.metrics?.recall).toBe(model.calibration.recall);
+    expect(check.metrics?.recallType3).toBe(3 / 72);
+    expect(check.metrics?.recallType4).toBe(0);
     expect(check.detail).toContain('Type 4');
     expect(model.thresholds.warn).toBeLessThan(model.thresholds.block);
   });

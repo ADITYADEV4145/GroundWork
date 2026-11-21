@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "id": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "role": "mid-size TypeScript",
+    "license": "MIT",
+    "month": "2025-02",
+    "start": "f997bcb385d4b35ff581333e6bc9360d5ee10e71",
+    "end": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066"
+  },
+  "toolCommit": "50412e5a8e4deacf6e0c82b0d88b7d685ff0de3c",
+  "modelHash": "3d2aa690e5261d9f4893910ded6a7d084a49ef5c22461c49a33a17a1558c6642",
+  "node": "v24.22.2",
+  "meaning": false,
+  "config": "unmodified defaults",
+  "eligibleCommits": [
+    "7a920647efa236bd1f80dad087a27371e5070f7b",
+    "40209160ae02f1a32bf5ffbbd13a874e542be978",
+    "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066"
+  ],
+  "excludedOutOfMonth": [],
+  "sampling": "none; all non-merge commits in the UTC calendar window",
+  "selectedCommits": [
+    "7a920647efa236bd1f80dad087a27371e5070f7b",
+    "40209160ae02f1a32bf5ffbbd13a874e542be978",
+    "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066"
+  ],
+  "totalMs": 3260.461102999999,
+  "runs": [
+    {
+      "commit": "7a920647efa236bd1f80dad087a27371e5070f7b",
+      "parent": "f997bcb385d4b35ff581333e6bc9360d5ee10e71",
+      "subject": "Fix timeout error firing even though it's cancelled (#2399)",
+      "committedAt": "2025-02-10T14:45:39+07:00",
+      "checkoutMs": 6.377320999999995,
+      "durationMs": 1274.005865,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "c1fbd7699d97eee862d4d5c0669670857bde9099",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut",
+            "line": 46
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "getHttp2TimeoutOption",
+            "line": 952
+          },
+          "probability": 0.7259857962106813,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.4673824364354751
+            },
+            {
+              "name": "paramCount",
+              "value": 0.33333333333333337
+            }
+          ],
+          "fix": "Replace the body of timedOut with a call to getHttp2TimeoutOption."
+        },
+        {
+          "id": "8fcaa44a440d61585af335505fa9984aaa4e25d3",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut.addTimeout",
+            "line": 56
+          },
+          "existing": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut.timeoutHandler",
+            "line": 73
+          },
+          "probability": 0.7353282377856535,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.5789010967517809
+            },
+            {
+              "name": "paramCount",
+              "value": 0.6666666666666667
+            }
+          ],
+          "fix": "Replace the body of timedOut.addTimeout with a call to timedOut.timeoutHandler."
+        },
+        {
+          "id": "7abeaf5f4b66409354e1901955a1ee500495a8cc",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut.addTimeout.cancel",
+            "line": 61
+          },
+          "existing": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut.timeoutHandler",
+            "line": 73
+          },
+          "probability": 0.8822275861208222,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.6259785032860612
+            },
+            {
+              "name": "returnType",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of timedOut.addTimeout.cancel with a call to timedOut.timeoutHandler."
+        },
+        {
+          "id": "552b03d4bada03ad3f9d6b6ae3a5150af26350ba",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut.timeoutHandler",
+            "line": 73
+          },
+          "existing": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut.addTimeout.cancel",
+            "line": 61
+          },
+          "probability": 0.8822275861208222,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.6259785032860612
+            },
+            {
+              "name": "returnType",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of timedOut.timeoutHandler with a call to timedOut.addTimeout.cancel."
+        }
+      ]
+    },
+    {
+      "commit": "40209160ae02f1a32bf5ffbbd13a874e542be978",
+      "parent": "7a920647efa236bd1f80dad087a27371e5070f7b",
+      "subject": "Readme tweaks",
+      "committedAt": "2025-02-10T14:46:18+07:00",
+      "checkoutMs": 6.6057700000001205,
+      "durationMs": 950.7754589999997,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+      "parent": "40209160ae02f1a32bf5ffbbd13a874e542be978",
+      "subject": "14.4.6",
+      "committedAt": "2025-02-10T14:49:51+07:00",
+      "checkoutMs": 6.274210999999923,
+      "durationMs": 1016.4224769999996,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    }
+  ]
+}

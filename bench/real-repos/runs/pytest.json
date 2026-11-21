@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "id": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "role": "approximately 100k lines (Python)",
+    "license": "MIT",
+    "month": "2025-07",
+    "start": "e920a27e7926dee4a05c147bd9304df14b8b8a22",
+    "end": "1b1375ff57b8c2f1d666306fee1fa81747156218"
+  },
+  "toolCommit": "50412e5a8e4deacf6e0c82b0d88b7d685ff0de3c",
+  "modelHash": "3d2aa690e5261d9f4893910ded6a7d084a49ef5c22461c49a33a17a1558c6642",
+  "node": "v24.22.2",
+  "meaning": false,
+  "config": "unmodified defaults",
+  "eligibleCommits": [
+    "c5a75f2498c86850c4ce13bcf10d56efc92394a4",
+    "39ed26ac3eb06e9402294e7ff6274d9c686245d1",
+    "22351c4febaee3ffdceb6289acaaefdf63b93f23",
+    "c486cdb7a3aeb5d98efb84ce00f49feb1977e4c5",
+    "1d7d63555e431d4562bcacbdc97038b0613d20ba",
+    "c02465cee0250cd8040a06032ec8732a6228bd13",
+    "678c1a1e3318948f32d078c3d058d71b6b2849b0",
+    "81b6451dd1ab12c53b216077e58c5a6f16fe17f5",
+    "91b3a262d094f023381921f33042c72f94c906de",
+    "cfc66062cb298e8b90a2849127e2104cd5070293",
+    "05ad7303972cce2124ae1eb3fdb5535420a5260b",
+    "748dae571d1c21c9aeb9f5199904a818d5e3a185",
+    "67738403d7e14e0284f6c9f737e68de823760c33",
+    "3b002340cdb626f7f8ff1b377855d5b107e72164",
+    "836cfbac1f49c069191b5859fbc1c1763e5077ea",
+    "cebf662286918966e9414e85e38d470705ac82f8",
+    "1b1375ff57b8c2f1d666306fee1fa81747156218"
+  ],
+  "excludedOutOfMonth": [],
+  "sampling": "none; all non-merge commits in the UTC calendar window",
+  "selectedCommits": [
+    "c5a75f2498c86850c4ce13bcf10d56efc92394a4",
+    "39ed26ac3eb06e9402294e7ff6274d9c686245d1",
+    "22351c4febaee3ffdceb6289acaaefdf63b93f23",
+    "c486cdb7a3aeb5d98efb84ce00f49feb1977e4c5",
+    "1d7d63555e431d4562bcacbdc97038b0613d20ba",
+    "c02465cee0250cd8040a06032ec8732a6228bd13",
+    "678c1a1e3318948f32d078c3d058d71b6b2849b0",
+    "81b6451dd1ab12c53b216077e58c5a6f16fe17f5",
+    "91b3a262d094f023381921f33042c72f94c906de",
+    "cfc66062cb298e8b90a2849127e2104cd5070293",
+    "05ad7303972cce2124ae1eb3fdb5535420a5260b",
+    "748dae571d1c21c9aeb9f5199904a818d5e3a185",
+    "67738403d7e14e0284f6c9f737e68de823760c33",
+    "3b002340cdb626f7f8ff1b377855d5b107e72164",
+    "836cfbac1f49c069191b5859fbc1c1763e5077ea",
+    "cebf662286918966e9414e85e38d470705ac82f8",
+    "1b1375ff57b8c2f1d666306fee1fa81747156218"
+  ],
+  "totalMs": 134828.14305900005,
+  "runs": [
+    {
+      "commit": "c5a75f2498c86850c4ce13bcf10d56efc92394a4",
+      "parent": "e920a27e7926dee4a05c147bd9304df14b8b8a22",
+      "subject": "Fix crash with `times` output style and skipped module (#13573)",
+      "committedAt": "2025-07-01T18:15:06-03:00",
+      "checkoutMs": 32.580918999999994,
+      "durationMs": 8122.056289,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "eef4c4bf1098f7015dabe7bc61829e6c05fe4e5f",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/_pytest/terminal.py",
+            "symbol": "TerminalReporter",
+            "line": 369
+          },
+          "existing": {
+            "file": "src/_pytest/reports.py",
+            "symbol": "BaseReport",
+            "line": 56
+          },
+          "probability": 0.5986149968711311,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3992759563201458
+            },
+            {
+              "name": "paramCount",
+              "value": 0.5
+            }
+          ],
+          "fix": "Replace the body of TerminalReporter with a call to BaseReport."
+        },
+        {
+          "id": "fa86e43819cb39536cca75a44b10a72e699fc930",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/_pytest/terminal.py",
+            "symbol": "TerminalReporter._get_progress_information_message",
+            "line": 700
+          },
+          "existing": {
+            "file": "src/_pytest/terminal.py",
+            "symbol": "TerminalReporter._is_last_item",
+            "line": 681
+          },
+          "probability": 0.7885750774254985,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.46855226452737575
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of TerminalReporter._get_progress_information_message with a call to TerminalReporter._is_last_item."
+        }
+      ]
+    },
+    {
+      "commit": "39ed26ac3eb06e9402294e7ff6274d9c686245d1",
+      "parent": "c5a75f2498c86850c4ce13bcf10d56efc92394a4",
+      "subject": "doc: fix grammar error i.e. -> e.g. (#13586)",
+      "committedAt": "2025-07-05T10:50:47-03:00",
+      "checkoutMs": 11.519060999999056,
+      "durationMs": 7845.3766259999975,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "22351c4febaee3ffdceb6289acaaefdf63b93f23",
+      "parent": "39ed26ac3eb06e9402294e7ff6274d9c686245d1",
+      "subject": "[pre-commit.ci] pre-commit autoupdate (#13590)",
+      "committedAt": "2025-07-08T08:44:20+02:00",
+      "checkoutMs": 13.940538000002562,
+      "durationMs": 8378.344873000002,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "c486cdb7a3aeb5d98efb84ce00f49feb1977e4c5",
+      "parent": "22351c4febaee3ffdceb6289acaaefdf63b93f23",
+      "subject": "Update URL of `pytest-doctestplus` (#13589)",
+      "committedAt": "2025-07-08T08:47:26+02:00",
+      "checkoutMs": 9.268820999997843,
+      "durationMs": 8749.868342000002,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "1d7d63555e431d4562bcacbdc97038b0613d20ba",
+      "parent": "c486cdb7a3aeb5d98efb84ce00f49feb1977e4c5",
+      "subject": "[automated] Update plugin list (#13588)",
+      "committedAt": "2025-07-09T19:43:30+02:00",
+      "checkoutMs": 13.244038000004366,
+      "durationMs": 7679.926441000003,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "c02465cee0250cd8040a06032ec8732a6228bd13",
+      "parent": "1d7d63555e431d4562bcacbdc97038b0613d20ba",
+      "subject": "Support PEP420 (implicit namespace packages) as `--pyargs` target. (#13426)",
+      "committedAt": "2025-07-12T08:03:22-03:00",
+      "checkoutMs": 13.750602000000072,
+      "durationMs": 8322.876710000004,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "59540fa5a7f0dbb00aa24ba2a60e15c74494c225",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/_pytest/main.py",
+            "symbol": "Session",
+            "line": 547
+          },
+          "existing": {
+            "file": "src/_pytest/cacheprovider.py",
+            "symbol": "LFPlugin",
+            "line": 319
+          },
+          "probability": 0.5452132925159348,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.25151167601763
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Session with a call to LFPlugin."
+        },
+        {
+          "id": "50a3f2061c5046f79483d16523d60480344de506",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/_pytest/main.py",
+            "symbol": "Session.perform_collect",
+            "line": 748
+          },
+          "existing": {
+            "file": "src/_pytest/pytester.py",
+            "symbol": "Pytester.getnode",
+            "line": 979
+          },
+          "probability": 0.5383831049299517,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3158010889426883
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Session.perform_collect with a call to Pytester.getnode."
+        },
+        {
+          "id": "d7d13494c064a08bcd6e8c658a3cd7840ccecb9c",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/_pytest/main.py",
+            "symbol": "search_pypath",
+            "line": 988
+          },
+          "existing": {
+            "file": "src/_pytest/pathlib.py",
+            "symbol": "spec_matches_module_path",
+            "line": 738
+          },
+          "probability": 0.9539824522844191,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.7446561730031356
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of search_pypath with a call to spec_matches_module_path."
+        },
+        {
+          "id": "9b1e529de39e7f89e9501908d114745472f2bed8",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/_pytest/main.py",
+            "symbol": "resolve_collection_argument",
+            "line": 1033
+          },
+          "existing": {
+            "file": "src/_pytest/pathlib.py",
+            "symbol": "import_path",
+            "line": 489
+          },
+          "probability": 0.5879819061948466,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.31502858113656385
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of resolve_collection_argument with a call to import_path."
+        }
+      ]
+    },
+    {
+      "commit": "678c1a1e3318948f32d078c3d058d71b6b2849b0",
+      "parent": "c02465cee0250cd8040a06032ec8732a6228bd13",
+      "subject": "[automated] Update plugin list (#13595)",
+      "committedAt": "2025-07-13T04:48:36Z",
+      "checkoutMs": 17.867869000008795,
+      "durationMs": 7254.406166999994,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "81b6451dd1ab12c53b216077e58c5a6f16fe17f5",
+      "parent": "678c1a1e3318948f32d078c3d058d71b6b2849b0",
+      "subject": "[pre-commit.ci] pre-commit autoupdate (#13597)",
+      "committedAt": "2025-07-15T13:15:22-03:00",
+      "checkoutMs": 12.189036000010674,
+      "durationMs": 7933.220520000003,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "91b3a262d094f023381921f33042c72f94c906de",
+      "parent": "5a7a91b4188fa749aa2d9de72c1a57fab381f1b3",
+      "subject": "doc: Update trainings",
+      "committedAt": "2025-07-18T22:02:42+02:00",
+      "checkoutMs": 33.98658899999282,
+      "durationMs": 8210.08475699999,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "cfc66062cb298e8b90a2849127e2104cd5070293",
+      "parent": "5f993856350d1cff144e48810b1c0137c8ec45c5",
+      "subject": "build(deps): Bump pytest-asyncio in /testing/plugins_integration (#13610)",
+      "committedAt": "2025-07-21T13:56:37-03:00",
+      "checkoutMs": 35.582786999992095,
+      "durationMs": 8198.089754,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "05ad7303972cce2124ae1eb3fdb5535420a5260b",
+      "parent": "cfc66062cb298e8b90a2849127e2104cd5070293",
+      "subject": "[automated] Update plugin list (#13608)",
+      "committedAt": "2025-07-26T01:01:45Z",
+      "checkoutMs": 17.619481000001542,
+      "durationMs": 7905.680647999994,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "748dae571d1c21c9aeb9f5199904a818d5e3a185",
+      "parent": "05ad7303972cce2124ae1eb3fdb5535420a5260b",
+      "subject": "[pre-commit.ci] pre-commit autoupdate (#13611)",
+      "committedAt": "2025-07-26T01:29:19Z",
+      "checkoutMs": 13.083306000000448,
+      "durationMs": 7906.789506999994,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "67738403d7e14e0284f6c9f737e68de823760c33",
+      "parent": "748dae571d1c21c9aeb9f5199904a818d5e3a185",
+      "subject": "Apply PEP 639 (#13014)",
+      "committedAt": "2025-07-26T01:33:09Z",
+      "checkoutMs": 8.753433999998379,
+      "durationMs": 7816.1068899999955,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "3b002340cdb626f7f8ff1b377855d5b107e72164",
+      "parent": "67738403d7e14e0284f6c9f737e68de823760c33",
+      "subject": "build(deps): Bump re-actors/alls-green (#13622)",
+      "committedAt": "2025-07-28T07:45:18+02:00",
+      "checkoutMs": 9.66610600000422,
+      "durationMs": 7894.730299999996,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "836cfbac1f49c069191b5859fbc1c1763e5077ea",
+      "parent": "3b002340cdb626f7f8ff1b377855d5b107e72164",
+      "subject": "selftests: Set a timeout for lsof (#13621)",
+      "committedAt": "2025-07-28T10:16:41-03:00",
+      "checkoutMs": 9.134270000009565,
+      "durationMs": 7941.322661000013,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "cebf662286918966e9414e85e38d470705ac82f8",
+      "parent": "836cfbac1f49c069191b5859fbc1c1763e5077ea",
+      "subject": "[automated] Update plugin list (#13620)",
+      "committedAt": "2025-07-28T10:17:03-03:00",
+      "checkoutMs": 12.590919000009308,
+      "durationMs": 7002.815469000023,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+      "parent": "cebf662286918966e9414e85e38d470705ac82f8",
+      "subject": "[pre-commit.ci] pre-commit autoupdate (#13624)",
+      "committedAt": "2025-07-28T20:55:54Z",
+      "checkoutMs": 10.38160200000857,
+      "durationMs": 7391.287726999988,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    }
+  ]
+}

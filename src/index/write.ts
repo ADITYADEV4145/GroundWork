@@ -4,6 +4,11 @@ import { splitWords } from '../extract/fingerprint.js';
 import type { FileStatus, Language } from '../types.js';
 import { symbolId } from './store.js';
 
+export function writeEmbedding(db: Db, model: string, contentHash: string, vector: number[]): void {
+  db.prepare('INSERT INTO reuse_embeddings(model, content_hash, vector) VALUES(?, ?, ?) ON CONFLICT(model, content_hash) DO UPDATE SET vector = excluded.vector')
+    .run(model, contentHash, JSON.stringify(vector));
+}
+
 export interface FileMeta {
   path: string;
   language: Language | null;

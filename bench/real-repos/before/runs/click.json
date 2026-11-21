@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "id": "click",
+    "url": "https://github.com/pallets/click.git",
+    "role": "Python",
+    "license": "BSD-3-Clause",
+    "month": "2025-07",
+    "start": "5c1239b0116b66492cdd0848144ab3c78a04495a",
+    "end": "528fd7a798abe0077060c5720e13791a34167f66"
+  },
+  "toolCommit": "c04b2c299d2c44201271915c969a21208901b300",
+  "modelHash": "6cf36cba1e7fd3f69aeff84fdcedee18946bfa2a6e0b4c7b09d16b025d537d0d",
+  "node": "v24.22.2",
+  "meaning": false,
+  "config": "unmodified defaults",
+  "eligibleCommits": [
+    "9caedb9206103dfb5465e1916bc2f13b9c10c0e4",
+    "3155dcac03fec1bbbcca5afcec10d1c097ad8092",
+    "f2ae679984c3dfaa0c7639686cd793f59eb4d9b8",
+    "a1235aacb1be55dc66ddcfefbf64dec44b6ab54d",
+    "e37cad2a8b6c32ee0d1597e4d43e778910ccd43a",
+    "4679b1cbc35d05e1c250affaf8a3b7156bad6319",
+    "b87b337b1ece5c61ae046daa9cf60f6eeb945d2d",
+    "cc3942a4b1a092db68e8ca1e1343ae70b4115c4d"
+  ],
+  "excludedOutOfMonth": [
+    "1b0e19f50595a07957bd96a600c37cd44b7e0cc3",
+    "7559bb8fb82f7bcb923bcb6b900c11472c6f227f",
+    "1838a0bb4c66a686c9b3c4209302f1fc8b1a4bf3",
+    "b3a608e5c1578d265e0c108d3c0062fcfb11d069"
+  ],
+  "sampling": "none; all non-merge commits in the UTC calendar window",
+  "selectedCommits": [
+    "9caedb9206103dfb5465e1916bc2f13b9c10c0e4",
+    "3155dcac03fec1bbbcca5afcec10d1c097ad8092",
+    "f2ae679984c3dfaa0c7639686cd793f59eb4d9b8",
+    "a1235aacb1be55dc66ddcfefbf64dec44b6ab54d",
+    "e37cad2a8b6c32ee0d1597e4d43e778910ccd43a",
+    "4679b1cbc35d05e1c250affaf8a3b7156bad6319",
+    "b87b337b1ece5c61ae046daa9cf60f6eeb945d2d",
+    "cc3942a4b1a092db68e8ca1e1343ae70b4115c4d"
+  ],
+  "totalMs": 20562.396765,
+  "runs": [
+    {
+      "commit": "9caedb9206103dfb5465e1916bc2f13b9c10c0e4",
+      "parent": "5c1239b0116b66492cdd0848144ab3c78a04495a",
+      "subject": "Fix reconciliation of envvar with default, flag_value and type parameters for flag options",
+      "committedAt": "2025-07-01T18:44:11+04:00",
+      "checkoutMs": 22.347639999999956,
+      "durationMs": 3229.1203269999996,
+      "exitCode": 1,
+      "status": "BLOCK",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "5abac2bb0757b05dc2851e20cbd1798b61e1c33a",
+          "kind": "duplicate",
+          "severity": "BLOCK",
+          "added": {
+            "file": "src/click/types.py",
+            "symbol": "BoolParamType",
+            "line": 661
+          },
+          "existing": {
+            "file": "src/click/types.py",
+            "symbol": "BoolParamType.convert",
+            "line": 712
+          },
+          "probability": 0.905927673629597,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.8585029978296527
+            },
+            {
+              "name": "bindingExact",
+              "value": 0
+            }
+          ],
+          "fix": "Replace the body of BoolParamType with a call to BoolParamType.convert."
+        },
+        {
+          "id": "c1e87bccf871a8d7cf35a002ed4daa9ae71e9b2e",
+          "kind": "duplicate",
+          "severity": "BLOCK",
+          "added": {
+            "file": "src/click/types.py",
+            "symbol": "BoolParamType.convert",
+            "line": 712
+          },
+          "existing": {
+            "file": "src/click/types.py",
+            "symbol": "BoolParamType",
+            "line": 661
+          },
+          "probability": 0.905927673629597,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.8585029978296527
+            },
+            {
+              "name": "bindingExact",
+              "value": 0
+            }
+          ],
+          "fix": "Replace the body of BoolParamType.convert with a call to BoolParamType."
+        },
+        {
+          "id": "aac7bc9ffe27969577f689417d95fa1c20bd3f08",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/click/core.py",
+            "symbol": "Option.get_default",
+            "line": 2918
+          },
+          "existing": {
+            "file": "src/click/core.py",
+            "symbol": "Option.consume_value",
+            "line": 3028
+          },
+          "probability": 0.5386828515037285,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.29565942455908095
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Option.get_default with a call to Option.consume_value."
+        },
+        {
+          "id": "436a3e4c6f8d870f2415041bf9836ea9f29b98bb",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/click/core.py",
+            "symbol": "Option.resolve_envvar_value",
+            "line": 2967
+          },
+          "existing": {
+            "file": "src/click/core.py",
+            "symbol": "Option.get_help_extra",
+            "line": 2828
+          },
+          "probability": 0.5507334054107693,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.2402009656182164
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Option.resolve_envvar_value with a call to Option.get_help_extra."
+        },
+        {
+          "id": "c397b6bbbf2b05c3229ce81cc7740bf706b45592",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/click/core.py",
+            "symbol": "Option.value_from_envvar",
+            "line": 2998
+          },
+          "existing": {
+            "file": "src/click/core.py",
+            "symbol": "Option.get_help_extra",
+            "line": 2828
+          },
+          "probability": 0.6465450360458589,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3279089610894173
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Option.value_from_envvar with a call to Option.get_help_extra."
+        },
+        {
+          "id": "f1e0f944a6470ee169bf67f18638c44c432e26c5",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/click/core.py",
+            "symbol": "Option.consume_value",
+            "line": 3028
+          },
+          "existing": {
+            "file": "src/click/core.py",
+            "symbol": "Parameter.handle_parse_result",
+            "line": 2385
+          },
+          "probability": 0.7372924694680346,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.44712205875033534
+            },
+            {
+              "name": "paramCount",
+              "value": 0.6666666666666667
+            }
+          ],
+          "fix": "Replace the body of Option.consume_value with a call to Parameter.handle_parse_result."
+        },
+        {
+          "id": "3111b1dd9641c5eb5d1c549216c40c3bf3f1096e",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/click/types.py",
+            "symbol": "BoolParamType.str_to_bool",
+            "line": 697
+          },
+          "existing": {
+            "file": "src/click/core.py",
+            "symbol": "_check_iter",
+            "line": 1974
+          },
+          "probability": 0.6601187133632723,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3223694997566835
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of BoolParamType.str_to_bool with a call to _check_iter."
+        }
+      ]
+    },
+    {
+      "commit": "3155dcac03fec1bbbcca5afcec10d1c097ad8092",
+      "parent": "565f36d5bc4a15d304337b749e113fb4477b1843",
+      "subject": "fix(typing): Using correct typing for `param_hint`",
+      "committedAt": "2025-07-04T08:01:42+02:00",
+      "checkoutMs": 13.209453000001304,
+      "durationMs": 2583.64609,
+      "exitCode": 1,
+      "status": "BLOCK",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "2b2484c365df6e8734eca480582015e78e74c03a",
+          "kind": "duplicate",
+          "severity": "BLOCK",
+          "added": {
+            "file": "src/click/exceptions.py",
+            "symbol": "MissingParameter",
+            "line": 137
+          },
+          "existing": {
+            "file": "src/click/exceptions.py",
+            "symbol": "MissingParameter.format_message",
+            "line": 160
+          },
+          "probability": 0.7602750407455627,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.8247103870634526
+            },
+            {
+              "name": "bindingExact",
+              "value": 0
+            }
+          ],
+          "fix": "Replace the body of MissingParameter with a call to MissingParameter.format_message."
+        },
+        {
+          "id": "53adb191fa423a833819539454c6eb36305beeb9",
+          "kind": "duplicate",
+          "severity": "BLOCK",
+          "added": {
+            "file": "src/click/exceptions.py",
+            "symbol": "MissingParameter.format_message",
+            "line": 160
+          },
+          "existing": {
+            "file": "src/click/exceptions.py",
+            "symbol": "MissingParameter",
+            "line": 137
+          },
+          "probability": 0.7602750407455628,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.8247103870634528
+            },
+            {
+              "name": "bindingExact",
+              "value": 0
+            }
+          ],
+          "fix": "Replace the body of MissingParameter.format_message with a call to MissingParameter."
+        },
+        {
+          "id": "50838faeae9e7c382ed3dd6647a6b36cddfbde94",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/click/exceptions.py",
+            "symbol": "BadParameter",
+            "line": 95
+          },
+          "existing": {
+            "file": "src/click/core.py",
+            "symbol": "Parameter.get_error_hint",
+            "line": 2434
+          },
+          "probability": 0.5729144311477643,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3371807409658251
+            },
+            {
+              "name": "paramCount",
+              "value": 0.25
+            }
+          ],
+          "fix": "Replace the body of BadParameter with a call to Parameter.get_error_hint."
+        }
+      ]
+    },
+    {
+      "commit": "f2ae679984c3dfaa0c7639686cd793f59eb4d9b8",
+      "parent": "565f36d5bc4a15d304337b749e113fb4477b1843",
+      "subject": "Use the value of Enum choices to render default",
+      "committedAt": "2025-07-20T17:10:04+04:00",
+      "checkoutMs": 13.084578999998485,
+      "durationMs": 2154.8601180000005,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "abf793257f849be279fe8f80a000038a7a48568a",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "src/click/core.py",
+            "symbol": "Option.get_help_extra",
+            "line": 2828
+          },
+          "existing": {
+            "file": "src/click/core.py",
+            "symbol": "Option.value_from_envvar",
+            "line": 3000
+          },
+          "probability": 0.6420713728274515,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3247263130248912
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Option.get_help_extra with a call to Option.value_from_envvar."
+        }
+      ]
+    },
+    {
+      "commit": "a1235aacb1be55dc66ddcfefbf64dec44b6ab54d",
+      "parent": "565f36d5bc4a15d304337b749e113fb4477b1843",
+      "subject": "Fix Zsh completions with colons (#2846)",
+      "committedAt": "2025-07-21T20:35:04+01:00",
+      "checkoutMs": 14.122627000000648,
+      "durationMs": 1776.0346900000004,
+      "exitCode": 1,
+      "status": "BLOCK",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "c8d39ae535db31a22d67997baccc7ab65c0d172c",
+          "kind": "duplicate",
+          "severity": "BLOCK",
+          "added": {
+            "file": "src/click/shell_completion.py",
+            "symbol": "ZshComplete",
+            "line": 363
+          },
+          "existing": {
+            "file": "src/click/shell_completion.py",
+            "symbol": "FishComplete.get_completion_args",
+            "line": 405
+          },
+          "probability": 0.8747286748642382,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.6513578291247142
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of ZshComplete with a call to FishComplete.get_completion_args."
+        },
+        {
+          "id": "087b521d2ef7a9e3c6b81f21bd27e296029855e3",
+          "kind": "duplicate",
+          "severity": "BLOCK",
+          "added": {
+            "file": "src/click/shell_completion.py",
+            "symbol": "ZshComplete.format_completion",
+            "line": 381
+          },
+          "existing": {
+            "file": "examples/completion/completion.py",
+            "symbol": "list_users",
+            "line": 36
+          },
+          "probability": 0.8599482990796992,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.6062198105592808
+            },
+            {
+              "name": "paramCount",
+              "value": 0.33333333333333337
+            }
+          ],
+          "fix": "Replace the body of ZshComplete.format_completion with a call to list_users."
+        }
+      ]
+    },
+    {
+      "commit": "e37cad2a8b6c32ee0d1597e4d43e778910ccd43a",
+      "parent": "565f36d5bc4a15d304337b749e113fb4477b1843",
+      "subject": "BUG/TST: fix a race in `click.testing.StreamMixer`'s finalization, seen in a multi-threaded context",
+      "committedAt": "2025-07-05T09:26:56+02:00",
+      "checkoutMs": 14.43660699999964,
+      "durationMs": 1579.6669450000009,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "4679b1cbc35d05e1c250affaf8a3b7156bad6319",
+      "parent": "e37cad2a8b6c32ee0d1597e4d43e778910ccd43a",
+      "subject": "TST: adjust tests",
+      "committedAt": "2025-07-05T09:26:56+02:00",
+      "checkoutMs": 7.631757999999536,
+      "durationMs": 3718.6644269999997,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "b87b337b1ece5c61ae046daa9cf60f6eeb945d2d",
+      "parent": "44fd6394b72c1186feae31e793cd1196e1024fe2",
+      "subject": "add missing changelog entry for PR #2991",
+      "committedAt": "2025-07-22T13:04:16+02:00",
+      "checkoutMs": 23.136662000000797,
+      "durationMs": 2553.6230880000003,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "cc3942a4b1a092db68e8ca1e1343ae70b4115c4d",
+      "parent": "0be2bd385064053bb75f92db317de128db729d52",
+      "subject": "test: add two new tests for Parameter.__init__ in src/click/core.py",
+      "committedAt": "2025-07-23T10:14:01+04:00",
+      "checkoutMs": 13.672183999999106,
+      "durationMs": 2845.1395699999994,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    }
+  ]
+}

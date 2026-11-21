@@ -2,6 +2,7 @@
 // `gw selftest --through N` runs every check with phase <= N.
 
 export interface CheckOptions {
+  root?: string;
   /** Skip slow checks (cold index of a 100k-line repo). */
   quick: boolean;
   /** Random edit sequences for the incremental-equality check. */

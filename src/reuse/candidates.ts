@@ -3,8 +3,12 @@ import path from 'node:path';
 import { readFingerprintedSymbols, type FingerprintedSymbol } from '../index/query.js';
 import { languageForPath } from '../lang/index.js';
 import type { Db } from '../store/db.js';
-import { buildIdf, wordsOf, type ComparableSymbol } from './signals.js';
+import type { GroundworkConfig } from '../config/schema.js';
+import type { Embedding, EmbedderFactory } from './embeddings.js';
+import { meaningModel } from './model.js';
+import { buildIdf, vectorCosine, wordsOf, type ComparableSymbol } from './signals.js';
 import { extractReuseSource } from './source.js';
+import { relatedSymbols, type PairIdentity } from './policy.js';
 
 function bands(s: ComparableSymbol): string[] {
   const hash = s.fingerprint?.minhash;
@@ -12,11 +16,13 @@ function bands(s: ComparableSymbol): string[] {
   return Array.from({ length: 16 }, (_, i) => `${i}:${hash.slice(i * 8, i * 8 + 8).join(',')}`);
 }
 
+type Candidate = FingerprintedSymbol & { bindingHash?: string | null; embedding?: Embedding };
 export class CandidateIndex {
-  readonly symbols: (FingerprintedSymbol & { bindingHash?: string | null })[];
+  readonly symbols: Candidate[];
   readonly idf: Map<string, number>;
-  private readonly lsh = new Map<string, Set<FingerprintedSymbol>>();
-  private readonly vocab = new Map<string, Set<FingerprintedSymbol>>();
+  private readonly lsh = new Map<string, Set<Candidate>>();
+  private readonly vocab = new Map<string, Set<Candidate>>();
+  private meaningContext?: { root: string; config: GroundworkConfig; factory?: EmbedderFactory };
 
   constructor(db: Db, skipTests = true) {
     const files = new Map<string, Map<string, string | null>>();
@@ -49,12 +55,45 @@ export class CandidateIndex {
     }
   }
 
-  find(query: ComparableSymbol & { id?: string; file?: string; qualifiedName?: string }, limit = 80): FingerprintedSymbol[] {
-    const found = new Set<FingerprintedSymbol>();
+  async prepareMeaning(root: string, config: GroundworkConfig, factory?: EmbedderFactory, options: { deadline?: number; priorityFiles?: ReadonlySet<string> } = {}): Promise<void> {
+    if (!config.reuse.embeddings.enabled) return;
+    const { DEFAULT_EMBEDDING_MODEL, embedSources, warnMeaning } = await import('./embeddings.js');
+    this.meaningContext = { root, config, factory };
+    const files = new Map<string, string>();
+    const sources = [...this.symbols].sort((a, b) => Number(!!options.priorityFiles?.has(b.file)) - Number(!!options.priorityFiles?.has(a.file))).flatMap((s) => {
+      try {
+        if (!files.has(s.file)) files.set(s.file, readFileSync(path.join(root, s.file), 'utf8'));
+        return [{ id: s.id, text: files.get(s.file)!.slice(s.startByte, s.endByte) }];
+      }
+      catch { return []; }
+    });
+    const vectors = await embedSources(root, config, sources, factory, options);
+    for (const symbol of this.symbols) symbol.embedding = vectors.get(symbol.id);
+    const model = config.reuse.embeddings.model ?? DEFAULT_EMBEDDING_MODEL;
+    if (vectors.size && model !== meaningModel.embeddingModel)
+      warnMeaning(root, model, 'This model has no calibrated classifier; only baseline scoring is used.');
+  }
+
+  async embedQuery(text: string): Promise<Embedding | undefined> {
+    const ctx = this.meaningContext;
+    if (!ctx) return undefined;
+    const { embedSources } = await import('./embeddings.js');
+    return (await embedSources(ctx.root, ctx.config, [{ id: 'query', text }], ctx.factory)).get('query');
+  }
+
+  find(query: ComparableSymbol & PairIdentity & { id?: string }, limit = 80): Candidate[] {
+    const found = new Set<Candidate>();
     for (const key of bands(query)) for (const s of this.lsh.get(key) ?? []) found.add(s);
-    const counts = new Map<FingerprintedSymbol, number>();
+    const counts = new Map<Candidate, number>();
     for (const w of Object.keys(wordsOf(query))) for (const s of this.vocab.get(w) ?? []) counts.set(s, (counts.get(s) ?? 0) + (this.idf.get(w) ?? 1));
     for (const [s] of [...counts].sort((a, b) => b[1] - a[1]).slice(0, limit)) found.add(s);
-    return [...found].filter((s) => s.id !== query.id && !(s.file === query.file && s.qualifiedName === query.qualifiedName));
+    if (query.embedding) {
+      const embedding = query.embedding;
+      const semantic = this.symbols.filter((s) => s.embedding?.model === embedding.model)
+        .map((s) => ({ s, cosine: vectorCosine(embedding.vector, s.embedding!.vector) }))
+        .sort((a, b) => b.cosine - a.cosine).slice(0, limit);
+      for (const { s } of semantic) found.add(s);
+    }
+    return [...found].filter((s) => s.id !== query.id && !relatedSymbols(query, s));
   }
 }

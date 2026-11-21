@@ -23,9 +23,9 @@ export function grammarPath(lang: Language): string {
 export async function initParsers(): Promise<void> {
   initPromise ??= (async () => {
     await Parser.init();
-    for (const lang of Object.keys(GRAMMARS) as Language[]) {
+    await Promise.all((Object.keys(GRAMMARS) as Language[]).map(async (lang) => {
       languages.set(lang, await TsLanguage.load(grammarPath(lang)));
-    }
+    }));
   })();
   return initPromise;
 }

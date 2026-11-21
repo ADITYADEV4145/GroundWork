@@ -13,7 +13,7 @@ Groundwork is built in phases by parallel streams on top of the Phase 1 index. K
 
 | What | Where | How |
 | --- | --- | --- |
-| CLI command | `src/cli/commands/<name>.ts` | export `register(program)`, add it to the list in `src/cli/main.ts` |
+| CLI command | `src/cli/commands/<name>.ts` | export `register(program)`, add it to the list in `src/cli/program.ts` (the hook bootstrap stays lightweight) |
 | MCP tool | `src/mcp/tools/<name>.ts` | `defineTool({...})`, add it to `TOOLS` in `src/mcp/tools/index.ts` |
 | Hook handler | `src/hooks/handlers/<name>.ts` | implement `HookHandler`, add it to `HANDLERS` in `src/hooks/handlers/index.ts` |
 | Config | `src/config/sections/<phase>.ts` | each stream owns its section's zod schema |
@@ -26,4 +26,4 @@ Read the index through `src/index/query.ts` (or `src/api.ts`); don't write SQL a
 
 - Agent-facing output is short, ranked and token-budgeted (`fitToBudget`); every CLI command supports `--json`.
 - Hooks fail open: any error or timeout means allow, exit 0, nothing on stdout.
-- Everything is local; no network calls.
+- Runtime is local and offline. The sole consented setup exception is `gw init --embeddings`, which downloads a model to `.groundwork/models/` only on that explicit command; runtime inference is local-files-only and never downloads missing models. Dev-only benchmark scripts (`scripts/calibrate-mine.ts`, `scripts/setup-real-repos.ts`) clone pinned repos into external caches and are not shipped with the tool.

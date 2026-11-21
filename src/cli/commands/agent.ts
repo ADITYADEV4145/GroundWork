@@ -1,7 +1,5 @@
 import type { Command } from 'commander';
-import { runHook } from '../../hooks/run.js';
 import type { AgentName, HookEventName } from '../../hooks/types.js';
-import { startMcpServer } from '../../mcp/server.js';
 import { globalOpts, repoRoot } from '../context.js';
 
 const AGENTS = ['claude', 'codex', 'cursor'];
@@ -12,6 +10,7 @@ export function register(program: Command): void {
     .command('mcp')
     .description('run the Groundwork MCP server on stdio')
     .action(async (_o, cmd: Command) => {
+      const { startMcpServer } = await import('../../mcp/server.js');
       await startMcpServer(repoRoot(globalOpts(cmd)));
     });
 
@@ -22,6 +21,7 @@ export function register(program: Command): void {
     .argument('<event>', EVENTS.join('|'))
     .action(async (agent: string, event: string) => {
       if (!AGENTS.includes(agent) || !EVENTS.includes(event)) return;
+      const { runHook } = await import('../../hooks/run.js');
       await runHook(agent as AgentName, event as HookEventName);
       process.exitCode = 0;
     });

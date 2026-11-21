@@ -29,6 +29,21 @@ Other ways to install:
 
 `gw setup --remove` removes exactly what setup added. `gw setup --dry-run` shows the plan without writing anything.
 
+### Optional local meaning signal
+
+The default needs no embedding model or optional runtime. To consent to a model download:
+
+```sh
+gw init --embeddings                         # downloads the calibrated small model
+gw init --embeddings --model owner/model     # explicitly choose another Transformers.js ONNX model
+```
+
+Model files stay in `.groundwork/models/`; consent is recorded in `.groundwork/config.json` only after installation succeeds. Subsequent `gw check`, `gw similar` and `find_similar` use local files only: there are no runtime downloads. Vectors are cached in the index by exact symbol-content hash and model id, so unchanged symbols are not re-embedded. Missing models or an unavailable optional `@huggingface/transformers` runtime warn once per process/model and fall back to the default classifier. Set `reuse.embeddings.enabled` to `false` to disable meaning.
+
+Only the selected, calibrated model uses the meaning classifier; other model ids retain baseline scoring. [Candidate evaluation](bench/dupes/embeddings.md) documents precision, recall, size and speed. Meaning did **not** improve recall on the current labeled corpus; it remains opt-in. Description-only similarity scores are extrapolations, not separately calibrated natural-language probabilities.
+
+For a CPU-only source installation if ONNX Runtime's optional CUDA installer fails, use `ONNXRUNTIME_NODE_INSTALL_CUDA=skip npm install`. `npm install --omit=optional` omits the embedding runtime entirely; all default functionality still works.
+
 ## How it works
 
 ```
@@ -82,7 +97,7 @@ Everything stays in `.groundwork/` in your repository. Hooks run with your user 
 
 **Which languages?** TypeScript, JavaScript and Python today. For other files, the agent falls back to its normal tools.
 
-**Does it send my code anywhere?** No. There are no network calls and no telemetry.
+**Does it send my code anywhere?** No. There are no runtime network calls and no telemetry. Optional model installation downloads model files only after explicit consent; inference stays local.
 
 **How do I remove it?** Run `gw setup --remove` and delete `.groundwork/`.
 

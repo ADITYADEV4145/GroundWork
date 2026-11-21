@@ -1,5 +1,15 @@
 # Reuse calibration report
 
+Optional local embeddings have a [separate evaluation and opt-in model](embeddings.md). [Real-history before/after and held-out review](../real-repos/review.md) is separate from calibration.
+
+Calibration retains the pre-policy confidence floor (0.750969663, rounded upward) so tightening eligibility does not promote old medium-confidence warnings. An initial unconstrained labeled-set recalibration chose ~0.606 and regressed an existing boundary-policy negative regression test; the floor preserves the previous confidence requirement. No post-fix original or held-out history results were consulted. The floor is common to both models; choose the lowest qualifying OOF score at or above it, not the unconstrained lowest score.
+
+## Conservative BLOCK policy and recall cost
+
+Policy `independent-compatible-majority-structure-v1` excludes same-file ancestors/descendants (containing spans or dotted qualified-name ancestry), permits only class/class (including dataclasses) or callable/callable (function/method) pairs for BLOCK, and requires a majority of structural shingles (structure >= 0.5) or normalized/binding-aware exact equality. Vocabulary, matching signatures or embeddings alone cannot justify replacing an implementation. The 0.5 boundary encodes majority structural evidence; it was fixed before replaying either history set and was not searched over the 14 findings. Constants/files retain their separate checks. Cross-kind/low-structure results may remain WARN; their raw classifier probabilities are unchanged. Independent BLOCK candidates outrank nonblocking candidates.
+
+The same 510 labels and five family-disjoint folds are retained. Eligibility is applied to OOF BLOCK selection, never inferred from a label; filtered positives remain false negatives in the recall denominator. Training/IDF populations are unchanged because WARN/search still use the classifier. Both models are recalibrated against this policy. Before: default and meaning each 140 TP/7 FP, 95.24% precision, 57.61% recall. After default: 73 TP/3 FP, 96.1% precision, 30.0% recall. This deliberately loses semantic-only BLOCK recall; see the clone-type table, including Type 4.
+
 ## Method and scope
 
 - 510 labeled pairs: 243 duplicates, 267 negatives; TypeScript/JavaScript and Python.
@@ -16,11 +26,11 @@
 
 ## Operating point
 
-BLOCK = 0.750969663; WARN = 0.428794750.
+BLOCK = 0.755317939; WARN = 0.428794750.
 
 | Selection | TP | FP | FN | Precision | Recall |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| BLOCK (all signals, OOF) | 140 | 7 | 103 | 95.2% | 57.6% |
+| BLOCK (all signals, OOF) | 73 | 3 | 170 | 96.1% | 30.0% |
 | WARN or higher (OOF) | 218 | 45 | 25 | 82.9% | 89.7% |
 
 ## By clone type at full-model BLOCK
@@ -29,36 +39,36 @@ Precision compares selected positives of this type against ALL selected negative
 
 | Clone type | Positive support | TP | FP | Precision | Recall |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Type 1 | 24 | 24 | 7 | 77.4% | 100.0% |
-| Type 2 | 48 | 46 | 7 | 86.8% | 95.8% |
-| Type 3 | 72 | 22 | 7 | 75.9% | 30.6% |
-| Type 4 | 99 | 48 | 7 | 87.3% | 48.5% |
+| Type 1 | 24 | 24 | 3 | 88.9% | 100.0% |
+| Type 2 | 48 | 46 | 3 | 93.9% | 95.8% |
+| Type 3 | 72 | 3 | 3 | 50.0% | 4.2% |
+| Type 4 | 99 | 0 | 3 | 0.0% | 0.0% |
 
 ## Signal combinations (each trained and thresholded independently on OOF scores)
 
 | Signals | BLOCK | TP | FP | Precision | Recall |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | structure | no safe threshold | 0 | 0 | 0.0% | 0.0% |
-| vocabulary | 0.756369 | 81 | 3 | 96.4% | 33.3% |
+| vocabulary | 0.756369 | 47 | 2 | 95.9% | 19.3% |
 | signature+name | no safe threshold | 0 | 0 | 0.0% | 0.0% |
 | structure+vocabulary | 0.951980 | 12 | 0 | 100.0% | 4.9% |
-| vocabulary+signature+name | 0.940101 | 20 | 1 | 95.2% | 8.2% |
+| vocabulary+signature+name | 0.966435 | 11 | 0 | 100.0% | 4.5% |
 | structure+vocabulary+interactions | 0.941633 | 8 | 0 | 100.0% | 3.3% |
 | binding-aware | 0.951585 | 72 | 0 | 100.0% | 29.6% |
-| all | 0.750970 | 140 | 7 | 95.2% | 57.6% |
+| all | 0.755318 | 73 | 3 | 96.1% | 30.0% |
 
 ## Recall by type for each signal combination
 
 | Signals | Type 1 recall | Type 2 recall | Type 3 recall | Type 4 recall |
 | --- | ---: | ---: | ---: | ---: |
 | structure | 0.0% | 0.0% | 0.0% | 0.0% |
-| vocabulary | 100.0% | 12.5% | 51.4% | 14.1% |
+| vocabulary | 100.0% | 12.5% | 23.6% | 0.0% |
 | signature+name | 0.0% | 0.0% | 0.0% | 0.0% |
 | structure+vocabulary | 33.3% | 8.3% | 0.0% | 0.0% |
-| vocabulary+signature+name | 0.0% | 25.0% | 5.6% | 4.0% |
+| vocabulary+signature+name | 0.0% | 16.7% | 4.2% | 0.0% |
 | structure+vocabulary+interactions | 16.7% | 8.3% | 0.0% | 0.0% |
 | binding-aware | 100.0% | 100.0% | 0.0% | 0.0% |
-| all | 100.0% | 95.8% | 30.6% | 48.5% |
+| all | 100.0% | 95.8% | 4.2% | 0.0% |
 
 ## False positives at BLOCK
 

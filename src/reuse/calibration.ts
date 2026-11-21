@@ -5,6 +5,7 @@ import { initParsers, languageForPath } from '../lang/index.js';
 import { sha1 } from '../util/hash.js';
 import { buildIdf, pairSignals, type ComparableSymbol, type Signals } from './signals.js';
 import { extractReuseSource } from './source.js';
+import { canBlock, BLOCK_SCORE_FLOOR } from './policy.js';
 
 const refSchema = z.object({ file: z.string().startsWith('corpus/'), symbol: z.string().min(1) });
 export const labelSchema = z.object({
@@ -26,7 +27,7 @@ export const COMBINATIONS: Record<string, (keyof Signals)[]> = {
   all: SIGNAL_KEYS,
 };
 
-export async function loadDataset(directory: string): Promise<Dataset> {
+export async function loadDataset(directory: string): Promise<Dataset & { sources: Map<ComparableSymbol, string> }> {
   await initParsers();
   const text = readFileSync(path.join(directory, 'labeled.jsonl'), 'utf8');
   const labels = text.trim().split('\n').map((line) => labelSchema.parse(JSON.parse(line)));
@@ -34,6 +35,7 @@ export async function loadDataset(directory: string): Promise<Dataset> {
   const files = [...new Set(labels.flatMap((p) => [p.a.file, p.b.file]))].sort();
   const symbols = new Map<string, ComparableSymbol>();
   const sources: string[] = [];
+  const symbolSources = new Map<ComparableSymbol, string>();
   for (const file of files) {
     const absolute = path.resolve(directory, file);
     if (!absolute.startsWith(path.resolve(directory, 'corpus') + path.sep)) throw new Error('Corpus path escapes directory');
@@ -46,7 +48,9 @@ export async function loadDataset(directory: string): Promise<Dataset> {
     for (const symbol of extraction.symbols) {
       const key = `${file}:${symbol.qualifiedName}`;
       if (symbols.has(key)) throw new Error(`Ambiguous corpus symbol ${key}`);
-      symbols.set(key, symbol);
+      symbols.set(key, { ...symbol, file });
+      const stored = symbols.get(key)!;
+      symbolSources.set(stored, source.slice(symbol.startByte, symbol.endByte));
     }
   }
   const idf = buildIdf([...symbols.values()]);
@@ -62,34 +66,34 @@ export async function loadDataset(directory: string): Promise<Dataset> {
     if (group !== label.b.file.split('/')[1]) throw new Error(`Pair crosses task families: ${label.id}`);
     return { label, a, b, group, signals: pairSignals(a, b, idf) };
   });
-  return { examples, digest: sha1(text + sources.join('\n')), symbols: [...symbols.values()] };
+  return { examples, digest: sha1(text + sources.join('\n')), symbols: [...symbols.values()], sources: symbolSources };
 }
 
 export interface Coefficients { intercept: number; weights: Signals }
 export function predict(model: Coefficients, signals: Signals): number {
   let value = model.intercept;
-  for (const key of SIGNAL_KEYS) value += model.weights[key] * signals[key];
+  for (const key of Object.keys(model.weights) as (keyof Signals)[]) value += (model.weights[key] ?? 0) * (signals[key] ?? 0);
   return 1 / (1 + Math.exp(-Math.max(-40, Math.min(40, value))));
 }
 
 export function train(examples: Example[], keys: (keyof Signals)[], iterations = 1800): Coefficients {
   if (!examples.length || !examples.some((e) => e.label.label === 'dup') || !examples.some((e) => e.label.label === 'not')) throw new Error('Training requires both classes');
-  const model: Coefficients = { intercept: 0, weights: Object.fromEntries(SIGNAL_KEYS.map((k) => [k, 0])) as unknown as Signals };
+  const model: Coefficients = { intercept: 0, weights: Object.fromEntries([...new Set([...SIGNAL_KEYS, ...keys])].map((k) => [k, 0])) as unknown as Signals };
   for (let iteration = 0; iteration < iterations; iteration++) {
     const gradient = Object.fromEntries(keys.map((key) => [key, 0])) as Record<keyof Signals, number>;
     let bias = 0;
     for (const example of examples) {
       const error = predict(model, example.signals) - (example.label.label === 'dup' ? 1 : 0);
       bias += error;
-      for (const key of keys) gradient[key] += error * example.signals[key];
+      for (const key of keys) gradient[key] += error * (example.signals[key] ?? 0);
     }
     model.intercept -= 0.4 * bias / examples.length;
-    for (const key of keys) model.weights[key] -= 0.4 * (gradient[key] / examples.length + 0.002 * model.weights[key]);
+    for (const key of keys) model.weights[key] = (model.weights[key] ?? 0) - 0.4 * (gradient[key] / examples.length + 0.002 * (model.weights[key] ?? 0));
   }
   return model;
 }
 
-export interface Prediction { example: Example; probability: number; fold: number }
+export interface Prediction { example: Example; probability: number; fold: number; blockEligible?: boolean }
 export function outOfFold(dataset: Dataset, keys: (keyof Signals)[], folds = 5): Prediction[] {
   const groups = [...new Set(dataset.examples.map((e) => e.group))].sort();
   if (folds < 2 || folds > groups.length) throw new Error('Invalid fold count');
@@ -101,29 +105,30 @@ export function outOfFold(dataset: Dataset, keys: (keyof Signals)[], folds = 5):
     const features = (e: Example) => ({ ...e, signals: pairSignals(e.a, e.b, idf) });
     const model = train(training.map(features), keys);
     for (const example of dataset.examples.filter((e) => assignments.get(e.group) === fold)) {
-      predictions.push({ example, probability: predict(model, features(example).signals), fold });
+      const signals = features(example).signals;
+      predictions.push({ example, probability: predict(model, signals), fold, blockEligible: canBlock(example.a, example.b, signals) });
     }
   }
   return predictions;
 }
 
-export function metrics(predictions: Prediction[], threshold: number) {
+export function metrics(predictions: Prediction[], threshold: number, blocking = false) {
   const positive = predictions.filter((p) => p.example.label.label === 'dup').length;
-  const selected = predictions.filter((p) => p.probability >= threshold);
+  const selected = predictions.filter((p) => p.probability >= threshold && (!blocking || p.blockEligible !== false));
   const tp = selected.filter((p) => p.example.label.label === 'dup').length;
   const fp = selected.length - tp;
   return { tp, fp, fn: positive - tp, precision: selected.length ? tp / selected.length : 0, recall: positive ? tp / positive : 0, support: positive };
 }
 
 export function chooseBlock(predictions: Prediction[], target = 0.95): number {
-  const candidates = [...new Set(predictions.map((p) => p.probability))].sort((a, b) => a - b);
+  const candidates = [...new Set(predictions.map((p) => p.probability))].filter((p) => p >= BLOCK_SCORE_FLOOR).sort((a, b) => a - b);
   for (const threshold of candidates) {
-    const result = metrics(predictions, threshold);
+    const result = metrics(predictions, threshold, true);
     if (result.tp > 0 && result.precision >= target) return threshold;
   }
   throw new Error('No nonempty BLOCK threshold reaches target precision');
 }
 
 export function recallByType(predictions: Prediction[], threshold: number) {
-  return [1, 2, 3, 4].map((type) => ({ type, ...metrics(predictions.filter((p) => p.example.label.label === 'not' || p.example.label.cloneType === type), threshold) }));
+  return [1, 2, 3, 4].map((type) => ({ type, ...metrics(predictions.filter((p) => p.example.label.label === 'not' || p.example.label.cloneType === type), threshold, true) }));
 }

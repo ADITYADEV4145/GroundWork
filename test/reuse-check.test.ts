@@ -1,7 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import * as policy from '../src/reuse/policy.js';
 import { defaultConfig } from '../src/config/load.js';
 import { duplicateGate } from '../src/hooks/handlers/duplicate_gate.js';
 import { HANDLERS } from '../src/hooks/handlers/index.js';
@@ -101,7 +102,7 @@ describe('git-scripted reuse check scenarios (also exercised by selftest)', () =
         expect(formatFinding(f).split('\n').length).toBeLessThanOrEqual(6);
         expect(f.signals).toHaveLength(2);
         expect(formatFinding(f)).toContain('Fix:');
-        if (f.kind === 'duplicate') expect(f.severity).toBe(f.probability! >= thresholds.block ? 'BLOCK' : 'WARN');
+        if (f.kind === 'duplicate' && f.severity === 'BLOCK') expect(f.probability!).toBeGreaterThanOrEqual(thresholds.block);
       }
       if (!report.findings.length) expect(formatCheck(report)).toBe('PASS: no reuse findings.');
     });
@@ -383,6 +384,76 @@ describe('check command and Stop gate', () => {
         expect(result.stdout).toBe('');
       }
     });
+  });
+
+  it('keeps fast and global-option hook routes equivalent without the compile cache', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile: 'strict' }));
+      await checkRepository(root);
+      for (const [i, args] of [['hook', 'claude', 'stop'], ['--root', root, 'hook', 'claude', 'stop']].entries()) {
+        const run = (input: string) => spawnSync(process.execPath, ['--import', TSX, MAIN, ...args], {
+          cwd: root, encoding: 'utf8', input, env: { ...process.env, NODE_DISABLE_COMPILE_CACHE: '1' },
+        });
+        const payload = { cwd: root, session_id: `route-${i}` };
+        const first = run(JSON.stringify(payload));
+        expect(first.status).toBe(0);
+        expect(JSON.parse(first.stdout)).toMatchObject({ decision: 'block' });
+        const second = run(JSON.stringify(payload));
+        expect(second.status).toBe(0);
+        expect(second.stdout).toBe('');
+        const active = run(JSON.stringify({ ...payload, stop_hook_active: true }));
+        expect(active.status).toBe(0);
+        expect(active.stdout).toBe('');
+        const malformed = run('not JSON');
+        expect(malformed.status).toBe(0);
+        expect(malformed.stdout).toBe('');
+      }
+    });
+  });
+
+  it('does not promote policy-rejected advisory matches into whole-file BLOCKs', async () => {
+    await withCheckScenario('file', async (root) => {
+      const eligibility = vi.spyOn(policy, 'canBlock').mockReturnValue(false);
+      try {
+        const report = await checkRepository(root);
+        const advisory = report.findings.find((f) => f.kind === 'duplicate');
+        expect(advisory).toMatchObject({ severity: 'WARN' });
+        expect(advisory!.probability).toBeGreaterThanOrEqual(thresholds.block);
+        expect(report.findings.find((f) => f.kind === 'duplicate-file')).toMatchObject({ severity: 'WARN' });
+      } finally { eligibility.mockRestore(); }
+    });
+  });
+
+  it('preserves packaging profiles and agent renderers on both hook routes', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await checkRepository(root);
+      for (const [agent, profile] of [['claude', 'standard'], ['claude', 'minimal'], ['codex', 'strict'], ['cursor', 'strict']]) {
+        writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile }));
+        for (const global of [false, true]) {
+          const result = spawnSync(process.execPath, ['--import', TSX, MAIN, ...(global ? ['--root', root] : []), 'hook', agent!, 'stop'], {
+            cwd: root, encoding: 'utf8', input: JSON.stringify({ workspace_roots: [root], session_id: `${agent}-${profile}-${global}` }),
+          });
+          expect(result.status).toBe(0);
+          if (profile === 'minimal') expect(result.stdout).toBe('');
+          else expect(JSON.parse(result.stdout)).toMatchObject(agent === 'cursor' ? { followup_message: expect.stringContaining('BLOCK') } :
+            profile === 'strict' ? { decision: 'block' } : { systemMessage: expect.stringContaining('BLOCK') });
+        }
+      }
+      const result = spawnSync(process.execPath, ['--import', TSX, MAIN, 'setup', '--help'], { cwd: root, encoding: 'utf8' });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain('--profile');
+    });
+  });
+
+  it('allows Cursor permission hooks even when loading the hook runner fails', async () => {
+    const loader = `export async function resolve(s, c, next) { if (s.includes('/hooks/run.')) { process.stderr.write('unavailable runner\\n'); throw new Error('unavailable runner'); } return next(s, c); }`;
+    const preload = `import { register } from 'node:module'; register(${JSON.stringify('data:text/javascript,' + encodeURIComponent(loader))}, import.meta.url);`;
+    const result = spawnSync(process.execPath, ['--import', TSX, '--import', 'data:text/javascript,' + encodeURIComponent(preload), MAIN, 'hook', 'cursor', 'pre_tool'], {
+      encoding: 'utf8', input: '{}',
+    });
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout)).toEqual({ permission: 'allow' });
+    expect(result.stderr).toContain('unavailable runner');
   });
 
   it('prioritizes Stop denial while preserving opt-in nonblocking waste summaries', async () => {

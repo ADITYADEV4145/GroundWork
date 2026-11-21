@@ -384,6 +384,8 @@ export function suggestionPool(db: Db, kinds: SymbolKind[]): SymbolFact[] {
 }
 
 export interface FingerprintedSymbol extends SymbolHit {
+  startByte: number;
+  endByte: number;
   fingerprint: import('../types.js').BodyFingerprint;
   params: Param[];
   returnType: string | null;
@@ -397,6 +399,7 @@ export function readFingerprintedSymbols(db: Db): FingerprintedSymbol[] {
     const bytes = r.minhash as Uint8Array;
     return {
       ...toHit(r),
+      startByte: Number(r.start_byte), endByte: Number(r.end_byte),
       fingerprint: { tokenCount: Number(r.token_count), normHash: String(r.norm_hash),
         minhash: new Uint32Array(Uint8Array.from(bytes).buffer), vocab: JSON.parse(String(r.vocab_json)) },
       params: JSON.parse(String(r.params_json)) as Param[],
@@ -437,4 +440,13 @@ export function readReuseState(db: Db): ReuseState {
       kind: String(r.kind) as import('../types.js').LiteralKind, line: Number(r.line), constName: nullable(r.const_name),
     })),
   };
+}
+
+export function readEmbedding(db: Db, model: string, contentHash: string): number[] | null {
+  const row = db.prepare('SELECT vector FROM reuse_embeddings WHERE model = ? AND content_hash = ?').get(model, contentHash);
+  if (!row) return null;
+  try {
+    const value: unknown = JSON.parse(String(row.vector));
+    return Array.isArray(value) && value.length > 0 && value.every((n) => typeof n === 'number' && Number.isFinite(n)) && value.some((n) => n !== 0) ? value : null;
+  } catch { return null; }
 }

@@ -19,23 +19,61 @@ const payloadSchema = z
   })
   .passthrough();
 
+const CURSOR_TOOLS: Record<string, string> = { Shell: 'Bash', Read: 'Read', Write: 'Write', Edit: 'Edit', Delete: 'Delete' };
+
+/** Map agent-specific tool names onto Claude Code's, which handlers match on. */
+function toolName(agent: AgentName, name: string | undefined): string | null {
+  if (!name) return null;
+  if (agent !== 'cursor') return name;
+  if (name.startsWith('MCP:')) return `mcp__groundwork__${name.slice(4)}`;
+  return CURSOR_TOOLS[name] ?? name;
+}
+
 export function normalise(agent: AgentName, event: HookEventName, raw: unknown): HookEvent {
   const p = payloadSchema.safeParse(raw);
   const d = p.success ? p.data : {};
+  const roots = (raw as { workspace_roots?: unknown } | null)?.workspace_roots;
+  const firstRoot = Array.isArray(roots) && typeof roots[0] === 'string' ? roots[0] : undefined;
   return {
     agent,
     event,
     sessionId: d.session_id ?? d.conversation_id ?? null,
-    cwd: d.cwd ?? process.cwd(),
-    tool: d.tool_name ?? null,
+    cwd: d.cwd ?? firstRoot ?? process.env.CURSOR_PROJECT_DIR ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd(),
+    tool: toolName(agent, d.tool_name),
     input: d.tool_input ?? {},
     response: d.tool_response ?? d.tool_output ?? null,
     raw,
   };
 }
 
-/** Agent-specific stdout for a combined result. Claude Code's format is used for codex/cursor until their adapters land. */
+const CLAUDE_EVENT: Record<HookEventName, string> = {
+  pre_tool: 'PreToolUse',
+  post_tool: 'PostToolUse',
+  session_start: 'SessionStart',
+  prompt: 'UserPromptSubmit',
+  stop: 'Stop',
+};
+
+/** Cursor treats invalid or missing JSON on permission hooks as a block, so they always answer. */
+function renderCursor(ev: HookEvent, r: HookResult): string {
+  const msg = r.action === 'allow' ? undefined : r.message;
+  switch (ev.event) {
+    case 'pre_tool':
+      return JSON.stringify(r.action === 'deny' && msg ? { permission: 'deny', agent_message: msg, user_message: msg } : { permission: 'allow' });
+    case 'post_tool':
+      return msg ? JSON.stringify({ additional_context: msg }) : '';
+    case 'stop':
+      return r.action === 'deny' && msg ? JSON.stringify({ followup_message: msg }) : '';
+    case 'session_start':
+      return msg ? JSON.stringify({ additional_context: msg }) : '';
+    default:
+      return '';
+  }
+}
+
+/** Agent-specific stdout for a combined result. Claude Code and Codex share the same hook output contract. */
 export function render(ev: HookEvent, r: HookResult): string {
+  if (ev.agent === 'cursor') return renderCursor(ev, r);
   if (ev.agent === 'claude' && ev.event === 'pre_tool' && r.updatedInput && r.action !== 'deny')
     return JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', updatedInput: r.updatedInput } });
   if (ev.event === 'stop' && r.action === 'deny' && r.message) return JSON.stringify({ decision: 'block', reason: r.message });
@@ -44,8 +82,12 @@ export function render(ev: HookEvent, r: HookResult): string {
   if (ev.event === 'pre_compact') return r.message;
   if (ev.event === 'pre_tool' && r.action === 'deny')
     return JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: r.message } });
-  const hookEventName = ev.event === 'post_tool' ? 'PostToolUse' : ev.event === 'pre_tool' ? 'PreToolUse' : ev.event === 'session_start' ? 'SessionStart' : 'UserPromptSubmit';
-  return JSON.stringify({ hookSpecificOutput: { hookEventName, additionalContext: r.message } });
+  return JSON.stringify({ hookSpecificOutput: { hookEventName: CLAUDE_EVENT[ev.event], additionalContext: r.message } });
+}
+
+/** What to print when the hook itself failed: nothing, except where silence would block (Cursor permission hooks). */
+export function failOpenOutput(agent: AgentName, event: HookEventName): string {
+  return agent === 'cursor' && event === 'pre_tool' ? JSON.stringify({ permission: 'allow' }) : '';
 }
 
 export async function dispatch(ev: HookEvent, root: string): Promise<HookResult> {
@@ -91,5 +133,7 @@ export async function runHook(agent: AgentName, event: HookEventName, timeoutMs 
     if (out) process.stdout.write(out + '\n');
   } catch (e) {
     log(root, 'error', 'hook_failed', { agent, event, error: (e as Error).message });
+    const out = failOpenOutput(agent, event);
+    if (out) process.stdout.write(out + '\n');
   }
 }

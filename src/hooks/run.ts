@@ -52,6 +52,7 @@ const CLAUDE_EVENT: Record<HookEventName, string> = {
   session_start: 'SessionStart',
   prompt: 'UserPromptSubmit',
   stop: 'Stop',
+  pre_compact: 'PreCompact',
 };
 
 /** Cursor treats invalid or missing JSON on permission hooks as a block, so they always answer. */
@@ -66,6 +67,8 @@ function renderCursor(ev: HookEvent, r: HookResult): string {
       return r.action === 'deny' && msg ? JSON.stringify({ followup_message: msg }) : '';
     case 'session_start':
       return msg ? JSON.stringify({ additional_context: msg }) : '';
+    case 'pre_compact':
+      return msg ? JSON.stringify({ user_message: msg }) : '';
     default:
       return '';
   }

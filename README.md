@@ -258,43 +258,45 @@ Every command accepts `--json`.
 | Measure | Baseline | Groundwork |
 | --- | ---: | ---: |
 | Success | 30/30 (100.0%) | 30/30 (100.0%) |
-| Estimated tool-output tokens (bytes / 4), mean per attempt | 143.8 | 179.4 |
-| Captured tool calls | 58 | 115 |
-| Distinct directly read files (summed across attempts) | 14 | 21 |
-| Direct source-read bytes | 4932 | 7398 |
+| Estimated tool-output tokens (bytes / 4), mean per attempt | 161.8 | 158.5 |
+| Captured tool calls | 60 | 93 |
+| Distinct directly read files (summed across attempts) | 17 | 21 |
+| Direct source-read bytes | 5769 | 7072 |
 | Guarded reads blocked | 0 | 0 |
-| Wall time, mean per attempt (s) | 8.3 | 11.2 |
+| Wall time, mean per attempt (s) | 4.7 | 9.2 |
 | Provider input tokens per attempt | unavailable | unavailable |
 | Provider output tokens per attempt | unavailable | unavailable |
 
-Estimated tool-output token reduction (median of paired task reductions): **-76.8% (95% bootstrap interval [-82.8, -36.8]%)**.
-Provider input token reduction: unavailable. Wall time reduction: -15.2% (95% bootstrap interval [-49.0, -10.5]%).
+Estimated tool-output token reduction (median of paired task reductions): **18.8% (95% bootstrap interval [-9.9, 28.8]%)**.
+Provider input token reduction: unavailable. Wall time reduction: -166.2% (95% bootstrap interval [-229.4, -47.5]%).
 Success delta (Groundwork minus baseline, median per task): 0.0 pp (95% bootstrap interval [0.0, 0.0] pp).
 
 | Suite metric | Baseline total | Groundwork total | Paired delta (GW – baseline, per task) | Task coverage |
 | --- | ---: | ---: | ---: | ---: |
-| duplicatesAdded | 20 | 17 | 0.0 (95% bootstrap interval [-0.2, 0.0]) | 10/10 |
+| duplicatesAdded | 25 | 24 | 0.0 (95% bootstrap interval [-0.2, 0.0]) | 10/10 |
 | inventedCalls | 0 | 0 | 0.0 (95% bootstrap interval [0.0, 0.0]) | 10/10 |
 <!-- long-horizon-results:end -->
 
-**Groundwork used more estimated tool-output tokens and more wall time in these
-sessions; these results do not demonstrate token or time savings.** Negative
-reductions mean increases. The intervals above bootstrap the median across ten
+**These results do not demonstrate token or time savings.** The estimated-output
+interval spans zero; Groundwork took more wall time. Negative reductions mean
+increases. The intervals above bootstrap the median across ten
 tasks, not suite-total ratios or variation across independent sessions; the
 sequential tasks also share conversation context. Duplicate counts are raw
 scorer findings, not independently labeled clones. Provider token usage is
 unavailable.
 
-Collection deviations: Groundwork run 3 authored files in a staging directory
-and copied them into task workspaces via the shell wrapper. Two runs each had
-one failed-then-retried tool call. These are collection-time disclosures; the
-capture JSON does not retain shell-command text or error status, so staging
-costs outside the wrappers or task timers cannot be verified. No retries were
-removed from the supplied captures.
+This rerun used the final Phase 2 tools at collector revision `fa8657c`.
+The first, pre-19 run reported estimated-output reduction -76.8%
+(95% interval [-82.8, -36.8]%) and wall-time reduction -15.2%
+(95% interval [-49.0, -10.5]%). It remains separately verifiable as historical
+evidence; the two sets are not pooled.
 
-See the [historical full report](bench/long-horizon/results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.md),
+See the [current full report](bench/long-horizon/results/2026-11-21T21-44-09-424Z-long-horizon.md),
 [raw observations](bench/long-horizon/observations/) and
-[methodology and offline reproduction](bench/long-horizon/README.md).
+[methodology and offline reproduction](bench/long-horizon/README.md), including
+self-reported collection deviations: shell README reads, externally staged
+file authoring, skipped helper lookup and a retried tool call. Costs outside
+wrappers or task timers cannot be established from these captures.
 
 ## Accuracy
 

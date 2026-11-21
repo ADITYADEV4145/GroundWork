@@ -7,49 +7,61 @@ import { evaluatorFingerprint } from './evaluator-fingerprint.mjs';
 
 const read = (file) => readFileSync(new URL(file, import.meta.url), 'utf8');
 const archive = './results/pre-19/long-horizon/';
-const stem = archive + '2026-11-21T20-56-14-672Z-long-horizon';
-const records = JSON.parse(read(stem + '.json'));
-assert.equal(records.length, 1);
-const recorded = records[0];
-const rawEvidence = JSON.parse(read(archive + 'evidence.json'));
 const historicalTasks = JSON.parse(read(archive + 'tasks.json'));
 const currentTasks = JSON.parse(read('./tasks.json'));
 assert.deepEqual({ ...currentTasks, revision: historicalTasks.revision }, historicalTasks, 'only the active fixture pin may differ from historical tasks');
 assert.equal(read('./grade.mjs'), read(archive + 'grade.mjs'), 'historical grader must be unchanged');
-assert.deepEqual(rawEvidence.evaluator, evaluatorFingerprint(), 'Recorded evaluator is stale: evaluator or fixture files changed');
-assert.deepEqual(recorded.evidence.evaluator, rawEvidence.evaluator, 'results must record the same evaluator fingerprint');
-console.log(`PASS evaluator and fixture file fingerprint (${Object.keys(rawEvidence.evaluator.files).length} files)`);
-const replay = loadEvidence('long-horizon', 3, fileURLToPath(new URL('./results/pre-19/', import.meta.url)));
-assert.deepEqual(replay, { ...recorded, evidence: evidenceSchema.parse(recorded.evidence) }, 'offline evidence must reproduce the saved JSON');
-assert.equal(read(archive + 'evidence.json'), read(stem + '.long-horizon.evidence.json'));
-const markdown = renderReport(replay.summary);
-assert.equal(markdown, read(stem + '.md'), 'saved Markdown must match the reporter');
+const fingerprint = evaluatorFingerprint();
 
-assert.equal(replay.evidence.captures.length, 6);
-assert.equal(readdirSync(new URL('./observations/', import.meta.url)).filter((file) => file.endsWith('.json')).length, 6);
-for (const capture of replay.evidence.captures) {
-  const raw = captureSchema.parse(JSON.parse(read(`./observations/lh-${capture.condition}-${capture.run}.json`)));
-  const { observations, ...rawMetadata } = raw;
-  const { samples, ...gradedMetadata } = capture;
-  assert.deepEqual(gradedMetadata, rawMetadata, 'original run labels and metadata must be unchanged');
-  assert.equal(observations.length, samples.length);
-  for (const sample of samples) {
-    const observation = observations.find((item) => item.task === sample.task);
-    assert.ok(observation, sample.task);
-    const measured = {
-      toolCalls: observation.tools.length,
-      toolOutputBytes: observation.tools.reduce((sum, tool) => sum + tool.bytes, 0),
-      filesRead: new Set(observation.tools.flatMap((tool) => tool.file === undefined ? [] : [tool.file])).size,
-      readBytes: observation.tools.reduce((sum, tool) => sum + (tool.readBytes ?? 0), 0),
-      readBlocks: observation.tools.filter((tool) => tool.blocked).length,
-      wallMs: observation.wallMs,
-      usage: observation.usage,
-    };
-    for (const [key, value] of Object.entries(measured)) assert.deepEqual(sample[key], value, `${raw.condition} ${raw.run} ${sample.task} ${key}`);
+function verifySet({ name, directory, evidenceFile, benchDir, observationDir, prefix }) {
+  const files = readdirSync(new URL(directory, import.meta.url)).filter((file) => file.endsWith('-long-horizon.json'));
+  assert.equal(files.length, 1, `${name} must have exactly one saved report`);
+  const stem = directory + files[0].slice(0, -5);
+  const records = JSON.parse(read(stem + '.json'));
+  assert.equal(records.length, 1);
+  const recorded = records[0];
+  const rawEvidence = JSON.parse(read(evidenceFile));
+  assert.deepEqual(rawEvidence.evaluator, fingerprint, `${name}: recorded evaluator is stale: evaluator or fixture files changed`);
+  assert.deepEqual(recorded.evidence.evaluator, rawEvidence.evaluator, `${name}: results must record the same evaluator fingerprint`);
+  const replay = loadEvidence('long-horizon', 3, fileURLToPath(new URL(benchDir, import.meta.url)));
+  assert.deepEqual(replay, { ...recorded, evidence: evidenceSchema.parse(recorded.evidence) }, `${name}: offline evidence must reproduce the saved JSON`);
+  assert.equal(read(evidenceFile), read(stem + '.long-horizon.evidence.json'));
+  const markdown = renderReport(replay.summary);
+  assert.equal(markdown, read(stem + '.md'), `${name}: saved Markdown must match the reporter`);
+
+  assert.equal(replay.evidence.captures.length, 6);
+  assert.equal(readdirSync(new URL(observationDir, import.meta.url)).filter((file) => file.endsWith('.json')).length, 6);
+  for (const capture of replay.evidence.captures) {
+    const raw = captureSchema.parse(JSON.parse(read(`${observationDir}${prefix}-${capture.condition}-${capture.run}.json`)));
+    const { observations, ...rawMetadata } = raw;
+    const { samples, ...gradedMetadata } = capture;
+    assert.deepEqual(gradedMetadata, rawMetadata, `${name}: original run labels and metadata must be unchanged`);
+    assert.equal(observations.length, samples.length);
+    for (const sample of samples) {
+      const observation = observations.find((item) => item.task === sample.task);
+      assert.ok(observation, sample.task);
+      const measured = {
+        toolCalls: observation.tools.length,
+        toolOutputBytes: observation.tools.reduce((sum, tool) => sum + tool.bytes, 0),
+        filesRead: new Set(observation.tools.flatMap((tool) => tool.file === undefined ? [] : [tool.file])).size,
+        readBytes: observation.tools.reduce((sum, tool) => sum + (tool.readBytes ?? 0), 0),
+        readBlocks: observation.tools.filter((tool) => tool.blocked).length,
+        wallMs: observation.wallMs,
+        usage: observation.usage,
+      };
+      for (const [key, value] of Object.entries(measured)) assert.deepEqual(sample[key], value, `${name} ${raw.condition} ${raw.run} ${sample.task} ${key}`);
+    }
   }
+  console.log(`PASS ${name}: evaluator and fixture file fingerprint (${Object.keys(fingerprint.files).length} files)`);
+  console.log(`PASS ${name}: six raw captures retain original labels and match all recorded timing/tool measurements`);
+  console.log(`PASS ${name}: manifest, offline evidence digest, JSON summary and Markdown reproduce exactly`);
+  return markdown;
 }
-console.log('PASS six raw captures retain original labels and match all recorded timing/tool measurements');
-console.log('PASS historical manifest, offline evidence digest, JSON summary and Markdown reproduce exactly');
+
+verifySet({ name: 'historical pre-19', directory: archive, evidenceFile: archive + 'evidence.json',
+  benchDir: './results/pre-19/', observationDir: archive + 'observations/', prefix: 'lh' });
+const markdown = verifySet({ name: 'active fa8657c', directory: './results/', evidenceFile: './evidence.json',
+  benchDir: '../', observationDir: './observations/', prefix: 'lh2' });
 
 const headline = markdown.slice(markdown.indexOf('| Measure |'), markdown.indexOf('| Task category |')).trimEnd()
   + '\n\n' + markdown.slice(markdown.indexOf('| Suite metric |'), markdown.indexOf('Tool-output counts')).trimEnd();
@@ -60,7 +72,6 @@ for (const file of ['../../README.md', './README.md']) {
   assert.ok(match, `${file} headline block missing`);
   assert.equal(match[1], headline, `${file} headline must exactly match the reporter's numbers and intervals`);
   assert.ok(doc.includes(label), `${file} measurement label missing`);
-  assert.ok(doc.includes('staging directory'), `${file} staging deviation missing`);
-  assert.ok(doc.includes('failed-then-retried tool call'), `${file} retry deviation missing`);
+  assert.ok(doc.includes('self-reported collection deviations'), `${file} collection deviation disclosure missing`);
   console.log(`PASS ${file} headline table, medians and 95% intervals exactly match results JSON`);
 }

@@ -5,7 +5,8 @@ Ten sequential edit tasks on **one** dependency-free event-operations repository
 starts with reusable slug, date, retry, validation, CSV and collection helpers.
 Features build on prior work: cards → invitations → agenda → reminders → roster
 → capacity → CSV → organizer digest → delivery → dashboard. Every step must
-preserve earlier acceptance contracts. No shared harness files are modified.
+preserve earlier acceptance contracts. Tasks, acceptance checks and grading
+are unchanged between the first collection and this rerun.
 
 ## Recorded Devin-agent results
 
@@ -15,27 +16,28 @@ preserve earlier acceptance contracts. No shared harness files are modified.
 | Measure | Baseline | Groundwork |
 | --- | ---: | ---: |
 | Success | 30/30 (100.0%) | 30/30 (100.0%) |
-| Estimated tool-output tokens (bytes / 4), mean per attempt | 143.8 | 179.4 |
-| Captured tool calls | 58 | 115 |
-| Distinct directly read files (summed across attempts) | 14 | 21 |
-| Direct source-read bytes | 4932 | 7398 |
+| Estimated tool-output tokens (bytes / 4), mean per attempt | 161.8 | 158.5 |
+| Captured tool calls | 60 | 93 |
+| Distinct directly read files (summed across attempts) | 17 | 21 |
+| Direct source-read bytes | 5769 | 7072 |
 | Guarded reads blocked | 0 | 0 |
-| Wall time, mean per attempt (s) | 8.3 | 11.2 |
+| Wall time, mean per attempt (s) | 4.7 | 9.2 |
 | Provider input tokens per attempt | unavailable | unavailable |
 | Provider output tokens per attempt | unavailable | unavailable |
 
-Estimated tool-output token reduction (median of paired task reductions): **-76.8% (95% bootstrap interval [-82.8, -36.8]%)**.
-Provider input token reduction: unavailable. Wall time reduction: -15.2% (95% bootstrap interval [-49.0, -10.5]%).
+Estimated tool-output token reduction (median of paired task reductions): **18.8% (95% bootstrap interval [-9.9, 28.8]%)**.
+Provider input token reduction: unavailable. Wall time reduction: -166.2% (95% bootstrap interval [-229.4, -47.5]%).
 Success delta (Groundwork minus baseline, median per task): 0.0 pp (95% bootstrap interval [0.0, 0.0] pp).
 
 | Suite metric | Baseline total | Groundwork total | Paired delta (GW – baseline, per task) | Task coverage |
 | --- | ---: | ---: | ---: | ---: |
-| duplicatesAdded | 20 | 17 | 0.0 (95% bootstrap interval [-0.2, 0.0]) | 10/10 |
+| duplicatesAdded | 25 | 24 | 0.0 (95% bootstrap interval [-0.2, 0.0]) | 10/10 |
 | inventedCalls | 0 | 0 | 0.0 (95% bootstrap interval [0.0, 0.0]) | 10/10 |
 <!-- long-horizon-results:end -->
 
-**Groundwork used more estimated tool-output tokens and more wall time; these
-sessions do not demonstrate savings.** Negative reductions mean increases.
+**These sessions do not demonstrate token or time savings.** The estimated-output
+interval spans zero, so the observed median reduction does not establish
+savings. Groundwork took more wall time. Negative reductions mean increases.
 These are the reporter's medians across tasks, not ratios of suite totals. Its
 95% task-bootstrap intervals condition on these sessions, do not estimate
 variation across independent model runs, and do not account for dependence
@@ -44,14 +46,22 @@ exposed. Duplicate counts are raw scorer findings, not labeled clone counts.
 
 ### Collection deviations
 
-- Groundwork run 3 authored files in a staging directory and copied them into
-  task workspaces via the shell wrapper. Its patches contain ordinary feature
-  source and replay successfully; that does not establish complete accounting
-  for staging-file authoring/read costs or time outside task begin/finish.
-- Two runs each had one failed-then-retried tool call, as reported during
-  collection. The capture JSON lacks command text and error status, so it
-  cannot independently identify those calls. The supplied captures are stored
-  unchanged; no retries were filtered out.
+These are self-reported collection deviations for the rerun:
+
+- Baseline 1 read the task README with `cat` via the shell wrapper. Shell reads
+  contribute tool-output bytes but not the direct source-read counters.
+- Baseline 3 drafted files in `~/lhb3tmp` and `/tmp`, then base64-decoded them
+  into the workspace via the shell wrapper.
+- Groundwork 1 never called `find_similar`.
+- Groundwork 3 had one `find_similar` call fail on a wrong argument name,
+  then retried, and staged commands in `/tmp/cmd.sh`.
+
+The capture JSON lacks shell-command text and explicit error status, so these
+disclosures cannot be independently reconstructed from the tool records.
+Authoring or reads outside wrappers and time outside task begin/finish may
+be unmeasured. All supplied captures are stored unchanged; no retries or
+sessions were filtered out.
+
 - One Devin session per arm/run carried context across ten steps. This is a
   small local event-library fixture, not evidence of performance on large
   production repositories. Results do not establish end-to-end model-token
@@ -59,16 +69,14 @@ exposed. Duplicate counts are raw scorer findings, not labeled clone counts.
 
 ### Evidence and offline reproduction
 
-The six [raw observations](observations/) retain original run labels 1–3 for
-both arms; none of the provisional two-pair relabeling is used. Each pins source
-`e366bbcd1944f81d118c486db4d1d8e6feeda705` and collector revision
-`34ea4c11efc47ffe7781308b31bdbf903e45f166`. The complete
-[report](results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.md),
-[JSON](results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.json), dated graded evidence,
-original `tasks.json` and original `grade.mjs` are archived under
-`results/pre-19/long-horizon/`. Its [evidence.json](results/pre-19/long-horizon/evidence.json)
-is the same graded evidence at the fixed path within that historical suite. Its task/verifier
-digest is checked on replay. The evidence and results additionally record an
+The six active [raw observations](observations/) retain original run labels
+1–3 for both arms. They pin fixture revision
+`f2d5514fd96dac166b8e57c1790949fe67e65b05` and collector revision
+`fa8657cbb6bc73dfb9a8011b891f55b6af499eda` (final Phase 2 tools). The complete
+[report](results/2026-11-21T21-44-09-424Z-long-horizon.md),
+[JSON](results/2026-11-21T21-44-09-424Z-long-horizon.json) and dated graded evidence
+are under `results/`; [evidence.json](evidence.json) enables shared offline replay.
+The manifest/verifier digest is checked on replay. Both evidence sets record an
 `evaluator` SHA-256 fingerprint: every suite `.mjs` file (including acceptance,
 metrics, validation and verification helpers), the task manifest and every
 fixture file, including both archived and active manifests. `verify-results.mjs`
@@ -78,24 +86,39 @@ the shared reporter alone checks only its manifest/grade digest. This local
 fingerprint does not hash Node or third-party packages; the original collector
 revision and dependency lockfile define that environment.
 
-After `npm ci && npm run build`, verify the historical report offline, without agents,
+After `npm ci && npm run build`, replay and verify both sets offline, without agents,
 network access or execution of captured patches:
 
 ```sh
+node dist/cli/main.js bench --suite all --runs 3 --output-dir /path/to/replayed-results
 node bench/long-horizon/verify-results.mjs
 ```
 
-Verification invokes the shared `loadEvidence` reporter against the archived
-suite directory, not the active collection manifest. No historical observations,
-scores or reported numbers have been relabeled or recomputed.
+Offline `all` includes both navigation and active long-horizon evidence.
+Verification also invokes shared `loadEvidence` against the separate historical
+suite directory; the two long-horizon collections are not pooled.
+
+### First collection (historical pre-19 comparison)
+
+The first run reported estimated-output reduction -76.8%
+(95% interval [-82.8, -36.8]%) and wall-time reduction -15.2%
+(95% interval [-49.0, -10.5]%). Its mean estimated output was 143.8 versus
+179.4 tokens per attempt, and mean wall time was 8.3 versus 11.2 seconds
+(baseline versus Groundwork). That run demonstrated no savings either.
+
+Its original [report](results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.md),
+JSON, evidence, manifest, grader and all six raw captures remain under
+`results/pre-19/long-horizon/`. Original labels and measurements are unchanged.
+Those captures used collector `34ea4c1` and fixture pin `e366bbc`. Previously
+disclosed deviations were Groundwork 3's staged file authoring and two runs
+with one failed-then-retried tool call each.
 
 After rebasing onto merged Phase 2, the active manifest pins fixture commit
 `f2d5514fd96dac166b8e57c1790949fe67e65b05`, which is reachable in fresh clones.
 Its fixture tree is identical to the historical pin:
 `db8cdd31ecc3d901b1752acfc8145482c70bfa3d`. Only the pin changed; all ten tasks
-are unchanged. New sessions must use the active manifest. No evidence is
-installed at the active suite's fixed path until new sessions are graded, so
-the shared CLI cannot accidentally present these historical results as a new run.
+are unchanged. The active fixed-path evidence now contains only the rerun;
+historical results remain separate.
 
 ## Run
 

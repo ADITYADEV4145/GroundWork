@@ -250,6 +250,29 @@ describe('consented, offline-only optional meaning', () => {
     });
   });
 
+  it.each(['overrun', 'failure'])('preserves manual duplicate and grounding BLOCKs on optional meaning %s', async (mode) => {
+    await withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, 'caller.ts', "import { parseDateString } from './utils.js';\nparseDateString();\n");
+      const baseline = await checkRepository(root);
+      await initializeEmbeddings(root, { consent: true, factory: fake().factory });
+      let now = Date.now();
+      const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
+      const factory = vi.fn<EmbedderFactory>(async () => ({ embed: async () => { now += 31_000; return [1, 0]; } }));
+      const prepare = mode === 'failure' ? vi.spyOn(CandidateIndex.prototype, 'prepareMeaning').mockRejectedValue(new Error('optional adapter failed')) : undefined;
+      try {
+        const report = await checkRepository(root, { embeddingFactory: factory });
+        expect(report.findings).toEqual(baseline.findings);
+        expect(report).toMatchObject({ status: 'BLOCK', blocked: true });
+        expect(report.findings).toEqual(expect.arrayContaining([
+          expect.objectContaining({ kind: 'grounding', severity: 'BLOCK' }),
+          expect.objectContaining({ kind: 'duplicate', severity: 'BLOCK' }),
+        ]));
+        if (mode === 'overrun') expect(factory).toHaveBeenCalledOnce();
+      } finally { clock.mockRestore(); prepare?.mockRestore(); }
+      await expect(checkRepository(root, { timeoutMs: 0 })).rejects.toThrow();
+    });
+  });
+
   it('retains completed vectors but starts no further embedding work after the optional budget', async () => {
     await withIndexedFixture('reuse-app', async (_db, root) => {
       await initializeEmbeddings(root, { consent: true, factory: fake().factory });

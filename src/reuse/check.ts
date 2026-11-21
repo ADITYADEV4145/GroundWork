@@ -88,7 +88,7 @@ export function formatCheck(report: CheckReport): string {
 /** Worktree (including staged and untracked files) versus a Git commit, never index versus index. */
 export async function checkRepository(root: string, options: CheckOptions = {}): Promise<CheckReport> {
   const start = performance.now();
-  const deadline = Date.now() + (options.timeoutMs ?? 30_000);
+  let deadline = Date.now() + (options.timeoutMs ?? 30_000);
   const checkDeadline = () => { if (Date.now() >= deadline) throw new Error('reuse check timed out'); };
   const config = options.config ?? loadConfig(root);
   const commit = git(root, ['rev-parse', '--verify', '--end-of-options', `${options.base ?? 'HEAD'}^{commit}`], deadline).trim();
@@ -107,10 +107,15 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   finally { db.close(); }
   const oldFiles = new Map(base.state.files.map((f) => [f.file, f]));
   const changedFiles = new Set(state.files.filter((f) => f.hash !== oldFiles.get(f.file)?.hash).map((f) => f.file));
-  await candidates.prepareMeaning(root, config, options.embeddingFactory, {
-    deadline: options.timeoutMs === undefined ? undefined : Date.now() + Math.max(0, Math.min(250, (deadline - Date.now()) / 10)),
-    priorityFiles: changedFiles,
-  });
+  const meaningStart = Date.now();
+  try {
+    await candidates.prepareMeaning(root, config, options.embeddingFactory, {
+      deadline: meaningStart + (options.timeoutMs === undefined ? 30_000 : Math.max(0, Math.min(250, (deadline - meaningStart) / 10))),
+      priorityFiles: changedFiles,
+    });
+  } catch {
+    for (const symbol of candidates.symbols) delete symbol.embedding;
+  } finally { deadline += Math.max(0, Date.now() - meaningStart); }
   checkDeadline();
   const baseSymbols = new Map(base.state.symbols.map((s) => [s.id, s]));
   const symbols = new Map(state.symbols.map((s) => [s.id, s]));

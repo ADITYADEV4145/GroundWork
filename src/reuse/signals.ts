@@ -2,6 +2,11 @@ import { minhashSimilarity, splitWords, vocabulary } from '../extract/fingerprin
 import type { BodyFingerprint, Param } from '../types.js';
 
 export interface ComparableSymbol {
+  kind?: string;
+  file?: string;
+  qualifiedName?: string;
+  startByte?: number;
+  endByte?: number;
   name: string;
   fingerprint: BodyFingerprint | null;
   docstring: string | null;

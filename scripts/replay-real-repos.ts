@@ -13,7 +13,7 @@ const only = process.argv.find((arg) => arg.startsWith('--repo='))?.split('=')[1
 if (only && !repositories.some((r) => r.id === only)) throw new Error(`Unknown repository: ${only}`);
 const toolCommit = git(project, 'rev-parse', 'HEAD');
 const modelHash = createHash('sha256').update(readFileSync(path.join(project, 'src/reuse/model.json'))).digest('hex');
-const directory = path.join(cache, 'results');
+const directory = process.env.GW_REAL_REPOS_RESULTS ?? path.join(cache, 'results');
 mkdirSync(directory, { recursive: true });
 for (const repo of repositories.filter((r) => !only || r.id === only)) {
   if (git(clonePath(repo), 'rev-parse', '--is-shallow-repository') !== 'false') throw new Error('Run setup-real-repos.ts to unshallow before replay.');

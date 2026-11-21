@@ -37,7 +37,7 @@ export const PHASE3_CHECKS: Check[] = [{
     const keys = meaning ? [...SIGNAL_KEYS, 'meaning' as const] : SIGNAL_KEYS;
     const predictions = outOfFold(dataset, keys);
     const threshold = chooseBlock(predictions);
-    const result = metrics(predictions, active.thresholds.block);
+    const result = metrics(predictions, active.thresholds.block, true);
     const final = train(dataset.examples, keys);
     const weights: Partial<Record<keyof typeof final.weights, number>> = active.weights;
     const fresh = dataset.digest === active.calibration.datasetDigest && dataset.examples.length === active.calibration.pairs &&

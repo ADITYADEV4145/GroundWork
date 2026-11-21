@@ -199,7 +199,7 @@ describe('consented, offline-only optional meaning', () => {
     const picked = chooseEmbeddingCandidate(evaluation.candidates);
     expect(picked.model).toBe(meaningModel.embeddingModel);
     for (const candidate of evaluation.candidates) {
-      const selected = candidate.oof.filter((p) => p.probability >= candidate.block);
+      const selected = candidate.oof.filter((p) => p.probability >= candidate.block && p.blockEligible);
       const labels = new Map(dataset.examples.map((e) => [e.label.id, e.label]));
       const tp = selected.filter((p) => labels.get(p.id)!.label === 'dup').length;
       expect(tp / selected.length).toBeGreaterThanOrEqual(0.95);

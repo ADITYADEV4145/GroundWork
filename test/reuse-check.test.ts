@@ -101,7 +101,7 @@ describe('git-scripted reuse check scenarios (also exercised by selftest)', () =
         expect(formatFinding(f).split('\n').length).toBeLessThanOrEqual(6);
         expect(f.signals).toHaveLength(2);
         expect(formatFinding(f)).toContain('Fix:');
-        if (f.kind === 'duplicate') expect(f.severity).toBe(f.probability! >= thresholds.block ? 'BLOCK' : 'WARN');
+        if (f.kind === 'duplicate' && f.severity === 'BLOCK') expect(f.probability!).toBeGreaterThanOrEqual(thresholds.block);
       }
       if (!report.findings.length) expect(formatCheck(report)).toBe('PASS: no reuse findings.');
     });

@@ -17,6 +17,7 @@ import { CandidateIndex } from './candidates.js';
 import { allowReason, configName, inspectSource } from './inspection.js';
 import { scoreSignals } from './model.js';
 import { pairSignals, type Signals } from './signals.js';
+import { canBlock } from './policy.js';
 
 type IndexedSymbol = ReuseState['symbols'][number];
 type Literal = ReuseState['literals'][number] & { configish?: boolean };
@@ -187,11 +188,13 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
       const signals = pairSignals(query, candidate, candidates.idf);
       const score = scoreSignals(signals, query.embedding?.model);
       const p = score.probability;
-      if (!best || p > best.p) best = { target: symbols.get(candidate.id)!, p, signals, score };
+      const blocking = p >= score.thresholds.block && canBlock(query, candidate, signals);
+      const bestBlocking = best && best.p >= best.score.thresholds.block && canBlock(query, best.target, best.signals);
+      if (!best || (blocking && !bestBlocking) || (blocking === !!bestBlocking && p > best.p)) best = { target: symbols.get(candidate.id)!, p, signals, score };
     }
     if (!best || best.p < best.score.thresholds.warn) continue;
     matches.set(s.id, best);
-    add({ kind: 'duplicate', severity: best.p >= best.score.thresholds.block ? 'BLOCK' : 'WARN', added: location(s), existing: location(best.target),
+    add({ kind: 'duplicate', severity: best.p >= best.score.thresholds.block && canBlock(query, best.target, best.signals) ? 'BLOCK' : 'WARN', added: location(s), existing: location(best.target),
       probability: best.p, signals: topSignals(best.signals, best.score), fix: `Replace the body of ${s.qualifiedName} with a call to ${best.target.qualifiedName}.` });
   }
   const callKey = (c: ReuseState['calls'][number]) => `${c.file}\0${c.callerId ?? '<module>'}`;

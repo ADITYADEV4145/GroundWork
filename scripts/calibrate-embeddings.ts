@@ -10,6 +10,7 @@ import { embeddingCacheDir, embedSources, initializeEmbeddings } from '../src/re
 import type { Signals } from '../src/reuse/signals.js';
 import { vectorCosine } from '../src/reuse/signals.js';
 import { chooseEmbeddingCandidate } from '../src/reuse/embedding-evaluation.js';
+import { BLOCK_POLICY } from '../src/reuse/policy.js';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const root = path.resolve(process.env.GW_EMBEDDING_EVAL_CACHE ?? path.join(os.homedir(), 'work/gw-embedding-evaluation'));
@@ -37,17 +38,17 @@ for (const model of candidates) {
   for (let i = 0; i < dataset.symbols.length; i++) dataset.symbols[i]!.embedding = vectors.get(String(i));
   const predictions = outOfFold(dataset, keys);
   const block = chooseBlock(predictions);
-  const result = metrics(predictions, block);
+  const result = metrics(predictions, block, true);
   const coefficients = train(dataset.examples.map((e) => ({ ...e, signals: { ...e.signals,
     meaning: e.a.embedding && e.b.embedding ? vectorCosine(e.a.embedding.vector, e.b.embedding.vector) : 0 } })), keys);
   const record = { model, format: 'source-v1:q8:mean:512', sizeBytes: size(path.join(embeddingCacheDir(root), model)), embedMsPerSymbol: ms / sources.length,
     ...result, block, warn: block * 0.6, byType: recallByType(predictions, block), coefficients,
-    oof: predictions.map((p) => ({ id: p.example.label.id, fold: p.fold, probability: p.probability })) };
+    oof: predictions.map((p) => ({ id: p.example.label.id, fold: p.fold, probability: p.probability, blockEligible: p.blockEligible })) };
   results.push(record);
   console.log(`${model}: ${pct(result.precision)} precision, ${pct(result.recall)} recall; ${(record.sizeBytes / 1048576).toFixed(1)} MiB, ${record.embedMsPerSymbol.toFixed(2)} ms/symbol.`);
 }
 const picked = chooseEmbeddingCandidate(results);
-writeFileSync(path.join(repo, 'src/reuse/meaning-model.json'), JSON.stringify({ status: 'calibrated-grouped-oof', embeddingModel: picked.model,
+writeFileSync(path.join(repo, 'src/reuse/meaning-model.json'), JSON.stringify({ status: 'calibrated-grouped-oof', blockPolicy: BLOCK_POLICY, embeddingModel: picked.model,
   format: picked.format, ...picked.coefficients, thresholds: { block: picked.block, warn: picked.warn },
   calibration: { datasetDigest: dataset.digest, pairs: dataset.examples.length, groups: 12, folds: 5, precision: picked.precision, recall: picked.recall, tp: picked.tp, fp: picked.fp } }, null, 2) + '\n');
 writeFileSync(path.join(repo, 'bench/dupes/embeddings-oof.json'), JSON.stringify({ datasetDigest: dataset.digest, candidates: results }, null, 2) + '\n');

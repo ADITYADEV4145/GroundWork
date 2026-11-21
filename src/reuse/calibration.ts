@@ -5,6 +5,7 @@ import { initParsers, languageForPath } from '../lang/index.js';
 import { sha1 } from '../util/hash.js';
 import { buildIdf, pairSignals, type ComparableSymbol, type Signals } from './signals.js';
 import { extractReuseSource } from './source.js';
+import { canBlock, BLOCK_SCORE_FLOOR } from './policy.js';
 
 const refSchema = z.object({ file: z.string().startsWith('corpus/'), symbol: z.string().min(1) });
 export const labelSchema = z.object({
@@ -47,8 +48,9 @@ export async function loadDataset(directory: string): Promise<Dataset & { source
     for (const symbol of extraction.symbols) {
       const key = `${file}:${symbol.qualifiedName}`;
       if (symbols.has(key)) throw new Error(`Ambiguous corpus symbol ${key}`);
-      symbols.set(key, symbol);
-      symbolSources.set(symbol, source.slice(symbol.startByte, symbol.endByte));
+      symbols.set(key, { ...symbol, file });
+      const stored = symbols.get(key)!;
+      symbolSources.set(stored, source.slice(symbol.startByte, symbol.endByte));
     }
   }
   const idf = buildIdf([...symbols.values()]);
@@ -91,7 +93,7 @@ export function train(examples: Example[], keys: (keyof Signals)[], iterations =
   return model;
 }
 
-export interface Prediction { example: Example; probability: number; fold: number }
+export interface Prediction { example: Example; probability: number; fold: number; blockEligible?: boolean }
 export function outOfFold(dataset: Dataset, keys: (keyof Signals)[], folds = 5): Prediction[] {
   const groups = [...new Set(dataset.examples.map((e) => e.group))].sort();
   if (folds < 2 || folds > groups.length) throw new Error('Invalid fold count');
@@ -103,29 +105,30 @@ export function outOfFold(dataset: Dataset, keys: (keyof Signals)[], folds = 5):
     const features = (e: Example) => ({ ...e, signals: pairSignals(e.a, e.b, idf) });
     const model = train(training.map(features), keys);
     for (const example of dataset.examples.filter((e) => assignments.get(e.group) === fold)) {
-      predictions.push({ example, probability: predict(model, features(example).signals), fold });
+      const signals = features(example).signals;
+      predictions.push({ example, probability: predict(model, signals), fold, blockEligible: canBlock(example.a, example.b, signals) });
     }
   }
   return predictions;
 }
 
-export function metrics(predictions: Prediction[], threshold: number) {
+export function metrics(predictions: Prediction[], threshold: number, blocking = false) {
   const positive = predictions.filter((p) => p.example.label.label === 'dup').length;
-  const selected = predictions.filter((p) => p.probability >= threshold);
+  const selected = predictions.filter((p) => p.probability >= threshold && (!blocking || p.blockEligible !== false));
   const tp = selected.filter((p) => p.example.label.label === 'dup').length;
   const fp = selected.length - tp;
   return { tp, fp, fn: positive - tp, precision: selected.length ? tp / selected.length : 0, recall: positive ? tp / positive : 0, support: positive };
 }
 
 export function chooseBlock(predictions: Prediction[], target = 0.95): number {
-  const candidates = [...new Set(predictions.map((p) => p.probability))].sort((a, b) => a - b);
+  const candidates = [...new Set(predictions.map((p) => p.probability))].filter((p) => p >= BLOCK_SCORE_FLOOR).sort((a, b) => a - b);
   for (const threshold of candidates) {
-    const result = metrics(predictions, threshold);
+    const result = metrics(predictions, threshold, true);
     if (result.tp > 0 && result.precision >= target) return threshold;
   }
   throw new Error('No nonempty BLOCK threshold reaches target precision');
 }
 
 export function recallByType(predictions: Prediction[], threshold: number) {
-  return [1, 2, 3, 4].map((type) => ({ type, ...metrics(predictions.filter((p) => p.example.label.label === 'not' || p.example.label.cloneType === type), threshold) }));
+  return [1, 2, 3, 4].map((type) => ({ type, ...metrics(predictions.filter((p) => p.example.label.label === 'not' || p.example.label.cloneType === type), threshold, true) }));
 }

@@ -8,6 +8,7 @@ import type { Embedding, EmbedderFactory } from './embeddings.js';
 import { meaningModel } from './model.js';
 import { buildIdf, vectorCosine, wordsOf, type ComparableSymbol } from './signals.js';
 import { extractReuseSource } from './source.js';
+import { relatedSymbols, type PairIdentity } from './policy.js';
 
 function bands(s: ComparableSymbol): string[] {
   const hash = s.fingerprint?.minhash;
@@ -76,7 +77,7 @@ export class CandidateIndex {
     return (await embedSources(ctx.root, ctx.config, [{ id: 'query', text }], ctx.factory)).get('query');
   }
 
-  find(query: ComparableSymbol & { id?: string; file?: string; qualifiedName?: string }, limit = 80): Candidate[] {
+  find(query: ComparableSymbol & PairIdentity & { id?: string }, limit = 80): Candidate[] {
     const found = new Set<Candidate>();
     for (const key of bands(query)) for (const s of this.lsh.get(key) ?? []) found.add(s);
     const counts = new Map<Candidate, number>();
@@ -89,6 +90,6 @@ export class CandidateIndex {
         .sort((a, b) => b.cosine - a.cosine).slice(0, limit);
       for (const { s } of semantic) found.add(s);
     }
-    return [...found].filter((s) => s.id !== query.id && !(s.file === query.file && s.qualifiedName === query.qualifiedName));
+    return [...found].filter((s) => s.id !== query.id && !relatedSymbols(query, s));
   }
 }

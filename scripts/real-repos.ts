@@ -14,7 +14,7 @@ export const repositorySchema = z.object({
 }).strict();
 export type Repository = z.infer<typeof repositorySchema>;
 export const repositories = z.object({ repositories: z.array(repositorySchema).length(3) }).parse(
-  JSON.parse(readFileSync(path.join(project, 'bench/real-repos/repos.json'), 'utf8'))).repositories;
+  JSON.parse(readFileSync(process.env.GW_REAL_REPOS_MANIFEST ?? path.join(project, 'bench/real-repos/repos.json'), 'utf8'))).repositories;
 export const cache = path.resolve(process.env.GW_REAL_REPOS_CACHE ?? path.join(os.homedir(), 'work/gw-real-repos'));
 if (cache === project || cache.startsWith(project + path.sep)) throw new Error('GW_REAL_REPOS_CACHE must be outside the GroundWork repository.');
 export const clonePath = (repo: Repository) => path.join(cache, repo.id);

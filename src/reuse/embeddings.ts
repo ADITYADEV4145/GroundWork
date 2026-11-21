@@ -10,8 +10,9 @@ import { openDb } from '../store/db.js';
 import { sha1 } from '../util/hash.js';
 import { log } from '../util/log.js';
 import { gwPath } from '../util/paths.js';
+import meaningModel from './meaning-model.json' with { type: 'json' };
 
-export const DEFAULT_EMBEDDING_MODEL = 'Xenova/jina-embeddings-v2-small-en';
+export const DEFAULT_EMBEDDING_MODEL = meaningModel.embeddingModel;
 export const EMBEDDING_FORMAT = 'source-v1:q8:mean:512';
 export interface Embedder { embed(text: string): Promise<number[]> }
 export type EmbedderFactory = (model: string, options: { cacheDir: string; download: boolean }) => Promise<Embedder>;

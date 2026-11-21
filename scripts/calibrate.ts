@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chooseBlock, COMBINATIONS, loadDataset, metrics, outOfFold, recallByType, SIGNAL_KEYS, train } from '../src/reuse/calibration.js';
+import { BLOCK_POLICY } from '../src/reuse/policy.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dataset = await loadDataset(path.join(root, 'bench/dupes'));
@@ -10,7 +11,7 @@ const runs = Object.entries(COMBINATIONS).map(([name, keys]) => {
   const predictions = outOfFold(dataset, keys);
   let threshold: number | null = null;
   try { threshold = chooseBlock(predictions); } catch { /* An ablation may have no safe operating point. */ }
-  return { name, predictions, threshold, result: metrics(predictions, threshold ?? 2) };
+  return { name, predictions, threshold, result: metrics(predictions, threshold ?? 2, true) };
 });
 const full = runs.find((run) => run.name === 'all')!;
 if (full.threshold === null) throw new Error('Full model cannot reach 95% nonempty OOF precision');
@@ -22,7 +23,7 @@ const f1 = (threshold: number) => {
 };
 const warn = warnCandidates.sort((a, b) => f1(b) - f1(a) || a - b)[0] ?? block / 2;
 const model = {
-  status: 'calibrated-grouped-oof', ...train(dataset.examples, SIGNAL_KEYS),
+  status: 'calibrated-grouped-oof', blockPolicy: BLOCK_POLICY, ...train(dataset.examples, SIGNAL_KEYS),
   thresholds: { block, warn },
   calibration: { datasetDigest: dataset.digest, pairs: dataset.examples.length, groups: new Set(dataset.examples.map((e) => e.group)).size,
     folds: 5, iterations: 1800, learningRate: 0.4, l2: 0.002, targetPrecision: 0.95,
@@ -30,12 +31,20 @@ const model = {
 };
 writeFileSync(path.join(root, 'src/reuse/model.json'), JSON.stringify(model, null, 2) + '\n');
 writeFileSync(path.join(root, 'bench/dupes/oof.json'), JSON.stringify({ datasetDigest: dataset.digest,
-  predictions: full.predictions.map((p) => ({ id: p.example.label.id, fold: p.fold, probability: p.probability })) }, null, 2) + '\n');
+  predictions: full.predictions.map((p) => ({ id: p.example.label.id, fold: p.fold, probability: p.probability, blockEligible: p.blockEligible })) }, null, 2) + '\n');
 const types = recallByType(full.predictions, block);
 const positives = dataset.examples.filter((e) => e.label.label === 'dup').length;
 const report = `# Reuse calibration report
 
-Optional local embeddings have a [separate evaluation and opt-in model](embeddings.md); the no-meaning model below is unchanged.
+Optional local embeddings have a [separate evaluation and opt-in model](embeddings.md). [Real-history before/after and held-out review](../real-repos/review.md) is separate from calibration.
+
+Calibration retains the pre-policy confidence floor (0.750969663, rounded upward) so tightening eligibility does not promote old medium-confidence warnings. An initial unconstrained labeled-set recalibration chose ~0.606 and regressed an existing boundary-policy negative regression test; the floor preserves the previous confidence requirement. No post-fix original or held-out history results were consulted. The floor is common to both models; choose the lowest qualifying OOF score at or above it, not the unconstrained lowest score.
+
+## Conservative BLOCK policy and recall cost
+
+Policy \`${BLOCK_POLICY}\` excludes same-file ancestors/descendants (containing spans or dotted qualified-name ancestry), permits only class/class (including dataclasses) or callable/callable (function/method) pairs for BLOCK, and requires a majority of structural shingles (structure >= 0.5) or normalized/binding-aware exact equality. Vocabulary, matching signatures or embeddings alone cannot justify replacing an implementation. The 0.5 boundary encodes majority structural evidence; it was fixed before replaying either history set and was not searched over the 14 findings. Constants/files retain their separate checks. Cross-kind/low-structure results may remain WARN; their raw classifier probabilities are unchanged. Independent BLOCK candidates outrank nonblocking candidates.
+
+The same 510 labels and five family-disjoint folds are retained. Eligibility is applied to OOF BLOCK selection, never inferred from a label; filtered positives remain false negatives in the recall denominator. Training/IDF populations are unchanged because WARN/search still use the classifier. Both models are recalibrated against this policy. Before: default and meaning each 140 TP/7 FP, 95.24% precision, 57.61% recall. After default: ${full.result.tp} TP/${full.result.fp} FP, ${pct(full.result.precision)} precision, ${pct(full.result.recall)} recall. This deliberately loses semantic-only BLOCK recall; see the clone-type table, including Type 4.
 
 ## Method and scope
 

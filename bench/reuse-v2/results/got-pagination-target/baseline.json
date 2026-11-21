@@ -1,0 +1,21 @@
+{
+  "task_id": "got-pagination-target",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": false,
+  "acceptance": {
+    "exitCode": 1,
+    "output": "\n  ✘ [fail]: page relation resolution\n  ─\n\n  page relation resolution\n\n  test/bench-v2-pagination-target.ts:4\n\n   3: test('page relation resolution', t => {                                   \n   4:  t.is(paginationTarget('</p?x=2>; rel=\"next alternate\", <https://other.te…\n   5:  t.is(paginationTarget('<../last>; rel=last', 'https://example.com/a/b', …\n\n  Difference (- actual, + expected):\n\n  - URL {}\n  + 'https://example.com/p?x=2'\n\n  › <anonymous> (test/bench-v2-pagination-target.ts:4:4)\n\n  ─\n\n  1 test failed\n"
+  },
+  "check": {
+    "status": "PASS",
+    "findings": []
+  },
+  "reuse": {
+    "label": "reused",
+    "reason": "Devin lead review (agent, not Aditya): Calls parseLinkHeader to parse entries; its URL-object return mismatch is an acceptance failure, not duplication.",
+    "source": "human"
+  }
+}

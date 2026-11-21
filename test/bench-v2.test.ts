@@ -119,6 +119,7 @@ describe('reports and cheap acceptance gates', () => {
     expect(summarize([]).differences.duplicates.ci).toBeNull();
   });
   it('skips only missing files; empty, insufficient and malformed evidence does not pass', () => {
+    expect(summarize([]).arms.baseline.reviewedLabels).toBe(0);
     const dir = temp();
     expect(evaluateRealRepoReview(dir).skipped).toBe(true);
     expect(evaluateBenchmarkV2(dir).skipped).toBe(true);
@@ -130,6 +131,15 @@ describe('reports and cheap acceptance gates', () => {
     expect(evaluateBenchmarkV2(dir).ok).toBe(false);
     writeFileSync(path.join(dir, 'report.json'), '{}');
     expect(evaluateBenchmarkV2(dir).ok).toBe(false);
+  });
+  it('attributes reviewed overrides separately from automated labels without asserting human review', () => {
+    const run = result();
+    expect(summarize([run]).arms.baseline.reviewedLabels).toBe(0);
+    run.reuse = applyOverride(run.reuse, { task_id: run.task_id, arm: run.arm, label: 'reused', reviewer: 'Agent', reasoning: 'Calls helper.' });
+    const report = summarize([run]);
+    expect(report.arms.baseline.reviewedLabels).toBe(1);
+    expect(renderReport(report)).toContain('baseline 1/1; groundwork 0/0');
+    expect(renderReport(report)).toContain('agent review is not independent human review');
   });
   it('requires ten attributed reviews and >=90% agreement, rejecting duplicate rows', () => {
     const dir = temp();

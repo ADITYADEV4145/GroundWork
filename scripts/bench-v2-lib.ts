@@ -191,12 +191,13 @@ export function summarize(results: Result[]) {
     const known = runs.filter(r => r.reuse.label !== 'unknown'), duplicates = known.filter(r => r.reuse.label === 'duplicate').length;
     const successes = runs.filter(r => r.success).length, acus = runs.flatMap(r => r.acus === null ? [] : [r.acus]);
     return [arm, { n, duplicates: { count: duplicates, n: known.length, rate: known.length ? duplicates / known.length : null, ci: wilson(duplicates, known.length) },
+      reviewedLabels: runs.filter(r => r.reuse.source === 'human').length,
       unknownLabels: n - known.length, success: { count: successes, n, rate: n ? successes / n : null, ci: wilson(successes, n) },
       acus: { n: acus.length, mean: acus.length ? acus.reduce((a, b) => a + b, 0) / acus.length : null },
       check: { unavailable: runs.filter(r => r.check.status === 'UNAVAILABLE').length,
         BLOCK: runs.reduce((sum, r) => sum + r.check.findings.filter(f => f.severity === 'BLOCK').length, 0),
         WARN: runs.reduce((sum, r) => sum + r.check.findings.filter(f => f.severity === 'WARN').length, 0) } }];
-  })) as Record<Arm, { n: number; duplicates: {count: number; n: number; rate: number | null; ci: Interval | null}; unknownLabels: number;
+  })) as Record<Arm, { n: number; duplicates: {count: number; n: number; rate: number | null; ci: Interval | null}; reviewedLabels: number; unknownLabels: number;
     success: {count: number; n: number; rate: number | null; ci: Interval | null}; acus: {n: number; mean: number | null}; check: {unavailable: number; BLOCK: number; WARN: number} }>;
   const a = arms.baseline, b = arms.groundwork;
   const difference = (field: 'duplicates' | 'success') => ({
@@ -216,7 +217,8 @@ export function renderReport(report: Summary): string {
     const r = report.arms[arm];
     lines.push(`| ${arm} | ${r.n} | ${r.duplicates.count}/${r.duplicates.n} | ${percent(r.duplicates.rate)} ${interval(r.duplicates.ci)} | ${r.success.count}/${r.n}: ${percent(r.success.rate)} ${interval(r.success.ci)} | ${r.acus.mean?.toFixed(2) ?? 'n/a'} (${r.acus.n}) | ${r.check.BLOCK} / ${r.check.WARN} | ${r.check.unavailable} |`);
   }
-  lines.push('', 'Differences are baseline − groundwork (percentage points), with independent-proportions Newcombe 95% intervals. These are descriptive intervals, not paired-task inference.', '');
+  lines.push('', `Reviewed label overrides: baseline ${report.arms.baseline.reviewedLabels}/${report.arms.baseline.n}; groundwork ${report.arms.groundwork.reviewedLabels}/${report.arms.groundwork.n}. See labels.jsonl for attribution; agent review is not independent human review.`,
+    '', 'Differences are baseline − groundwork (percentage points), with independent-proportions Newcombe 95% intervals. These are descriptive intervals, not paired-task inference.', '');
   for (const key of ['duplicates', 'success'] as const) {
     const d = report.differences[key];
     const points = (n: number) => `${(100 * n).toFixed(1)} pp`;

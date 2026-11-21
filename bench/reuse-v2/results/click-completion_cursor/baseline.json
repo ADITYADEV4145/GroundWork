@@ -1,0 +1,75 @@
+{
+  "task_id": "click-completion_cursor",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": true,
+  "acceptance": {
+    "exitCode": 0,
+    "output": ".                                                                        [100%]\n1 passed in 0.07s\n"
+  },
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "ad9fe78d05f399dd1fff59318304c6c471f36fed",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/completion_cursor.py",
+          "symbol": "src/click/completion_cursor.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "src/click/shell_completion.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/completion_cursor.py and update its 1 caller to use src/click/shell_completion.py."
+      },
+      {
+        "id": "3e11ad3ac997ca2b6247ccde3323e960a8df8ef1",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/completion_cursor.py",
+          "symbol": "completion_cursor",
+          "line": 18
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "split_arg_string",
+          "line": 464
+        },
+        "probability": 0.5142341188048023,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.3476749670929593
+          }
+        ],
+        "fix": "Duplicate of split_arg_string: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "duplicate",
+    "reason": "Devin lead review (agent, not Aditya): Reimplements quote, escape and token state handling instead of calling split_arg_string.",
+    "source": "human"
+  }
+}

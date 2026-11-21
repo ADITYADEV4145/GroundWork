@@ -12,7 +12,7 @@ describe('real-history gate', () => {
     expect(evaluateRealRepoReview(path.join(project, 'missing-evidence'))).toEqual(expected);
     const check = PHASE3_CHECKS.find((c) => c.name.startsWith('real-repo BLOCK agreement'))!;
     expect(check.slow).not.toBe(true);
-    expect(await check.run({ quick: false, sequences: 1 })).toEqual(expected);
+    expect(await check.run({ quick: false, sequences: 1 })).toEqual(evaluateRealRepoReview(path.join(project, 'bench/reuse-v2')));
   });
   it('keeps UTC calendar bounds and deterministic endpoint-inclusive sampling reproducible', () => {
     expect(monthBounds('2025-02').map((n) => new Date(n).toISOString())).toEqual(['2025-02-01T00:00:00.000Z', '2025-03-01T00:00:00.000Z']);

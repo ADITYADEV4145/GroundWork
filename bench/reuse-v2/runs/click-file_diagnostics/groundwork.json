@@ -1,0 +1,14 @@
+{
+  "task_id": "click-file_diagnostics",
+  "arm": "groundwork",
+  "patch": "diff --git a/src/click/file_diagnostics.py b/src/click/file_diagnostics.py\nnew file mode 100644\nindex 0000000..574eb9c\n--- /dev/null\n+++ b/src/click/file_diagnostics.py\n@@ -0,0 +1,18 @@\n+from __future__ import annotations\n+\n+import collections.abc as cabc\n+import os\n+\n+from .utils import format_filename\n+\n+\n+def file_diagnostics(\n+    paths: cabc.Iterable[str | bytes | os.PathLike[str] | os.PathLike[bytes]],\n+    shorten: bool = False,\n+) -> list[str]:\n+    \"\"\"Return a \"Cannot open\" message for each path without opening any files.\n+\n+    Invalid bytes and surrogate escapes are replaced for display.\n+    If `shorten` is true, only the basename of each path is shown.\n+    \"\"\"\n+    return [f\"Cannot open: {format_filename(path, shorten=shorten)}\" for path in paths]\ndiff --git a/tests/test_file_diagnostics.py b/tests/test_file_diagnostics.py\nnew file mode 100644\nindex 0000000..028f678\n--- /dev/null\n+++ b/tests/test_file_diagnostics.py\n@@ -0,0 +1,23 @@\n+from pathlib import Path\n+\n+from click.file_diagnostics import file_diagnostics\n+\n+\n+def test_file_diagnostics():\n+    path = Path(\"nested\") / \"escaped\\udcff.txt\"\n+    paths = [\"nested/café.txt\", b\"nested/invalid\\xff.txt\", path]\n+\n+    assert file_diagnostics(iter(paths)) == [\n+        \"Cannot open: nested/café.txt\",\n+        \"Cannot open: nested/invalid�.txt\",\n+        f\"Cannot open: {path.with_name('escaped�.txt')}\",\n+    ]\n+    assert file_diagnostics(paths, shorten=True) == [\n+        \"Cannot open: café.txt\",\n+        \"Cannot open: invalid�.txt\",\n+        \"Cannot open: escaped�.txt\",\n+    ]\n+\n+\n+def test_file_diagnostics_empty():\n+    assert file_diagnostics([]) == []\n",
+  "decisions": [
+    "REUSE format_filename",
+    "NEW because no existing API formats a collection of paths as Cannot open diagnostics",
+    "NEW because no existing test verifies mixed paths, replacement characters, ordering, and shortening for the diagnostics API",
+    "NEW because no existing test verifies empty input for the diagnostics API"
+  ],
+  "notes": "The new API reuses Click’s format_filename to replace invalid bytes and surrogate escapes and to display basenames on request. It preserves input order without opening files.\nReported tests_run (agent-provided): \".venv/bin/python -m pytest -q: 902 passed, 21 skipped, 1 xfailed; .venv/bin/mypy: passed; pre-commit run: passed (uv-lock skipped); gw check --base 528fd7a798abe0077060c5720e13791a34167f66: passed, no findings; git diff --cached --check: passed.\"",
+  "session_id": "",
+  "acus": null
+}

@@ -1,0 +1,50 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx -y groundwork-agent hook claude pre_tool",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit|mcp__groundwork__find_code|mcp__plugin_groundwork_groundwork__find_code",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx -y groundwork-agent hook claude post_tool",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx -y groundwork-agent hook claude pre_compact",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx -y groundwork-agent hook claude stop",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

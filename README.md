@@ -22,6 +22,22 @@ gw doctor                    # runtime, grammars, storage checks
 
 Every command takes `--json`. The index lives in `.groundwork/index.db` and refreshes incrementally: only files whose content changed are re-parsed.
 
+## Install into your agent
+
+```sh
+gw setup            # detects Claude Code, Codex and Cursor; shows every file it will change and asks first
+gw setup --remove   # removes exactly what setup added
+```
+
+Claude Code can also install it as a plugin:
+
+```
+/plugin marketplace add ADITYADEV4145/GroundWork
+/plugin install groundwork
+```
+
+Any other MCP client can run `gw mcp` (stdio). See [SECURITY.md](SECURITY.md) for what the hooks do.
+
 ## What the index holds
 
 TypeScript, JavaScript (JSX/CommonJS) and Python, parsed with tree-sitter (WASM):

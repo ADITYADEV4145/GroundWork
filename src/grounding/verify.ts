@@ -493,8 +493,9 @@ export class Grounder {
   /** `Cls.m = ...`, `setattr(...)` or other dynamic rewiring of the target in `where` makes its signature unknown. */
   private patched(target: SymbolFact, where: FileFacts): boolean {
     const text = this.text(where.path) ?? '';
-    if (/\bsetattr\s*\(|Object\.(assign|defineProperty)\s*\(|\.prototype\b/.test(text)) return true;
-    return new RegExp(`\\.${escapeRe(target.name)}\\s*=(?!=)`).test(text);
+    if (/\bsetattr\s*\(|Object\.assign\s*\(\s*[A-Z][\w$]*(\.prototype)?\s*,/.test(text)) return true;
+    const n = escapeRe(target.name);
+    return new RegExp(`\\.${n}\\s*=(?!=)|defineProperty\\s*\\([^)]*['"\`]${n}['"\`]`).test(text);
   }
 
   private checkPyArgs(f: FileFacts, call: CallFact, target: SymbolFact): Finding | null {

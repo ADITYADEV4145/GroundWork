@@ -36,8 +36,11 @@ export const BLOCK_END = '# <<< groundwork';
 
 type HookMap = Record<string, { matcher?: string; command: string }[]>;
 
-function isOurs(command: unknown, gw: string): boolean {
-  return typeof command === 'string' && command.startsWith(`${gw} hook `);
+/** Any Groundwork hook, whichever launch command installed it, so removal and re-setup with a new `--command` find it. */
+const OUR_HOOK = /(?:^|[\s/])(?:gw|groundwork-agent)(?:\s+\S+)*\s+hook\s+(?:claude|codex|cursor)\s+\w+$/;
+
+function isOurs(command: unknown): boolean {
+  return typeof command === 'string' && OUR_HOOK.test(command.trim());
 }
 
 function asObject(v: unknown): Record<string, unknown> {
@@ -65,7 +68,7 @@ function nestedHooks(file: string, gw: string, map: HookMap): JsonEdit {
         if (!Array.isArray(hooks[event])) continue;
         const kept = (hooks[event] as unknown[]).filter((g) => {
           const inner = asObject(g).hooks;
-          return !(Array.isArray(inner) && inner.some((h) => isOurs(asObject(h).command, gw)));
+          return !(Array.isArray(inner) && inner.some((h) => isOurs(asObject(h).command)));
         });
         if (kept.length) hooks[event] = kept;
         else delete hooks[event];
@@ -97,7 +100,7 @@ function cursorHooks(file: string, gw: string, map: HookMap): JsonEdit {
       const hooks = asObject(doc.hooks);
       for (const event of Object.keys(hooks)) {
         if (!Array.isArray(hooks[event])) continue;
-        const kept = (hooks[event] as unknown[]).filter((h) => !isOurs(asObject(h).command, gw));
+        const kept = (hooks[event] as unknown[]).filter((h) => !isOurs(asObject(h).command));
         if (kept.length) hooks[event] = kept;
         else delete hooks[event];
       }

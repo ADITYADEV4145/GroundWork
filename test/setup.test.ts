@@ -51,6 +51,27 @@ describe('gw setup', () => {
   });
 });
 
+describe('gw setup edge cases', () => {
+  function fresh() {
+    const root = tempDir('gw-setup-root-');
+    const home = tempDir('gw-setup-home-');
+    dirs.push(root, home);
+    return { root, home };
+  }
+
+  it('removes hooks installed with a custom --command and does not duplicate them on re-setup', () => {
+    const { root, home } = fresh();
+    const custom = targetsFor({ root, home, gw: 'npx -y groundwork-agent' });
+    applySetup(root, planSetup(root, custom, 'add'), 'add');
+    const plain = targetsFor({ root, home, gw: 'gw' });
+    applySetup(root, planSetup(root, plain, 'add'), 'add');
+    const settings = JSON.parse(readFileSync(path.join(root, '.claude', 'settings.json'), 'utf8'));
+    expect(settings.hooks.PreToolUse).toHaveLength(1);
+    applySetup(root, planSetup(root, plain, 'remove'), 'remove');
+    expect(snapshot(root)).toEqual({});
+  });
+});
+
 describe('hook rendering', () => {
   it('cursor permission hooks always answer with valid JSON', () => {
     const ev = normalise('cursor', 'pre_tool', { tool_name: 'Shell', tool_input: { command: 'ls' }, workspace_roots: ['/w'] });

@@ -10,7 +10,7 @@ import { DEFAULT_EMBEDDING_MODEL, embedSources } from '../../reuse/embeddings.js
 import { pairSignals, buildIdf } from '../../reuse/signals.js';
 import { findRepoRoot } from '../../util/paths.js';
 import { checkRepository } from '../../reuse/check.js';
-import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, withCheckScenario } from '../../reuse/scenarios.js';
+import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, withCheckScenario, writeScenarioFile } from '../../reuse/scenarios.js';
 import type { Check } from '../registry.js';
 import { evaluateRealRepoReview } from '../real-repo-review.js';
 
@@ -81,6 +81,7 @@ export const PHASE3_CHECKS: Check[] = [{
     const main = fileURLToPath(new URL('../../../dist/cli/main.js', import.meta.url));
     if (!existsSync(main)) return { ok: false, detail: 'Run npm run build before the built Stop latency check.' };
     return withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile: 'strict' }));
       await checkRepository(root);
       const session = randomUUID();
       const times: number[] = [];

@@ -11,7 +11,9 @@ if (command === 'hook' && process.argv.length === 5 &&
   try {
     const { runHook } = await import('../hooks/run.js');
     await runHook(agent as AgentName, event as HookEventName);
-  } catch { /* Hooks fail open, including module loading failures. */ }
+  } catch {
+    if (agent === 'cursor' && event === 'pre_tool') process.stdout.write('{"permission":"allow"}\n');
+  }
   process.exitCode = 0;
 } else {
   await import('./program.js');

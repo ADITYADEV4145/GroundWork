@@ -387,6 +387,7 @@ describe('check command and Stop gate', () => {
 
   it('keeps fast and global-option hook routes equivalent without the compile cache', async () => {
     await withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile: 'strict' }));
       await checkRepository(root);
       for (const [i, args] of [['hook', 'claude', 'stop'], ['--root', root, 'hook', 'claude', 'stop']].entries()) {
         const run = (input: string) => spawnSync(process.execPath, ['--import', TSX, MAIN, ...args], {
@@ -407,6 +408,38 @@ describe('check command and Stop gate', () => {
         expect(malformed.stdout).toBe('');
       }
     });
+  });
+
+  it('preserves packaging profiles and agent renderers on both hook routes', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await checkRepository(root);
+      for (const [agent, profile] of [['claude', 'standard'], ['claude', 'minimal'], ['codex', 'strict'], ['cursor', 'strict']]) {
+        writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile }));
+        for (const global of [false, true]) {
+          const result = spawnSync(process.execPath, ['--import', TSX, MAIN, ...(global ? ['--root', root] : []), 'hook', agent!, 'stop'], {
+            cwd: root, encoding: 'utf8', input: JSON.stringify({ workspace_roots: [root], session_id: `${agent}-${profile}-${global}` }),
+          });
+          expect(result.status).toBe(0);
+          if (profile === 'minimal') expect(result.stdout).toBe('');
+          else expect(JSON.parse(result.stdout)).toMatchObject(agent === 'cursor' ? { followup_message: expect.stringContaining('BLOCK') } :
+            profile === 'strict' ? { decision: 'block' } : { systemMessage: expect.stringContaining('BLOCK') });
+        }
+      }
+      const result = spawnSync(process.execPath, ['--import', TSX, MAIN, 'setup', '--help'], { cwd: root, encoding: 'utf8' });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain('--profile');
+    });
+  });
+
+  it('allows Cursor permission hooks even when loading the hook runner fails', async () => {
+    const loader = `export async function resolve(s, c, next) { if (s.includes('/hooks/run.')) { process.stderr.write('unavailable runner\\n'); throw new Error('unavailable runner'); } return next(s, c); }`;
+    const preload = `import { register } from 'node:module'; register(${JSON.stringify('data:text/javascript,' + encodeURIComponent(loader))}, import.meta.url);`;
+    const result = spawnSync(process.execPath, ['--import', TSX, '--import', 'data:text/javascript,' + encodeURIComponent(preload), MAIN, 'hook', 'cursor', 'pre_tool'], {
+      encoding: 'utf8', input: '{}',
+    });
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout)).toEqual({ permission: 'allow' });
+    expect(result.stderr).toContain('unavailable runner');
   });
 
   it('prioritizes Stop denial while preserving opt-in nonblocking waste summaries', async () => {

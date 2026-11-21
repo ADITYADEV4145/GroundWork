@@ -199,6 +199,8 @@ export class Grounder {
       const bound = imp.alias ?? (imp.kind === 'module' ? imp.module.split('.')[0]! : imp.name);
       if (bound !== name) continue;
       if (imp.resolvedFileId === null) return 'unknown';
+      const from = this.file(fileId);
+      if (!from || !this.trusted(from, imp)) return 'unknown';
       if (imp.kind === 'namespace' || (imp.kind === 'module' && (imp.alias || !imp.module.includes('.')))) return { moduleFileId: imp.resolvedFileId };
       if (imp.kind === 'module') return 'unknown';
       if (this.isPyModuleItself(imp)) return { moduleFileId: imp.resolvedFileId };
@@ -211,6 +213,38 @@ export class Grounder {
       return 'unknown';
     }
     return 'unknown';
+  }
+
+  /**
+   * A Python absolute import the resolver matched by path suffix (`import types` -> src/click/types.py) is only
+   * trusted when the matched root is a sys.path-like directory, not the inside of another package.
+   */
+  trusted(from: FileFacts, imp: ImportFact): boolean {
+    if (!isPy(from) || imp.module.startsWith('.') || imp.resolvedFileId === null) return true;
+    const f = this.file(imp.resolvedFileId);
+    if (!f) return false;
+    const mod = imp.module.split('.').join('/');
+    const tails = [`${mod}.py`, `${mod}.pyi`, `${mod}/__init__.py`, `${mod}/${imp.name}.py`, `${mod}/${imp.name}/__init__.py`];
+    const tail = tails.find((t) => f.path === t || f.path.endsWith(`/${t}`));
+    if (!tail) return false;
+    const rootDir = f.path.slice(0, f.path.length - tail.length);
+    return !existsSync(path.join(this.root, rootDir, '__init__.py'));
+  }
+
+  /** How many times `name` is bound in a file: definitions, assignments, imports. More than one: scopes we cannot see. */
+  private bindingCache = new Map<string, number>();
+  bindings(text: string, name: string): number {
+    const key = `${text.length}:${name}`;
+    const hit = this.bindingCache.get(key);
+    if (hit !== undefined) return hit;
+    const n = escapeRe(name);
+    const re = new RegExp(
+      `\\b(function\\*?|def|class|const|let|var)\\s+${n}\\b|^[ \\t]*${n}\\s*(:[^=\\n]*)?=(?!=)|\\bas\\s+${n}\\b|^[ \\t]*(import|from)\\b[^\\n]*[\\s{,]${n}\\b(?!\\s+as\\b)`,
+      'gm',
+    );
+    const count = text.match(re)?.length ?? 0;
+    this.bindingCache.set(key, count);
+    return count;
   }
 
   /** `from pkg import mod` resolved straight to pkg/mod.py. */
@@ -302,11 +336,12 @@ export class Grounder {
     const lines = text.split('\n');
     for (const imp of this.importsOf(f.id)) {
       if (!inRanges(imp.line, opts.ranges, importEnd(lines, imp.line))) continue;
-      const finding = this.checkImport(f, imp);
+      const finding = this.checkImport(f, imp, lines);
       if (finding) res.findings.push(finding);
     }
     for (const call of callFacts(this.db, f.id)) {
       if (!inRanges(call.line, opts.ranges)) continue;
+      if (suppressed(lines, call.line)) continue;
       const finding = this.checkCall(f, call, text);
       if (finding) res.findings.push(finding);
     }
@@ -314,7 +349,7 @@ export class Grounder {
     return res;
   }
 
-  private checkImport(f: FileFacts, imp: ImportFact): Finding | null {
+  private checkImport(f: FileFacts, imp: ImportFact, lines: string[]): Finding | null {
     if (imp.unresolvedReason === 'not-found') {
       if (!imp.module.startsWith('.') || existsOnDisk(this.root, f.path, imp.module, isPy(f))) return null;
       return {
@@ -327,6 +362,7 @@ export class Grounder {
         suggestions: [],
       };
     }
+    if (!this.trusted(f, imp) || suppressed(lines, imp.line)) return null;
     if (imp.resolvedFileId === null || imp.kind === 'side-effect' || imp.kind === 'namespace' || imp.kind === 'module' || imp.kind === 'reexport-all') return null;
     if (imp.name === '*' || this.isPyModuleItself(imp)) return null;
     const wanted = imp.kind === 'default' ? 'default' : imp.name;
@@ -346,7 +382,14 @@ export class Grounder {
   }
 
   private checkCall(f: FileFacts, call: CallFact, text: string): Finding | null {
-    if (call.calleeId && (call.confidence === 'exact' || call.confidence === 'import-resolved')) return this.checkArgs(f, call);
+    if (call.calleeId && (call.confidence === 'exact' || call.confidence === 'import-resolved')) {
+      const head = call.calleeText.split('.')[0]!;
+      if (!/^(this|self|cls|super)$/.test(head)) {
+        if (this.bindings(text, head) > 1 || this.maybeShadowed(f, call, head, text)) return null;
+        if (this.bind(f.id, head) === 'unknown') return null;
+      }
+      return this.checkArgs(f, call);
+    }
     if (call.calleeId || f.isTest) return null;
     const parts = call.calleeText.split('.');
     if (parts.length !== 2 || !parts[0] || !parts[1] || /[^\w$]/.test(parts[0] + parts[1])) return null;
@@ -417,6 +460,8 @@ export class Grounder {
       if (target.decorators.some((d) => !SAFE_PY_DECORATORS.has(d.replace(/\(.*$/s, '')) && !dataclassOk(d))) return null;
       if (target.kind === 'class' || target.kind === 'dataclass') {
         if (/\bmetaclass\s*=|__new__|__call__/.test(body)) return null;
+        // Without its own __init__ the signature comes from a base (often outside the repo): unknown.
+        if (target.kind === 'class' && !this.membersOf(target.id).some((m) => m.name === '__init__')) return null;
         if (target.kind === 'dataclass' && (/^\s*class\s+\w+\s*\(/.test(body) || /kw_only|KW_ONLY|init\s*=\s*False/.test(body + target.decorators.join(' ')))) return null;
       }
       if (target.kind === 'method' && call.calleeText.includes('.') && !/^(self|cls)\./.test(call.calleeText)) {
@@ -475,6 +520,13 @@ export class Grounder {
       suggestions: [],
     };
   }
+}
+
+/** `// @ts-expect-error`, `// @ts-ignore`, `# type: ignore`, `# noqa`, `# gw: ignore` on the line or the one above. */
+function suppressed(lines: string[], line: number): boolean {
+  const here = lines[line - 1] ?? '';
+  const above = lines[line - 2] ?? '';
+  return /#\s*(type:\s*ignore|noqa|pyright:\s*ignore|gw:\s*ignore)|\/\/\s*gw:\s*ignore/.test(here) || /@ts-(expect-error|ignore)|gw:\s*ignore/.test(above);
 }
 
 function similarity(a: string, b: string): number {

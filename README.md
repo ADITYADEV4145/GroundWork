@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="docs/assets/groundwork-hero.webp" alt="Groundwork — give your coding agent solid ground. A live, local map of your codebase. Local, offline and open source." width="100%">
+  <picture>
+    <source media="(max-width: 600px)" srcset="docs/assets/groundwork-hero-mobile.webp">
+    <img src="docs/assets/groundwork-hero.webp" alt="Groundwork: find code, reuse it, and verify calls. A live, local map of your codebase for coding agents. Local, offline and MIT licensed." width="100%">
+  </picture>
 </p>
 
 <h1 align="center">Less searching. More building.</h1>

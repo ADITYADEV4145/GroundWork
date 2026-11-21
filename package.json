@@ -34,7 +34,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node scripts/bundle-hook.mjs",
     "typecheck": "tsc -p tsconfig.scripts.json",
     "test": "vitest run",
     "gw": "node --import tsx src/cli/main.ts",
@@ -59,6 +59,7 @@
     "@types/node": "^22.20.5",
     "@types/picomatch": "^4.0.3",
     "@types/sql.js": "^1.16.0",
+    "esbuild": "^0.28.2",
     "fast-check": "^4.10.3",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",

@@ -1,0 +1,326 @@
+[
+  {
+    "id": "vue-public-instance-fragment-unknown-e8fc82e5e5",
+    "repo": "vue",
+    "commit": "9daf90e29fec5f88dade153f242d5c39f6504fe6",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "b7f6c54f67e57e7bb0f2062b348ec355e0177c99",
+      "file": "packages/runtime-core/src/componentPublicInstance.ts",
+      "symbol": "getPublicInstance",
+      "line": 255,
+      "endLine": 261,
+      "kind": "function",
+      "sha256": "05b8f98ac66f1e62638d1d68692a1e6456539e43d346a4ea06c4f47709720e8d"
+    },
+    "b": {
+      "revision": "b7f6c54f67e57e7bb0f2062b348ec355e0177c99",
+      "file": "packages/runtime-core/src/component.ts",
+      "symbol": "getExposeProxy",
+      "line": 1110,
+      "endLine": 1128,
+      "kind": "function",
+      "sha256": "7f28effc466c2461b8d65467de561565a24ae08647bd1cc26d4b710aba875740"
+    },
+    "after": [
+      {
+        "revision": "9daf90e29fec5f88dade153f242d5c39f6504fe6",
+        "file": "packages/runtime-core/src/component.ts",
+        "symbol": "getComponentPublicInstance",
+        "line": 1111,
+        "endLine": 1133,
+        "kind": "function",
+        "sha256": "dc31cec61dfeb08cfa3897726590eae5942fda94d48d704a7a8898391d77fc11"
+      }
+    ],
+    "review": {
+      "id": "vue-public-instance-fragment-unknown-e8fc82e5e5",
+      "label": "unknown",
+      "actionClass": "unknown",
+      "mode": "withheld-expression-granularity",
+      "family": "vue-public-instance-fragment-unknown",
+      "reason": "getPublicInstance / getExposeProxy: The author replaces repeated getExposeProxy(instance)||instance.proxy expressions with an extended/renamed helper. This is real expression-level reuse, but the two before functions are not duplicate bodies: getPublicInstance handles null and functional-parent traversal, while getExposeProxy builds an exposed Proxy. Withhold the whole-symbol pair from positive supervision rather than inflate TS family yield with a fragment-level refactor.",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.046875,
+        "exact": 0,
+        "vocabulary": 0.32072698182053433,
+        "bindingExact": 0,
+        "structureVocabulary": 0.015034077272837548,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 0.2
+      },
+      "probability": 0.45337502142368774,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.parent",
+          "$0.proxy"
+        ],
+        "writes": [],
+        "calls": [
+          "getExposeProxy",
+          "getPublicInstance",
+          "isStatefulComponent"
+        ],
+        "returns": [
+          "call",
+          "null"
+        ],
+        "raises": [],
+        "guards": [
+          "truth:return"
+        ],
+        "literals": [],
+        "arity": 1,
+        "parameterUse": [
+          5
+        ],
+        "earlyReturns": 2
+      },
+      "b": {
+        "reads": [
+          "$0.exposeProxy",
+          "$0.exposed"
+        ],
+        "writes": [
+          "$0.exposeProxy"
+        ],
+        "calls": [
+          "Proxy",
+          "markRaw",
+          "proxyRefs"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [
+          "truth:return"
+        ],
+        "literals": [],
+        "arity": 1,
+        "parameterUse": [
+          4
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0,
+      "writes": 0,
+      "calls": 0,
+      "returnShape": 0,
+      "exceptions": null,
+      "validation": 1,
+      "arity": 1,
+      "literals": null,
+      "parameterUse": 1,
+      "earlyReturns": 0.5,
+      "writePresenceMismatch": 1
+    }
+  },
+  {
+    "id": "vue-normal-87c5443044-0",
+    "repo": "vue",
+    "commit": "87c54430448005294c41803f07f517fef848f917",
+    "subject": "fix(compiler-core): should set `<math>` tag as block to retain MathML namespace after patching (#10891)",
+    "origin": "permissive-normal",
+    "a": {
+      "revision": "87c54430448005294c41803f07f517fef848f917",
+      "file": "packages/compiler-core/src/transforms/hoistStatic.ts",
+      "symbol": "getConstantType",
+      "line": 156,
+      "endLine": 294,
+      "kind": "function",
+      "sha256": "180d5e3dde83ee378171e1b3bfec81f724a5709887d6b2ed99973302966c40c0"
+    },
+    "b": {
+      "revision": "87c54430448005294c41803f07f517fef848f917",
+      "file": "packages/compiler-core/src/transforms/transformText.ts",
+      "symbol": "transformText",
+      "line": 18,
+      "endLine": 119,
+      "kind": "function",
+      "sha256": "bdeb00c501fcb46a4cbc3393e91bb638f1598812f31dfbb4900c07a3a8a99457"
+    },
+    "legacy": {
+      "severity": "BLOCK",
+      "probability": 0.8519045003747233
+    },
+    "identity": {
+      "related": false,
+      "compatible": true
+    },
+    "review": {
+      "id": "vue-normal-87c5443044-0",
+      "reason": "getConstantType computes a ConstantTypes enum, caches results and may remove block helpers. transformText instead returns a deferred visitor that merges text children, splices arrays and generates CREATE_TEXT calls; it even calls getConstantType as a subordinate query. These compiler phases cannot replace one another.",
+      "label": "negative",
+      "actionClass": "related-different",
+      "mode": "different-contract",
+      "family": "vue:87c54430448005294c41803f07f517fef848f917",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.25,
+        "exact": 0,
+        "vocabulary": 0.5595399612248035,
+        "bindingExact": 0,
+        "structureVocabulary": 0.13988499030620088,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 1,
+        "returnType": 0,
+        "name": 0
+      },
+      "probability": 0.8519045003747233,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": false,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.children",
+          "$0.children.length",
+          "$0.children[*]",
+          "$0.codegenNode",
+          "$0.constType",
+          "$0.content",
+          "$0.props",
+          "$0.props.length",
+          "$0.props[*]",
+          "$0.tag",
+          "$0.tagType",
+          "$0.type",
+          "$1.helper",
+          "$1.inSSR",
+          "$1.removeHelper",
+          "ConstantTypes.CAN_SKIP_PATCH",
+          "ConstantTypes.CAN_STRINGIFY",
+          "ConstantTypes.NOT_CONSTANT",
+          "ElementTypes.ELEMENT",
+          "NodeTypes.COMMENT",
+          "NodeTypes.COMPOUND_EXPRESSION",
+          "NodeTypes.DIRECTIVE",
+          "NodeTypes.ELEMENT",
+          "NodeTypes.FOR",
+          "NodeTypes.IF",
+          "NodeTypes.IF_BRANCH",
+          "NodeTypes.INTERPOLATION",
+          "NodeTypes.SIMPLE_EXPRESSION",
+          "NodeTypes.TEXT",
+          "NodeTypes.TEXT_CALL",
+          "NodeTypes.VNODE_CALL",
+          "codegenNode.isBlock",
+          "codegenNode.isComponent",
+          "codegenNode.type",
+          "constantCache.get",
+          "constantCache.set",
+          "p.exp",
+          "p.name",
+          "p.type"
+        ],
+        "writes": [
+          "codegenNode.isBlock",
+          "mutate:constantCache"
+        ],
+        "calls": [
+          "$1.helper",
+          "$1.removeHelper",
+          "constantCache.get",
+          "constantCache.set",
+          "getConstantType",
+          "getGeneratedPropsConstantType",
+          "getPatchFlag",
+          "getVNodeBlockHelper",
+          "getVNodeHelper",
+          "isString",
+          "isSymbol"
+        ],
+        "returns": [
+          "call"
+        ],
+        "raises": [],
+        "guards": [
+          "comparison:return",
+          "null:return",
+          "truth:return"
+        ],
+        "literals": [
+          "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "b5a55159efa0c1143d328639239715d932846ce610800062302b1d2bd1153c60",
+          "dbe88d753e3e601cf3849cc5c6d9b3825831bb61a7ce3e2e04e088ed517ce77b",
+          "eb8a8c0e8c9852edbc5a2e6744975981c00e83db33653ce676093b4c639fe07a",
+          "f9da7dcdae51467cc7fa0e285837e60367028f17a2cb1ef4e97263827f7e7652"
+        ],
+        "arity": 2,
+        "parameterUse": [
+          25,
+          11
+        ],
+        "earlyReturns": 11
+      },
+      "b": {
+        "reads": [
+          "$0.type",
+          "NodeTypes.ELEMENT",
+          "NodeTypes.FOR",
+          "NodeTypes.IF_BRANCH",
+          "NodeTypes.ROOT"
+        ],
+        "writes": [],
+        "calls": [],
+        "returns": [],
+        "raises": [],
+        "guards": [
+          "comparison:return"
+        ],
+        "literals": [],
+        "arity": 2,
+        "parameterUse": [
+          4,
+          0
+        ],
+        "earlyReturns": 1
+      }
+    },
+    "features": {
+      "sameFile": 0,
+      "verbOpposition": 0,
+      "reads": 0.1,
+      "writes": 0,
+      "calls": 0,
+      "returnShape": 0,
+      "exceptions": null,
+      "validation": 0.3333333333333333,
+      "arity": 1,
+      "literals": 0,
+      "parameterUse": 0.9153150324227656,
+      "earlyReturns": 0.09090909090909091,
+      "writePresenceMismatch": 1
+    }
+  }
+]

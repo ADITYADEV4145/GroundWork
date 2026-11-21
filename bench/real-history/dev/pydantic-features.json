@@ -1,5 +1,170 @@
 [
   {
+    "id": "pydantic-alias-move-unknown-39fc0bb9d6",
+    "repo": "pydantic",
+    "commit": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+      "file": "pydantic/_internal/_generate_schema.py",
+      "symbol": "GenerateSchema._apply_alias_generator_to_field_info",
+      "line": 1230,
+      "endLine": 1278,
+      "kind": "method",
+      "sha256": "d6aaf5e3ba208d6f902847dc0368e858bd51cbc6517611ba00030fd1c4c5dfc4"
+    },
+    "b": {
+      "revision": "e039cbd954bccc45f8a941882f71b36ecd2a25ea",
+      "file": "pydantic/_internal/_generate_schema.py",
+      "symbol": "GenerateSchema._apply_alias_generator_to_computed_field_info",
+      "line": 1280,
+      "endLine": 1321,
+      "kind": "method",
+      "sha256": "f265fa7dfb0e6ce73aa83ac52395221f5858536c2880302f0c6a07c445e42b4a"
+    },
+    "after": [
+      {
+        "revision": "d992117243b3d44047ef37f9d7d75243bb98dbca",
+        "file": "pydantic/_internal/_fields.py",
+        "symbol": "_apply_alias_generator_to_field_info",
+        "line": 135,
+        "endLine": 182,
+        "kind": "function",
+        "sha256": "760fa735acb8eae1aa37970fa59b439cafbfcd4d606a886bdb58a01bd53ecd2b"
+      }
+    ],
+    "review": {
+      "id": "pydantic-alias-move-unknown-39fc0bb9d6",
+      "label": "unknown",
+      "actionClass": "unknown",
+      "mode": "withheld-movement-not-consolidation",
+      "family": "pydantic-alias-move-unknown",
+      "reason": "GenerateSchema._apply_alias_generator_to_field_info / GenerateSchema._apply_alias_generator_to_computed_field_info: The broader deleted-body miner proposes these at structure 0.859. Inspection shows two different implementations moved to _fields.py and ComputedFieldInfo respectively, not consolidated into one. The computed field only sets a serialization-oriented alias, while FieldInfo handles validation and serialization aliases separately. This commit is not positive reuse proof; withhold rather than turn a mining proposal into a permissive-detector negative.",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 0.859375,
+        "exact": 0,
+        "vocabulary": 0.8749303482038538,
+        "bindingExact": 0,
+        "structureVocabulary": 0.7518932679876869,
+        "exactVocabulary": 0,
+        "paramCount": 1,
+        "paramNames": 0.8333333333333334,
+        "returnType": 0,
+        "name": 0.8571428571428571
+      },
+      "probability": 0.2634184995941537,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": false,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "$0.generate_aliases",
+          "$1.alias",
+          "$1.alias_priority",
+          "$1.serialization_alias",
+          "$1.validation_alias",
+          "alias.__class__"
+        ],
+        "writes": [
+          "$1.alias",
+          "$1.alias_priority",
+          "$1.serialization_alias",
+          "$1.validation_alias"
+        ],
+        "calls": [
+          "$0",
+          "$0.generate_aliases",
+          "TypeError",
+          "_get_first_non_null",
+          "isinstance"
+        ],
+        "returns": [],
+        "raises": [
+          "TypeError"
+        ],
+        "guards": [
+          "null:raise",
+          "type:raise"
+        ],
+        "literals": [
+          "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "85db64670542afa4c70a029ae6d5dd4b11425f491033612e741c8e42d308d75d"
+        ],
+        "arity": 3,
+        "parameterUse": [
+          5,
+          18,
+          2
+        ],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "$0.generate_aliases",
+          "$1.alias",
+          "$1.alias_priority",
+          "alias.__class__"
+        ],
+        "writes": [
+          "$1.alias",
+          "$1.alias_priority"
+        ],
+        "calls": [
+          "$0",
+          "$0.generate_aliases",
+          "TypeError",
+          "_get_first_non_null",
+          "isinstance"
+        ],
+        "returns": [],
+        "raises": [
+          "TypeError"
+        ],
+        "guards": [
+          "null:raise",
+          "type:raise"
+        ],
+        "literals": [
+          "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "85db64670542afa4c70a029ae6d5dd4b11425f491033612e741c8e42d308d75d"
+        ],
+        "arity": 3,
+        "parameterUse": [
+          5,
+          8,
+          2
+        ],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 0.6666666666666666,
+      "writes": 0.5,
+      "calls": 1,
+      "returnShape": null,
+      "exceptions": 1,
+      "validation": 1,
+      "arity": 1,
+      "literals": 1,
+      "parameterUse": 0.9548106976123596,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
     "id": "pydantic-normal-55a434c41b-0",
     "repo": "pydantic",
     "commit": "55a434c41b1ad2af95584ae8c8c17d364add181f",
@@ -35,6 +200,7 @@
       "id": "pydantic-normal-55a434c41b-0",
       "reason": "_apply_parse builds a parsing chain and handles strict annotations and the field-type marker; _check_func installs a value predicate that can raise ValueError. Their validators implement different contracts.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "pydantic:55a434c41b1ad2af95584ae8c8c17d364add181f",
       "reviewer": "agent-reviewed"
@@ -176,6 +342,7 @@
       "id": "pydantic-normal-588436ec26-2",
       "reason": "get_callable_return_type unwraps callable objects, collects return hints and can return PydanticUndefined; eval_type converts and evaluates one annotation value. The latter does not perform the former's discovery.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "pydantic:588436ec2609ce488e3810a91a55cf29b9dd81d6",
       "reviewer": "agent-reviewed"
@@ -312,6 +479,7 @@
       "id": "pydantic-normal-588436ec26-4",
       "reason": "get_function_type_hints collects an annotation dictionary with namespace, partial and type-parameter handling; try_eval_type evaluates a single value and returns a value/success tuple with NameError recovery.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "pydantic:588436ec2609ce488e3810a91a55cf29b9dd81d6",
       "reviewer": "agent-reviewed"
@@ -450,6 +618,7 @@
       "id": "pydantic-normal-1dcddac2c5-0",
       "reason": "_Definitions contains finalize_schema in the same source range. The class owns definition storage and other operations; its own finalization method cannot replace that class.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "pydantic:1dcddac2c5e1ac2361fc897f804f44338a1d8067",
       "reviewer": "agent-reviewed"
@@ -586,6 +755,7 @@
       "id": "pydantic-normal-cbf4202637-0",
       "reason": "PydanticModelField encloses to_argument. A field metadata class and its argument-conversion method are not independent interchangeable definitions.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "pydantic:cbf4202637a56fc5325ab4b18452e3f3ba910a84",
       "reviewer": "agent-reviewed"

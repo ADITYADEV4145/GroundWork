@@ -35,6 +35,7 @@
       "id": "zod-normal-d9f76e1122-1",
       "reason": "rest preserves an existing v3 tuple definition while changing its rest schema; _tuple constructs a v4 schema from a Class and item list. Inputs, definition format and version boundary differ.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
       "reviewer": "agent-reviewed"
@@ -164,6 +165,7 @@
       "id": "zod-normal-d9f76e1122-0",
       "reason": "The AST/source ranges show ZodTuple contains ZodTuple._parse. Replacing the enclosing class with its parsing method destroys the class interface and is not independent duplicate code.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "zod:d9f76e1122e08f1675c33f2794cc25e806c3f0f8",
       "reviewer": "agent-reviewed"
@@ -287,6 +289,7 @@
       "id": "zod-normal-1780c67e9c-0",
       "reason": "init registers traits, invokes the initializer and binds prototype methods; the bundled initializer installs error issues. Their writes and responsibilities differ, and source must not depend on a generated bundle.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:1780c67e9cfeb1c94ef4e18fc8e93f22a3e114c0",
       "reviewer": "agent-reviewed"
@@ -428,6 +431,7 @@
       "id": "zod-normal-3a8edd7470-1",
       "reason": "Enum parsing validates strings and membership, caches allowed values and can succeed; the BigInt helper unconditionally reports an invalid bigint and returns INVALID.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:3a8edd7470a550b55aeefa365c6d3ebbd6583910",
       "reviewer": "agent-reviewed"
@@ -574,6 +578,7 @@
       "id": "zod-normal-3a8edd7470-2",
       "reason": "ZodNativeEnum is the enclosing class of ZodNativeEnum._parse, verified from the AST ranges and qualified names. Class construction and its own method are not alternative implementations.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "zod:3a8edd7470a550b55aeefa365c6d3ebbd6583910",
       "reviewer": "agent-reviewed"
@@ -694,6 +699,7 @@
       "id": "zod-normal-24a5e4f329-6",
       "reason": "The v3 factory processes error parameters and creates a v3 typeName definition; the generated v4 bundle uses a different definition contract and omits those parameters. Sharing an intersection name is insufficient.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:24a5e4f329378ebd035a19a678e7b24e52036829",
       "reviewer": "agent-reviewed"
@@ -820,6 +826,7 @@
       "id": "zod-normal-24a5e4f329-36",
       "reason": "The map factory constructs key/value schema storage; default wraps an existing schema with a default-value thunk. The classes, stored fields and accepted arguments differ.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:24a5e4f329378ebd035a19a678e7b24e52036829",
       "reviewer": "agent-reviewed"
@@ -947,6 +954,7 @@
       "id": "zod-normal-24a5e4f329-37",
       "reason": "The promise factory wraps an inner schema as ZodPromise; transform builds ZodEffects around this with an executable callback. These are different schema operations, not duplicate factories.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:24a5e4f329378ebd035a19a678e7b24e52036829",
       "reviewer": "agent-reviewed"
@@ -1073,6 +1081,7 @@
       "id": "zod-normal-7ed0c3694d-0",
       "reason": "The changed v4 datetime accepts hours-only offsets using ([+-]\\d{2}(?::?\\d{2})?), whereas v3 datetimeRegex requires minutes. They also call different time/date sources. Their normalized structure is identical but substituting the old regex would undo the commit's fix.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:7ed0c3694d324f5c02d5b224e7e3163d2fd84c52",
       "reviewer": "agent-reviewed"
@@ -1227,6 +1236,7 @@
       "id": "zod-normal-11477ae593-0",
       "reason": "The full v4 formatter creates and returns fieldErrors and maps new union/key/element issue layouts; the v3 nested processError returns void, requires captured mapper/fieldErrors, and reads unionErrors/returnTypeError/argumentsError. Shared traversal is not the same callable contract.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "zod:11477ae593b0a01ab7e701f39d69ce170936a216",
       "reviewer": "agent-reviewed"

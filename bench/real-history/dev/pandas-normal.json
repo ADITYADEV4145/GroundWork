@@ -1,0 +1,65 @@
+{
+  "repo": "pandas",
+  "detector": "ca55316b9e09b3a90be8623e6a3864697e6f133a",
+  "sampling": "Up to 2 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+  "runs": [
+    {
+      "hash": "1f1e13f705284f50232af813f3b0c0140b52e5d9",
+      "parent": "7e4d30697d1d905b27141255c537537edf9f634a",
+      "date": "2025-04-03T08:30:25-07:00",
+      "subject": "MNT: Bump dev pin on NumPy (#60987)",
+      "productionFiles": [
+        "pandas/compat/numpy/__init__.py",
+        "pandas/core/accessor.py",
+        "pandas/core/arrays/base.py",
+        "pandas/core/arrays/datetimelike.py",
+        "pandas/core/arrays/interval.py",
+        "pandas/core/arrays/masked.py",
+        "pandas/core/arrays/sparse/accessor.py",
+        "pandas/core/base.py",
+        "pandas/core/common.py",
+        "pandas/core/dtypes/missing.py",
+        "pandas/core/generic.py",
+        "pandas/core/groupby/groupby.py",
+        "pandas/core/indexing.py",
+        "pandas/core/nanops.py",
+        "pandas/plotting/_misc.py"
+      ],
+      "keyword": false,
+      "proposals": 0,
+      "driver": "built checkRepository API, timeoutMs=120000 (decision logic unchanged)",
+      "ms": 130531.40098600001,
+      "exitCode": 0,
+      "report": {
+        "status": "UNAVAILABLE",
+        "findings": [],
+        "error": "reuse check timed out"
+      }
+    },
+    {
+      "hash": "e637b4290d22e71afc1455bc1b691582f0a3ec78",
+      "parent": "41968a550a159ec0e5ef541a610b7007003bab5b",
+      "date": "2025-05-14T22:29:29+02:00",
+      "subject": "ENH: Implement pandas.read_iceberg (#61383)",
+      "productionFiles": [
+        "pandas/__init__.py",
+        "pandas/compat/_optional.py",
+        "pandas/io/api.py",
+        "pandas/io/iceberg.py"
+      ],
+      "keyword": false,
+      "proposals": 0,
+      "driver": "built checkRepository API, timeoutMs=120000 (decision logic unchanged)",
+      "ms": 113818.76926500001,
+      "exitCode": 0,
+      "report": {
+        "status": "PASS",
+        "blocked": false,
+        "base": "41968a550a159ec0e5ef541a610b7007003bab5b",
+        "findings": [],
+        "allows": [],
+        "ms": 113596.815926
+      }
+    }
+  ]
+}

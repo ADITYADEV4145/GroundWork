@@ -7,11 +7,11 @@ import manifest from '../bench/real-history/dev/repos.json' with { type: 'json' 
 
 export interface Observation {
   id: string; repo: string; commit: string; origin: string; a: Ref; b: Ref;
-  review: { label: 'positive' | 'negative'; family: string; mode: string; reason: string; reviewer: string };
+  review: { label: 'positive' | 'negative' | 'unknown'; actionClass: import('./real-history-diagnose.js').ActionClass; family: string; mode: string; reason: string; reviewer: string };
   current: { signals: Record<string, number>; probability: number; pairWouldBlock: boolean; related: boolean; compatible: boolean };
   features: Record<string, number | null>;
 }
-export function separation<T extends { review: { label: 'positive' | 'negative'; family: string } }>(rows: T[], field: (r: T) => number | null | undefined, direction = 1) {
+export function separation<T extends { review: { label: 'positive' | 'negative' | 'unknown'; family: string } }>(rows: T[], field: (r: T) => number | null | undefined, direction = 1) {
   const groups = new Map<string, number>();
   const available = rows.flatMap((row) => {
     const value = field(row);
@@ -34,6 +34,7 @@ const fmt = (v: number | null) => v === null ? '—' : v.toFixed(3);
 const contractFeatures = ['reads', 'writes', 'calls', 'returnShape', 'arity', 'parameterUse', 'exceptions', 'validation', 'earlyReturns', 'sameFile', 'verbOpposition', 'writePresenceMismatch', 'literals'];
 
 export function render() {
+  if (manifest.repos.length > 5) throw new Error('Use scripts/render-real-history-actions.ts for expanded action-class evidence.');
   const rows = manifest.repos.flatMap((r) => load<Observation[]>(`${r.id}-features.json`));
   const labels = load<{ id: string }[]>('labels.json');
   if (new Set(rows.map((r) => r.id)).size !== rows.length || rows.length !== labels.length || labels.some((l) => !rows.some((r) => r.id === l.id))) throw new Error('Features do not exactly cover labels');

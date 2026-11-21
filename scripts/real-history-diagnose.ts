@@ -1,7 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { initParsers } from '../src/lang/parser.js';
+import { initParsers, parse } from '../src/lang/parser.js';
+import type { ExtractedSymbol } from '../src/lang/adapter.js';
+import type { Language } from '../src/types.js';
 import { languageForPath } from '../src/lang/index.js';
 import { extractReuseSource } from '../src/reuse/source.js';
 import { buildIdf, pairSignals } from '../src/reuse/signals.js';
@@ -15,7 +17,26 @@ import { cacheDir, evidenceDir, git, digest, type Ref } from './real-history-dev
 import { contractOf, compareContracts } from './real-history-features.js';
 import manifest from '../bench/real-history/dev/repos.json' with { type: 'json' };
 
-type Label = { id: string; label: 'positive' | 'negative'; mode: string; family: string; reason: string; reviewer: 'agent-reviewed' };
+export type ActionClass = 'direct-reuse' | 'extract/extend' | 'related-different' | 'unknown';
+export function validateDirectTarget(before: Ref, after: Ref, caller?: Ref) {
+  if (!caller || before.file !== after.file || before.symbol !== after.symbol || before.sha256 !== after.sha256) throw new Error('Direct reuse needs an unchanged existing target identity/body and caller witness');
+}
+export function directDelegation(text: string, language: Language, symbol: ExtractedSymbol, target: string): boolean {
+  const tree = parse(language, text);
+  try {
+    const node = tree.rootNode.descendantsOfType(['function_definition', 'function_declaration', 'method_definition', 'arrow_function', 'function_expression'])
+      .filter((n) => n.startIndex >= symbol.startByte && n.endIndex <= symbol.endByte).sort((a, b) => (b.endIndex - b.startIndex) - (a.endIndex - a.startIndex))[0];
+    const body = node?.childForFieldName('body');
+    if (!body) return false;
+    const statements = ['block', 'statement_block'].includes(body.type) ? body.namedChildren.filter((n) => n && n.type !== 'comment' && !(language === 'python' && n.type === 'expression_statement' && n.firstNamedChild?.type === 'string')) : [body];
+    if (statements.length !== 1) return false;
+    let expression = statements[0]!;
+    while (['return_statement', 'expression_statement', 'await', 'await_expression', 'parenthesized_expression'].includes(expression.type) && expression.firstNamedChild) expression = expression.firstNamedChild;
+    const callee = expression.childForFieldName('function')?.text;
+    return ['call', 'call_expression'].includes(expression.type) && !!callee && (callee === target || callee.endsWith('.' + target));
+  } finally { tree.delete(); }
+}
+type Label = { id: string; label: 'positive' | 'negative' | 'unknown'; actionClass: ActionClass; mode: string; family: string; reason: string; reviewer: 'agent-reviewed' };
 type Pair = { id: string; repo: string; commit: string; origin: string; a: Ref; b: Ref; after?: Ref[]; legacy?: { severity: string; probability: number }; subject?: string; identity?: { related: boolean; compatible: boolean } };
 const load = <T>(name: string): T => JSON.parse(readFileSync(path.join(evidenceDir, name), 'utf8')) as T;
 const save = (name: string, value: unknown) => writeFileSync(path.join(evidenceDir, name), JSON.stringify(value, null, 2) + '\n');
@@ -40,10 +61,10 @@ function resolve(repo: string, ref: Pick<Ref, 'revision' | 'file' | 'symbol' | '
     endLine: file.text.slice(0, symbol.endByte).split('\n').length, kind: symbol.kind, sha256 } satisfies Ref };
 }
 
-async function catalog() {
+async function catalog(repoId?: string) {
   await initParsers();
-  const pairs: Pair[] = [];
-  for (const repo of manifest.repos) {
+  const pairs: Pair[] = repoId ? load<Pair[]>('normal-pairs.json').filter((r) => r.repo !== repoId) : [];
+  for (const repo of manifest.repos.filter((r) => !repoId || r.id === repoId)) {
     const input = load<{ runs: { hash: string; subject: string; report: { status: string; findings: { kind: string; severity: string; probability: number; added: { file: string; symbol: string; line: number }; existing: { file: string; symbol: string; line: number } }[] } }[] }>(`${repo.id}-normal.json`);
     for (const run of input.runs) {
       if (run.report.status === 'UNAVAILABLE') continue;
@@ -62,24 +83,41 @@ async function catalog() {
 
 async function positives() {
   await initParsers();
-  const groups = load<{ id: string; repo: string; commit: string; file: string; members: string[]; afterHelper: string; mode: string; reason: string }[]>('positive-groups.json');
+  const groups = load<{ id: string; repo: string; commit: string; file: string; members: (string | { file: string; symbol: string; line?: number })[]; afterHelper: string; afterHelperFile?: string; afterCaller?: { file: string; symbol: string }; actionClass: ActionClass; mode: string; reason: string }[]>('positive-groups.json');
   const pairs: Pair[] = [], labels: Label[] = [];
+  const events = new Set<string>();
   for (const group of groups) {
+    const event = `${group.repo}:${group.commit}`;
+    if (events.has(event)) throw new Error(`Refactor event counted twice: ${event}`);
+    events.add(event);
     const repo = path.join(cacheDir, group.repo), before = git(repo, 'rev-parse', `${group.commit}^`).trim();
-    const site = (revision: string, name: string) => {
-      const symbols = source(group.repo, revision, group.file).extracted.symbols.filter((s) => s.qualifiedName === name);
+    const site = (revision: string, member: string | { file: string; symbol: string; line?: number }) => {
+      const { file, symbol: name, line } = typeof member === 'string' ? { file: group.file, symbol: member, line: undefined } : member;
+      const symbols = source(group.repo, revision, file).extracted.symbols.filter((s) => s.qualifiedName === name && (line === undefined || s.startLine === line));
       if (symbols.length !== 1) throw new Error(`Ambiguous positive symbol ${name}`);
-      return resolve(group.repo, { revision, file: group.file, symbol: name, line: symbols[0]!.startLine }).ref;
+      return resolve(group.repo, { revision, file, symbol: name, line: symbols[0]!.startLine }).ref;
     };
+    const actionClass = group.actionClass;
+    if (!['direct-reuse', 'extract/extend', 'unknown'].includes(actionClass)) throw new Error(`Invalid seed action: ${group.id}; related-different requires a permissive-detector finding`);
+    const after = site(group.commit, { file: group.afterHelperFile ?? group.file, symbol: group.afterHelper });
+    if (actionClass === 'direct-reuse') {
+      if (group.members.length !== 2) throw new Error(`Direct reuse needs exactly one target: ${group.id}`);
+      if (!group.afterCaller) throw new Error(`Direct reuse needs an explicit delegating caller: ${group.id}`);
+      const witness = site(group.commit, group.afterCaller);
+      validateDirectTarget(site(before, group.members[1]!), after, witness);
+      const caller = resolve(group.repo, witness);
+      if (!directDelegation(caller.text, caller.language, caller.symbol, after.symbol.split('.').at(-1)!)) throw new Error(`Not a whole-body direct delegation: ${group.id}`);
+    }
     for (let i = 0; i < group.members.length; i++) for (let j = i + 1; j < group.members.length; j++) {
       const a = site(before, group.members[i]!), b = site(before, group.members[j]!);
-      const id = `${group.id}-${digest(`${a.symbol}:${b.symbol}`).slice(0, 10)}`;
-      pairs.push({ id, repo: group.repo, commit: group.commit, origin: group.file.startsWith('tests/') ? 'refactor-test' : 'refactor-production', a, b, after: [site(group.commit, group.afterHelper)] });
-      labels.push({ id, label: 'positive', mode: group.mode, family: group.id, reason: `${a.symbol} / ${b.symbol}: ${group.reason}`, reviewer: 'agent-reviewed' });
+      const id = `${group.id}-${digest(a.file === b.file ? `${a.symbol}:${b.symbol}` : `${a.file}:${a.symbol}:${b.file}:${b.symbol}`).slice(0, 10)}`;
+      pairs.push({ id, repo: group.repo, commit: group.commit, origin: group.file.startsWith('tests/') ? 'refactor-test' : 'refactor-production', a, b, after: [after] });
+      pairs.at(-1)!.after = group.afterCaller ? [after, site(group.commit, group.afterCaller)] : [after];
+      labels.push({ id, label: actionClass === 'unknown' ? 'unknown' : 'positive', actionClass, mode: group.mode, family: group.id, reason: `${a.symbol} / ${b.symbol}: ${group.reason}`, reviewer: 'agent-reviewed' });
     }
   }
   save('positive-pairs.json', pairs); save('positive-labels.json', labels);
-  console.log(`Positive seeds: ${pairs.length} pairs, ${groups.length} author-refactor families; none labeled direct-call interchangeable`);
+  console.log(`Reviewed seeds: ${pairs.length} pairs, ${groups.length} distinct author events; direct reuse requires an unchanged target and caller witness`);
 }
 
 function labels() {
@@ -87,12 +125,12 @@ function labels() {
   const negatives = load<{ id: string; reason: string }[]>('negative-reviews.json').map((r): Label => {
     const pair = pairs.find((p) => p.id === r.id);
     if (!pair) throw new Error(`Missing normal finding ${r.id}`);
-    return { ...r, label: 'negative', mode: pair.identity?.related ? 'containment' : 'different-contract', family: `${pair.repo}:${pair.commit}`, reviewer: 'agent-reviewed' };
+    return { ...r, label: 'negative', actionClass: 'related-different', mode: pair.identity?.related ? 'containment' : 'different-contract', family: `${pair.repo}:${pair.commit}`, reviewer: 'agent-reviewed' };
   });
   const output = [...load<Label[]>('positive-labels.json'), ...negatives];
   if (new Set(output.map((r) => r.id)).size !== output.length) throw new Error('Duplicate labels');
   save('labels.json', output);
-  console.log(`Labels: ${output.length - negatives.length} positive, ${negatives.length} negative; agent-reviewed, not human-approved`);
+  console.log(`Labels: ${output.filter((r) => r.label === 'positive').length} positive, ${negatives.length} negative, ${output.filter((r) => r.label === 'unknown').length} withheld; agent-reviewed, not human-approved`);
 }
 
 export function auc(positive: { value: number; weight: number }[], negative: { value: number; weight: number }[]): number | null {
@@ -107,7 +145,7 @@ async function diagnose(repoId: string) {
   const proposals = load<Pair[]>('positive-pairs.json');
   const catalog = new Map([...normal, ...proposals].map((p) => [p.id, p]));
   const selected = labels.filter((l) => catalog.get(l.id)?.repo === repoId).map((l) => ({ pair: catalog.get(l.id)!, label: l }));
-  if (!selected.length) { save(`${repoId}-features.json`, []); return; }
+  if (!selected.length) { save(`${repoId}-features.json`, []); console.log(`${repoId}: no labelled pairs; no feature index required`); return; }
   const clone = path.join(cacheDir, repoId), worktree = path.join(cacheDir, `${repoId}-features`);
   if (!existsSync(worktree)) git(clone, 'worktree', 'add', '--detach', worktree, selected[0]!.pair.a.revision);
   const output = [];
@@ -157,7 +195,7 @@ async function contracts() {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [, , command, repo] = process.argv;
-  if (command === 'catalog') await catalog();
+  if (command === 'catalog' && (!repo || manifest.repos.some((r) => r.id === repo))) await catalog(repo);
   else if (command === 'positives') await positives();
   else if (command === 'labels') labels();
   else if (command === 'contracts') await contracts();

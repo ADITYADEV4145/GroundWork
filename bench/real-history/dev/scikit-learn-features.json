@@ -36,6 +36,7 @@
     "review": {
       "id": "sklearn-backend-predicates-4f11033faf",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_numpy_array / is_cupy_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -173,6 +174,7 @@
     "review": {
       "id": "sklearn-backend-predicates-1f3b4b759d",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_numpy_array / is_torch_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -310,6 +312,7 @@
     "review": {
       "id": "sklearn-backend-predicates-c5f31629f6",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_numpy_array / is_ndonnx_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -447,6 +450,7 @@
     "review": {
       "id": "sklearn-backend-predicates-cff53d6210",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_numpy_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -585,6 +589,7 @@
     "review": {
       "id": "sklearn-backend-predicates-771cba7bd4",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_numpy_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -722,6 +727,7 @@
     "review": {
       "id": "sklearn-backend-predicates-9101c17383",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_numpy_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -859,6 +865,7 @@
     "review": {
       "id": "sklearn-backend-predicates-298bf73340",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_cupy_array / is_torch_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -995,6 +1002,7 @@
     "review": {
       "id": "sklearn-backend-predicates-4a55e0fa15",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_cupy_array / is_ndonnx_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -1131,6 +1139,7 @@
     "review": {
       "id": "sklearn-backend-predicates-2e17534ff6",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_cupy_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -1268,6 +1277,7 @@
     "review": {
       "id": "sklearn-backend-predicates-592fb792f2",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_cupy_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -1404,6 +1414,7 @@
     "review": {
       "id": "sklearn-backend-predicates-2391d309ff",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_cupy_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -1540,6 +1551,7 @@
     "review": {
       "id": "sklearn-backend-predicates-e61585ce5d",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_torch_array / is_ndonnx_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -1676,6 +1688,7 @@
     "review": {
       "id": "sklearn-backend-predicates-b62727e61c",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_torch_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -1813,6 +1826,7 @@
     "review": {
       "id": "sklearn-backend-predicates-a4e54a9e06",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_torch_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -1949,6 +1963,7 @@
     "review": {
       "id": "sklearn-backend-predicates-2db3b685de",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_torch_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -2085,6 +2100,7 @@
     "review": {
       "id": "sklearn-backend-predicates-5e5afec392",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_ndonnx_array / is_dask_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -2222,6 +2238,7 @@
     "review": {
       "id": "sklearn-backend-predicates-feda0b4b78",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_ndonnx_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -2358,6 +2375,7 @@
     "review": {
       "id": "sklearn-backend-predicates-585e5b4fbe",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_ndonnx_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -2494,6 +2512,7 @@
     "review": {
       "id": "sklearn-backend-predicates-99b66c7dfe",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_dask_array / is_jax_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -2631,6 +2650,7 @@
     "review": {
       "id": "sklearn-backend-predicates-77e709cd9f",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_dask_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -2768,6 +2788,7 @@
     "review": {
       "id": "sklearn-backend-predicates-7c308c3d68",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "sklearn-backend-predicates",
       "reason": "is_jax_array / is_pydata_sparse_array: Both before bodies repeat the loaded-module guard, import and class-membership predicate. The commit replaces that repeated core with _issubclass_fast(type(x), module, class), retaining NumPy/Jax zero-gradient specialization. This is a real parameterized helper extraction, NOT evidence that one backend predicate can call another unchanged. All 21 pairs are ONE correlated refactor family in vendored MIT-licensed code (array_api_compat/LICENSE).",
@@ -2868,6 +2889,131 @@
     }
   },
   {
+    "id": "sklearn-cv-tag-parent-cf73b3fed8",
+    "repo": "scikit-learn",
+    "commit": "446adff13b9af38404c694fed409e83b70b9c300",
+    "origin": "refactor-production",
+    "a": {
+      "revision": "5035b6df2b99924ae753b7f10c894b5bd0214726",
+      "file": "sklearn/linear_model/_coordinate_descent.py",
+      "symbol": "LassoCV.__sklearn_tags__",
+      "line": 2079,
+      "endLine": 2082,
+      "kind": "method",
+      "sha256": "4086680b06de1a3c8bbc379a1b0402712783d71edde128cb982fbfdebe208f9e"
+    },
+    "b": {
+      "revision": "5035b6df2b99924ae753b7f10c894b5bd0214726",
+      "file": "sklearn/linear_model/_coordinate_descent.py",
+      "symbol": "ElasticNetCV.__sklearn_tags__",
+      "line": 2360,
+      "endLine": 2363,
+      "kind": "method",
+      "sha256": "4086680b06de1a3c8bbc379a1b0402712783d71edde128cb982fbfdebe208f9e"
+    },
+    "after": [
+      {
+        "revision": "446adff13b9af38404c694fed409e83b70b9c300",
+        "file": "sklearn/linear_model/_coordinate_descent.py",
+        "symbol": "LinearModelCV.__sklearn_tags__",
+        "line": 1872,
+        "endLine": 1877,
+        "kind": "method",
+        "sha256": "7ca60ddf061f3725f63d201da7afd338bae8044ca3a52a0e1a1edff3e173a942"
+      }
+    ],
+    "review": {
+      "id": "sklearn-cv-tag-parent-cf73b3fed8",
+      "label": "positive",
+      "actionClass": "extract/extend",
+      "mode": "generalize-parent",
+      "family": "sklearn-cv-tag-parent",
+      "reason": "LassoCV.__sklearn_tags__ / ElasticNetCV.__sklearn_tags__: The two identical overrides set target_tags.multi_output=False on parent tags. The author removes both and adds a LinearModelCV implementation parameterized by _is_multitask(), also correcting sparse flags. This is one inheritance/generalization event across CV estimators, not permission to call a sibling's super()-capturing method unchanged.",
+      "reviewer": "agent-reviewed"
+    },
+    "current": {
+      "signals": {
+        "structure": 1,
+        "exact": 1,
+        "vocabulary": 1,
+        "bindingExact": 1,
+        "structureVocabulary": 1,
+        "exactVocabulary": 1,
+        "paramCount": 1,
+        "paramNames": 0,
+        "returnType": 0,
+        "name": 1
+      },
+      "probability": 0.9353138798372874,
+      "thresholds": {
+        "block": 0.7553179385545834,
+        "warn": 0.4287947504167517
+      },
+      "related": false,
+      "compatible": true,
+      "blockEligible": true,
+      "pairWouldBlock": true,
+      "idf": "all indexed symbols at the exact before/current revision; same buildIdf population as CandidateIndex"
+    },
+    "contracts": {
+      "a": {
+        "reads": [
+          "super().__sklearn_tags__",
+          "tags.target_tags"
+        ],
+        "writes": [
+          "tags.target_tags.multi_output"
+        ],
+        "calls": [
+          "super",
+          "super().__sklearn_tags__"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 0,
+        "parameterUse": [],
+        "earlyReturns": 0
+      },
+      "b": {
+        "reads": [
+          "super().__sklearn_tags__",
+          "tags.target_tags"
+        ],
+        "writes": [
+          "tags.target_tags.multi_output"
+        ],
+        "calls": [
+          "super",
+          "super().__sklearn_tags__"
+        ],
+        "returns": [],
+        "raises": [],
+        "guards": [],
+        "literals": [],
+        "arity": 0,
+        "parameterUse": [],
+        "earlyReturns": 0
+      }
+    },
+    "features": {
+      "sameFile": 1,
+      "verbOpposition": 0,
+      "reads": 1,
+      "writes": 1,
+      "calls": 1,
+      "returnShape": null,
+      "exceptions": null,
+      "validation": null,
+      "arity": 1,
+      "literals": null,
+      "parameterUse": null,
+      "earlyReturns": null,
+      "writePresenceMismatch": 0
+    }
+  },
+  {
     "id": "scikit-learn-normal-119ade27a6-0",
     "repo": "scikit-learn",
     "commit": "119ade27a6a2179bed33a73ef0d1f6b3db602d79",
@@ -2903,6 +3049,7 @@
       "id": "scikit-learn-normal-119ade27a6-0",
       "reason": "The example scoring adapter calls estimator.predict and returns a dictionary for cross-validation. class_likelihood_ratios consumes two label arrays, computes confusion-matrix ratios, and returns a numeric tuple. Caller and callee are not interchangeable.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "scikit-learn:119ade27a6a2179bed33a73ef0d1f6b3db602d79",
       "reviewer": "agent-reviewed"

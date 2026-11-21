@@ -7,8 +7,9 @@ import { adapterFor } from '../src/lang/index.js';
 import type { Language } from '../src/types.js';
 import { assertExternalCache, digest } from '../scripts/real-history-dev.js';
 import { contractOf, compareContracts, jaccard } from '../scripts/real-history-features.js';
-import { auc } from '../scripts/real-history-diagnose.js';
+import { auc, directDelegation, validateDirectTarget } from '../scripts/real-history-diagnose.js';
 import { separation, type Observation } from '../scripts/render-real-history-dev.js';
+import { actionSeparation } from '../scripts/render-real-history-actions.js';
 import manifest from '../bench/real-history/dev/repos.json' with { type: 'json' };
 
 beforeAll(async () => { await initParsers(); });
@@ -57,6 +58,26 @@ describe('development-only contract prototypes', () => {
 });
 
 describe('honest development statistics and cache boundaries', () => {
+  it('requires the same unchanged target identity, not identical code moved to a new module', () => {
+    const ref = { revision: 'before', file: 'helper.ts', symbol: 'helper', line: 1, endLine: 2, kind: 'function', sha256: 'hash' };
+    expect(() => validateDirectTarget(ref, { ...ref, revision: 'after' }, ref)).not.toThrow();
+    for (const changed of [{ file: 'new.ts' }, { symbol: 'newHelper' }, { sha256: 'changed' }]) expect(() => validateDirectTarget(ref, { ...ref, ...changed }, ref)).toThrow('unchanged');
+    expect(() => validateDirectTarget(ref, ref)).toThrow('caller witness');
+  });
+  it('recognizes whole-body delegation, not a helper used inside a different contract', () => {
+    for (const [text, expected] of [['function f(x) { return helper(x) }', true], ['const f = (x) => helper(x)', true], ['function f(x) { sideEffect(); return helper(x) }', false], ['function f(x) { return other(x) }', false], ['function f(x) {}', false]] as const) {
+      const s = adapterFor('typescript').extract(text, 'typescript').symbols.find((s) => s.name === 'f')!;
+      expect(directDelegation(text, 'typescript', s, 'helper')).toBe(expected);
+    }
+    const text = 'def f(x):\n    """doc"""\n    return helper(x)\n', s = adapterFor('python').extract(text, 'python').symbols[0]!;
+    expect(directDelegation(text, 'python', s, 'helper')).toBe(true);
+  });
+  it('does not supply extraction or unknown examples to the missing direct-reuse class', () => {
+    const rows = [{ review: { family: 'e', label: 'positive', actionClass: 'extract/extend' }, features: { x: 1 } }, { review: { family: 'n', label: 'negative', actionClass: 'related-different' }, features: { x: 0 } }] as const;
+    expect(actionSeparation(rows, 'direct-reuse', (r) => r.features.x)).toMatchObject({ positiveAvailable: 0, familyAuc: null });
+    expect(actionSeparation(rows, 'extract/extend', (r) => r.features.x)).toMatchObject({ positiveAvailable: 1, familyAuc: 1 });
+    expect(() => actionSeparation(rows, 'related-different', (r) => r.features.x)).toThrow('reference');
+  });
   it('computes ties, reverse separation and missing classes explicitly', () => {
     const point = (value: number) => ({ value, weight: 1 });
     expect(auc([point(1)], [point(0)])).toBe(1); expect(auc([point(0)], [point(1)])).toBe(0);
@@ -81,7 +102,7 @@ describe('honest development statistics and cache boundaries', () => {
 
 describe('committed development artifact consistency (offline)', () => {
   it('keeps reserved repos out and covers exactly the reviewed pair IDs with valid simultaneous source references', () => {
-    expect(manifest.repos.length).toBeGreaterThanOrEqual(3); expect(manifest.repos.length).toBeLessThanOrEqual(5);
+    expect(manifest.repos.length).toBeGreaterThanOrEqual(3); expect(new Set(manifest.repos.map((r) => r.id)).size).toBe(manifest.repos.length);
     for (const repo of manifest.repos) {
       expect(['got', 'click', 'pytest']).not.toContain(repo.id); expect(repo.start).toMatch(/^[a-f0-9]{40}$/); expect(repo.end).toMatch(/^[a-f0-9]{40}$/);
     }
@@ -106,5 +127,17 @@ describe('committed development artifact consistency (offline)', () => {
     for (const row of data<Observation[]>('normal-pairs.json')) expect(available.has(`${row.repo}:${row.commit}`)).toBe(true);
     const summary = data<{ sourceHashes: Record<string, string> }>('summary.json');
     for (const [file, hash] of Object.entries(summary.sourceHashes)) expect(digest(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'))).toBe(hash);
+  });
+  it('counts labelled families once and requires an explicit consistent action per family', () => {
+    const rows = manifest.repos.flatMap((r) => data<Observation[]>(`${r.id}-features.json`));
+    const families = data<{ id: string; members: string[]; actionClass: string }[]>('families.json');
+    expect(new Set(families.map((f) => f.id)).size).toBe(families.length);
+    expect(families.flatMap((f) => f.members).sort()).toEqual(rows.map((r) => r.id).sort());
+    for (const family of families) {
+      expect(['direct-reuse', 'extract/extend', 'related-different', 'unknown']).toContain(family.actionClass);
+      expect(rows.filter((r) => r.review.family === family.id).every((r) => r.review.actionClass === family.actionClass)).toBe(true);
+    }
+    const positiveEvents = rows.filter((r) => r.review.label === 'positive').map((r) => `${r.repo}:${r.commit}`);
+    expect(new Set(positiveEvents).size).toBe(families.filter((f) => ['direct-reuse', 'extract/extend'].includes(f.actionClass)).length);
   });
 });

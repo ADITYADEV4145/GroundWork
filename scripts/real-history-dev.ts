@@ -72,6 +72,8 @@ function sites(repo: string, revision: string, file: string): Site[] {
   if (!lang) return [];
   let source: string;
   try { source = git(repo, 'show', `${revision}:${file}`); } catch { return []; }
+  const limit = manifest.repos.find((r) => r.id === path.basename(repo))?.maxMiningSourceBytes;
+  if (limit && Buffer.byteLength(source) > limit) { skippedOversize.add(`${revision}:${file}`); return []; }
   const extracted = adapterFor(lang).extract(source, lang);
   if (extracted.hasErrors) return [];
   const tree = parse(lang, source);
@@ -91,18 +93,20 @@ function sites(repo: string, revision: string, file: string): Site[] {
   } finally { tree.delete(); }
 }
 
-export function commits(repo: string, start: string, end: string) {
+const skippedOversize = new Set<string>();
+
+export function commits(repo: string, start: string, end: string, since = manifest.startUtc, until = manifest.endUtcExclusive) {
   if (git(repo, 'rev-parse', '--is-shallow-repository').trim() !== 'false') throw new Error('Unshallow the development clone before mining.');
   return git(repo, 'log', '--reverse', '--no-merges', '--format=%H%x09%P%x09%cI%x09%s', `${start}..${end}`).trim().split('\n').filter(Boolean)
     .map((s) => { const [hash, parents, date, subject] = s.split('\t'); return { hash: hash!, parent: parents!.split(' ')[0]!, date: date!, subject: subject! }; })
-    .filter((c) => Date.parse(c.date) >= Date.parse(manifest.startUtc) && Date.parse(c.date) < Date.parse(manifest.endUtcExclusive));
+    .filter((c) => Date.parse(c.date) >= Date.parse(since) && Date.parse(c.date) < Date.parse(until));
 }
 
 export async function mine(id: string, tests = false) {
   await initParsers();
   const pin = manifest.repos.find((r) => r.id === id)!;
   const repo = path.join(cacheDir, id);
-  const history = commits(repo, pin.start, pin.end).filter((c) => !tests || /parametr|reuse|duplic|simplif|clean|consolid|refactor|helper|merge|reduc/i.test(c.subject));
+  const history = commits(repo, pin.start, pin.end, pin.startUtc ?? manifest.startUtc, pin.endUtcExclusive ?? manifest.endUtcExclusive).filter((c) => !tests || /parametr|reuse|duplic|simplif|clean|consolid|refactor|helper|merge|reduc/i.test(c.subject));
   const proposals: Proposal[] = [], audit = [];
   const start = performance.now();
   for (const [i, c] of history.entries()) {
@@ -166,7 +170,7 @@ export async function mine(id: string, tests = false) {
     audit.push({ ...c, productionFiles: changes.map(([, f]) => f!), keyword: /dedup|consolidat|reuse|extract|refactor|duplicat|simplif/i.test(c.subject), proposals: proposals.filter((p) => p.commit === c.hash).length });
     if (i % 50 === 0) console.log(`${id}: ${i}/${history.length}, ${proposals.length} proposals`);
   }
-  writeFileSync(path.join(evidenceDir, `${id}-${tests ? 'test-' : ''}mining.json`), JSON.stringify({ repo: id, start: pin.start, end: pin.end, sampling: tests ? 'Test paths only, commits selected by refactor/parameterize/cleanup/helper/reduce keywords; supplementary, not production detector recall.' : 'All eligible non-merge commits, production TS/Python paths.', ms: performance.now() - start, commits: audit, proposals }, null, 2) + '\n');
+  writeFileSync(path.join(evidenceDir, `${id}-${tests ? 'test-' : ''}mining.json`), JSON.stringify({ repo: id, start: pin.start, end: pin.end, sampling: tests ? 'Test paths only, commits selected by refactor/parameterize/cleanup/helper/reduce keywords; supplementary, not production detector recall.' : 'All eligible non-merge commits, production TS/Python paths; configured oversize source exclusions recorded separately.', maxMiningSourceBytes: pin.maxMiningSourceBytes ?? null, skippedOversize: [...skippedOversize], ms: performance.now() - start, commits: audit, proposals }, null, 2) + '\n');
   console.log(`${id}: ${history.length} commits, ${proposals.length} proposals`);
 }
 
@@ -174,9 +178,14 @@ async function replay(id: string) {
   const pin = manifest.repos.find((r) => r.id === id)!;
   const repo = path.join(cacheDir, id), worktree = path.join(cacheDir, `${id}-normal`);
   if (!existsSync(worktree)) git(repo, 'worktree', 'add', '--detach', worktree, pin.end);
-  const mining = JSON.parse(readFileSync(path.join(evidenceDir, `${id}-mining.json`), 'utf8'));
+  const miningFile = path.join(evidenceDir, `${id}-mining.json`);
+  const mining = existsSync(miningFile) ? JSON.parse(readFileSync(miningFile, 'utf8')) : { commits: commits(repo, pin.start, pin.end, pin.startUtc ?? manifest.startUtc, pin.endUtcExclusive ?? manifest.endUtcExclusive).map((c) => ({ ...c,
+    keyword: /dedup|consolidat|reuse|extract|refactor|duplicat|simplif/i.test(c.subject),
+    productionFiles: git(repo, 'diff-tree', '--no-commit-id', '--name-only', '-r', c.hash).trim().split('\n').filter(production) })) };
+  const limit = Number(process.env.GW_REAL_HISTORY_NORMAL_LIMIT ?? (['django', 'scikit-learn'].includes(id) ? 4 : 12));
+  if (!Number.isInteger(limit) || limit < 1) throw new Error('GW_REAL_HISTORY_NORMAL_LIMIT must be a positive integer');
   const selected = (mining.commits as { hash: string; parent: string; subject: string; keyword: boolean; productionFiles: string[] }[])
-    .filter((c) => !c.keyword && c.productionFiles.length).sort((a, b) => digest(`normal-v1:${a.hash}`).localeCompare(digest(`normal-v1:${b.hash}`))).slice(0, ['django', 'scikit-learn'].includes(id) ? 4 : 12);
+    .filter((c) => !c.keyword && c.productionFiles.length).sort((a, b) => digest(`normal-v1:${a.hash}`).localeCompare(digest(`normal-v1:${b.hash}`))).slice(0, limit);
   const results = [];
   for (const c of selected) {
     git(worktree, 'switch', '--detach', c.hash);
@@ -184,10 +193,13 @@ async function replay(id: string) {
     const driver = `const { checkRepository } = await import(${JSON.stringify(pathToFileURL(path.join(cacheDir, 'permissive-detector/dist/reuse/check.js')).href)});\ntry { const report = await checkRepository(${JSON.stringify(worktree)}, { base: ${JSON.stringify(c.parent)}, timeoutMs: 120000 }); console.log(JSON.stringify(report)); process.exitCode = report.blocked ? 1 : 0; } catch(e) { console.log(JSON.stringify({status:'UNAVAILABLE', findings:[], error:e.message})); }`;
     const run = spawnSync(process.execPath, ['--input-type=module', '--eval', driver], { encoding: 'utf8', timeout: 180_000, maxBuffer: 64 * 1024 * 1024 });
     let report;
-    try { report = JSON.parse(run.stdout); } catch { throw new Error(`${id} ${c.hash}: ${run.error ?? run.stderr}`); }
-    if (!Array.isArray(report.findings) || run.error || ![0, 1].includes(run.status!)) throw new Error(`${id}: invalid check run`);
+    try { report = JSON.parse(run.stdout); } catch {
+      if (!run.error && !run.signal) throw new Error(`${id} ${c.hash}: invalid checker JSON: ${run.stderr}`);
+      report = { status: 'UNAVAILABLE', findings: [], error: String(run.error ?? run.signal) };
+    }
+    if (!Array.isArray(report.findings) || report.status !== 'UNAVAILABLE' && (run.error || ![0, 1].includes(run.status!))) throw new Error(`${id}: invalid check run`);
     results.push({ ...c, driver: 'built checkRepository API, timeoutMs=120000 (decision logic unchanged)', ms: performance.now() - start, exitCode: run.status, report });
-    writeFileSync(path.join(evidenceDir, `${id}-normal.json`), JSON.stringify({ repo: id, detector: git(path.join(cacheDir, 'permissive-detector'), 'rev-parse', 'HEAD').trim(), sampling: 'Up to 12 non-keyword commits with production changes (4 for Django/scikit-learn); smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.', runs: results }, null, 2) + '\n');
+    writeFileSync(path.join(evidenceDir, `${id}-normal.json`), JSON.stringify({ repo: id, detector: git(path.join(cacheDir, 'permissive-detector'), 'rev-parse', 'HEAD').trim(), sampling: `Up to ${limit} non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.`, runs: results }, null, 2) + '\n');
     console.log(`${id}: ${results.length}/${selected.length}, ${report.findings.length} findings, ${Math.round(performance.now() - start)} ms`);
   }
 }

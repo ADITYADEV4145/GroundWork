@@ -1,21 +1,20 @@
 {
-  "protocol": "Development case-control diagnosis; no detector/model changes or held-out evaluation. Agent-reviewed, not human-approved.",
-  "signalDetector": "342e156116bcbc9ce4b0d91d6de000cb79966954",
-  "sourceHashes": {
-    "src/reuse/model.json": "3d2aa690e5261d9f4893910ded6a7d084a49ef5c22461c49a33a17a1558c6642",
-    "src/reuse/signals.ts": "92b4296974554ff3ef6bedb2d03df38b0111624e32f280cf08c08e2bc5788fe3",
-    "src/reuse/policy.ts": "0a954f470800264e4b3c06bd8e0bd89091ebe795c8c2d432336013d8244ee16e",
-    "scripts/real-history-features.ts": "de64e6aa5c6275e86ab05f48b1e3515b099e79b2a4d953225367f83040bac334",
-    "bench/real-history/dev/labels.json": "ae73301ebab79316b9f1aa7a7d52bbc93cfc707c02e20881890841858df683dc"
+  "purpose": "Evidence only; agent-reviewed, not human-approved; no model/rule fitted or held-out evaluation.",
+  "searchedCommits": 6166,
+  "proposalCount": 1529,
+  "familyCounts": {
+    "direct-reuse": 0,
+    "extract/extend": 8,
+    "related-different": 21,
+    "unknown": 2
   },
-  "pairs": {
-    "positive": 24,
-    "negative": 33,
-    "positiveFamilies": 4,
-    "negativeFamilies": 19,
-    "positivePairScoresAboveBlock": 3,
-    "negativePairScoresAboveBlock": 2,
-    "testPositive": 1
+  "positiveFamilies": 8,
+  "tsPositiveFamilies": 3,
+  "directReuseFamilies": 0,
+  "targets": {
+    "positiveFamilies": 20,
+    "tsPositiveFamilies": 6,
+    "directReuseFamilies": 8
   },
   "repos": [
     {
@@ -25,16 +24,28 @@
       "licenseFile": "LICENSE",
       "start": "f7ad26147ba291cb3fb257545972a8e00e767470",
       "end": "1b0a5e589afd6ac913b0eddc3aa615224a1495c2",
-      "commitsMined": 338,
-      "commitsWithProductionChanges": 152,
-      "rawProposals": 495,
-      "sampledNormalCommits": 12,
+      "startUtc": "2025-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "commitsSearched": 338,
+      "proposals": 495,
+      "proposalEvents": 1,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 6,
+        "unknown": 0
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 10,
+        "unknown": 0
+      },
+      "normalSampling": "Up to 12 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 12,
       "unavailable": 0,
-      "legacyBlock": 43,
-      "legacyWarn": 9,
-      "seconds": 72.375481557,
-      "positive": 0,
-      "negative": 10
+      "legacyDuplicatePairs": 52
     },
     {
       "id": "pydantic",
@@ -43,16 +54,28 @@
       "licenseFile": "LICENSE",
       "start": "59b35de6564af0a971aae99807f0f562fa051e3e",
       "end": "42298a08b4cb999242b2ce231adda03539858567",
-      "commitsMined": 216,
-      "commitsWithProductionChanges": 143,
-      "rawProposals": 24,
-      "sampledNormalCommits": 12,
+      "startUtc": "2025-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "commitsSearched": 216,
+      "proposals": 24,
+      "proposalEvents": 7,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 4,
+        "unknown": 1
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 5,
+        "unknown": 1
+      },
+      "normalSampling": "Up to 12 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 12,
       "unavailable": 0,
-      "legacyBlock": 7,
-      "legacyWarn": 10,
-      "seconds": 189.990998316,
-      "positive": 0,
-      "negative": 5
+      "legacyDuplicatePairs": 17
     },
     {
       "id": "django",
@@ -61,16 +84,28 @@
       "licenseFile": "LICENSE",
       "start": "8d9901c961bf9d5cfa6bddddbbcebfbf487a5125",
       "end": "192bc7a7be92e20cc250907fb4083df689715679",
-      "commitsMined": 482,
-      "commitsWithProductionChanges": 263,
-      "rawProposals": 406,
-      "sampledNormalCommits": 4,
+      "startUtc": "2025-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "commitsSearched": 482,
+      "proposals": 406,
+      "proposalEvents": 28,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 3,
+        "related-different": 1,
+        "unknown": 0
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 3,
+        "related-different": 2,
+        "unknown": 0
+      },
+      "normalSampling": "Up to 12 non-keyword commits with production changes (4 for Django/scikit-learn); smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 4,
       "unavailable": 3,
-      "legacyBlock": 2,
-      "legacyWarn": 0,
-      "seconds": 479.467337114,
-      "positive": 3,
-      "negative": 2
+      "legacyDuplicatePairs": 2
     },
     {
       "id": "scikit-learn",
@@ -79,16 +114,28 @@
       "licenseFile": "COPYING",
       "start": "74775cac41cb299d029417d0b06d2cd25ec8f1fc",
       "end": "6eeb16782ba417b2a00c436da0b83edadfcd7575",
-      "commitsMined": 562,
-      "commitsWithProductionChanges": 245,
-      "rawProposals": 134,
-      "sampledNormalCommits": 4,
+      "startUtc": "2025-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "commitsSearched": 562,
+      "proposals": 134,
+      "proposalEvents": 13,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 2,
+        "related-different": 1,
+        "unknown": 0
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 22,
+        "related-different": 1,
+        "unknown": 0
+      },
+      "normalSampling": "Up to 12 non-keyword commits with production changes (4 for Django/scikit-learn); smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 4,
       "unavailable": 0,
-      "legacyBlock": 2,
-      "legacyWarn": 2,
-      "seconds": 171.94296409500004,
-      "positive": 21,
-      "negative": 1
+      "legacyDuplicatePairs": 4
     },
     {
       "id": "typescript-eslint",
@@ -97,383 +144,850 @@
       "licenseFile": "LICENSE",
       "start": "4dbf48b8eec0321babb4293a1be71b54dd00c018",
       "end": "f9bd7d86fc39eb2957de7eefdcd3ab9b6c9dc4a7",
-      "commitsMined": 374,
-      "commitsWithProductionChanges": 154,
-      "rawProposals": 22,
-      "sampledNormalCommits": 12,
+      "startUtc": "2025-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "commitsSearched": 374,
+      "proposals": 22,
+      "proposalEvents": 5,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 7,
+        "unknown": 0
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 15,
+        "unknown": 0
+      },
+      "normalSampling": "Up to 12 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 12,
       "unavailable": 0,
-      "legacyBlock": 28,
-      "legacyWarn": 15,
-      "seconds": 255.488650374,
-      "positive": 0,
-      "negative": 15
-    }
-  ],
-  "signals": [
-    {
-      "feature": "structure",
-      "positiveMean": 0.6555989583333334,
-      "negativeMean": 0.2128314393939394,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.9324494949494949,
-      "familyAuc": 0.888345864661655,
-      "direction": 1
+      "legacyDuplicatePairs": 43
     },
     {
-      "feature": "exact",
-      "positiveMean": 0.125,
-      "negativeMean": 0.030303030303030304,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.5473484848484849,
-      "familyAuc": 0.6105889724310788,
-      "direction": 1
+      "id": "typescript",
+      "url": "https://github.com/microsoft/TypeScript.git",
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE.txt",
+      "maxMiningSourceBytes": 200000,
+      "startUtc": "2024-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "start": "f2e9ebd1b7e6f8e11ab23631f7b2df4346708535",
+      "end": "3ba257fface990ec5ec59fa2bb8edd7a721e1013",
+      "commitsSearched": 1078,
+      "proposals": 294,
+      "proposalEvents": 50,
+      "oversizeSourceVersionsSkipped": 1797,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 1,
+        "related-different": 0,
+        "unknown": 0
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 1,
+        "related-different": 0,
+        "unknown": 0
+      },
+      "normalSampling": "Up to 2 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 2,
+      "unavailable": 2,
+      "legacyDuplicatePairs": 0
     },
     {
-      "feature": "vocabulary",
-      "positiveMean": 0.7887997107796179,
-      "negativeMean": 0.6159517450616275,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.7904040404040404,
-      "familyAuc": 0.693400167084378,
-      "direction": 1
+      "id": "vite",
+      "url": "https://github.com/vitejs/vite.git",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "startUtc": "2024-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "start": "8de7bd2b68db27b83d9484cc8d4e26436615168e",
+      "end": "3e81af38a80c7617aba6bf3300d8b4267570f9cf",
+      "commitsSearched": 1527,
+      "proposals": 81,
+      "proposalEvents": 22,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 2,
+        "related-different": 1,
+        "unknown": 0
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 2,
+        "related-different": 1,
+        "unknown": 0
+      },
+      "normalSampling": "Up to 2 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 2,
+      "unavailable": 0,
+      "legacyDuplicatePairs": 15
     },
     {
-      "feature": "bindingExact",
-      "positiveMean": 0,
-      "negativeMean": 0,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.5,
-      "familyAuc": 0.4999999999999999,
-      "direction": 1
+      "id": "vue",
+      "url": "https://github.com/vuejs/core.git",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "startUtc": "2024-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "start": "24d77c25ce5d5356adb5367beef1d23e6e340b35",
+      "end": "ba391f5fdf5d84bfacaca6a2a3e7057fc99efa34",
+      "commitsSearched": 1195,
+      "proposals": 17,
+      "proposalEvents": 8,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 1,
+        "unknown": 1
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 1,
+        "unknown": 1
+      },
+      "normalSampling": "Up to 2 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 2,
+      "unavailable": 0,
+      "legacyDuplicatePairs": 3
     },
     {
-      "feature": "structureVocabulary",
-      "positiveMean": 0.5200351991522367,
-      "negativeMean": 0.16306259676144108,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.9090909090909091,
-      "familyAuc": 0.8319548872180454,
-      "direction": 1
-    },
-    {
-      "feature": "exactVocabulary",
-      "positiveMean": 0.10047513173036376,
-      "negativeMean": 0.03022358762409769,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.5454545454545454,
-      "familyAuc": 0.6033834586466176,
-      "direction": 1
-    },
-    {
-      "feature": "paramCount",
-      "positiveMean": 1,
-      "negativeMean": 0.603030303030303,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.8181818181818182,
-      "familyAuc": 0.8026315789473687,
-      "direction": 1
-    },
-    {
-      "feature": "paramNames",
-      "positiveMean": 0.9791666666666666,
-      "negativeMean": 0.34901428537792173,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.88510101010101,
-      "familyAuc": 0.8334429824561417,
-      "direction": 1
-    },
-    {
-      "feature": "returnType",
-      "positiveMean": 0.875,
-      "negativeMean": 0.18181818181818182,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.8465909090909091,
-      "familyAuc": 0.5276315789473693,
-      "direction": 1
-    },
-    {
-      "feature": "name",
-      "positiveMean": 0.476388888888889,
-      "negativeMean": 0.0708152958152958,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.9747474747474747,
-      "familyAuc": 0.9349624060150383,
-      "direction": 1
+      "id": "pandas",
+      "url": "https://github.com/pandas-dev/pandas.git",
+      "license": "BSD-3-Clause",
+      "licenseFile": "LICENSE",
+      "start": "8fbe6ac83da590acfc58ff83713aac14ab7f900d",
+      "end": "0ab10aa1417f19ecf265ff9383b1aa851b02736b",
+      "startUtc": "2025-01-01T00:00:00Z",
+      "endUtcExclusive": "2025-07-01T00:00:00Z",
+      "commitsSearched": 394,
+      "proposals": 56,
+      "proposalEvents": 5,
+      "oversizeSourceVersionsSkipped": 0,
+      "familyCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 0,
+        "unknown": 0
+      },
+      "pairCounts": {
+        "direct-reuse": 0,
+        "extract/extend": 0,
+        "related-different": 0,
+        "unknown": 0
+      },
+      "normalSampling": "Up to 2 non-keyword commits with production changes; smallest SHA256(normal-v1:<commit>) from all eligible commits, independent of findings.",
+      "normalRuns": 2,
+      "unavailable": 1,
+      "legacyDuplicatePairs": 0
     }
   ],
   "contracts": [
     {
       "feature": "reads",
-      "positiveMean": 0.31124338624338616,
-      "negativeMean": 0.08759157509157507,
-      "positiveAvailable": 24,
-      "negativeAvailable": 24,
-      "auc": 0.9045138888888888,
-      "familyAuc": 0.8816964285714297,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.08469991546914622,
+        "positiveAvailable": 0,
+        "negativeAvailable": 26,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.4096371882086167,
+        "negativeMean": 0.08469991546914622,
+        "positiveAvailable": 28,
+        "negativeAvailable": 26,
+        "auc": 0.9217032967032966,
+        "familyAuc": 0.9335317460317465,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.3333333333333333,
+        "negativeMean": 0.08469991546914622,
+        "positiveAvailable": 2,
+        "negativeAvailable": 26,
+        "auc": 0.6538461538461539,
+        "familyAuc": 0.6273148148148148,
+        "direction": 1
+      }
     },
     {
       "feature": "writes",
-      "positiveMean": 0.5,
-      "negativeMean": 0.2,
-      "positiveAvailable": 1,
-      "negativeAvailable": 5,
-      "auc": 0.8,
-      "familyAuc": 0.8,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.14285714285714285,
+        "positiveAvailable": 0,
+        "negativeAvailable": 7,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.75,
+        "negativeMean": 0.14285714285714285,
+        "positiveAvailable": 2,
+        "negativeAvailable": 7,
+        "auc": 0.8928571428571429,
+        "familyAuc": 0.8928571428571429,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.25,
+        "negativeMean": 0.14285714285714285,
+        "positiveAvailable": 2,
+        "negativeAvailable": 7,
+        "auc": 0.6428571428571429,
+        "familyAuc": 0.6428571428571429,
+        "direction": 1
+      }
     },
     {
       "feature": "calls",
-      "positiveMean": 0.7488425925925926,
-      "negativeMean": 0.16857142857142854,
-      "positiveAvailable": 24,
-      "negativeAvailable": 25,
-      "auc": 0.9333333333333333,
-      "familyAuc": 0.9122643849206353,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.15608465608465605,
+        "positiveAvailable": 0,
+        "negativeAvailable": 27,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.7847222222222222,
+        "negativeMean": 0.15608465608465605,
+        "positiveAvailable": 28,
+        "negativeAvailable": 27,
+        "auc": 0.9444444444444444,
+        "familyAuc": 0.9575341710758379,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.5,
+        "negativeMean": 0.15608465608465605,
+        "positiveAvailable": 2,
+        "negativeAvailable": 27,
+        "auc": 0.6296296296296297,
+        "familyAuc": 0.6354166666666666,
+        "direction": 1
+      }
     },
     {
       "feature": "returnShape",
-      "positiveMean": 0.7727272727272727,
-      "negativeMean": 0.2619047619047619,
-      "positiveAvailable": 22,
-      "negativeAvailable": 21,
-      "auc": 0.816017316017316,
-      "familyAuc": 0.8605006105006093,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.25,
+        "positiveAvailable": 0,
+        "negativeAvailable": 22,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.782608695652174,
+        "negativeMean": 0.25,
+        "positiveAvailable": 23,
+        "negativeAvailable": 22,
+        "auc": 0.8270750988142292,
+        "familyAuc": 0.8799130763416468,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0,
+        "negativeMean": 0.25,
+        "positiveAvailable": 1,
+        "negativeAvailable": 22,
+        "auc": 0.36363636363636365,
+        "familyAuc": 0.380952380952381,
+        "direction": 1
+      }
     },
     {
       "feature": "arity",
-      "positiveMean": 1,
-      "negativeMean": 0.7373333333333334,
-      "positiveAvailable": 24,
-      "negativeAvailable": 25,
-      "auc": 0.76,
-      "familyAuc": 0.7500000000000001,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.7567901234567901,
+        "positiveAvailable": 0,
+        "negativeAvailable": 27,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 1,
+        "negativeMean": 0.7567901234567901,
+        "positiveAvailable": 28,
+        "negativeAvailable": 27,
+        "auc": 0.7407407407407407,
+        "familyAuc": 0.7222222222222228,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 1,
+        "negativeMean": 0.7567901234567901,
+        "positiveAvailable": 2,
+        "negativeAvailable": 27,
+        "auc": 0.7407407407407407,
+        "familyAuc": 0.7222222222222223,
+        "direction": 1
+      }
     },
     {
       "feature": "parameterUse",
-      "positiveMean": 0.9947047644455619,
-      "negativeMean": 0.7948685777954878,
-      "positiveAvailable": 24,
-      "negativeAvailable": 19,
-      "auc": 0.7916666666666666,
-      "familyAuc": 0.7008928571428575,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.8103722862160491,
+        "positiveAvailable": 0,
+        "negativeAvailable": 21,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.9952931239516105,
+        "negativeMean": 0.8103722862160491,
+        "positiveAvailable": 27,
+        "negativeAvailable": 21,
+        "auc": 0.781305114638448,
+        "familyAuc": 0.7299107142857142,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.9774053488061798,
+        "negativeMean": 0.8103722862160491,
+        "positiveAvailable": 2,
+        "negativeAvailable": 21,
+        "auc": 0.6904761904761905,
+        "familyAuc": 0.72265625,
+        "direction": 1
+      }
     },
     {
       "feature": "exceptions",
-      "positiveMean": 0.5,
-      "negativeMean": 0,
-      "positiveAvailable": 2,
-      "negativeAvailable": 2,
-      "auc": 0.75,
-      "familyAuc": 0.75,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0,
+        "positiveAvailable": 0,
+        "negativeAvailable": 2,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.5,
+        "negativeMean": 0,
+        "positiveAvailable": 2,
+        "negativeAvailable": 2,
+        "auc": 0.75,
+        "familyAuc": 0.75,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 1,
+        "negativeMean": 0,
+        "positiveAvailable": 1,
+        "negativeAvailable": 2,
+        "auc": 1,
+        "familyAuc": 1,
+        "direction": 1
+      }
     },
     {
       "feature": "validation",
-      "positiveMean": 0.9565217391304348,
-      "negativeMean": 0.09090909090909091,
-      "positiveAvailable": 23,
-      "negativeAvailable": 11,
-      "auc": 0.932806324110672,
-      "familyAuc": 0.7833333333333343,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.10256410256410256,
+        "positiveAvailable": 0,
+        "negativeAvailable": 13,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.9583333333333334,
+        "negativeMean": 0.10256410256410256,
+        "positiveAvailable": 24,
+        "negativeAvailable": 13,
+        "auc": 0.9391025641025641,
+        "familyAuc": 0.8229166666666674,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 1,
+        "negativeMean": 0.10256410256410256,
+        "positiveAvailable": 2,
+        "negativeAvailable": 13,
+        "auc": 0.9615384615384616,
+        "familyAuc": 0.9583333333333334,
+        "direction": 1
+      }
     },
     {
       "feature": "earlyReturns",
-      "positiveMean": 1,
-      "negativeMean": 0.16666666666666666,
-      "positiveAvailable": 22,
-      "negativeAvailable": 10,
-      "auc": 0.95,
-      "familyAuc": 0.9444444444444444,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.14646464646464644,
+        "positiveAvailable": 0,
+        "negativeAvailable": 12,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 1,
+        "negativeMean": 0.14646464646464644,
+        "positiveAvailable": 23,
+        "negativeAvailable": 12,
+        "auc": 0.9583333333333334,
+        "familyAuc": 0.9545454545454544,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.5,
+        "negativeMean": 0.14646464646464644,
+        "positiveAvailable": 1,
+        "negativeAvailable": 12,
+        "auc": 0.8333333333333334,
+        "familyAuc": 0.8181818181818182,
+        "direction": 1
+      }
     },
     {
       "feature": "sameFile",
-      "positiveMean": 1,
-      "negativeMean": 0.36,
-      "positiveAvailable": 24,
-      "negativeAvailable": 25,
-      "auc": 0.82,
-      "familyAuc": 0.8203125000000008,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.3333333333333333,
+        "positiveAvailable": 0,
+        "negativeAvailable": 27,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.9285714285714286,
+        "negativeMean": 0.3333333333333333,
+        "positiveAvailable": 28,
+        "negativeAvailable": 27,
+        "auc": 0.7976190476190477,
+        "familyAuc": 0.715277777777778,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.5,
+        "negativeMean": 0.3333333333333333,
+        "positiveAvailable": 2,
+        "negativeAvailable": 27,
+        "auc": 0.5833333333333334,
+        "familyAuc": 0.5902777777777778,
+        "direction": 1
+      }
     },
     {
       "feature": "verbOpposition",
-      "positiveMean": 0,
-      "negativeMean": 0.04,
-      "positiveAvailable": 24,
-      "negativeAvailable": 25,
-      "auc": 0.52,
-      "familyAuc": 0.5312500000000006,
-      "direction": -1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.037037037037037035,
+        "positiveAvailable": 0,
+        "negativeAvailable": 27,
+        "auc": null,
+        "familyAuc": null,
+        "direction": -1
+      },
+      "extract/extend": {
+        "positiveMean": 0,
+        "negativeMean": 0.037037037037037035,
+        "positiveAvailable": 28,
+        "negativeAvailable": 27,
+        "auc": 0.5185185185185185,
+        "familyAuc": 0.5277777777777777,
+        "direction": -1
+      },
+      "unknown": {
+        "positiveMean": 0,
+        "negativeMean": 0.037037037037037035,
+        "positiveAvailable": 2,
+        "negativeAvailable": 27,
+        "auc": 0.5185185185185185,
+        "familyAuc": 0.5277777777777778,
+        "direction": -1
+      }
     },
     {
       "feature": "writePresenceMismatch",
-      "positiveMean": 0,
-      "negativeMean": 0.16,
-      "positiveAvailable": 24,
-      "negativeAvailable": 25,
-      "auc": 0.58,
-      "familyAuc": 0.6093750000000008,
-      "direction": -1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.2222222222222222,
+        "positiveAvailable": 0,
+        "negativeAvailable": 27,
+        "auc": null,
+        "familyAuc": null,
+        "direction": -1
+      },
+      "extract/extend": {
+        "positiveMean": 0,
+        "negativeMean": 0.2222222222222222,
+        "positiveAvailable": 28,
+        "negativeAvailable": 27,
+        "auc": 0.6111111111111112,
+        "familyAuc": 0.652777777777778,
+        "direction": -1
+      },
+      "unknown": {
+        "positiveMean": 0.5,
+        "negativeMean": 0.2222222222222222,
+        "positiveAvailable": 2,
+        "negativeAvailable": 27,
+        "auc": 0.3611111111111111,
+        "familyAuc": 0.40277777777777773,
+        "direction": -1
+      }
     },
     {
       "feature": "literals",
-      "positiveMean": 0.041666666666666664,
-      "negativeMean": 0.05412555412555413,
-      "positiveAvailable": 24,
-      "negativeAvailable": 21,
-      "auc": 0.4722222222222222,
-      "familyAuc": 0.666666666666667,
-      "direction": 1
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.0494189842015929,
+        "positiveAvailable": 0,
+        "negativeAvailable": 23,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.11538461538461539,
+        "negativeMean": 0.0494189842015929,
+        "positiveAvailable": 26,
+        "negativeAvailable": 23,
+        "auc": 0.5183946488294314,
+        "familyAuc": 0.7843137254901971,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 1,
+        "negativeMean": 0.0494189842015929,
+        "positiveAvailable": 1,
+        "negativeAvailable": 23,
+        "auc": 1,
+        "familyAuc": 1,
+        "direction": 1
+      }
     }
   ],
-  "independentCallablePairs": 49,
-  "allPairContractStats": [
+  "signals": [
     {
-      "feature": "reads",
-      "positiveMean": 0.31124338624338616,
-      "negativeMean": 0.08277683854606929,
-      "positiveAvailable": 24,
-      "negativeAvailable": 26,
-      "auc": 0.9118589743589743,
-      "familyAuc": 0.8816964285714297,
-      "direction": 1
+      "feature": "structure",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.2078125,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.7047991071428571,
+        "negativeMean": 0.2078125,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.9433673469387756,
+        "familyAuc": 0.9375850340136058,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.453125,
+        "negativeMean": 0.2078125,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.5571428571428572,
+        "familyAuc": 0.5642857142857143,
+        "direction": 1
+      }
     },
     {
-      "feature": "writes",
-      "positiveMean": 0.5,
-      "negativeMean": 0.16666666666666666,
-      "positiveAvailable": 1,
-      "negativeAvailable": 6,
-      "auc": 0.8333333333333334,
-      "familyAuc": 0.8333333333333334,
-      "direction": 1
+      "feature": "exact",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.02857142857142857,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.25,
+        "negativeMean": 0.02857142857142857,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.6107142857142858,
+        "familyAuc": 0.7946428571428573,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0,
+        "negativeMean": 0.02857142857142857,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.4857142857142857,
+        "familyAuc": 0.47619047619047616,
+        "direction": 1
+      }
     },
     {
-      "feature": "calls",
-      "positiveMean": 0.7488425925925926,
-      "negativeMean": 0.1589336589336589,
-      "positiveAvailable": 24,
-      "negativeAvailable": 27,
-      "auc": 0.9382716049382716,
-      "familyAuc": 0.9122643849206352,
-      "direction": 1
+      "feature": "vocabulary",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.6114158470227847,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.8081262375274371,
+        "negativeMean": 0.6114158470227847,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.8204081632653061,
+        "familyAuc": 0.8224111866969013,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.5978286650121941,
+        "negativeMean": 0.6114158470227847,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.4714285714285714,
+        "familyAuc": 0.47619047619047616,
+        "direction": 1
+      }
     },
     {
-      "feature": "returnShape",
-      "positiveMean": 0.7727272727272727,
-      "negativeMean": 0.25,
-      "positiveAvailable": 22,
-      "negativeAvailable": 22,
-      "auc": 0.8243801652892562,
-      "familyAuc": 0.8605006105006094,
-      "direction": 1
+      "feature": "bindingExact",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.14285714285714285,
+        "negativeMean": 0,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.5714285714285714,
+        "familyAuc": 0.7500000000000004,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0,
+        "negativeMean": 0,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.5,
+        "familyAuc": 0.5,
+        "direction": 1
+      }
     },
     {
-      "feature": "arity",
-      "positiveMean": 1,
-      "negativeMean": 0.6950617283950616,
-      "positiveAvailable": 24,
-      "negativeAvailable": 27,
-      "auc": 0.7777777777777778,
-      "familyAuc": 0.7499999999999999,
-      "direction": 1
+      "feature": "structureVocabulary",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.15774144809810733,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.5777566561325388,
+        "negativeMean": 0.15774144809810733,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.9244897959183673,
+        "familyAuc": 0.9120748299319732,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.3834636726302622,
+        "negativeMean": 0.15774144809810733,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.5428571428571428,
+        "familyAuc": 0.5595238095238095,
+        "direction": 1
+      }
     },
     {
-      "feature": "parameterUse",
-      "positiveMean": 0.9947047644455619,
-      "negativeMean": 0.80363227391298,
-      "positiveAvailable": 24,
-      "negativeAvailable": 20,
-      "auc": 0.7979166666666667,
-      "familyAuc": 0.6889880952380956,
-      "direction": 1
+      "feature": "exactVocabulary",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.028496525474149253,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.21813374119950485,
+        "negativeMean": 0.028496525474149253,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.6091836734693877,
+        "familyAuc": 0.7913832199546488,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0,
+        "negativeMean": 0.028496525474149253,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.4857142857142857,
+        "familyAuc": 0.47619047619047616,
+        "direction": 1
+      }
     },
     {
-      "feature": "exceptions",
-      "positiveMean": 0.5,
-      "negativeMean": 0,
-      "positiveAvailable": 2,
-      "negativeAvailable": 4,
-      "auc": 0.75,
-      "familyAuc": 0.75,
-      "direction": 1
+      "feature": "paramCount",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.6257142857142857,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 1,
+        "negativeMean": 0.6257142857142857,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.8,
+        "familyAuc": 0.7738095238095243,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 1,
+        "negativeMean": 0.6257142857142857,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.8,
+        "familyAuc": 0.7738095238095237,
+        "direction": 1
+      }
     },
     {
-      "feature": "validation",
-      "positiveMean": 0.9565217391304348,
-      "negativeMean": 0.07692307692307693,
-      "positiveAvailable": 23,
-      "negativeAvailable": 13,
-      "auc": 0.939799331103679,
-      "familyAuc": 0.7833333333333343,
-      "direction": 1
+      "feature": "paramNames",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.38621346907061194,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.9464285714285714,
+        "negativeMean": 0.38621346907061194,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.8392857142857143,
+        "familyAuc": 0.7333333333333337,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.4166666666666667,
+        "negativeMean": 0.38621346907061194,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.4714285714285714,
+        "familyAuc": 0.4281746031746032,
+        "direction": 1
+      }
     },
     {
-      "feature": "earlyReturns",
-      "positiveMean": 1,
-      "negativeMean": 0.16666666666666666,
-      "positiveAvailable": 22,
-      "negativeAvailable": 10,
-      "auc": 0.95,
-      "familyAuc": 0.9444444444444444,
-      "direction": 1
+      "feature": "returnType",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.17142857142857143,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.7857142857142857,
+        "negativeMean": 0.17142857142857143,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.8071428571428572,
+        "familyAuc": 0.5369047619047626,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0,
+        "negativeMean": 0.17142857142857143,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.4142857142857143,
+        "familyAuc": 0.4119047619047619,
+        "direction": 1
+      }
     },
     {
-      "feature": "sameFile",
-      "positiveMean": 1,
-      "negativeMean": 0.5151515151515151,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.7424242424242424,
-      "familyAuc": 0.7495614035087729,
-      "direction": 1
-    },
-    {
-      "feature": "verbOpposition",
-      "positiveMean": 0,
-      "negativeMean": 0.030303030303030304,
-      "positiveAvailable": 24,
-      "negativeAvailable": 33,
-      "auc": 0.5151515151515151,
-      "familyAuc": 0.5263157894736843,
-      "direction": -1
-    },
-    {
-      "feature": "writePresenceMismatch",
-      "positiveMean": 0,
-      "negativeMean": 0.14814814814814814,
-      "positiveAvailable": 24,
-      "negativeAvailable": 27,
-      "auc": 0.5740740740740741,
-      "familyAuc": 0.6093750000000009,
-      "direction": -1
-    },
-    {
-      "feature": "literals",
-      "positiveMean": 0.041666666666666664,
-      "negativeMean": 0.0494189842015929,
-      "positiveAvailable": 24,
-      "negativeAvailable": 23,
-      "auc": 0.4782608695652174,
-      "familyAuc": 0.666666666666667,
-      "direction": 1
+      "feature": "name",
+      "direct-reuse": {
+        "positiveMean": null,
+        "negativeMean": 0.07248299319727891,
+        "positiveAvailable": 0,
+        "negativeAvailable": 35,
+        "auc": null,
+        "familyAuc": null,
+        "direction": 1
+      },
+      "extract/extend": {
+        "positiveMean": 0.536904761904762,
+        "negativeMean": 0.07248299319727891,
+        "positiveAvailable": 28,
+        "negativeAvailable": 35,
+        "auc": 0.9790816326530613,
+        "familyAuc": 0.9676020408163273,
+        "direction": 1
+      },
+      "unknown": {
+        "positiveMean": 0.5285714285714286,
+        "negativeMean": 0.07248299319727891,
+        "positiveAvailable": 2,
+        "negativeAvailable": 35,
+        "auc": 0.9285714285714286,
+        "familyAuc": 0.9238095238095239,
+        "direction": 1
+      }
     }
-  ]
+  ],
+  "sourceHashes": {
+    "src/reuse/model.json": "3d2aa690e5261d9f4893910ded6a7d084a49ef5c22461c49a33a17a1558c6642",
+    "src/reuse/signals.ts": "92b4296974554ff3ef6bedb2d03df38b0111624e32f280cf08c08e2bc5788fe3",
+    "src/reuse/policy.ts": "0a954f470800264e4b3c06bd8e0bd89091ebe795c8c2d432336013d8244ee16e",
+    "scripts/real-history-features.ts": "de64e6aa5c6275e86ab05f48b1e3515b099e79b2a4d953225367f83040bac334",
+    "bench/real-history/dev/labels.json": "d17b7c658d2d07057dc448ea67f9ccaa5d04aa0d4aea40ddf0b20f10296da1a2"
+  }
 }

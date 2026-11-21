@@ -35,6 +35,7 @@
       "id": "typescript-eslint-normal-1c73754f70-0",
       "reason": "The first returns whether a template literal has expressions; checkExpression dispatches multiple AST kinds to formatting checks and returns void. It is an effectful visitor rather than a predicate.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:1c73754f70dc44e329453dea55f7eb36225abcbb",
       "reviewer": "agent-reviewed"
@@ -164,6 +165,7 @@
       "id": "typescript-eslint-normal-1c73754f70-1",
       "reason": "The first tests const/readonly declaration context and excludes interpolated templates; getTemplateLiteral unwraps a type/value AST node and returns a literal node or null. Return shape and examined structure differ.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:1c73754f70dc44e329453dea55f7eb36225abcbb",
       "reviewer": "agent-reviewed"
@@ -296,6 +298,7 @@
       "id": "typescript-eslint-normal-9a9670dd1b-0",
       "reason": "isDefinitionFile returns a case-normalized declaration-file predicate including arbitrary .d.*.ts names; getExtension returns a case-sensitive suffix or null. Their outputs and matching rules differ.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:9a9670dd1bcce833900b9273b81ef9cbfb9b722f",
       "reviewer": "agent-reviewed"
@@ -429,6 +432,7 @@
       "id": "typescript-eslint-normal-586e7eb20a-0",
       "reason": "One checks imported external-module interface/type-alias merging using scope; the other applies the ignoreTypeValueShadow option and compares value/type variable categories. They answer different shadowing questions.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:586e7eb20a2c91564abfeb1c3631f74e45b37140",
       "reviewer": "agent-reviewed"
@@ -572,6 +576,7 @@
       "id": "typescript-eslint-normal-04166e034b-0",
       "reason": "Spread checking reports disallowed string spreading; throw checking accepts configured any/unknown/Error-like types and reports invalid thrown values. Shared checker/report APIs do not make their validation policies duplicates.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:04166e034b19f2aec4bf4a54fc36d636854fdac8",
       "reviewer": "agent-reviewed"
@@ -721,6 +726,7 @@
       "id": "typescript-eslint-normal-04166e034b-4",
       "reason": "isString returns a recursively computed StringLike predicate; getEnumValueType maps enum values to Number/String flags or undefined. Its output is a classification, not the same boolean predicate.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:04166e034b19f2aec4bf4a54fc36d636854fdac8",
       "reviewer": "agent-reviewed"
@@ -844,6 +850,7 @@
       "id": "typescript-eslint-normal-04166e034b-7",
       "reason": "isClassInstance recursively distinguishes instances from constructor-like types; getConstructSignatureDeclaration returns a signature declaration for a symbol. Different input domains and return types prevent reuse as a replacement.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:04166e034b19f2aec4bf4a54fc36d636854fdac8",
       "reviewer": "agent-reviewed"
@@ -974,6 +981,7 @@
       "id": "typescript-eslint-normal-04166e034b-8",
       "reason": "Class-declaration detection tests object flags and declaration kinds; isString tests StringLike flags. Their shared recursion driver is already reused, but these distinct leaf predicates must remain different.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:04166e034b19f2aec4bf4a54fc36d636854fdac8",
       "reviewer": "agent-reviewed"
@@ -1092,6 +1100,7 @@
       "id": "typescript-eslint-normal-e4532c7fa3-1",
       "reason": "specifierNameMatches compares TypeScript type symbol/intrinsic names against specifiers; isIdentifier checks an ESTree Identifier node and its spelling. The two compiler representations and resolution semantics differ.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:e4532c7fa3becd3cb1e11cdc253cbc3d8be02f78",
       "reviewer": "agent-reviewed"
@@ -1226,6 +1235,7 @@
       "id": "typescript-eslint-normal-4ad8a07133-1",
       "reason": "populateProjectService normalizes options, validates globs and lazily initializes a cached service; validateDefaultProjectForFilesGlob only rejects broad patterns and returns void. This is orchestration versus an already-called validation step.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:4ad8a0713376e5b88c56997312861a2c8cb049ab",
       "reviewer": "agent-reviewed"
@@ -1363,6 +1373,7 @@
       "id": "typescript-eslint-normal-4ad8a07133-7",
       "reason": "absolutify returns an absolute path using the project-service host directory; retrieveASTAndProgramFor retrieves script/program state and produces an AST/program pair or undefined. Reading the same service does not imply duplicate work.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:4ad8a0713376e5b88c56997312861a2c8cb049ab",
       "reviewer": "agent-reviewed"
@@ -1508,6 +1519,7 @@
       "id": "typescript-eslint-normal-4ad8a07133-12",
       "reason": "The nested getCurrentDirectory returns a path string; createProgramFromConfigFile reads a config and constructs a compiler program and host. Path lookup is not program construction.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:4ad8a0713376e5b88c56997312861a2c8cb049ab",
       "reviewer": "agent-reviewed"
@@ -1634,6 +1646,7 @@
       "id": "typescript-eslint-normal-4ad8a07133-0",
       "reason": "formatDiagnostics is a nested closure inside getParsedConfigFile; containing source and a captured-state formatting callback are not independent alternatives.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "typescript-eslint:4ad8a0713376e5b88c56997312861a2c8cb049ab",
       "reviewer": "agent-reviewed"
@@ -1771,6 +1784,7 @@
       "id": "typescript-eslint-normal-4ad8a07133-4",
       "reason": "openClientFileAndMaybeReload is nested inside openClientFileFromProjectService. It uses captured project state for one stage of the containing orchestration; it cannot replace the enclosing function.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "typescript-eslint:4ad8a0713376e5b88c56997312861a2c8cb049ab",
       "reviewer": "agent-reviewed"
@@ -1949,6 +1963,7 @@
       "id": "typescript-eslint-normal-fa265a9705-4",
       "reason": "teardown conditionally removes INTEGRATION_TEST_DIR; setup creates fixture/tar/temp directories, packs packages, writes dependency configuration and installs fixtures. These are opposite lifecycle effects, not redundant implementations.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "different-contract",
       "family": "typescript-eslint:fa265a970535e9b8d3ac8bfde9f3a24f1a1ec94a",
       "reviewer": "agent-reviewed"

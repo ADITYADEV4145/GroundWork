@@ -36,6 +36,7 @@
     "review": {
       "id": "django-mail-recipients-b05123b724",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "shared-helper",
       "family": "django-mail-recipients",
       "reason": "mail_admins / mail_managers: The two functions duplicate recipient validation, EmailMultiAlternatives construction, HTML attachment and sending; ADMINS versus MANAGERS is the configuration difference. The commit extracts _send_server_message(setting_name=...) and both wrappers call it. Calling mail_managers from mail_admins unchanged would send to the wrong recipients, so this is helper-extraction evidence, not direct-call equivalence.",
@@ -212,6 +213,7 @@
     "review": {
       "id": "django-expression-resolution-25a6fa82bb",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "extend-existing",
       "family": "django-expression-resolution",
       "reason": "Func.resolve_expression / BaseExpression.resolve_expression: Both before implementations copy self, set is_summary and resolve child expressions. The commit moves Func's composite-expression validation into BaseExpression and deletes Func's override, inheriting the generalized implementation. This is an author-performed consolidation, but before-state BaseExpression lacks Func's validation: direct replacement without extending it would be unsafe.",
@@ -369,6 +371,7 @@
     "review": {
       "id": "django-log-assertions-a85dcca1d0",
       "label": "positive",
+      "actionClass": "extract/extend",
       "mode": "extend-existing-test",
       "family": "django-log-assertions",
       "reason": "LogResponseRealLoggerTests.assertResponseLogged / LoggingAssertionMixin.assertLogRecord: Both before helpers validate one captured record, its message and status. The commit extends assertLogRecord with level/request checks and a return value, makes LogResponseRealLoggerTests inherit the mixin and replaces every assertResponseLogged call. Real duplicate assertion logic is consolidated; the old target alone lacks checks and a return value, so it is not a safe unchanged replacement. Test-only evidence, outside the production skipTests population.",
@@ -524,6 +527,7 @@
       "id": "django-normal-f920937c8a-0",
       "reason": "RoutePattern encloses check, verified by source ranges and qualified names. A validation method cannot replace the route-pattern class and its matching interface.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "django:f920937c8a63df6bea220e4386f59cdb45b2e355",
       "reviewer": "agent-reviewed"
@@ -636,6 +640,7 @@
       "id": "django-normal-f920937c8a-1",
       "reason": "RoutePattern.match is contained by its proposed target RoutePattern. A method cannot be replaced by the class containing its own implementation.",
       "label": "negative",
+      "actionClass": "related-different",
       "mode": "containment",
       "family": "django:f920937c8a63df6bea220e4386f59cdb45b2e355",
       "reviewer": "agent-reviewed"

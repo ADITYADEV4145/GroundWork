@@ -73,6 +73,21 @@ describe('Codex skill ownership', () => {
 });
 
 describe('gw setup edge cases', () => {
+  it('keeps user edits made between setup runs with different commands', () => {
+    const root = tempDir('gw-setup-edits-'); dirs.push(root);
+    const first = targetsFor({ root, gw: 'gw' });
+    applySetup(root, planSetup(root, first, 'add'), 'add');
+    const file = path.join(root, '.claude/settings.json');
+    const settings = JSON.parse(readFileSync(file, 'utf8'));
+    settings.model = 'user-chosen-model';
+    settings.hooks.Stop.push({ hooks: [{ type: 'command', command: 'echo user hook' }] });
+    writeFileSync(file, JSON.stringify(settings, null, 2) + '\n');
+    const second = targetsFor({ root, gw: 'npx groundwork-agent' });
+    applySetup(root, planSetup(root, second, 'add'), 'add');
+    applySetup(root, planSetup(root, second, 'remove'), 'remove');
+    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ model: 'user-chosen-model', hooks: { Stop: [{ hooks: [{ type: 'command', command: 'echo user hook' }] }] } });
+  });
+
   function fresh() {
     const root = tempDir('gw-setup-root-');
     const home = tempDir('gw-setup-home-');

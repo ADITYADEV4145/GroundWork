@@ -14,6 +14,7 @@ export interface PlannedChange {
   after: string | null;
   /** Entry keys this change writes, recorded so later runs recognise them. */
   owned: string[];
+  restoreBefore: string | null;
 }
 
 interface Manifest {
@@ -106,6 +107,9 @@ export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'r
       const known = new Set([...installed, ...owned]);
       let after = transform(edit, before, mode, known);
       const original = manifest.originals?.[edit.file];
+      const restoreBefore = original
+        ? before === original.after ? original.before : transform(edit, before, 'remove', installed)
+        : before;
       if (mode === 'remove' && original && before === original.after) after = original.before;
       let action: PlannedChange['action'];
       if (mode === 'add') action = before === null ? 'create' : after === before ? 'unchanged' : 'update';
@@ -117,7 +121,7 @@ export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'r
           after = null;
         } else action = after === before ? 'unchanged' : 'remove';
       }
-      out.push({ agent: t.label, file: edit.file, action, before, after, owned });
+      out.push({ agent: t.label, file: edit.file, action, before, after, owned, restoreBefore });
     }
   return out;
 }
@@ -135,7 +139,7 @@ export function applySetup(root: string, changes: PlannedChange[], mode: 'add' |
   manifest.originals ??= {};
   for (const c of changes) {
     if (c.action === 'unchanged') continue;
-    if (mode === 'add') manifest.originals[c.file] = { before: manifest.originals[c.file] ? manifest.originals[c.file]!.before : c.before, after: c.after };
+    if (mode === 'add') manifest.originals[c.file] = { before: c.restoreBefore, after: c.after };
     else delete manifest.originals[c.file];
     if (c.action === 'delete') {
       rmSync(c.file, { force: true });

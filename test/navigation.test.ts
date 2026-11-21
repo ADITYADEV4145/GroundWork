@@ -149,4 +149,29 @@ describe('MCP navigation', () => {
       expect(await runNavigationTool('find_code', { query: '_leep' }, ctx)).not.toContain('sleep (function)');
     });
   });
+
+  it('finds a joined letter-number term whether the documentation separates it or not', async () => {
+    const root = tempDir('gw-nav-numbers-');
+    try {
+      writeFileSync(path.join(root, 'app.py'), [
+        'def negotiate():\n    """Negotiate HTTP/2."""\n    pass\n',
+        'def multiplex():\n    """Multiplex HTTP2."""\n    pass\n',
+        'def retry():\n    """Retry HTTP 3 times."""\n    pass\n',
+      ].join('\n'));
+      await initSqlBackend();
+      await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const result = await runNavigationTool('find_code', { query: 'HTTP2' }, { root, db, config });
+        expect(result).toContain('negotiate (function)');
+        expect(result).toContain('multiplex (function)');
+        expect(result).not.toContain('retry (function)');
+      } finally {
+        db.close();
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
 });

@@ -22,6 +22,10 @@ function searchWords(value: string): string[] {
     .match(/[\p{L}\p{N}\p{M}]+/gu) ?? [];
 }
 
+function separateLetterNumber(value: string): string {
+  return value.replace(/(?<=[\p{L}\p{M}])(?=\p{N})|(?<=\p{N})(?=\p{L})/gu, ' ');
+}
+
 function toSymbol(r: Row): NavigationSymbol {
   return {
     id: String(r.id),
@@ -53,17 +57,19 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
     const fts5 = /\bUSING\s+fts5\s*\(/i.test(String(schema?.sql ?? ''));
     // FTS4's simple tokenizer preserves the case of non-ASCII characters.
     const tokens = fts5 ? words : [...new Set([...words, ...termsByCase.filter((w) => /[^\x00-\x7f]/u.test(w))])];
-    const terms = tokens.map((w) => fts5 ? `"${w}"*` : `"${w}*"`).join(' OR ');
+    const variants = new Set(tokens.flatMap((w) => [w, separateLetterNumber(w)]));
+    const terms = [...variants].map((w) => fts5 ? `"${w}"*` : `"${w}*"`).join(' OR ');
     const rows = db.prepare(`${select}, ${fts5 ? 'bm25(symbols_fts, 0, 5, 2, 2, 1)' : '0'} rank
       ${FROM} JOIN symbols_fts ON symbols_fts.rowid = s.rowid WHERE symbols_fts MATCH ?${filter}`).all(terms, ...filterArgs);
     for (const r of rows) candidates.set(String(r.id), r);
   }
+  const scoringWords = [...new Set(words.flatMap((w) => separateLetterNumber(w).split(' ')))];
   return [...candidates.values()].map((r) => {
     const s = toSymbol(r);
     const doc = String(r.docstring ?? '').trim();
     const overlap = (value: string) => {
-      const tokens = searchWords(value).map((w) => w.toLowerCase());
-      return words.filter((w) => tokens.some((token) => token.startsWith(w))).length / Math.max(1, words.length);
+      const tokens = searchWords(value).flatMap((w) => separateLetterNumber(w.toLowerCase()).split(' '));
+      return scoringWords.filter((w) => tokens.some((token) => token.startsWith(w))).length / Math.max(1, scoringWords.length);
     };
     const name = String(r.name).toLowerCase();
     const qualified = s.name.toLowerCase();

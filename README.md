@@ -2,58 +2,93 @@
 
 Your agent spends most of its tokens finding its way around, then rewrites code you already have. Groundwork fixes both.
 
-Groundwork is an open-source tool and agent skill that gives coding agents (Claude Code, Codex, Cursor) a live, local map of the codebase: fast navigation, a reuse-first duplicate gate, grounding checks for invented calls, and waste guards. 100% local; nothing leaves your machine.
+Groundwork is an open-source tool and agent skill for Claude Code, Codex and Cursor. It keeps a live, local map of your codebase and uses it to:
 
-Status: Phase 1 (codebase index) in place; navigation, Reuse First, grounding and waste guards are in progress.
+- **navigate cheaply**: find a symbol, read only its definition, and skip re-reading unchanged files
+- **reuse first**: find existing code before writing new code, and catch semantic clones and dead code before the agent stops
+- **stay grounded**: flag invented imports, calls and members, and wrong arguments, right after each edit
+- **cut waste**: answer repeated commands from the earlier result and trim huge outputs without dropping failures
 
-## Quick start
+It is 100% local: no network calls and no telemetry.
+
+## Install
 
 Requires Node.js 22+.
 
 ```sh
 npm install -g groundwork-agent
-cd your-repo
-gw init                      # writes .groundwork/ and builds the index
-gw symbols parse config      # ranked symbol search
-gw show ApiClient.get        # signature, docs, callers, callees
-gw stats                     # what's indexed, how well imports and calls resolved
-gw doctor                    # runtime, grammars, storage checks
+cd your-repo && gw init      # builds the index in .groundwork/
+gw setup                     # wires Claude Code, Codex and Cursor; shows every file it will change and asks first
 ```
 
-Every command takes `--json`. The index lives in `.groundwork/index.db` and refreshes incrementally: only files whose content changed are re-parsed.
+Other ways to install:
 
-## Install into your agent
+- **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
+- **Skill only (any agent that reads skills):** `npx skills add ADITYADEV4145/GroundWork`.
+- **Any MCP client:** run `gw mcp` as a stdio server from the repository root, or with `npx -y groundwork-agent mcp`.
 
-```sh
-gw setup            # detects Claude Code, Codex and Cursor; shows every file it will change and asks first
-gw setup --remove   # removes exactly what setup added
+`gw setup --remove` removes exactly what setup added. `gw setup --dry-run` shows the plan without writing anything.
+
+## How it works
+
+```
+ edit / read / run           hooks (fail open, 2 s budget)          .groundwork/index.db
+ ┌───────────────┐  PreToolUse   ┌──────────────────────────┐  query  ┌──────────────────────────┐
+ │ Claude Code   │ ────────────▶ │ read guard, repeat guard │ ──────▶ │ files, symbols, imports, │
+ │ Codex         │  PostToolUse  │ refresh, grounding notes │         │ calls, literals,         │
+ │ Cursor        │ ────────────▶ │ output trimmer           │ ◀────── │ fingerprints (MinHash)   │
+ │               │  Stop         │ gw check duplicate gate  │ refresh └──────────────────────────┘
+ │               │ ────────────▶ └──────────────────────────┘                     ▲
+ │               │  MCP tools: repo_map, find_code, outline, read_symbol,          │
+ │               │  callers, callees, where_used, find_similar, verify_calls ──────┘
+ └───────────────┘
 ```
 
-Claude Code can also install it as a plugin:
+The index covers TypeScript, JavaScript (JSX and CommonJS) and Python. It is parsed with tree-sitter and refreshed incrementally: only files whose content changed are re-parsed. Storage is `node:sqlite`, with a `sql.js` fallback. [SKILL.md](SKILL.md) teaches the agent the protocol: navigate with the index, run `find_similar` before writing and answer `REUSE` / `EXTEND` / `NEW`, then act on gate and grounding feedback.
 
-```
-/plugin marketplace add ADITYADEV4145/GroundWork
-/plugin install groundwork
-```
+## Profiles
 
-Any other MCP client can run `gw mcp` (stdio). See [SECURITY.md](SECURITY.md) for what the hooks do.
+| Profile | What runs |
+| --- | --- |
+| `minimal` | navigation tools and the read guard only |
+| `standard` (default) | adds Reuse First, grounding notes after edits, waste guards, and Stop gate findings as warnings |
+| `strict` | as `standard`, plus a Stop gate that blocks once on BLOCK findings |
 
-## What the index holds
+Choose one with `gw setup --profile strict`, or set `"profile"` in `.groundwork/config.json`. Every guard can also be switched on or off on its own in that file, and an explicit setting overrides the profile.
 
-TypeScript, JavaScript (JSX/CommonJS) and Python, parsed with tree-sitter (WASM):
+## Commands
 
-- files with language, hash, size, line count and test/generated flags
-- symbols (functions, methods, classes, interfaces, types, enums, constants, React components, dataclasses) with signatures, arity, docs, decorators, export status and parent
-- body fingerprints (normalized tokens, 128-permutation MinHash over 4-token shingles, identifier vocabulary) for duplicate detection
-- imports resolved to files (relative, tsconfig path aliases, barrels and re-exports, Python packages and relative imports)
-- call sites resolved to symbols with confidence `exact`, `import-resolved` or `name-only`
-- literals: URLs, paths, env vars, config keys and exported constants
+| Command | What it does |
+| --- | --- |
+| `gw symbols <query>`, `gw show <symbol>` | search symbols; show one symbol's signature, docs, callers and callees |
+| `gw similar "<description>"` | find existing code to reuse before writing a symbol |
+| `gw check [--base <ref>]` | duplicate gate over changed code; exits 1 on BLOCK findings (works in CI too) |
+| `gw verify [files...]` | grounding check; exits 1 on definite errors |
+| `gw run -- <cmd>` | run a noisy command, keep the full log locally, and print a trimmed summary |
+| `gw report` | what the guards saved in a session |
+| `gw stats`, `gw doctor`, `gw selftest` | index contents, environment checks, phase acceptance checks |
 
-Storage is `node:sqlite`, with a `sql.js` fallback.
+Every command takes `--json`.
+
+## Privacy and security
+
+Everything stays in `.groundwork/` in your repository. Hooks run with your user permissions, never run your commands for you, and fail open: if Groundwork errors or times out, the agent carries on. See [SECURITY.md](SECURITY.md) for what each hook does and how to audit it.
+
+## FAQ
+
+**Does it slow my agent down?** Hooks have a 2-second budget and usually answer in milliseconds. On timeout they allow the action.
+
+**What if a guard is wrong?** Repeat the read once, rerun the command with `GW_FORCE=1`, or mark an intended duplicate with `// groundwork: allow-duplicate <reason>`. Forces are counted so you can tune the config. See [troubleshooting](references/troubleshooting.md).
+
+**Which languages?** TypeScript, JavaScript and Python today. For other files, the agent falls back to its normal tools.
+
+**Does it send my code anywhere?** No. There are no network calls and no telemetry.
+
+**How do I remove it?** Run `gw setup --remove` and delete `.groundwork/`.
 
 ## Development
 
-See [AGENTS.md](AGENTS.md).
+See [AGENTS.md](AGENTS.md). Benchmarks (`gw bench`) are not part of this release yet.
 
 ## License
 

@@ -3,7 +3,7 @@ import type { GroundworkConfig } from '../config/schema.js';
 // Agent hooks are normalised to one event shape so handlers don't care which agent called them.
 
 export type AgentName = 'claude' | 'codex' | 'cursor';
-export type HookEventName = 'pre_tool' | 'post_tool' | 'session_start' | 'prompt' | 'stop';
+export type HookEventName = 'pre_tool' | 'post_tool' | 'session_start' | 'prompt' | 'stop' | 'pre_compact';
 
 export interface HookEvent {
   agent: AgentName;

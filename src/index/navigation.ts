@@ -32,6 +32,15 @@ function isPrefixTerm(value: string): boolean {
   return !/\p{N}$/u.test(value);
 }
 
+function rankingTokens(value: string): string[] {
+  return searchWords(value).flatMap((w) => separateLetterNumber(w.toLowerCase()).split(' '));
+}
+
+function matchesTerm(tokens: string[], parts: string[]): boolean {
+  return tokens.some((_, i) => parts.every((part, j) =>
+    j === parts.length - 1 && isPrefixTerm(part) ? tokens[i + j]?.startsWith(part) : tokens[i + j] === part));
+}
+
 function toSymbol(r: Row): NavigationSymbol {
   return {
     id: String(r.id),
@@ -48,6 +57,7 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
   const q = query.toLowerCase();
   const termsByCase = searchWords(query).slice(0, 24);
   const words = [...new Set(termsByCase.map((w) => w.toLowerCase()))];
+  const scoringWords = words.map(rankingTokens);
   const select = `SELECT ${SYMBOL}, s.name, s.docstring, s.exported, f.is_test, ${CALLERS} caller_count`;
   const filter = (kind ? ' AND s.kind = ?' : '') + (file ? ' AND f.path = ?' : '');
   const filterArgs = [...(kind ? [kind] : []), ...(file ? [file] : [])];
@@ -61,20 +71,35 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
     const fts5 = /\bUSING\s+fts5\s*\(/i.test(String(schema?.sql ?? ''));
     // FTS4's simple tokenizer preserves the case of non-ASCII characters.
     const tokens = fts5 ? words : [...new Set([...words, ...termsByCase.filter((w) => /[^\x00-\x7f]/u.test(w))])];
-    const variants = new Set(tokens.flatMap((w) => [w, separateLetterNumber(w)]));
-    const terms = [...variants].map((w) => !isPrefixTerm(w) ? `"${w}"` : fts5 ? `"${w}"*` : `"${w}*"`).join(' OR ');
-    const rows = db.prepare(`${select}, ${fts5 ? 'bm25(symbols_fts, 0, 5, 2, 2, 1)' : '0'} rank
-      ${FROM} JOIN symbols_fts ON symbols_fts.rowid = s.rowid WHERE symbols_fts MATCH ?${filter}`).all(terms, ...filterArgs);
-    for (const r of rows) candidates.set(String(r.id), r);
+    const prefix = (w: string) => fts5 ? `"${w}"*` : `"${w}*"`;
+    const variants = (values: string[]) => [...new Set(values.flatMap((w) => [w, separateLetterNumber(w)]))];
+    const search = db.prepare(`${select}, ${fts5 ? 'bm25(symbols_fts, 0, 5, 2, 2, 1)' : '0'} rank
+      ${FROM} JOIN symbols_fts ON symbols_fts.rowid = s.rowid WHERE symbols_fts MATCH ?${filter}`);
+    const terms = variants(tokens).map((w) => isPrefixTerm(w) ? prefix(w) : `"${w}"`).join(' OR ');
+    for (const r of search.all(terms, ...filterArgs)) candidates.set(String(r.id), r);
+
+    // SQLite treats HTTP2Server as one token. Verify expanded matches so HTTP20 still cannot match HTTP2.
+    const numbered = (w: string) => !isPrefixTerm(w) && /\p{L}/u.test(w);
+    const expanded = variants(tokens.filter(numbered)).map(prefix).join(' OR ');
+    if (expanded) {
+      const required = words.filter(numbered).map(rankingTokens);
+      for (const r of search.all(expanded, ...filterArgs)) {
+        const id = String(r.id);
+        if (candidates.has(id)) continue;
+        const fields = [r.qualified_name, r.docstring, r.signature, r.path];
+        if (fields.some((field) => {
+          const fieldTokens = rankingTokens(String(field ?? ''));
+          return required.some((parts) => matchesTerm(fieldTokens, parts));
+        })) candidates.set(id, r);
+      }
+    }
   }
-  const scoringWords = words.map((w) => separateLetterNumber(w).split(' '));
   return [...candidates.values()].map((r) => {
     const s = toSymbol(r);
     const doc = String(r.docstring ?? '').trim();
     const overlap = (value: string) => {
-      const tokens = searchWords(value).flatMap((w) => separateLetterNumber(w.toLowerCase()).split(' '));
-      const matched = scoringWords.filter((parts) => tokens.some((_, i) => parts.every((part, j) =>
-        j === parts.length - 1 && isPrefixTerm(part) ? tokens[i + j]?.startsWith(part) : tokens[i + j] === part)));
+      const tokens = rankingTokens(value);
+      const matched = scoringWords.filter((parts) => matchesTerm(tokens, parts));
       return matched.length / Math.max(1, scoringWords.length);
     };
     const name = String(r.name).toLowerCase();

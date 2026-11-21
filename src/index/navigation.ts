@@ -25,7 +25,7 @@ function searchWords(value: string): string[] {
 }
 
 function separateLetterNumber(value: string): string {
-  return value.replace(/(?<=[\p{L}\p{M}])(?=\p{N})|(?<=\p{N})(?=\p{L})/gu, ' ');
+  return value.replace(/(?<=[\p{L}\p{M}])(?=\p{N})/gu, ' ');
 }
 
 function isPrefixTerm(value: string): boolean {

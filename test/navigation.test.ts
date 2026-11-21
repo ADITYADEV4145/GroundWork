@@ -160,6 +160,7 @@ describe('MCP navigation', () => {
         'def endpoint():\n    """Host the HTTP/2Server."""\n    pass\n',
         'def different_version():\n    """Support HTTP/20, HTTP20, HTTP20Server and HTTP/20Server."""\n    pass\n',
         'def retry():\n    """Retry HTTP 3 times."""\n    pass\n',
+        'def retry_twice():\n    """Retry HTTP 2x on timeout."""\n    pass\n',
       ].join('\n'));
       await initSqlBackend();
       await refreshIndex(root);
@@ -172,6 +173,7 @@ describe('MCP navigation', () => {
         expect(result).toContain('endpoint (function)');
         expect(result).not.toContain('different_version (function)');
         expect(result).not.toContain('retry (function)');
+        expect(result).not.toContain('retry_twice (function)');
       } finally {
         db.close();
       }

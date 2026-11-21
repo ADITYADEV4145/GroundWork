@@ -9,6 +9,7 @@ import { dispatch, normalise, render } from '../src/hooks/run.js';
 import { readFingerprintedSymbols } from '../src/index/query.js';
 import { indexDbPath } from '../src/index/store.js';
 import { checkRepository, formatCheck, formatFinding } from '../src/reuse/check.js';
+import { CandidateIndex } from '../src/reuse/candidates.js';
 import { thresholds } from '../src/reuse/model.js';
 import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, scenarioGit, stopEvent, withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
 import { openDb } from '../src/store/db.js';
@@ -66,6 +67,24 @@ describe('git-scripted reuse check scenarios (also exercised by selftest)', () =
 });
 
 describe('scope, call provenance and literal provenance', () => {
+  it('keeps same-named methods in different classes but excludes same-scope overloads', async () => {
+    await withCheckScenario('clean', async (root) => {
+      const body = 'const date = new Date(value); if (Number.isNaN(date.getTime())) return null; return date;';
+      writeScenarioFile(root, 'classes.ts', `class First { parse(value: string) { ${body} } }\nclass Second { parse(value: string) { ${body} } }\nfunction parse(value: string): Date | null;\nfunction parse(value: string): Date | null { ${body} }\n`);
+      await checkRepository(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const index = new CandidateIndex(db);
+        const method = index.symbols.find((s) => s.qualifiedName === 'Second.parse')!;
+        expect(index.find(method).map((s) => s.qualifiedName)).toContain('First.parse');
+        expect(index.find(method).map((s) => s.id)).not.toContain(method.id);
+        const fn = index.symbols.find((s) => s.qualifiedName === 'parse')!;
+        expect(index.find({ ...fn, id: 'overload-signature' }).some((s) => s.qualifiedName === 'parse' && s.file === fn.file)).toBe(false);
+        expect(index.find({ name: 'parse', fingerprint: null, docstring: null, params: null, returnType: null })).toEqual([]);
+      } finally { db.close(); }
+    });
+  });
+
   it('never recommends mutable bindings as reusable constants', async () => {
     await withCheckScenario('clean', async (root) => {
       writeScenarioFile(root, 'mutable.ts', "export let endpoint = 'https://mutable.test/api';\nendpoint = 'https://changed.test/api';\nexport var region = 'mutable-region';\nexport const API_URL = 'https://constant.test/api';\n");

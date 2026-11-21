@@ -49,12 +49,12 @@ export class CandidateIndex {
     }
   }
 
-  find(query: ComparableSymbol & { id?: string; file?: string }, limit = 80): FingerprintedSymbol[] {
+  find(query: ComparableSymbol & { id?: string; file?: string; qualifiedName?: string }, limit = 80): FingerprintedSymbol[] {
     const found = new Set<FingerprintedSymbol>();
     for (const key of bands(query)) for (const s of this.lsh.get(key) ?? []) found.add(s);
     const counts = new Map<FingerprintedSymbol, number>();
     for (const w of Object.keys(wordsOf(query))) for (const s of this.vocab.get(w) ?? []) counts.set(s, (counts.get(s) ?? 0) + (this.idf.get(w) ?? 1));
     for (const [s] of [...counts].sort((a, b) => b[1] - a[1]).slice(0, limit)) found.add(s);
-    return [...found].filter((s) => s.id !== query.id && !(s.file === query.file && s.name === query.name));
+    return [...found].filter((s) => s.id !== query.id && !(s.file === query.file && s.qualifiedName === query.qualifiedName));
   }
 }

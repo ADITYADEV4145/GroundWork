@@ -8,7 +8,7 @@ import { defaultConfig } from '../src/config/load.js';
 import { runCommand } from '../src/cli/commands/run.js';
 import { bumpCounter, emptyLedger, readLedger, report, sessionIds, stats, summary, tokens, updateLedger } from '../src/guards/ledger.js';
 import { commandInfo, lastSummary, workspaceFingerprint } from '../src/guards/repeat.js';
-import { compactOutput, failurePattern, noisyTool, shellQuote } from '../src/guards/trimmer.js';
+import { compactOutput, failurePattern, isSimpleNoisyCommand, noisyTool, shellQuote } from '../src/guards/trimmer.js';
 import { wasteGuards } from '../src/hooks/handlers/waste-guards.js';
 import { normalise, render, dispatch } from '../src/hooks/run.js';
 import { readSessionLedger, updateSessionLedger } from '../src/hooks/session-ledger.js';
@@ -162,10 +162,21 @@ describe('output trimmer', () => {
     const lines = Array.from({ length: 100 }, (_, i) => `line ${i}`); lines[40] = '✗ unexpected failure';
     const out = compactOutput(lines.join('\n')); expect(out).toContain(lines.slice(37, 44).join('\n')); expect(out).toContain('line 99');
   });
-  it('rewrites Claude pre-tool input only and renders permission allow', async () => {
+  it('only rewrites simple noisy commands without overriding permission checks', async () => {
+    for (const command of ['rm -rf x; npm test', 'npm test | tee log', 'npm test && git push', 'npm test || git push', 'npm test &', 'npm test > log', 'npm test < input', 'npm test\nwhoami', 'npm test $(whoami)', 'npm test "$(whoami)"', 'npm test `whoami`', 'npm test <(cat input)', 'echo "npm test"', '']) {
+      expect(isSimpleNoisyCommand(command), command).toBe(false);
+      expect((await wasteGuards.run(event('pre_tool', 'Bash', { command }), ctx()))?.updatedInput, command).toBeUndefined();
+    }
+    for (const command of ['npx vitest run', 'CI=1 npm test', 'pnpm exec vitest run', 'python -m pytest', 'npm test -- "a;b|c&d"', "npm test -- '$(literal)'", 'npm test -- a\\;b']) {
+      expect(isSimpleNoisyCommand(command), command).toBe(true);
+      expect((await wasteGuards.run(event('pre_tool', 'Bash', { command }), ctx()))?.updatedInput, command).toBeDefined();
+    }
+    expect(isSimpleNoisyCommand('npm test "unfinished')).toBe(false);
+  });
+  it('rewrites Claude pre-tool input only and leaves permissions unchanged', async () => {
     const ev = event('pre_tool', 'Bash', { command: 'npm test', timeout: 2000 });
     const r = await dispatch(ev, root); expect(r.updatedInput?.command).toContain(' run -- '); expect(r.updatedInput?.timeout).toBe(2000);
-    expect(JSON.parse(render(ev, r)).hookSpecificOutput.permissionDecision).toBe('allow');
+    expect(JSON.parse(render(ev, r)).hookSpecificOutput.permissionDecision).toBeUndefined();
     ev.agent = 'codex'; expect(render(ev, { action: 'allow', updatedInput: { command: 'different' } })).toBe('');
     expect((await wasteGuards.run(ev, ctx()))?.updatedInput).toBeUndefined();
     ev.agent = 'claude'; const c = ctx(); c.config.guards.outputTrimmer.enabled = false;

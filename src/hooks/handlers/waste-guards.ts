@@ -2,7 +2,7 @@ import path from 'node:path';
 import { statSync } from 'node:fs';
 import { readLedger, stats, summary, updateLedger } from '../../guards/ledger.js';
 import { commandInfo, lastSummary, responseText, workspaceFingerprint } from '../../guards/repeat.js';
-import { invokingGw, noisyTool, shellQuote } from '../../guards/trimmer.js';
+import { invokingGw, isSimpleNoisyCommand, shellQuote } from '../../guards/trimmer.js';
 import { log } from '../../util/log.js';
 import type { HookHandler, HookResult } from '../types.js';
 
@@ -34,10 +34,9 @@ export const wasteGuards: HookHandler = {
           }
         });
         if (result) return result;
-        if (ev.agent === 'claude' && cfg.outputTrimmer.enabled && noisyTool(info.command) && !/\bgw\s+run\s+--/.test(info.command)) {
+        if (ev.agent === 'claude' && cfg.outputTrimmer.enabled && isSimpleNoisyCommand(info.command)) {
           return { action: 'allow', updatedInput: { ...ev.input, command: `GW_SESSION_ID=${shellQuote(ev.sessionId)} GW_ROOT=${shellQuote(root)} ${invokingGw()} run -- ${shellQuote(info.command)}` } };
         }
-        if (info.forced && ev.agent === 'claude') return { action: 'allow', updatedInput: { ...ev.input, command: info.command } };
       }
       if (ev.tool === 'Bash' && command && ev.event === 'post_tool' && cfg.repeatCommand.enabled) {
         // A rewritten command is an implementation detail; run records the original.

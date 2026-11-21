@@ -37,7 +37,7 @@ export function normalise(agent: AgentName, event: HookEventName, raw: unknown):
 /** Agent-specific stdout for a combined result. Claude Code's format is used for codex/cursor until their adapters land. */
 export function render(ev: HookEvent, r: HookResult): string {
   if (ev.agent === 'claude' && ev.event === 'pre_tool' && r.updatedInput && r.action !== 'deny')
-    return JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'allow', updatedInput: r.updatedInput } });
+    return JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', updatedInput: r.updatedInput } });
   if (ev.event === 'stop') return r.message ? JSON.stringify({ systemMessage: r.message }) : '';
   if (r.action === 'allow' || !r.message) return '';
   if (ev.event === 'pre_compact') return r.message;

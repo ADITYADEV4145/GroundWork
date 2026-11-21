@@ -12,15 +12,25 @@ export interface PlannedChange {
   action: 'create' | 'update' | 'unchanged' | 'remove' | 'delete';
   before: string | null;
   after: string | null;
+  /** Entry keys this change writes, recorded so later runs recognise them. */
+  owned: string[];
 }
 
 interface Manifest {
   created: string[];
   createdDirs: string[];
+  /** Hook commands and MCP entries setup wrote, so removal never touches look-alikes. */
+  installed?: string[];
 }
 
 function manifestPath(root: string): string {
   return gwPath(root, 'setup.json');
+}
+
+const SEP = '\u0000';
+
+function installedIn(manifest: Manifest, file: string): string[] {
+  return (manifest.installed ?? []).filter((k) => k.startsWith(file + SEP)).map((k) => k.slice(file.length + 1));
 }
 
 function readManifest(root: string): Manifest {
@@ -35,19 +45,20 @@ function read(file: string): string | null {
   return existsSync(file) ? readFileSync(file, 'utf8') : null;
 }
 
+/** `[mcp_servers.groundwork]` in any TOML spelling: bare or quoted keys, spacing, trailing comment. */
+const SERVER_TABLE = /^\s*\[\s*(?:mcp_servers|"mcp_servers"|'mcp_servers')\s*\.\s*(?:groundwork|"groundwork"|'groundwork')\s*\]\s*(?:#.*)?$/;
+
 function stripBlock(text: string): string {
   const re = new RegExp(`\\n?${BLOCK_START.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?${BLOCK_END}\\n?`, 'g');
   return text.replace(re, '');
 }
 
-function transform(edit: Edit, before: string | null, mode: 'add' | 'remove'): string | null {
+function transform(edit: Edit, before: string | null, mode: 'add' | 'remove', known: Set<string>): string | null {
   if (edit.kind === 'block') {
     const base = stripBlock(before ?? '');
     if (mode === 'remove') return before === null ? null : base;
     // A table the user declared themselves wins; TOML rejects a second declaration.
-    const table = /^\s*(\[[^\]\n]+\])/.exec(edit.block)?.[1];
-    const bare = (l: string) => l.replace(/#.*/, '').replace(/[\s"']/g, '');
-    if (table && base.split('\n').some((l) => bare(l) === bare(table))) return before;
+    if (base.split('\n').some((l) => SERVER_TABLE.test(l))) return before;
     const head = base ? `${base.endsWith('\n') ? base : `${base}\n`}\n` : '';
     return `${head}${BLOCK_START}\n${edit.block}\n${BLOCK_END}\n`;
   }
@@ -59,8 +70,8 @@ function transform(edit: Edit, before: string | null, mode: 'add' | 'remove'): s
       throw new Error(`${edit.file} is not valid JSON; fix or remove it and run gw setup again`);
     }
   }
-  if (mode === 'add') edit.add(doc);
-  else edit.remove(doc);
+  if (mode === 'add') edit.add(doc, known);
+  else edit.remove(doc, known);
   if (mode === 'remove' && before === null) return null;
   // Keep the file's own indentation and trailing newline so add + remove round-trips byte for byte.
   const indent = before ? (/\n([ \t]+)\S/.exec(before)?.[1] ?? 2) : 2;
@@ -74,7 +85,9 @@ export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'r
   for (const t of targets)
     for (const edit of t.edits) {
       const before = read(edit.file);
-      let after = transform(edit, before, mode);
+      const owned = edit.kind === 'json' ? edit.owned : [];
+      const known = new Set([...installedIn(manifest, edit.file), ...owned]);
+      let after = transform(edit, before, mode, known);
       let action: PlannedChange['action'];
       if (mode === 'add') action = before === null ? 'create' : after === before ? 'unchanged' : 'update';
       else {
@@ -85,7 +98,7 @@ export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'r
           after = null;
         } else action = after === before ? 'unchanged' : 'remove';
       }
-      out.push({ agent: t.label, file: edit.file, action, before, after });
+      out.push({ agent: t.label, file: edit.file, action, before, after, owned });
     }
   return out;
 }
@@ -111,6 +124,12 @@ export function applySetup(root: string, changes: PlannedChange[], mode: 'add' |
     if (c.action === 'create' && !manifest.created.includes(c.file)) manifest.created.push(c.file);
     writeFileSync(c.file, c.after ?? '');
   }
+  // Per file, the manifest holds exactly what setup's latest write left there.
+  const touched = new Set(changes.map((c) => c.file));
+  manifest.installed = [
+    ...(manifest.installed ?? []).filter((k) => !touched.has(k.slice(0, k.indexOf(SEP)))),
+    ...(mode === 'add' ? changes.flatMap((c) => c.owned.map((k) => `${c.file}${SEP}${k}`)) : []),
+  ];
   if (mode === 'remove') {
     // Deepest first, and only directories that are empty now.
     for (const d of [...manifest.createdDirs].sort((a, b) => b.length - a.length)) {
@@ -121,7 +140,7 @@ export function applySetup(root: string, changes: PlannedChange[], mode: 'add' |
         manifest.createdDirs = manifest.createdDirs.filter((x) => x !== d);
       }
     }
-    if (!manifest.created.length && !manifest.createdDirs.length) {
+    if (!manifest.created.length && !manifest.createdDirs.length && !manifest.installed.length) {
       rmSync(manifestPath(root), { force: true });
       return;
     }

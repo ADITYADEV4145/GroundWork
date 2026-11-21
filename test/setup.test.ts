@@ -103,6 +103,29 @@ describe('gw setup with Codex config', () => {
   });
 });
 
+describe('gw setup ignores look-alikes', () => {
+  it('keeps user hooks and servers that resemble Groundwork, and installs past a similar TOML table', () => {
+    const root = tempDir('gw-setup-root-');
+    dirs.push(root);
+    mkdirSync(path.join(root, '.claude'));
+    mkdirSync(path.join(root, '.codex'));
+    const settings = JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: 'command', command: 'python scripts/team_hooks.py hook claude stop' }] }] } }, null, 2) + '\n';
+    const mcp = JSON.stringify({ mcpServers: { groundwork: { command: 'node', args: ['tools/other.js', 'mcp'] } } }, null, 2) + '\n';
+    const toml = '[mcp_servers."ground work"]\ncommand = "x"\n';
+    writeFileSync(path.join(root, '.claude', 'settings.json'), settings);
+    writeFileSync(path.join(root, '.mcp.json'), mcp);
+    writeFileSync(path.join(root, '.codex', 'config.toml'), toml);
+    const targets = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent !== 'cursor');
+    applySetup(root, planSetup(root, targets, 'add'), 'add');
+    expect(readFileSync(path.join(root, '.mcp.json'), 'utf8')).toBe(mcp);
+    expect(readFileSync(path.join(root, '.codex', 'config.toml'), 'utf8')).toContain('[mcp_servers.groundwork]');
+    applySetup(root, planSetup(root, targets, 'remove'), 'remove');
+    expect(readFileSync(path.join(root, '.claude', 'settings.json'), 'utf8')).toBe(settings);
+    expect(readFileSync(path.join(root, '.mcp.json'), 'utf8')).toBe(mcp);
+    expect(readFileSync(path.join(root, '.codex', 'config.toml'), 'utf8')).toBe(toml);
+  });
+});
+
 describe('hook rendering', () => {
   it('cursor permission hooks always answer with valid JSON', () => {
     const ev = normalise('cursor', 'pre_tool', { tool_name: 'Shell', tool_input: { command: 'ls' }, workspace_roots: ['/w'] });

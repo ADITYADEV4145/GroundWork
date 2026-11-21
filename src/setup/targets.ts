@@ -10,10 +10,12 @@ import type { AgentName } from '../hooks/types.js';
 export interface JsonEdit {
   kind: 'json';
   file: string;
-  /** Adds our entries to the parsed file; must be idempotent. */
-  add(doc: Record<string, unknown>): void;
-  /** Removes only our entries. */
-  remove(doc: Record<string, unknown>): void;
+  /** Keys of the entries this edit writes (hook commands, `mcp:<json>`), recorded in the setup manifest. */
+  owned: string[];
+  /** Adds our entries to the parsed file; must be idempotent. `known` holds every entry key setup ever wrote here. */
+  add(doc: Record<string, unknown>, known: Set<string>): void;
+  /** Removes only entries in `known`. */
+  remove(doc: Record<string, unknown>, known: Set<string>): void;
 }
 
 export interface BlockEdit {
@@ -36,11 +38,9 @@ export const BLOCK_END = '# <<< groundwork';
 
 type HookMap = Record<string, { matcher?: string; command: string }[]>;
 
-/** Any Groundwork hook, whichever launcher installed it (`gw`, `npx -y groundwork-agent@x`, `node dist/cli/main.js`), so removal and re-setup with a new `--command` find it. */
-const OUR_HOOK = /\shook\s+(?:claude|codex|cursor)\s+(?:pre_tool|post_tool|session_start|prompt|stop|pre_compact)$/;
-
-function isOurs(command: unknown): boolean {
-  return typeof command === 'string' && OUR_HOOK.test(command.trim());
+/** Only entries setup itself wrote (recorded in the manifest) or would write now count as ours; look-alikes stay. */
+function isOurs(command: unknown, known: Set<string>): boolean {
+  return typeof command === 'string' && known.has(command.trim());
 }
 
 function asObject(v: unknown): Record<string, unknown> {
@@ -48,12 +48,15 @@ function asObject(v: unknown): Record<string, unknown> {
 }
 
 /** Claude Code and Codex share the `{ hooks: { Event: [{ matcher, hooks: [{ type, command }] }] } }` shape. */
-function nestedHooks(file: string, gw: string, map: HookMap): JsonEdit {
+const commandsOf = (map: HookMap) => Object.values(map).flatMap((es) => es.map((e) => e.command));
+
+function nestedHooks(file: string, map: HookMap): JsonEdit {
   return {
     kind: 'json',
     file,
-    add(doc) {
-      this.remove(doc);
+    owned: commandsOf(map),
+    add(doc, known) {
+      this.remove(doc, known);
       const hooks = asObject(doc.hooks);
       for (const [event, entries] of Object.entries(map)) {
         const list = Array.isArray(hooks[event]) ? (hooks[event] as unknown[]) : [];
@@ -62,13 +65,13 @@ function nestedHooks(file: string, gw: string, map: HookMap): JsonEdit {
       }
       doc.hooks = hooks;
     },
-    remove(doc) {
+    remove(doc, known) {
       const hooks = asObject(doc.hooks);
       for (const event of Object.keys(hooks)) {
         if (!Array.isArray(hooks[event])) continue;
         const kept = (hooks[event] as unknown[]).filter((g) => {
           const inner = asObject(g).hooks;
-          return !(Array.isArray(inner) && inner.some((h) => isOurs(asObject(h).command)));
+          return !(Array.isArray(inner) && inner.some((h) => isOurs(asObject(h).command, known)));
         });
         if (kept.length) hooks[event] = kept;
         else delete hooks[event];
@@ -81,12 +84,13 @@ function nestedHooks(file: string, gw: string, map: HookMap): JsonEdit {
   };
 }
 
-function cursorHooks(file: string, gw: string, map: HookMap): JsonEdit {
+function cursorHooks(file: string, map: HookMap): JsonEdit {
   return {
     kind: 'json',
     file,
-    add(doc) {
-      this.remove(doc);
+    owned: commandsOf(map),
+    add(doc, known) {
+      this.remove(doc, known);
       const hooks = asObject(doc.hooks);
       for (const [event, entries] of Object.entries(map)) {
         const list = Array.isArray(hooks[event]) ? (hooks[event] as unknown[]) : [];
@@ -96,11 +100,11 @@ function cursorHooks(file: string, gw: string, map: HookMap): JsonEdit {
       doc.version ??= 1;
       doc.hooks = hooks;
     },
-    remove(doc) {
+    remove(doc, known) {
       const hooks = asObject(doc.hooks);
       for (const event of Object.keys(hooks)) {
         if (!Array.isArray(hooks[event])) continue;
-        const kept = (hooks[event] as unknown[]).filter((h) => !isOurs(asObject(h).command));
+        const kept = (hooks[event] as unknown[]).filter((h) => !isOurs(asObject(h).command, known));
         if (kept.length) hooks[event] = kept;
         else delete hooks[event];
       }
@@ -115,28 +119,24 @@ function cursorHooks(file: string, gw: string, map: HookMap): JsonEdit {
   };
 }
 
-/** An entry `gw setup` wrote: only `command` and `args`, ending in `mcp`. Anything else (env, cwd, other args) is the user's and is left alone. */
-function isOurMcp(entry: unknown): boolean {
-  const e = asObject(entry);
-  if (Object.keys(e).some((k) => k !== 'command' && k !== 'args')) return false;
-  if (typeof e.command !== 'string' || !Array.isArray(e.args)) return false;
-  return e.args.length > 0 && e.args[e.args.length - 1] === 'mcp';
-}
+const mcpKey = (entry: unknown) => `mcp:${JSON.stringify(entry)}`;
 
 function mcpServer(file: string, gw: string): JsonEdit {
   const [command, ...prefix] = gw.split(' ');
+  const entry = { command, args: [...prefix, 'mcp'] };
   return {
     kind: 'json',
     file,
-    add(doc) {
+    owned: [mcpKey(entry)],
+    add(doc, known) {
       const servers = asObject(doc.mcpServers);
-      if ('groundwork' in servers && !isOurMcp(servers.groundwork)) return;
-      servers.groundwork = { command, args: [...prefix, 'mcp'] };
+      if ('groundwork' in servers && !known.has(mcpKey(servers.groundwork))) return;
+      servers.groundwork = entry;
       doc.mcpServers = servers;
     },
-    remove(doc) {
+    remove(doc, known) {
       const servers = asObject(doc.mcpServers);
-      if (!('groundwork' in servers) || !isOurMcp(servers.groundwork)) return;
+      if (!('groundwork' in servers) || !known.has(mcpKey(servers.groundwork))) return;
       delete servers.groundwork;
       if (Object.keys(servers).length) doc.mcpServers = servers;
       else delete doc.mcpServers;
@@ -169,14 +169,14 @@ export function targetsFor(opts: TargetOptions): AgentTarget[] {
     {
       agent: 'claude',
       label: 'Claude Code',
-      edits: [nestedHooks(path.join(root, '.claude', 'settings.json'), gw, claudeHookMap(gw)), mcpServer(path.join(root, '.mcp.json'), gw)],
+      edits: [nestedHooks(path.join(root, '.claude', 'settings.json'), claudeHookMap(gw)), mcpServer(path.join(root, '.mcp.json'), gw)],
       notes: ['Claude Code asks once to approve the project MCP server in .mcp.json.'],
     },
     {
       agent: 'codex',
       label: 'Codex',
       edits: [
-        nestedHooks(path.join(root, '.codex', 'hooks.json'), gw, {
+        nestedHooks(path.join(root, '.codex', 'hooks.json'), {
           PreToolUse: [{ matcher: 'Bash', command: `${gw} hook codex pre_tool` }],
           PostToolUse: [{ matcher: ['apply_patch', 'Bash', ...FIND_CODE_TOOLS].join('|'), command: `${gw} hook codex post_tool` }],
           PreCompact: [{ command: `${gw} hook codex pre_compact` }],
@@ -194,7 +194,7 @@ export function targetsFor(opts: TargetOptions): AgentTarget[] {
       agent: 'cursor',
       label: 'Cursor',
       edits: [
-        cursorHooks(path.join(root, '.cursor', 'hooks.json'), gw, {
+        cursorHooks(path.join(root, '.cursor', 'hooks.json'), {
           preToolUse: [{ matcher: 'Read|Shell', command: `${gw} hook cursor pre_tool` }],
           postToolUse: [{ matcher: 'Read|Shell|Write|Edit|MCP:find_code', command: `${gw} hook cursor post_tool` }],
           preCompact: [{ command: `${gw} hook cursor pre_compact` }],

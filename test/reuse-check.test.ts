@@ -264,6 +264,23 @@ describe('check command and Stop gate', () => {
     });
   });
 
+  it('prioritizes Stop denial while preserving opt-in nonblocking waste summaries', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await checkRepository(root);
+      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ guards: { sessionSummary: true } }));
+      const payload = { cwd: root, session_id: 'combined-summary' };
+      const first = hook(root, payload);
+      expect(first.status).toBe(0);
+      expect(JSON.parse(first.stdout)).toMatchObject({ decision: 'block', reason: expect.stringContaining('BLOCK duplicate') });
+      const second = hook(root, payload);
+      expect(second.status).toBe(0);
+      expect(JSON.parse(second.stdout)).toEqual({ systemMessage: expect.stringContaining('Groundwork saved') });
+      const active = hook(root, { ...payload, stop_hook_active: true });
+      expect(active.status).toBe(0);
+      expect(active.stdout).toBe('');
+    });
+  });
+
   it('fails open on missing Git history, index lock timeouts and unwritable session state', async () => {
     await withCheckScenario('duplicate', async (root) => {
       await checkRepository(root);

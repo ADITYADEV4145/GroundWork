@@ -174,4 +174,23 @@ describe('MCP navigation', () => {
     }
   });
 
+  it('matches accented interior name fragments independent of case', async () => {
+    const root = tempDir('gw-nav-accent-');
+    try {
+      writeFileSync(path.join(root, 'app.py'), 'def ladeÄnderung():\n    pass\n');
+      await initSqlBackend();
+      await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const ctx = { root, db, config };
+        for (const query of ['Änder', 'änder']) {
+          expect(await runNavigationTool('find_code', { query }, ctx)).toContain('ladeÄnderung (function)');
+        }
+      } finally {
+        db.close();
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
 });

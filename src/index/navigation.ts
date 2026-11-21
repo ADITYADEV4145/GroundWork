@@ -14,6 +14,8 @@ export interface NavigationSymbol {
 const SYMBOL = 's.id, s.qualified_name, s.kind, f.path, s.start_line, s.end_line, s.signature';
 const FROM = 'FROM symbols s JOIN files f ON f.id = s.file_id';
 const CALLERS = '(SELECT COUNT(*) FROM calls c WHERE c.callee_id = s.id)';
+const lowerName = (column: string) =>
+  `CASE WHEN length(${column}) = length(CAST(${column} AS BLOB)) THEN lower(${column}) ELSE gw_unicode_lower(${column}) END`;
 
 function searchWords(value: string): string[] {
   return value
@@ -45,11 +47,9 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
   const select = `SELECT ${SYMBOL}, s.name, s.docstring, s.exported, f.is_test, ${CALLERS} caller_count`;
   const filter = (kind ? ' AND s.kind = ?' : '') + (file ? ' AND f.path = ?' : '');
   const filterArgs = [...(kind ? [kind] : []), ...(file ? [file] : [])];
-  const escaped = q.replace(/[%_\\]/g, (c) => `\\${c}`);
-  const fragment = `%${escaped}%`;
   const names = db.prepare(`${select} ${FROM}
-    WHERE (lower(s.qualified_name) LIKE ? ESCAPE '\\' OR lower(s.name) LIKE ? ESCAPE '\\')${filter}
-    ORDER BY f.path, s.start_line, s.id`).all(fragment, fragment, ...filterArgs);
+    WHERE (instr(${lowerName('s.qualified_name')}, ?) > 0 OR instr(${lowerName('s.name')}, ?) > 0)${filter}
+    ORDER BY f.path, s.start_line, s.id`).all(q, q, ...filterArgs);
   const candidates = new Map(names.map((r) => [String(r.id), r]));
   if (words.length) {
     // A sql.js-created FTS4 table can survive a switch to native SQLite even when refresh labels it FTS5.

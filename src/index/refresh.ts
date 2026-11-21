@@ -51,7 +51,8 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
         existing.set(String(r.path), { id: Number(r.id), hash: String(r.hash), size: Number(r.size), mtime: Number(r.mtime_ms), indexedAt: Number(r.indexed_at) });
 
       const discovered = discoverFiles(root, config);
-      const scope = opts.paths ? new Set(opts.paths.map((p) => p.split(path.sep).join('/'))) : null;
+      // A rebuilt (or empty) index has no rows to keep, so a scoped refresh must still index everything.
+      const scope = opts.paths && !rebuilt && !opts.full && existing.size > 0 ? new Set(opts.paths.map((p) => p.split(path.sep).join('/'))) : null;
       const res: RefreshResult = { files: discovered.length, added: 0, changed: 0, removed: 0, unchanged: 0, skipped: 0, partial: 0, rebuilt, link: null, ms: 0 };
       const now = Date.now();
       const discoveredSet = new Set(discovered);

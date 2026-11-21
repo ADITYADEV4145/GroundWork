@@ -23,3 +23,20 @@ export function outer(add: (x: number) => number): number {
 }
 
 export const total = add(1, 2);
+
+import nsDefault from './lib/ns-default';
+import nsDefaultComment from './lib/ns-default-comment';
+
+export const namespaces = [nsDefault, nsDefaultComment];
+
+export class Patched {
+  constructor() {
+    Object.assign(this, { m: () => 3 });
+  }
+  m(a: number): number {
+    return a;
+  }
+  use(): number {
+    return this.m();
+  }
+}

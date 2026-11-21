@@ -141,8 +141,10 @@ export class Grounder {
     if (name === 'default') {
       const d = tops.find((s) => s.isDefaultExport);
       if (d) return d;
-      if (this.importsOf(fileId).some((i) => i.kind === 'reexport' && (i.alias ?? i.name) === 'default')) return 'unknown';
-      return /\bexport\s+default\b|\bas\s+default\b|\bexport\s*\{[^}]*\bdefault\b/.test(text) ? 'unknown' : null;
+      if (this.importsOf(fileId).some((i) => (i.kind === 'reexport' && (i.alias ?? i.name) === 'default') || (i.kind === 'reexport-all' && /\bdefault\b/.test(i.alias ?? ''))))
+        return 'unknown';
+      const code = text.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ' ');
+      return /\bexport\s+default\b|\bas\s*['"]?default\b|\bexport\s*\{[^}]*\bdefault\b/.test(code) ? 'unknown' : null;
     }
     const local = this.aliasesOf(fileId).find((a) => a.exported === name)?.local ?? name;
     const own = tops.find((s) => s.exported && s.name === local);

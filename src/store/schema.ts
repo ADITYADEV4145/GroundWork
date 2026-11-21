@@ -2,10 +2,17 @@ import type { Db } from './db.js';
 
 // Bump on any change to the DDL or to what extraction writes. The index is a cache: on mismatch it is
 // rebuilt from scratch rather than migrated.
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const DDL = `
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+
+CREATE TABLE IF NOT EXISTS reuse_embeddings (
+  model TEXT NOT NULL,
+  content_hash TEXT NOT NULL,
+  vector TEXT NOT NULL,
+  PRIMARY KEY (model, content_hash)
+);
 
 CREATE TABLE IF NOT EXISTS files (
   id INTEGER PRIMARY KEY,
@@ -137,7 +144,7 @@ export function writeMeta(db: Db, key: string, value: string): void {
   db.prepare('INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').run(key, value);
 }
 
-const TABLES = ['symbols_fts', 'export_aliases', 'literals', 'calls', 'imports', 'symbols', 'files', 'meta'];
+const TABLES = ['symbols_fts', 'reuse_embeddings', 'export_aliases', 'literals', 'calls', 'imports', 'symbols', 'files', 'meta'];
 
 /** Create tables; if the stored schema/tool/config fingerprint differs, drop everything and start clean. */
 export function ensureSchema(db: Db, fingerprint: { toolVersion: string; configHash: string }): { rebuilt: boolean; fts: FtsFlavor } {

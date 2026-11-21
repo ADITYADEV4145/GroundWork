@@ -20,7 +20,10 @@ export function register(program: Command): void {
   program
     .command('init')
     .description('create .groundwork/ with a default config and build the index')
-    .action(async (_o, cmd: Command) => {
+    .option('--embeddings', 'consent to downloading a local embedding model')
+    .option('--model <id>', 'embedding model id (requires --embeddings)')
+    .action(async (o: { embeddings?: boolean; model?: string }, cmd: Command) => {
+      if (o.model && !o.embeddings) throw new Error('--model requires download consent via --embeddings.');
       const opts = globalOpts(cmd);
       const root = repoRoot(opts);
       mkdirSync(gwPath(root), { recursive: true });
@@ -31,6 +34,10 @@ export function register(program: Command): void {
       writeFileSync(gwPath(root, '.gitignore'), '*\n!.gitignore\n!config.json\n');
       await initSqlBackend();
       const r = await refreshIndex(root);
+      if (o.embeddings) {
+        const { initializeEmbeddings } = await import('../../reuse/embeddings.js');
+        await initializeEmbeddings(root, { consent: true, model: o.model });
+      }
       emit(opts, { root, configCreated: created, index: r }, () => `groundwork initialised in ${root}\nindex: ${summary(r)}`);
     });
 

@@ -87,3 +87,7 @@ Precision compares selected positives of this type against ALL selected negative
 - active-count-py-renamed-alternate: 0.489263; Count enabled boolean flags. Different implementation computes the same result on the stated domain.
 - active-count-py-edited-alternate: 0.428795; Count enabled boolean flags. Different implementation computes the same result on the stated domain.
 - unique-values-ts-base-edited: 0.625521; Remove duplicate strings while retaining first occurrence order. Equivalent control-flow refactor preserves the stated domain.
+
+## Optional meaning
+
+See [local embedding evaluation](embeddings.md) for the separate opt-in model. The no-meaning model above is unchanged.

@@ -26,7 +26,7 @@ export const COMBINATIONS: Record<string, (keyof Signals)[]> = {
   all: SIGNAL_KEYS,
 };
 
-export async function loadDataset(directory: string): Promise<Dataset> {
+export async function loadDataset(directory: string): Promise<Dataset & { sources: Map<ComparableSymbol, string> }> {
   await initParsers();
   const text = readFileSync(path.join(directory, 'labeled.jsonl'), 'utf8');
   const labels = text.trim().split('\n').map((line) => labelSchema.parse(JSON.parse(line)));
@@ -34,6 +34,7 @@ export async function loadDataset(directory: string): Promise<Dataset> {
   const files = [...new Set(labels.flatMap((p) => [p.a.file, p.b.file]))].sort();
   const symbols = new Map<string, ComparableSymbol>();
   const sources: string[] = [];
+  const symbolSources = new Map<ComparableSymbol, string>();
   for (const file of files) {
     const absolute = path.resolve(directory, file);
     if (!absolute.startsWith(path.resolve(directory, 'corpus') + path.sep)) throw new Error('Corpus path escapes directory');
@@ -47,6 +48,7 @@ export async function loadDataset(directory: string): Promise<Dataset> {
       const key = `${file}:${symbol.qualifiedName}`;
       if (symbols.has(key)) throw new Error(`Ambiguous corpus symbol ${key}`);
       symbols.set(key, symbol);
+      symbolSources.set(symbol, source.slice(symbol.startByte, symbol.endByte));
     }
   }
   const idf = buildIdf([...symbols.values()]);
@@ -62,29 +64,29 @@ export async function loadDataset(directory: string): Promise<Dataset> {
     if (group !== label.b.file.split('/')[1]) throw new Error(`Pair crosses task families: ${label.id}`);
     return { label, a, b, group, signals: pairSignals(a, b, idf) };
   });
-  return { examples, digest: sha1(text + sources.join('\n')), symbols: [...symbols.values()] };
+  return { examples, digest: sha1(text + sources.join('\n')), symbols: [...symbols.values()], sources: symbolSources };
 }
 
 export interface Coefficients { intercept: number; weights: Signals }
 export function predict(model: Coefficients, signals: Signals): number {
   let value = model.intercept;
-  for (const key of SIGNAL_KEYS) value += model.weights[key] * signals[key];
+  for (const key of Object.keys(model.weights) as (keyof Signals)[]) value += (model.weights[key] ?? 0) * (signals[key] ?? 0);
   return 1 / (1 + Math.exp(-Math.max(-40, Math.min(40, value))));
 }
 
 export function train(examples: Example[], keys: (keyof Signals)[], iterations = 1800): Coefficients {
   if (!examples.length || !examples.some((e) => e.label.label === 'dup') || !examples.some((e) => e.label.label === 'not')) throw new Error('Training requires both classes');
-  const model: Coefficients = { intercept: 0, weights: Object.fromEntries(SIGNAL_KEYS.map((k) => [k, 0])) as unknown as Signals };
+  const model: Coefficients = { intercept: 0, weights: Object.fromEntries([...new Set([...SIGNAL_KEYS, ...keys])].map((k) => [k, 0])) as unknown as Signals };
   for (let iteration = 0; iteration < iterations; iteration++) {
     const gradient = Object.fromEntries(keys.map((key) => [key, 0])) as Record<keyof Signals, number>;
     let bias = 0;
     for (const example of examples) {
       const error = predict(model, example.signals) - (example.label.label === 'dup' ? 1 : 0);
       bias += error;
-      for (const key of keys) gradient[key] += error * example.signals[key];
+      for (const key of keys) gradient[key] += error * (example.signals[key] ?? 0);
     }
     model.intercept -= 0.4 * bias / examples.length;
-    for (const key of keys) model.weights[key] -= 0.4 * (gradient[key] / examples.length + 0.002 * model.weights[key]);
+    for (const key of keys) model.weights[key] = (model.weights[key] ?? 0) - 0.4 * (gradient[key] / examples.length + 0.002 * (model.weights[key] ?? 0));
   }
   return model;
 }

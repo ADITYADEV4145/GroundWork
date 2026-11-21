@@ -8,6 +8,7 @@ export interface ComparableSymbol {
   params: Param[] | null;
   returnType: string | null;
   bindingHash?: string | null;
+  embedding?: { model: string; vector: number[] };
 }
 
 export interface Signals {
@@ -21,6 +22,7 @@ export interface Signals {
   bindingExact: number;
   structureVocabulary: number;
   exactVocabulary: number;
+  meaning?: number;
 }
 
 export interface OptionalSignal {
@@ -58,6 +60,7 @@ export function pairSignals(a: ComparableSymbol, b: ComparableSymbol, idf: Map<s
   const exact = a.fingerprint && b.fingerprint && a.fingerprint.normHash === b.fingerprint.normHash ? 1 : 0;
   const cosine = nx && ny ? Math.min(1, dot / Math.sqrt(nx * ny)) : 0;
   return {
+    ...(a.embedding && b.embedding && a.embedding.model === b.embedding.model ? { meaning: vectorCosine(a.embedding.vector, b.embedding.vector) } : {}),
     structure, exact, vocabulary: cosine,
     bindingExact: a.fingerprint && b.fingerprint && a.bindingHash && b.bindingHash && a.bindingHash === b.bindingHash ? 1 : 0,
     structureVocabulary: structure * cosine,
@@ -67,4 +70,11 @@ export function pairSignals(a: ComparableSymbol, b: ComparableSymbol, idf: Map<s
     returnType: a.returnType && b.returnType && a.returnType.replace(/\s/g, '') === b.returnType.replace(/\s/g, '') ? 1 : 0,
     name: overlap(splitWords(a.name), splitWords(b.name)),
   };
+}
+
+export function vectorCosine(a: number[], b: number[]): number {
+  if (!a.length || a.length !== b.length || [...a, ...b].some((v) => !Number.isFinite(v))) return 0;
+  let dot = 0, nx = 0, ny = 0;
+  for (let i = 0; i < a.length; i++) { dot += a[i]! * b[i]!; nx += a[i]! ** 2; ny += b[i]! ** 2; }
+  return nx && ny ? Math.max(0, Math.min(1, dot / Math.sqrt(nx * ny))) : 0;
 }

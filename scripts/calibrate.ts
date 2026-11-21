@@ -35,6 +35,8 @@ const types = recallByType(full.predictions, block);
 const positives = dataset.examples.filter((e) => e.label.label === 'dup').length;
 const report = `# Reuse calibration report
 
+Optional local embeddings have a [separate evaluation and opt-in model](embeddings.md); the no-meaning model below is unchanged.
+
 ## Method and scope
 
 - ${dataset.examples.length} labeled pairs: ${positives} duplicates, ${dataset.examples.length - positives} negatives; TypeScript/JavaScript and Python.

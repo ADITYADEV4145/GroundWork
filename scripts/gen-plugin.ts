@@ -2,7 +2,8 @@
 import { writeFileSync } from 'node:fs';
 import { claudeHookMap } from '../src/setup/targets.js';
 
-export const PLUGIN_GW = 'npx -y groundwork-agent';
+// The plugin launches the `gw` on PATH (from `npm link` or a global install), so it works before and after npm publish.
+export const PLUGIN_GW = 'gw';
 
 export function pluginHooks(): unknown {
   const hooks: Record<string, unknown[]> = {};

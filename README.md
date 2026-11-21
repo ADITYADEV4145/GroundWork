@@ -55,9 +55,9 @@ Restart your agent after setup. Codex asks you to trust the new hooks once, unde
 
 Setup only writes project-level files: `.claude/settings.json`, `.mcp.json`, `.codex/hooks.json`, `.codex/config.toml`, `.cursor/hooks.json` and `.cursor/mcp.json`. It keeps your existing settings, and `gw setup --remove` returns each file to exactly how it was before setup.
 
-Once `groundwork-agent` is published to npm, two more options will work:
+Two more options launch the `gw` on your PATH, so they work once the source install above is done:
 - **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
-- **Any MCP client:** run `npx -y groundwork-agent mcp`.
+- **Any MCP client:** run `gw mcp` as a stdio server from the repository root.
 
 ## How it works
 

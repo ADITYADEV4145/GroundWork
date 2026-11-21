@@ -27,3 +27,7 @@ Read the index through `src/index/query.ts` (or `src/api.ts`); don't write SQL a
 - Agent-facing output is short, ranked and token-budgeted (`fitToBudget`); every CLI command supports `--json`.
 - Hooks fail open: any error or timeout means allow, exit 0, nothing on stdout.
 - Runtime is local and offline. The sole consented setup exception is `gw init --embeddings`, which downloads a model to `.groundwork/models/` only on that explicit command; runtime inference is local-files-only and never downloads missing models. Dev-only benchmark scripts (`scripts/calibrate-mine.ts`, `scripts/setup-real-repos.ts`) clone pinned repos into external caches and are not shipped with the tool.
+
+## Releasing
+
+Publishing `groundwork-agent` to npm is the maintainer's decision; never run `npm publish` without it. `prepublishOnly` builds and runs the tests. Check the tarball with `npm pack --dry-run`, and smoke-test it with `npm install -g --prefix /tmp/gw ./groundwork-agent-<version>.tgz` then `/tmp/gw/bin/gw init` in a scratch repo. The plugin and `.mcp.json` launch `gw` from PATH, so they work from a source install and from a global npm install alike.

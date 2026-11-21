@@ -5,7 +5,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { aggregateReview, renderBlockReport, renderReview } from '../scripts/bench-v2-lib.js';
 import type { BlockTask, Result, ReviewRow } from '../scripts/bench-v2-lib.js';
-import { evaluateRealRepoReview } from '../src/selftest/real-repo-review.js';
+import { evaluateRealRepoReview, summarizeBlockReview } from '../src/selftest/real-repo-review.js';
 
 const tasks: BlockTask[] = JSON.parse(readFileSync('bench/reuse-v2/block-tasks.json', 'utf8'));
 const dirs: string[] = [];
@@ -71,11 +71,38 @@ describe('suite-attributed shared BLOCK review', () => {
   });
   it('accepts suite and kind provenance in the cheap gate without collapsing distinct findings', () => {
     const dir = temp();
-    const rows = Array.from({ length: 10 }, (_, i) => ({ ...reviewed(), suite: i % 2 ? 'block-v2' : 'reuse-v2', task_id: `task${i}` }));
+    const rows = Array.from({ length: 10 }, (_, i) => ({ ...reviewed(), suite: i % 2 ? 'block-v2' : 'reuse-v2', task_id: `task${i}`, added: {...finding.added, symbol: `new${i}`} }));
     writeFileSync(path.join(dir, 'block-review.json'), JSON.stringify(rows));
     expect(evaluateRealRepoReview(dir).ok).toBe(true);
     writeFileSync(path.join(dir, 'block-review.json'), JSON.stringify([{ ...reviewed(), suite: 'unknown' }]));
     expect(evaluateRealRepoReview(dir).detail).toContain('Invalid BLOCK review evidence');
+  });
+  it('counts symbol pairs once, excluding covered file BLOCKs without removing their review rows', () => {
+    const a = reviewed(), b = { ...reviewed(), added: { ...finding.added, file: 'other.py', symbol: 'other' } };
+    const fileRow = (r: ReviewRow): ReviewRow => ({ ...r, kind: 'duplicate-file', added: { ...r.added, symbol: r.added.file, line: 1 },
+      existing: { ...r.existing!, symbol: r.existing!.file, line: 1 } });
+    const rows = [a, fileRow(a), b, fileRow(b)];
+    const summary = summarizeBlockReview(rows);
+    expect(summary).toEqual({ reviewed: 2, agree: 2, agreement: 1, pending: 0, rawRows: 4, rawReviewed: 4, coveredFileRows: 2 });
+    expect(renderReview(rows)).toContain('2/2 distinct reviewed BLOCK pairs agree (100.0%)');
+    expect(renderReview(rows)).toContain('Gate: FAIL; requires >=10 distinct reviewed pairs');
+    expect(rows).toHaveLength(4);
+    const dir = temp();
+    writeFileSync(path.join(dir, 'block-review.json'), JSON.stringify(rows));
+    expect(evaluateRealRepoReview(dir)).toMatchObject({ ok: false, metrics: summary });
+    const repeated = Array.from({ length: 10 }, (_, i) => ({ ...a, task_id: `repeat${i}`, arm: i % 2 ? 'groundwork' as const : 'baseline' as const,
+      added: { ...a.added, line: i + 1 } }));
+    expect(summarizeBlockReview(repeated).reviewed).toBe(1);
+    expect(summarizeBlockReview([...repeated, { ...a, verdict: 'disagree' }])).toMatchObject({ reviewed: 1, agree: 0 });
+  });
+  it('keeps standalone file reviews, and only reviewed symbol evidence covers a file pair', () => {
+    const symbol = reviewed();
+    const file: ReviewRow = { ...symbol, kind: 'duplicate-file', added: { ...symbol.added, symbol: symbol.added.file },
+      existing: { ...symbol.existing!, symbol: symbol.existing!.file } };
+    expect(summarizeBlockReview([file])).toMatchObject({ reviewed: 1, agree: 1, coveredFileRows: 0 });
+    expect(summarizeBlockReview([file, { ...symbol, reviewer: null }])).toMatchObject({ reviewed: 1, pending: 1, coveredFileRows: 0 });
+    expect(summarizeBlockReview([{ ...file, reviewer: null }, symbol])).toMatchObject({ reviewed: 1, pending: 0, rawReviewed: 1, coveredFileRows: 1 });
+    expect(summarizeBlockReview([])).toMatchObject({ reviewed: 0, agree: 0, pending: 0, agreement: 0 });
   });
 });
 

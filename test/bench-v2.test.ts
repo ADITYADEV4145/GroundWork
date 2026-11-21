@@ -95,8 +95,8 @@ describe('BLOCK review aggregation', () => {
     for (const kind of ['duplicate-file', 'duplicate-constant'] as const) {
       r.check.findings = [{...finding, kind}]; expect(aggregateReview([r], []).length).toBe(1);
     }
-    expect(renderReview([row()])).toContain('1/1 reviewed agree (100.0%)');
-    expect(renderReview([{...row(), reviewer: null}])).toContain('0/0 reviewed agree (n/a)');
+    expect(renderReview([row()])).toContain('1/1 distinct reviewed BLOCK pairs agree (100.0%)');
+    expect(renderReview([{...row(), reviewer: null}])).toContain('0/0 distinct reviewed BLOCK pairs agree (n/a)');
     expect(renderReview([])).toContain('0 pending');
   });
 });
@@ -143,7 +143,7 @@ describe('reports and cheap acceptance gates', () => {
   });
   it('requires ten attributed reviews and >=90% agreement, rejecting duplicate rows', () => {
     const dir = temp();
-    const rows = Array.from({length: 10}, (_, i) => ({...row(), task_id: `task${i}`, verdict: i === 0 ? 'disagree' : 'agree'}));
+    const rows = Array.from({length: 10}, (_, i) => ({...row(), task_id: `task${i}`, added: {...finding.added, symbol: `new${i}`}, verdict: i === 0 ? 'disagree' : 'agree'}));
     const save = (value: unknown) => writeFileSync(path.join(dir, 'block-review.json'), JSON.stringify(value));
     save(rows); expect(evaluateRealRepoReview(dir).ok).toBe(true);
     save(rows.slice(1)); expect(evaluateRealRepoReview(dir).ok).toBe(false);

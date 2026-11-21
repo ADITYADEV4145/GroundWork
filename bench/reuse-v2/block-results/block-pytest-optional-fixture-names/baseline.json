@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block-pytest-optional-fixture-names",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "1a6d4a04dc8db9fa8a8e7140f13ea907a9bcbf59",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/_pytest/optional_fixture_names.py",
+          "symbol": "src/_pytest/optional_fixture_names.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/compat.py",
+          "symbol": "src/_pytest/compat.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/optional_fixture_names.py and update its 12 callers to use src/_pytest/compat.py."
+      },
+      {
+        "id": "2a10e7864a60ed0585833aea37fde57cd22240ab",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/_pytest/optional_fixture_names.py",
+          "symbol": "get_optional_fixture_names",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/_pytest/compat.py",
+          "symbol": "getfuncargnames",
+          "line": 107
+        },
+        "probability": 0.8190409549573725,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.7943480059948324
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of getfuncargnames: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "hard-negative",
+  "task_id": "block-got-admission-budget",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "e1adf7b5b87f9de3759652d9055415a3bec5e1df",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "source/core/utils/admission-budget.ts",
+          "symbol": "admissionBudget",
+          "line": 22
+        },
+        "existing": {
+          "file": "source/core/options.ts",
+          "symbol": "Options.method",
+          "line": 2156
+        },
+        "probability": 0.48850660130665774,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.33918068386003714
+          }
+        ],
+        "fix": "Duplicate of Options.method: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

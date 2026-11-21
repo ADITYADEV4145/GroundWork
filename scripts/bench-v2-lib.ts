@@ -2,6 +2,7 @@ import path from 'node:path';
 import ts from 'typescript';
 import { spawnSync } from 'node:child_process';
 import type { CheckFinding } from '../src/reuse/check.js';
+import { summarizeBlockReview } from '../src/selftest/real-repo-review.js';
 
 export type Arm = 'baseline' | 'groundwork';
 export type Label = 'reused' | 'duplicate' | 'unknown';
@@ -239,10 +240,11 @@ export function renderReport(report: Summary): string {
 }
 
 export function renderReview(rows: ReviewRow[]): string {
-  const reviewed = rows.filter(r => (r.verdict === 'agree' || r.verdict === 'disagree') && r.reviewer?.trim() && r.reasoning?.trim());
-  const agree = reviewed.filter(r => r.verdict === 'agree').length;
+  const summary = summarizeBlockReview(rows);
   const escape = (s: unknown) => String(s ?? '').replace(/\|/g, '\\|').replace(/[\r\n]/g, ' ');
-  return ['# BLOCK review', '', `${agree}/${reviewed.length} reviewed agree (${percent(reviewed.length ? agree / reviewed.length : null)}); ${rows.length - reviewed.length} pending. Agreement requires a verdict, reviewer and reasoning.`, '',
+  return ['# BLOCK review', '', `${summary.agree}/${summary.reviewed} distinct reviewed BLOCK pairs agree (${percent(summary.reviewed ? summary.agreement : null)}); ${summary.pending} pending distinct pairs. Agreement requires a verdict, reviewer and reasoning.`, '',
+    `${summary.rawReviewed}/${summary.rawRows} raw rows reviewed; ${summary.rawRows - summary.rawReviewed} raw rows pending. ${summary.coveredFileRows} duplicate-file rows covered by reviewed symbol-level BLOCKs are excluded from distinct counts. File-qualified symbol pairs count once across tasks, arms and line numbers; conflicting attributed verdicts count as disagree.`, '',
+    `Gate: ${summary.reviewed >= 10 && summary.agreement >= 0.9 ? 'PASS' : 'FAIL'}; requires >=10 distinct reviewed pairs and >=90% agreement.`, '',
     '| Suite | Task | Arm | Kind | Added | Existing | Probability | Signals | Verdict | Reviewer | Reasoning |', '| --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- | --- |',
     ...rows.map(r => `| ${[r.suite ?? 'reuse-v2', r.task_id, r.arm, r.kind ?? '', `${r.added.file}:${r.added.line} ${r.added.symbol}`, r.existing ? `${r.existing.file}:${r.existing.line} ${r.existing.symbol}` : '', r.probability ?? '', JSON.stringify(r.signals), r.verdict, r.reviewer, r.reasoning].map(escape).join(' | ')} |`), ''].join('\n');
 }

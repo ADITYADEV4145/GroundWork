@@ -12,6 +12,27 @@ const rowSchema = z.object({
   verdict: z.enum(['agree', 'disagree']).nullable(), reviewer: z.string().nullable(), reasoning: z.string().nullable(),
 });
 
+export function summarizeBlockReview(rows: z.infer<typeof rowSchema>[]) {
+  const attributed = (row: z.infer<typeof rowSchema>) => row.verdict !== null && Boolean(row.reviewer?.trim() && row.reasoning?.trim());
+  const fileLevel = (row: z.infer<typeof rowSchema>) => row.kind === 'duplicate-file' || (!row.kind && row.added.symbol === row.added.file && Boolean(row.existing && row.existing.symbol === row.existing.file));
+  const filePair = (row: z.infer<typeof rowSchema>) => JSON.stringify([row.added.file, row.existing?.file]);
+  const covered = new Set(rows.filter(row => attributed(row) && !fileLevel(row) && (!row.kind || ['duplicate', 'duplicate-constant'].includes(row.kind))).map(filePair));
+  const pairs = new Map<string, typeof rows>();
+  let coveredFileRows = 0;
+  for (const row of rows) {
+    if (fileLevel(row) && covered.has(filePair(row))) { coveredFileRows++; continue; }
+    const key = JSON.stringify([row.added.file, row.added.symbol, row.existing?.file, row.existing?.symbol]);
+    const group = pairs.get(key) ?? [];
+    group.push(row);
+    pairs.set(key, group);
+  }
+  const reviewedPairs = [...pairs.values()].map(group => group.filter(attributed)).filter(group => group.length);
+  const reviewed = reviewedPairs.length;
+  const agree = reviewedPairs.filter(group => group.every(row => row.verdict === 'agree')).length;
+  return { reviewed, agree, agreement: reviewed ? agree / reviewed : 0, pending: pairs.size - reviewed,
+    rawRows: rows.length, rawReviewed: rows.filter(attributed).length, coveredFileRows };
+}
+
 export function evaluateRealRepoReview(directory: string): CheckResult {
   const file = path.join(directory, 'block-review.json');
   if (!existsSync(file)) return { ok: true, skipped: true, detail: 'skipped: Benchmark v2 block-review.json absent; no BLOCK agreement evidence' };
@@ -19,12 +40,10 @@ export function evaluateRealRepoReview(directory: string): CheckResult {
     const rows = z.array(rowSchema).parse(JSON.parse(readFileSync(file, 'utf8')));
     const identities = rows.map(r => JSON.stringify([r.suite ?? 'reuse-v2', r.kind ?? 'duplicate', r.task_id, r.arm, r.added, r.existing]));
     if (new Set(identities).size !== rows.length) throw new Error('duplicate review rows');
-    const reviewed = rows.filter(r => r.verdict !== null && r.reviewer?.trim() && r.reasoning?.trim());
-    const agree = reviewed.filter(r => r.verdict === 'agree').length;
-    const agreement = reviewed.length ? agree / reviewed.length : 0;
-    return { ok: reviewed.length >= 10 && agreement >= 0.9,
-      detail: `${agree}/${reviewed.length} reviewed BLOCKs agree (${(100 * agreement).toFixed(1)}%); ${rows.length - reviewed.length} pending; requires >=10 reviewed and >=90% agreement. Reviewer identity is recorded, not independently authenticated.`,
-      metrics: { reviewed: reviewed.length, agree, agreement } };
+    const metrics = summarizeBlockReview(rows);
+    return { ok: metrics.reviewed >= 10 && metrics.agreement >= 0.9,
+      detail: `${metrics.agree}/${metrics.reviewed} distinct reviewed BLOCK pairs agree (${(100 * metrics.agreement).toFixed(1)}%); ${metrics.pending} distinct pairs pending; ${metrics.rawReviewed}/${metrics.rawRows} raw rows reviewed, ${metrics.coveredFileRows} covered duplicate-file rows excluded; requires >=10 distinct reviewed pairs and >=90% agreement. Reviewer identity is recorded, not independently authenticated.`,
+      metrics };
   } catch (error) { return { ok: false, detail: `Invalid BLOCK review evidence: ${error}` }; }
 }
 

@@ -380,6 +380,7 @@ describe('check command and Stop gate', () => {
       expect((await duplicateGate.run(stopEvent(root), ctx))?.action).toBe('allow');
       expect((await duplicateGate.run(stopEvent(root, false, 'another-session'), ctx))?.action).toBe('deny');
       writeScenarioFile(root, 'y-calendar.ts', source.replaceAll('decodeCalendar', 'loadCalendar'));
+      expect(defaultConfig().profile).toBe('standard');
       const standard = await duplicateGate.run(stopEvent(root, false, 'standard-session'), { root, config: defaultConfig() });
       expect(standard?.action).toBe('context');
       expect(standard?.message).toContain('BLOCK');

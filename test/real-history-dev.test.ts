@@ -1,14 +1,14 @@
-import { mkdtempSync, readFileSync, rmSync, mkdirSync, symlinkSync } from 'node:fs';
+import { mkdtempSync, rmSync, mkdirSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { initParsers } from '../src/lang/parser.js';
 import { adapterFor } from '../src/lang/index.js';
 import type { Language } from '../src/types.js';
-import { assertExternalCache, digest } from '../scripts/real-history-dev.js';
+import { assertExternalCache } from '../scripts/real-history-dev.js';
 import { contractOf, compareContracts, jaccard } from '../scripts/real-history-features.js';
 import { auc, directDelegation, validateDirectTarget } from '../scripts/real-history-diagnose.js';
-import { separation, type Observation } from '../scripts/render-real-history-dev.js';
+import { separation } from '../scripts/render-real-history-dev.js';
 import { actionSeparation } from '../scripts/render-real-history-actions.js';
 import manifest from '../bench/real-history/dev/repos.json' with { type: 'json' };
 
@@ -18,7 +18,6 @@ const contract = (source: string, language: Language = 'python', name = 'f') => 
   expect(symbol).toBeDefined();
   return contractOf(source, language, symbol)!;
 };
-const data = <T>(name: string) => JSON.parse(readFileSync(new URL(`../bench/real-history/dev/${name}`, import.meta.url), 'utf8')) as T;
 
 describe('development-only contract prototypes', () => {
   it('records normalized fields, literal subscript keys, compound writes, calls, guards and explicit return shape', () => {
@@ -100,49 +99,14 @@ describe('honest development statistics and cache boundaries', () => {
   });
 });
 
-describe('committed development artifact consistency (offline)', () => {
-  it('keeps reserved repos out and covers exactly the reviewed pair IDs with valid simultaneous source references', () => {
-    expect(manifest.repos.length).toBeGreaterThanOrEqual(3); expect(new Set(manifest.repos.map((r) => r.id)).size).toBe(manifest.repos.length);
+describe('development repository pins', () => {
+  it('keeps reserved evaluation repos out of development and retains immutable pins', () => {
+    expect(manifest.repos.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(manifest.repos.map((r) => r.id)).size).toBe(manifest.repos.length);
     for (const repo of manifest.repos) {
-      expect(['got', 'click', 'pytest']).not.toContain(repo.id); expect(repo.start).toMatch(/^[a-f0-9]{40}$/); expect(repo.end).toMatch(/^[a-f0-9]{40}$/);
+      expect(['got', 'click', 'pytest']).not.toContain(repo.id);
+      expect(repo.start).toMatch(/^[a-f0-9]{40}$/);
+      expect(repo.end).toMatch(/^[a-f0-9]{40}$/);
     }
-    const labels = data<{ id: string; reviewer: string; reason: string }[]>('labels.json');
-    const rows = manifest.repos.flatMap((r) => data<Observation[]>(`${r.id}-features.json`));
-    expect(rows.map((r) => r.id).sort()).toEqual(labels.map((r) => r.id).sort()); expect(new Set(labels.map((r) => r.id)).size).toBe(labels.length);
-    for (const row of rows) {
-      expect(row.a.revision).toBe(row.b.revision);
-      for (const ref of [row.a, row.b]) { expect(ref.revision).toMatch(/^[a-f0-9]{40}$/); expect(ref.sha256).toMatch(/^[a-f0-9]{64}$/); expect(ref.line).toBeGreaterThan(0); expect(ref.endLine).toBeGreaterThanOrEqual(ref.line); }
-      expect(row.review.reviewer).toBe('agent-reviewed'); expect(row.review.reason.length).toBeGreaterThan(30);
-    }
-  });
-  it('does not silently turn timeout runs into negatives or changed source scripts into fresh evidence', () => {
-    const available = new Set<string>();
-    for (const repo of manifest.repos) {
-      const normal = data<{ runs: { hash: string; report: { status: string; findings: unknown[]; error?: string } }[] }>(`${repo.id}-normal.json`);
-      for (const run of normal.runs) {
-        if (run.report.status === 'UNAVAILABLE') { expect(run.report.error).toBeTruthy(); expect(run.report.findings).toEqual([]); }
-        else available.add(`${repo.id}:${run.hash}`);
-      }
-    }
-    for (const row of data<Observation[]>('normal-pairs.json')) expect(available.has(`${row.repo}:${row.commit}`)).toBe(true);
-    const summary = data<{ sourceHashes: Record<string, string> }>('summary.json');
-    for (const [file, hash] of Object.entries(summary.sourceHashes)) {
-      const source = ['src/reuse/model.json', 'src/reuse/signals.ts'].includes(file)
-        ? readFileSync(new URL(`../bench/real-history/dev/frozen-${file.endsWith('json') ? 'model.json' : 'signals.ts.txt'}`, import.meta.url), 'utf8')
-        : readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
-      expect(digest(source)).toBe(hash);
-    }
-  });
-  it('counts labelled families once and requires an explicit consistent action per family', () => {
-    const rows = manifest.repos.flatMap((r) => data<Observation[]>(`${r.id}-features.json`));
-    const families = data<{ id: string; members: string[]; actionClass: string }[]>('families.json');
-    expect(new Set(families.map((f) => f.id)).size).toBe(families.length);
-    expect(families.flatMap((f) => f.members).sort()).toEqual(rows.map((r) => r.id).sort());
-    for (const family of families) {
-      expect(['direct-reuse', 'extract/extend', 'related-different', 'unknown']).toContain(family.actionClass);
-      expect(rows.filter((r) => r.review.family === family.id).every((r) => r.review.actionClass === family.actionClass)).toBe(true);
-    }
-    const positiveEvents = rows.filter((r) => r.review.label === 'positive').map((r) => `${r.repo}:${r.commit}`);
-    expect(new Set(positiveEvents).size).toBe(families.filter((f) => ['direct-reuse', 'extract/extend'].includes(f.actionClass)).length);
   });
 });

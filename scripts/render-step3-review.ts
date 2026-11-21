@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { project } from './real-repos.js';
-import { evaluateExpandedReview, wilson } from '../src/selftest/real-repo-review.js';
+import { evaluateExpandedReview, wilson } from './real-repo-evidence.js';
 import type { CheckFinding } from '../src/reuse/check.js';
 
 const root = path.join(project, 'bench/real-repos');

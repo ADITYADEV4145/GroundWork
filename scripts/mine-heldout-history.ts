@@ -7,7 +7,7 @@ import { clonePath, monthBounds, type Repository } from './real-repos.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
 export function historyManifestForSet(set: string): string {
   if (!['original', 'heldout', 'new-1', 'new-2'].includes(set)) throw new Error('Specify a frozen evaluation set.');
-  return path.join(root, 'bench/real-repos', set === 'original' ? 'repos.json' : set === 'heldout' ? 'heldout-repos.json' : `step3/${set}-repos.json`);
+  return path.join(root, 'bench/real-repos', set === 'original' ? 'repos.json' : set === 'heldout' ? 'heldout-repos.json' : `${set}-repos.json`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

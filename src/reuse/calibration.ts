@@ -71,9 +71,8 @@ export async function loadDataset(directory: string): Promise<Dataset & { source
 }
 
 export interface Coefficients { intercept: number; weights: Signals }
-export async function loadTrainingDataset(directory: string) {
+export async function loadTrainingDataset(directory: string, devDirectory = path.resolve(directory, '../real-history/dev')) {
   const dataset = await loadDataset(directory);
-  const devDirectory = path.resolve(directory, '../real-history/dev');
   const manifest = JSON.parse(readFileSync(path.join(devDirectory, 'repos.json'), 'utf8')) as { repos: { id: string }[] };
   type Row = { id: string; repo: string; a: { file: string; symbol: string; kind: string }; b: Row['a'];
     review: { label: string; family: string; reason: string }; current: { signals: Signals; related: boolean; compatible: boolean };

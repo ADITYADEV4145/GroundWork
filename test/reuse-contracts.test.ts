@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import path from 'node:path';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { initParsers } from '../src/lang/parser.js';
 import { adapterFor } from '../src/lang/index.js';
 import { contractOf as prototype } from '../scripts/real-history-features.js';
@@ -28,12 +30,26 @@ describe('contract evidence in reuse scoring', () => {
     expect(invalid.hasErrors).toBe(true);
     expect(invalid.symbols.every((s) => !('contract' in s) || s.contract == null)).toBe(true);
   });
-  it('excludes unknown dev cases and balances combinatorial dev family members without reserved history', async () => {
-    const data = await loadTrainingDataset(path.resolve(__dirname, '../bench/dupes'));
-    const dev = data.examples.filter((e) => e.population === 'dev');
-    expect(dev).toHaveLength(63);
-    for (const group of new Set(dev.map((e) => e.group))) expect(dev.filter((e) => e.group === group).reduce((n, e) => n + e.weight!, 0)).toBeCloseTo(1);
-    expect(dev.some((e) => /unknown|dev:(got|click|pytest):/.test(e.group))).toBe(false);
-    expect(new Set(dev.filter((e) => e.label.label === 'dup').map((e) => e.group)).size).toBe(8);
+  it('excludes unknown dev cases and balances synthetic family members without stored history', async () => {
+    const directory = mkdtempSync(path.join(tmpdir(), 'gw-training-'));
+    const corpus = path.resolve(__dirname, '../bench/dupes');
+    const row = (id: string, label: string, family: string) => ({ id, repo: 'synthetic',
+      a: { file: 'a.py', symbol: 'f', kind: 'function' }, b: { file: 'b.py', symbol: 'g', kind: 'function' },
+      review: { label, family, reason: 'Synthetic family-weighting and unknown-label fixture.' },
+      current: { signals: { structure: 1, exact: 1, bindingExact: 1 }, related: false, compatible: true }, contracts: { a: null, b: null } });
+    try {
+      writeFileSync(path.join(directory, 'repos.json'), JSON.stringify({ repos: [{ id: 'synthetic' }] }));
+      const features = path.join(directory, 'synthetic-features.json');
+      writeFileSync(features, JSON.stringify([row('one', 'positive', 'same'), row('two', 'positive', 'same'), row('three', 'negative', 'other'), row('unknown', 'unknown', 'unknown')]));
+      const data = await loadTrainingDataset(corpus, directory);
+      const dev = data.examples.filter((e) => e.population === 'dev');
+      expect(dev).toHaveLength(3);
+      for (const group of new Set(dev.map((e) => e.group))) expect(dev.filter((e) => e.group === group).reduce((n, e) => n + e.weight!, 0)).toBeCloseTo(1);
+      expect(dev.some((e) => e.label.id.includes('unknown'))).toBe(false);
+      writeFileSync(features, '[]');
+      expect((await loadTrainingDataset(corpus, directory)).examples.some((e) => e.population === 'dev')).toBe(false);
+      rmSync(features);
+      await expect(loadTrainingDataset(corpus, directory)).rejects.toThrow('ENOENT');
+    } finally { rmSync(directory, { recursive: true, force: true }); }
   });
 });

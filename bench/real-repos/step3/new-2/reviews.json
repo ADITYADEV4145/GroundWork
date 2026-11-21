@@ -1,0 +1,55 @@
+{
+  "reviewer": "agent",
+  "standardHash": "e8ec0dd223921af5bb95241a0c916daabca48cbd151b5c104e653bce8960c404",
+  "method": "Every BLOCK inspected at both current source sites under the frozen REUSE-or-EXTEND standard; strict substitutability labels are a separate column. Source-span SHA256s retained; no detector changes after replay.",
+  "reviews": [
+    {
+      "set": "new-2",
+      "repo": "pytest",
+      "commit": "b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0",
+      "findingId": "aa77afa54348c024ff017f1093e7a759ef6906ef",
+      "label": "disagree",
+      "reason": "These are independent expected-diagnostic cases (general mismatch reasons versus nested indentation), already using the shared fails_raises_group helper. Their different exception trees and exact expected messages are test data, not duplicate formatting implementations to consolidate.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "These are independent expected-diagnostic cases (general mismatch reasons versus nested indentation), already using the shared fails_raises_group helper. Their different exception trees and exact expected messages are test data, not duplicate formatting implementations to consolidate.",
+      "added": {
+        "file": "testing/python/raises_group.py",
+        "symbol": "test_assert_message",
+        "line": 554,
+        "endLine": 674,
+        "sha256": "7ebcdd5e7e48449f42034edb03fc53d097f3055a88da00f0270c231bc8cf24b0"
+      },
+      "existing": {
+        "file": "testing/python/raises_group.py",
+        "symbol": "test_message_indent",
+        "line": 677,
+        "endLine": 742,
+        "sha256": "5acf0652b72cbe94aa5f7b14407a61266408f4d14ab128a331d24ed4790a01f6"
+      }
+    },
+    {
+      "set": "new-2",
+      "repo": "pytest",
+      "commit": "b3f3263a83ad5cd53f9e080e4ef52b7f18b9d4f0",
+      "findingId": "1af5ed0e4d242a1f0aa2aa26f115bf1b5f5eb64c",
+      "label": "disagree",
+      "reason": "Suggestion placement after brief versus nested errors is a distinct regression contract from general mismatch diagnostics. Both already reuse fails_raises_group; relocating unique cases into the other test is not removal of duplicated implementation.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Suggestion placement after brief versus nested errors is a distinct regression contract from general mismatch diagnostics. Both already reuse fails_raises_group; relocating unique cases into the other test is not removal of duplicated implementation.",
+      "added": {
+        "file": "testing/python/raises_group.py",
+        "symbol": "test_suggestion_on_nested_and_brief_error",
+        "line": 745,
+        "endLine": 809,
+        "sha256": "3257bd70d1650da5896df29000ff455e8df87c145f68352b06466962ab3d8337"
+      },
+      "existing": {
+        "file": "testing/python/raises_group.py",
+        "symbol": "test_assert_message",
+        "line": 554,
+        "endLine": 674,
+        "sha256": "7ebcdd5e7e48449f42034edb03fc53d097f3055a88da00f0270c231bc8cf24b0"
+      }
+    }
+  ]
+}

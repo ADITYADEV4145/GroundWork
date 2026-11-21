@@ -102,10 +102,11 @@ export function commits(repo: string, start: string, end: string, since = manife
     .filter((c) => Date.parse(c.date) >= Date.parse(since) && Date.parse(c.date) < Date.parse(until));
 }
 
-export async function mine(id: string, tests = false) {
+export interface MiningWindow { id: string; start: string; end: string; startUtc: string; endUtcExclusive: string; repoPath: string; outputFile: string; maxMiningSourceBytes?: number }
+export async function mine(id: string, tests = false, window?: MiningWindow) {
   await initParsers();
-  const pin = manifest.repos.find((r) => r.id === id)!;
-  const repo = path.join(cacheDir, id);
+  const pin = window ?? manifest.repos.find((r) => r.id === id)!;
+  const repo = window?.repoPath ?? path.join(cacheDir, id);
   const history = commits(repo, pin.start, pin.end, pin.startUtc ?? manifest.startUtc, pin.endUtcExclusive ?? manifest.endUtcExclusive).filter((c) => !tests || /parametr|reuse|duplic|simplif|clean|consolid|refactor|helper|merge|reduc/i.test(c.subject));
   const proposals: Proposal[] = [], audit = [];
   const start = performance.now();
@@ -170,7 +171,7 @@ export async function mine(id: string, tests = false) {
     audit.push({ ...c, productionFiles: changes.map(([, f]) => f!), keyword: /dedup|consolidat|reuse|extract|refactor|duplicat|simplif/i.test(c.subject), proposals: proposals.filter((p) => p.commit === c.hash).length });
     if (i % 50 === 0) console.log(`${id}: ${i}/${history.length}, ${proposals.length} proposals`);
   }
-  writeFileSync(path.join(evidenceDir, `${id}-${tests ? 'test-' : ''}mining.json`), JSON.stringify({ repo: id, start: pin.start, end: pin.end, sampling: tests ? 'Test paths only, commits selected by refactor/parameterize/cleanup/helper/reduce keywords; supplementary, not production detector recall.' : 'All eligible non-merge commits, production TS/Python paths; configured oversize source exclusions recorded separately.', maxMiningSourceBytes: pin.maxMiningSourceBytes ?? null, skippedOversize: [...skippedOversize], ms: performance.now() - start, commits: audit, proposals }, null, 2) + '\n');
+  writeFileSync(window?.outputFile ?? path.join(evidenceDir, `${id}-${tests ? 'test-' : ''}mining.json`), JSON.stringify({ repo: id, start: pin.start, end: pin.end, sampling: tests ? 'Test paths only, commits selected by refactor/parameterize/cleanup/helper/reduce keywords; supplementary, not production detector recall.' : 'All eligible non-merge commits, production TS/Python paths; configured oversize source exclusions recorded separately.', maxMiningSourceBytes: pin.maxMiningSourceBytes ?? null, skippedOversize: [...skippedOversize], ms: performance.now() - start, commits: audit, proposals }, null, 2) + '\n');
   console.log(`${id}: ${history.length} commits, ${proposals.length} proposals`);
 }
 

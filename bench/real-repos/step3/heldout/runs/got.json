@@ -1,0 +1,545 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "id": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "role": "mid-size TypeScript",
+    "license": "MIT",
+    "month": "2024-07",
+    "start": "eccfcce064fd879581d75777720a55409bd6be35",
+    "end": "d754e732466bea16cb8118994d6faba9b26196de"
+  },
+  "toolCommit": "21f83a1277d7629de321b2274bbc455450291a60",
+  "modelHash": "1e9184b892b695a81dd5c2fb84ea967fab59233f6d9e1025507982ed6bc459a5",
+  "node": "v24.22.2",
+  "meaning": false,
+  "config": "unmodified defaults",
+  "eligibleCommits": [
+    "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+    "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+    "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+    "bc17e8120b527bb54352474300b5c71cf465ee7f",
+    "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+    "d754e732466bea16cb8118994d6faba9b26196de"
+  ],
+  "excludedOutOfMonth": [],
+  "sampling": "none; all non-merge commits in the UTC calendar window",
+  "selectedCommits": [
+    "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+    "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+    "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+    "bc17e8120b527bb54352474300b5c71cf465ee7f",
+    "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+    "d754e732466bea16cb8118994d6faba9b26196de"
+  ],
+  "totalMs": 6122.90811,
+  "runs": [
+    {
+      "commit": "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+      "parent": "eccfcce064fd879581d75777720a55409bd6be35",
+      "subject": "Remove unnecessary type assertions (#2362)",
+      "committedAt": "2024-07-10T15:14:43+02:00",
+      "checkoutMs": 9.135284000000013,
+      "durationMs": 1373.931696,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "bf68abca3901785a4045ee90108f271777dd20bd",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "getHttp2TimeoutOption",
+            "line": 952
+          },
+          "existing": {
+            "file": "source/create.ts",
+            "symbol": "delay",
+            "line": 21
+          },
+          "probability": 0.45164977414374813,
+          "signals": [
+            {
+              "name": "paramCount",
+              "value": 1
+            },
+            {
+              "name": "vocabulary",
+              "value": 0.3055194035854448
+            }
+          ],
+          "fix": "Duplicate of delay: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        }
+      ]
+    },
+    {
+      "commit": "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+      "parent": "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+      "subject": "Update packagephobia badges and link in readme (#2364)",
+      "committedAt": "2024-07-11T12:16:42+02:00",
+      "checkoutMs": 9.148719999999912,
+      "durationMs": 822.4225950000002,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+      "parent": "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+      "subject": "Update @sindresorhus/is to v7 (#2363)",
+      "committedAt": "2024-07-11T12:17:23+02:00",
+      "checkoutMs": 6.771885999999995,
+      "durationMs": 1064.3589430000002,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "50d8b15eed79086695d79213a42eda06a590ee07",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "validateSearchParameters",
+            "line": 620
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.searchParams",
+            "line": 1568
+          },
+          "probability": 0.6549374120293128,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.6228080900610459
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.searchParams: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "89c3d1cc7c61f99bb63123197a555d3546c83a27",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.https",
+            "line": 2209
+          },
+          "probability": 0.7095690605436797,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.5416800801279351
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.https: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "ce6205f2a56f1745063c8c9548e09bb34b3be1ac",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.dnsLookup",
+            "line": 1637
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.dnsLookupIpVersion",
+            "line": 1988
+          },
+          "probability": 0.5420037260485002,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.5858549053586009
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.dnsLookupIpVersion: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "5b08928452a4933fcc8cc360facc2a336e391a28",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.hooks",
+            "line": 1722
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.43736572543619884,
+          "signals": [
+            {
+              "name": "paramCount",
+              "value": 1
+            },
+            {
+              "name": "vocabulary",
+              "value": 0.3274369035303205
+            }
+          ],
+          "fix": "Duplicate of Options.request: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "255c2061a9a364d23ef068467f06c5fca743ce9e",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.followRedirect",
+            "line": 1772
+          },
+          "existing": {
+            "file": "source/core/response.ts",
+            "symbol": "isResponseOk",
+            "line": 115
+          },
+          "probability": 0.6671410810368741,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.45641676485605426
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of isResponseOk: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "85427c7dadf5e864e6c32362d21210b5cc9b8dc8",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.parseJson",
+            "line": 2015
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.form",
+            "line": 1338
+          },
+          "probability": 0.5079729235400953,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.4023620456329859
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.form: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "edc8f05425e84fbc2ce3720770392e6c7f476247",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.stringifyJson",
+            "line": 2066
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.form",
+            "line": 1338
+          },
+          "probability": 0.504179443866607,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3995698631584145
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.form: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "d55b47385542565d9c38439d7a619bf4b826e0a9",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.retry",
+            "line": 2098
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.6639171112288913,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.4973878119766231
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.request: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "cfc998738624dc3fff2339ecb0e33c3079bd8dbe",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.createConnection",
+            "line": 2166
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.5416145547951156,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.658643771688045
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.request: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "ff026d4e3081f28b0d1df45af4a2d784c7f089ac",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.https",
+            "line": 2209
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.7095690605436797,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.5416800801279351
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.request: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "4c7f7c3cd3b8baa7c6951cc9cca4b8233ca446d9",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/utils/is-form-data.ts",
+            "symbol": "isFormData",
+            "line": 9
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.body",
+            "line": 1310
+          },
+          "probability": 0.6817825344306093,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.48804369594975655
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of Options.body: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "84dca5c360c29e17bec303d5f675c3ebc2240a22",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create",
+            "line": 36
+          },
+          "existing": {
+            "file": "source/as-promise/index.ts",
+            "symbol": "asPromise.shortcut",
+            "line": 185
+          },
+          "probability": 0.41578265249545315,
+          "signals": [
+            {
+              "name": "paramCount",
+              "value": 1
+            },
+            {
+              "name": "vocabulary",
+              "value": 0.2823323847408244
+            }
+          ],
+          "fix": "Duplicate of asPromise.shortcut: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        }
+      ]
+    },
+    {
+      "commit": "bc17e8120b527bb54352474300b5c71cf465ee7f",
+      "parent": "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+      "subject": "Make `get-stream` a devDependency (#2365)",
+      "committedAt": "2024-07-11T17:52:51+02:00",
+      "checkoutMs": 7.1571640000001935,
+      "durationMs": 963.0420259999996,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+      "parent": "bc17e8120b527bb54352474300b5c71cf465ee7f",
+      "subject": "Fix handling of invalid arguments (#2367)",
+      "committedAt": "2024-07-24T12:56:41+02:00",
+      "checkoutMs": 6.470514999999978,
+      "durationMs": 928.8869910000003,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "84dca5c360c29e17bec303d5f675c3ebc2240a22",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create",
+            "line": 36
+          },
+          "existing": {
+            "file": "source/as-promise/index.ts",
+            "symbol": "asPromise.shortcut",
+            "line": 185
+          },
+          "probability": 0.41573675019221923,
+          "signals": [
+            {
+              "name": "paramCount",
+              "value": 1
+            },
+            {
+              "name": "vocabulary",
+              "value": 0.28229804368553935
+            }
+          ],
+          "fix": "Duplicate of asPromise.shortcut: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "2c745bbec4b2e5320fecb68b6c42fccea4692b8e",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create.lastHandler",
+            "line": 54
+          },
+          "existing": {
+            "file": "source/create.ts",
+            "symbol": "create.iterateHandlers",
+            "line": 70
+          },
+          "probability": 0.6256148015138833,
+          "signals": [
+            {
+              "name": "paramCount",
+              "value": 1
+            },
+            {
+              "name": "vocabulary",
+              "value": 0.3368665070710036
+            }
+          ],
+          "fix": "Duplicate of create.iterateHandlers: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        },
+        {
+          "id": "7897b4bc560bd6a0710e688e3adaf918d52a88e0",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create.iterateHandlers",
+            "line": 70
+          },
+          "existing": {
+            "file": "source/as-promise/index.ts",
+            "symbol": "asPromise.shortcut",
+            "line": 185
+          },
+          "probability": 0.6386638342122454,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.45832810991605294
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Duplicate of asPromise.shortcut: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+        }
+      ]
+    },
+    {
+      "commit": "d754e732466bea16cb8118994d6faba9b26196de",
+      "parent": "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+      "subject": "14.4.2",
+      "committedAt": "2024-07-24T13:01:14+02:00",
+      "checkoutMs": 5.569206999999551,
+      "durationMs": 926.0130829999998,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    }
+  ]
+}

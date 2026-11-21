@@ -1,0 +1,31 @@
+{
+  "reviewer": "agent",
+  "standardHash": "e8ec0dd223921af5bb95241a0c916daabca48cbd151b5c104e653bce8960c404",
+  "method": "Every BLOCK inspected at both current source sites under the frozen REUSE-or-EXTEND standard; strict substitutability labels are a separate column. Source-span SHA256s retained; no detector changes after replay.",
+  "reviews": [
+    {
+      "set": "new-1",
+      "repo": "pytest",
+      "commit": "779cecde7caedd6cc59f2ee1c4f689a45246f3c5",
+      "findingId": "be460dfe7b4b2ee3fac52ed3acd235974a83c920",
+      "label": "disagree",
+      "reason": "Normal-class location/path assertions and the nasty-getattr class/function robustness regression test different failure contracts. Both already use pytester's collection helpers; merging their fixture data/assertions would reorganize coverage, not remove a second implementation of reportinfo.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Normal-class location/path assertions and the nasty-getattr class/function robustness regression test different failure contracts. Both already use pytester's collection helpers; merging their fixture data/assertions would reorganize coverage, not remove a second implementation of reportinfo.",
+      "added": {
+        "file": "testing/python/collect.py",
+        "symbol": "TestReportInfo.test_reportinfo_with_nasty_getattr",
+        "line": 1252,
+        "endLine": 1279,
+        "sha256": "7c30893ecce9cc9829d9db5d85cfb17f4d8fdb4d90cb3d80a86ac94905efb950"
+      },
+      "existing": {
+        "file": "testing/python/collect.py",
+        "symbol": "TestReportInfo.test_class_reportinfo",
+        "line": 1237,
+        "endLine": 1250,
+        "sha256": "fefc5426cdaf9d09bd853d6cd5ee1b5e3e419b1e7fe40a7cc280647ffc8d3371"
+      }
+    }
+  ]
+}

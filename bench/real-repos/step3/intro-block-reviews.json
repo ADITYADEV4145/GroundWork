@@ -1,0 +1,1145 @@
+{
+  "reviewer": "agent",
+  "method": "Supplemental review of all 22 unique BLOCKs from the two dev-family introduction replays at one shared Vite commit; in-sample development evidence, never held-out precision/support. Duplicate captures at that same commit are deduplicated.",
+  "reviews": [
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "01b3c1515aa33d2612f0aec058d0d7a50b9e5cd5",
+      "finding": {
+        "id": "01b3c1515aa33d2612f0aec058d0d7a50b9e5cd5",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/fetchModule.ts",
+          "symbol": "fetchModule",
+          "line": 114
+        },
+        "existing": {
+          "file": "packages/vite/src/node/plugins/resolve.ts",
+          "symbol": "subpathImportsPrefix",
+          "line": 66
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use subpathImportsPrefix from packages/vite/src/node/plugins/resolve.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/fetchModule.ts",
+        "symbol": "fetchModule",
+        "line": 114,
+        "endLine": 118,
+        "sha256": "bb13a1f496cc7e66db365b39384dc0e1967884b34b02dd32d92d0a6816c4b6a0"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/plugins/resolve.ts",
+        "symbol": "subpathImportsPrefix",
+        "line": 66,
+        "endLine": 66,
+        "sha256": "7d5607fe5935d6927a1a6ffe7e1fc6a9c7e43386a56e1ddd294a79b322ae0101"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The '#' token detects/removes shebangs here, whereas subpathImportsPrefix denotes package-import specifiers; identical punctuation is not shared configuration."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "f8a48ea4c303919423e34b98b524259cb36c5d6d",
+      "finding": {
+        "id": "f8a48ea4c303919423e34b98b524259cb36c5d6d",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+          "symbol": "ssrModuleExportsKey",
+          "line": 2
+        },
+        "existing": {
+          "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+          "symbol": "ssrModuleExportsKey",
+          "line": 44
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use ssrModuleExportsKey from packages/vite/src/node/ssr/ssrTransform.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+        "symbol": "ssrModuleExportsKey",
+        "line": 2,
+        "endLine": 2,
+        "sha256": "54aa2c306a590bf691a331688481e3c36e6163c9aef11e48f4da3534437389b2"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+        "symbol": "ssrModuleExportsKey",
+        "line": 44,
+        "endLine": 44,
+        "sha256": "54aa2c306a590bf691a331688481e3c36e6163c9aef11e48f4da3534437389b2"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both symbols define the same SSR module-exports wire key; share this protocol constant rather than duplicate the definition."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "5a2620d589e1832680ff26626531b0d0bf95e0a0",
+      "finding": {
+        "id": "5a2620d589e1832680ff26626531b0d0bf95e0a0",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+          "symbol": "ssrImportKey",
+          "line": 3
+        },
+        "existing": {
+          "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+          "symbol": "ssrImportKey",
+          "line": 45
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use ssrImportKey from packages/vite/src/node/ssr/ssrTransform.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+        "symbol": "ssrImportKey",
+        "line": 3,
+        "endLine": 3,
+        "sha256": "01bd2b8a8e7badb23220a495baf61161d798094ab669aa4658d99ae2ba032f01"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+        "symbol": "ssrImportKey",
+        "line": 45,
+        "endLine": 45,
+        "sha256": "01bd2b8a8e7badb23220a495baf61161d798094ab669aa4658d99ae2ba032f01"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both symbols define the same SSR import wire key; share the protocol constant rather than maintain a second definition."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "f8f399c53ba9118a15d5d0f34a5b8ee0dc5a9e38",
+      "finding": {
+        "id": "f8f399c53ba9118a15d5d0f34a5b8ee0dc5a9e38",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+          "symbol": "ssrDynamicImportKey",
+          "line": 4
+        },
+        "existing": {
+          "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+          "symbol": "ssrDynamicImportKey",
+          "line": 46
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use ssrDynamicImportKey from packages/vite/src/node/ssr/ssrTransform.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+        "symbol": "ssrDynamicImportKey",
+        "line": 4,
+        "endLine": 4,
+        "sha256": "8eea9fa4662cb1d3df70cc5999d5975c57b523b923e898cb3aaa61e4126f3b2c"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+        "symbol": "ssrDynamicImportKey",
+        "line": 46,
+        "endLine": 46,
+        "sha256": "8eea9fa4662cb1d3df70cc5999d5975c57b523b923e898cb3aaa61e4126f3b2c"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both symbols define the same dynamic-import wire key; this is one SSR protocol constant, not different configuration."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "846cfd451ba8809314ce90bf27b243abcd7e74fa",
+      "finding": {
+        "id": "846cfd451ba8809314ce90bf27b243abcd7e74fa",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+          "symbol": "ssrExportAllKey",
+          "line": 5
+        },
+        "existing": {
+          "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+          "symbol": "ssrExportAllKey",
+          "line": 47
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use ssrExportAllKey from packages/vite/src/node/ssr/ssrTransform.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+        "symbol": "ssrExportAllKey",
+        "line": 5,
+        "endLine": 5,
+        "sha256": "7f4f621ae5db8b8f585c874d7615ea9ea77acf78c65f51ff92f3efed5639f02e"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+        "symbol": "ssrExportAllKey",
+        "line": 47,
+        "endLine": 47,
+        "sha256": "7f4f621ae5db8b8f585c874d7615ea9ea77acf78c65f51ff92f3efed5639f02e"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both symbols define the same SSR export-all wire key and should reuse a shared definition."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "613920a66e0f0eb43e45ebdf01f3424daf0a0916",
+      "finding": {
+        "id": "613920a66e0f0eb43e45ebdf01f3424daf0a0916",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+          "symbol": "ssrImportMetaKey",
+          "line": 6
+        },
+        "existing": {
+          "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+          "symbol": "ssrImportMetaKey",
+          "line": 48
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use ssrImportMetaKey from packages/vite/src/node/ssr/ssrTransform.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/constants.ts",
+        "symbol": "ssrImportMetaKey",
+        "line": 6,
+        "endLine": 6,
+        "sha256": "781d0533e52e64e909f0e4b533d97257a3745ef808565e578a5213672a97af13"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/ssr/ssrTransform.ts",
+        "symbol": "ssrImportMetaKey",
+        "line": 48,
+        "endLine": 48,
+        "sha256": "781d0533e52e64e909f0e4b533d97257a3745ef808565e578a5213672a97af13"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both symbols define the same SSR import-meta wire key and should reuse a shared definition."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "ce6dbf65edf97a7e8196a75aac94ec6b6516f841",
+      "finding": {
+        "id": "ce6dbf65edf97a7e8196a75aac94ec6b6516f841",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/moduleCache.ts",
+          "symbol": "withTrailingSlash",
+          "line": 120
+        },
+        "existing": {
+          "file": "packages/vite/src/node/utils.ts",
+          "symbol": "withTrailingSlash",
+          "line": 256
+        },
+        "probability": 0.9283319443725183,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of withTrailingSlash: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/moduleCache.ts",
+        "symbol": "withTrailingSlash",
+        "line": 120,
+        "endLine": 125,
+        "sha256": "ea3fd7c87574e8b5e74adaf6d34798746cf210173b05413efe249faba8837c53"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/utils.ts",
+        "symbol": "withTrailingSlash",
+        "line": 256,
+        "endLine": 261,
+        "sha256": "ea3fd7c87574e8b5e74adaf6d34798746cf210173b05413efe249faba8837c53"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "The two pure helpers have identical trailing-slash behavior; export/rehome the existing helper rather than keep both copies."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "31131011f1b976664cfa3513d48a59d04e511a2d",
+      "finding": {
+        "id": "31131011f1b976664cfa3513d48a59d04e511a2d",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/runtime.ts",
+          "symbol": "proxyGuardOnlyEsm",
+          "line": 468
+        },
+        "existing": {
+          "file": "packages/vite/src/node/ssr/ssrModuleLoader.ts",
+          "symbol": "proxyGuardOnlyEsm",
+          "line": 400
+        },
+        "probability": 0.9073848099621888,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of proxyGuardOnlyEsm: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/runtime.ts",
+        "symbol": "proxyGuardOnlyEsm",
+        "line": 468,
+        "endLine": 487,
+        "sha256": "f094ecb80c52593d1ba3b888b887cea551282a0db6a85a32f6e7d036977ebcc5"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/ssr/ssrModuleLoader.ts",
+        "symbol": "proxyGuardOnlyEsm",
+        "line": 400,
+        "endLine": 419,
+        "sha256": "f094ecb80c52593d1ba3b888b887cea551282a0db6a85a32f6e7d036977ebcc5"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "The two guards have the same imported-name early return and Proxy missing-export behavior; share the existing guard implementation."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "15b3923c39805c224339950ef707548c7bde97e9",
+      "finding": {
+        "id": "15b3923c39805c224339950ef707548c7bde97e9",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+          "symbol": "VALID_ID_PREFIX",
+          "line": 11
+        },
+        "existing": {
+          "file": "packages/vite/src/node/constants.ts",
+          "symbol": "VALID_ID_PREFIX",
+          "line": 65
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use VALID_ID_PREFIX from packages/vite/src/node/constants.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+        "symbol": "VALID_ID_PREFIX",
+        "line": 11,
+        "endLine": 11,
+        "sha256": "e85f63bb2391ad57d2eb00f47ba777b598568fbca74d1422c611473306009f05"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/constants.ts",
+        "symbol": "VALID_ID_PREFIX",
+        "line": 65,
+        "endLine": 65,
+        "sha256": "e85f63bb2391ad57d2eb00f47ba777b598568fbca74d1422c611473306009f05"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both constants denote the same Vite /@id/ prefix, so this is genuine shared protocol configuration."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "f1161e352d1fe7dbe2eed3e648978e238735fce3",
+      "finding": {
+        "id": "f1161e352d1fe7dbe2eed3e648978e238735fce3",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+          "symbol": "wrapId",
+          "line": 13
+        },
+        "existing": {
+          "file": "packages/vite/src/node/utils.ts",
+          "symbol": "wrapId",
+          "line": 68
+        },
+        "probability": 0.9311047632322675,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.7070112260903098
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of wrapId: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+        "symbol": "wrapId",
+        "line": 13,
+        "endLine": 17,
+        "sha256": "9be9b21d3533397b8ddc190bbca8a976b96087629805eb23f9ac17a37694741f"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/utils.ts",
+        "symbol": "wrapId",
+        "line": 68,
+        "endLine": 72,
+        "sha256": "9be9b21d3533397b8ddc190bbca8a976b96087629805eb23f9ac17a37694741f"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "The two wrapId bodies and prefix/null-byte constants are equivalent; a shared dependency-neutral helper avoids maintaining both copies."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "13b80cb6880ad27ca15fb70a94191f15061a5d4b",
+      "finding": {
+        "id": "13b80cb6880ad27ca15fb70a94191f15061a5d4b",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+          "symbol": "unwrapId",
+          "line": 19
+        },
+        "existing": {
+          "file": "packages/vite/src/node/utils.ts",
+          "symbol": "unwrapId",
+          "line": 77
+        },
+        "probability": 0.9654331538487302,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8465982843298281
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of unwrapId: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+        "symbol": "unwrapId",
+        "line": 19,
+        "endLine": 23,
+        "sha256": "f3467080029c18710ca66ae5eb1e3f96627092e8f4c72b6c044da764981ba914"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/utils.ts",
+        "symbol": "unwrapId",
+        "line": 77,
+        "endLine": 81,
+        "sha256": "f3467080029c18710ca66ae5eb1e3f96627092e8f4c72b6c044da764981ba914"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "The two unwrapId bodies invert the same prefix/null-byte encoding; share the existing implementation."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "a6f9e77314fa58ae2edd5a450a44b17137b4a4eb",
+      "finding": {
+        "id": "a6f9e77314fa58ae2edd5a450a44b17137b4a4eb",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+          "symbol": "isPrimitive",
+          "line": 35
+        },
+        "existing": {
+          "file": "packages/vite/src/node/ssr/ssrModuleLoader.ts",
+          "symbol": "isPrimitive",
+          "line": 357
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of isPrimitive: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+        "symbol": "isPrimitive",
+        "line": 35,
+        "endLine": 37,
+        "sha256": "e99be30ec4649fb46c9cef4342a889006e65f78c6a6d62106978b4e649b6a696"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/ssr/ssrModuleLoader.ts",
+        "symbol": "isPrimitive",
+        "line": 357,
+        "endLine": 359,
+        "sha256": "6a588e1c8eee1f0321bdffb23b245fe771175ecea3e2eeeb0e6940912fb4232c"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both predicates implement the same falsy-or-nonobject/nonfunction check; the any/unknown annotation difference does not change the runtime contract."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "fff057f3bfb4bffdcf80cc2e83e3dd500161489b",
+      "finding": {
+        "id": "fff057f3bfb4bffdcf80cc2e83e3dd500161489b",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+          "symbol": "posixPathToFileHref",
+          "line": 85
+        },
+        "existing": {
+          "file": "packages/vite/src/node/plugins/resolve.ts",
+          "symbol": "subpathImportsPrefix",
+          "line": 66
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use subpathImportsPrefix from packages/vite/src/node/plugins/resolve.ts"
+      },
+      "added": {
+        "file": "packages/vite/src/node/ssr/runtime/utils.ts",
+        "symbol": "posixPathToFileHref",
+        "line": 85,
+        "endLine": 88,
+        "sha256": "e63ae33e553876b743d38d1d5890a1ea00be2799cf192fe462b085fdc119d16b"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/plugins/resolve.ts",
+        "symbol": "subpathImportsPrefix",
+        "line": 66,
+        "endLine": 66,
+        "sha256": "7d5607fe5935d6927a1a6ffe7e1fc6a9c7e43386a56e1ddd294a79b322ae0101"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The '#' token is URL-fragment escaping here, not the package-subpath import prefix; the identical literal has different protocol meaning."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "9a9d37ff32d7821ba6c8f9acd979512a90d2127c",
+      "finding": {
+        "id": "9a9d37ff32d7821ba6c8f9acd979512a90d2127c",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/accept-exports/dynamic-imports/deps-all-accepted.ts",
+          "symbol": "<module>",
+          "line": 13
+        },
+        "existing": {
+          "file": "playground/hmr/self-accept-within-circular/c.js",
+          "symbol": "c",
+          "line": 3
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use c from playground/hmr/self-accept-within-circular/c.js"
+      },
+      "added": {
+        "file": "playground/hmr-ssr/accept-exports/dynamic-imports/deps-all-accepted.ts",
+        "symbol": "<module>",
+        "line": 13,
+        "endLine": 48,
+        "sha256": "34b1109b9e4d0b918c96fecf5c3ff0e4f65a71a39a15e7125a3a577db97f6b53"
+      },
+      "existing": {
+        "file": "playground/hmr/self-accept-within-circular/c.js",
+        "symbol": "c",
+        "line": 3,
+        "endLine": 3,
+        "sha256": "7678691f74b8a1a56be0ef0af76e3b7d622edf1620e6d40e207692f37e8da950"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The string names an accepted HMR export, whereas the target is a fixture's exported value; reusing it adds a module edge and changes the fixture graph."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "267fd680a8fb5388536b72eec536eb95122c4f2a",
+      "finding": {
+        "id": "267fd680a8fb5388536b72eec536eb95122c4f2a",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/accept-exports/main-accepted/callback.ts",
+          "symbol": "<module>",
+          "line": 4
+        },
+        "existing": {
+          "file": "playground/hmr/accept-exports/side-effects/side-effects.ts",
+          "symbol": "x",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use x from playground/hmr/accept-exports/side-effects/side-effects.ts"
+      },
+      "added": {
+        "file": "playground/hmr-ssr/accept-exports/main-accepted/callback.ts",
+        "symbol": "<module>",
+        "line": 4,
+        "endLine": 39,
+        "sha256": "642c4d7448009e920d8805d43a44de46e58f4ddde66eacaf6a1b043945edc85c"
+      },
+      "existing": {
+        "file": "playground/hmr/accept-exports/side-effects/side-effects.ts",
+        "symbol": "x",
+        "line": 1,
+        "endLine": 1,
+        "sha256": "c2839edc1005bf377840aa6e91bed07a1407e85d440bc29b912842b2756ea915"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The string names an accepted HMR export, not the unrelated fixture's exported payload; these are different roles and intentional module boundaries."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "9a981ca4d3f0d2d9335a2d169a36c0f7623bbc78",
+      "finding": {
+        "id": "9a981ca4d3f0d2d9335a2d169a36c0f7623bbc78",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/accept-exports/main-non-accepted/default.ts",
+          "symbol": "<module>",
+          "line": 10
+        },
+        "existing": {
+          "file": "playground/hmr/accept-exports/side-effects/side-effects.ts",
+          "symbol": "x",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use x from playground/hmr/accept-exports/side-effects/side-effects.ts"
+      },
+      "added": {
+        "file": "playground/hmr-ssr/accept-exports/main-non-accepted/default.ts",
+        "symbol": "<module>",
+        "line": 10,
+        "endLine": 45,
+        "sha256": "bd084a717c6c8f769868d28dfd14b22dfb18da09b4ab8383ad13baa67a62720a"
+      },
+      "existing": {
+        "file": "playground/hmr/accept-exports/side-effects/side-effects.ts",
+        "symbol": "x",
+        "line": 1,
+        "endLine": 1,
+        "sha256": "c2839edc1005bf377840aa6e91bed07a1407e85d440bc29b912842b2756ea915"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "An HMR acceptExports name is not shared configuration with another fixture's exported value; an import would alter the tested dependency graph."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "9d655a15503a7bb13aa311d2398d73826e9582a4",
+      "finding": {
+        "id": "9d655a15503a7bb13aa311d2398d73826e9582a4",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/accept-exports/star-imports/deps-all-accepted.ts",
+          "symbol": "<module>",
+          "line": 13
+        },
+        "existing": {
+          "file": "playground/hmr/self-accept-within-circular/c.js",
+          "symbol": "c",
+          "line": 3
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use c from playground/hmr/self-accept-within-circular/c.js"
+      },
+      "added": {
+        "file": "playground/hmr-ssr/accept-exports/star-imports/deps-all-accepted.ts",
+        "symbol": "<module>",
+        "line": 13,
+        "endLine": 48,
+        "sha256": "34b1109b9e4d0b918c96fecf5c3ff0e4f65a71a39a15e7125a3a577db97f6b53"
+      },
+      "existing": {
+        "file": "playground/hmr/self-accept-within-circular/c.js",
+        "symbol": "c",
+        "line": 3,
+        "endLine": 3,
+        "sha256": "7678691f74b8a1a56be0ef0af76e3b7d622edf1620e6d40e207692f37e8da950"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The accepted-export name and a fixture export payload have different contracts despite the same one-character string."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "7b21e42dd62a6deab1ae44a149b2c49dd02c54a9",
+      "finding": {
+        "id": "7b21e42dd62a6deab1ae44a149b2c49dd02c54a9",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/hmr.ts",
+          "symbol": "removeCb",
+          "line": 105
+        },
+        "existing": {
+          "file": "playground/hmr/hmr.ts",
+          "symbol": "removeCb",
+          "line": 139
+        },
+        "probability": 0.9707166792669578,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of removeCb: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      "added": {
+        "file": "playground/hmr-ssr/hmr.ts",
+        "symbol": "removeCb",
+        "line": 105,
+        "endLine": 108,
+        "sha256": "b6cbeac11402b7d240277aae184a73286ea2283c828d37773716678959966c4e"
+      },
+      "existing": {
+        "file": "playground/hmr/hmr.ts",
+        "symbol": "removeCb",
+        "line": 139,
+        "endLine": 142,
+        "sha256": "b6cbeac11402b7d240277aae184a73286ea2283c828d37773716678959966c4e"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "These callbacks close over different import.meta.hot module owners; sharing the existing callback would unregister from the wrong module and change the fixture's behavior."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "5abd2a0c49b4610eaddadb584530743e30ea520e",
+      "finding": {
+        "id": "5abd2a0c49b4610eaddadb584530743e30ea520e",
+        "kind": "grounding",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/intermediate-file-delete/index.js",
+          "symbol": "displayCount",
+          "line": 1
+        },
+        "existing": {
+          "file": "packages/vite/src/node/plugins/reporter.ts",
+          "symbol": "displaySize",
+          "line": 38
+        },
+        "signals": [
+          {
+            "name": "groundingCheck",
+            "value": 1
+          },
+          {
+            "name": "definiteError",
+            "value": 1
+          }
+        ],
+        "fix": "Use displaySize (packages/vite/src/node/plugins/reporter.ts:38): displaySize(bytes: number).",
+        "grounding": {
+          "file": "playground/hmr-ssr/intermediate-file-delete/index.js",
+          "line": 1,
+          "kind": "unknown-export",
+          "name": "displayCount",
+          "message": "'displayCount' is not exported in playground/hmr-ssr/intermediate-file-delete/re-export.js. Did you mean buildReporterPlugin.displaySize (packages/vite/src/node/plugins/reporter.ts:38, displaySize(bytes: number)) or displayTime (packages/vite/src/node/plugins/reporter.ts:342, displayTime(time: number)) or getCount (playground/hmr-ssr/counter/index.ts:5, getCount())?",
+          "blocking": true,
+          "suggestions": [
+            {
+              "name": "displaySize",
+              "qualifiedName": "buildReporterPlugin.displaySize",
+              "file": "packages/vite/src/node/plugins/reporter.ts",
+              "line": 38,
+              "signature": "displaySize(bytes: number)",
+              "score": 0.58
+            },
+            {
+              "name": "displayTime",
+              "qualifiedName": "displayTime",
+              "file": "packages/vite/src/node/plugins/reporter.ts",
+              "line": 342,
+              "signature": "displayTime(time: number)",
+              "score": 0.58
+            },
+            {
+              "name": "getCount",
+              "qualifiedName": "getCount",
+              "file": "playground/hmr-ssr/counter/index.ts",
+              "line": 5,
+              "signature": "getCount()",
+              "score": 0.58
+            }
+          ]
+        }
+      },
+      "added": {
+        "file": "playground/hmr-ssr/intermediate-file-delete/index.js",
+        "symbol": "displayCount",
+        "line": 1,
+        "endLine": 36,
+        "sha256": "fc4c80efeb73eea8b6b273cda9a0943ecef010ab63ade3509f95b412e1aed660"
+      },
+      "existing": {
+        "file": "packages/vite/src/node/plugins/reporter.ts",
+        "symbol": "displaySize",
+        "line": 38,
+        "endLine": 73,
+        "sha256": "5aa1549c6302f3e0d7df80022e1a8cf4a078fff4271ff83ba10c6f5302ea0990"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The referenced re-export.js exists and export-stars displayCount from display.js; the unrelated byte-size reporter is not a valid replacement."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "57d2f5730f2ad67821a334ac128465da4fb68988",
+      "finding": {
+        "id": "57d2f5730f2ad67821a334ac128465da4fb68988",
+        "kind": "grounding",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/queries/index.js",
+          "symbol": "./multi-query?query1",
+          "line": 1
+        },
+        "existing": null,
+        "signals": [
+          {
+            "name": "groundingCheck",
+            "value": 1
+          },
+          {
+            "name": "definiteError",
+            "value": 1
+          }
+        ],
+        "fix": "Correct ./multi-query?query1 to match the module exports and callable signature.",
+        "grounding": {
+          "file": "playground/hmr-ssr/queries/index.js",
+          "line": 1,
+          "kind": "missing-module",
+          "name": "./multi-query?query1",
+          "message": "module './multi-query?query1' does not exist.",
+          "blocking": true,
+          "suggestions": []
+        }
+      },
+      "added": {
+        "file": "playground/hmr-ssr/queries/index.js",
+        "symbol": "./multi-query?query1",
+        "line": 1,
+        "endLine": 36,
+        "sha256": "6d9b513acd745456134ff51d1d92a752cbb54c9152668f6b53412c45cb21395d"
+      },
+      "existing": null,
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "This fixture import intentionally uses a query handled by the registered query-resolver plugin; treating the query as a missing filesystem module is incorrect."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "64557f2ba48d51b56f05645c9a9d995fe2ddc6c3",
+      "finding": {
+        "id": "64557f2ba48d51b56f05645c9a9d995fe2ddc6c3",
+        "kind": "grounding",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/queries/index.js",
+          "symbol": "./multi-query?query2",
+          "line": 2
+        },
+        "existing": null,
+        "signals": [
+          {
+            "name": "groundingCheck",
+            "value": 1
+          },
+          {
+            "name": "definiteError",
+            "value": 1
+          }
+        ],
+        "fix": "Correct ./multi-query?query2 to match the module exports and callable signature.",
+        "grounding": {
+          "file": "playground/hmr-ssr/queries/index.js",
+          "line": 2,
+          "kind": "missing-module",
+          "name": "./multi-query?query2",
+          "message": "module './multi-query?query2' does not exist.",
+          "blocking": true,
+          "suggestions": []
+        }
+      },
+      "added": {
+        "file": "playground/hmr-ssr/queries/index.js",
+        "symbol": "./multi-query?query2",
+        "line": 2,
+        "endLine": 37,
+        "sha256": "6d9b513acd745456134ff51d1d92a752cbb54c9152668f6b53412c45cb21395d"
+      },
+      "existing": null,
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The registered query-resolver plugin supplies this query-specific module; it is not an unresolved local file requiring replacement."
+    },
+    {
+      "repo": "vite",
+      "set": "dev-introduction",
+      "commit": "8b3ab0771842bda44129148c07739ebd86bdd62f",
+      "findingId": "2299c267cb0e9ad0d03b0837812b9d488f45cdb3",
+      "finding": {
+        "id": "2299c267cb0e9ad0d03b0837812b9d488f45cdb3",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "playground/hmr-ssr/vite.config.ts",
+          "symbol": "transformCountPlugin",
+          "line": 74
+        },
+        "existing": {
+          "file": "playground/hmr/vite.config.ts",
+          "symbol": "transformCountPlugin",
+          "line": 61
+        },
+        "probability": 0.9863909793779269,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of transformCountPlugin: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      "added": {
+        "file": "playground/hmr-ssr/vite.config.ts",
+        "symbol": "transformCountPlugin",
+        "line": 74,
+        "endLine": 84,
+        "sha256": "d0c5c4db38bee66a42a1d385873b79b32371c3cb8f680c896deaf517744416f8"
+      },
+      "existing": {
+        "file": "playground/hmr/vite.config.ts",
+        "symbol": "transformCountPlugin",
+        "line": 61,
+        "endLine": 71,
+        "sha256": "d0c5c4db38bee66a42a1d385873b79b32371c3cb8f680c896deaf517744416f8"
+      },
+      "label": "not-assessed",
+      "reason": "Supplemental development introduction audit; no new strict-substitutability label is asserted.",
+      "reuseOrExtendLabel": "agree",
+      "reuseOrExtendReason": "Both plugin factories create a fresh per-instance transform counter with the same marker replacement; share a factory while preserving instance-local state."
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "reviews": [
+    {
+      "repo": "got",
+      "commit": "7a920647efa236bd1f80dad087a27371e5070f7b",
+      "findingId": "d0052877ba7b518586b49c56a90c37368ec3c4bf",
+      "label": "disagree",
+      "reason": "timedOut orchestrates request lifecycle timeouts and returns cleanup; addTimeout is its nested timer-creation helper capturing cancelers, not an interchangeable request handler.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "One request-lifecycle implementation contains its timer helper; this is enclosing code plus a captured helper, not two implementations to consolidate."
+    },
+    {
+      "repo": "got",
+      "commit": "7a920647efa236bd1f80dad087a27371e5070f7b",
+      "findingId": "57b3f9ca6f025ce3522f5456ef73fb034289ddb9",
+      "label": "disagree",
+      "reason": "addTimeout creates and registers a timer; its nested cancel closure clears that specific timer. Calling the child instead would remove timer creation and requires unavailable closure state.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Timer creation/registration and the nested timer cancellation closure deliberately do opposite work and require different captured state."
+    },
+    {
+      "repo": "got",
+      "commit": "7a920647efa236bd1f80dad087a27371e5070f7b",
+      "findingId": "7abeaf5f4b66409354e1901955a1ee500495a8cc",
+      "label": "disagree",
+      "reason": "cancel marks an event handled and clears a timeout; timeoutHandler schedules destruction of an unhandled request. The bug fix deliberately separates cancellation from firing.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Cancellation clears a handled timeout; the timeout handler reports an unhandled request. Combining these opposite lifecycle operations would change behavior."
+    },
+    {
+      "repo": "got",
+      "commit": "7a920647efa236bd1f80dad087a27371e5070f7b",
+      "findingId": "552b03d4bada03ad3f9d6b6ae3a5150af26350ba",
+      "label": "disagree",
+      "reason": "timeoutHandler must report an unhandled timeout; cancel does the opposite and is private to addTimeout. Replacing firing with cancellation would suppress the intended error.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "The timeout handler reports an unhandled timeout, whereas cancellation prevents it; their opposing state transitions are intentional."
+    },
+    {
+      "repo": "click",
+      "commit": "9caedb9206103dfb5465e1916bc2f13b9c10c0e4",
+      "findingId": "5abac2bb0757b05dc2851e20cbd1798b61e1c33a",
+      "label": "disagree",
+      "reason": "BoolParamType is the class defining boolean states, conversion and error handling; convert is already its own method and cannot replace the class that supplies that state and interface.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "A boolean parameter type and its own conversion method are one class implementation, not independent duplicate implementations."
+    },
+    {
+      "repo": "click",
+      "commit": "9caedb9206103dfb5465e1916bc2f13b9c10c0e4",
+      "findingId": "c1e87bccf871a8d7cf35a002ed4daa9ae71e9b2e",
+      "label": "disagree",
+      "reason": "BoolParamType.convert normalizes a value through str_to_bool and raises parameter-aware errors; calling the containing class constructs an object rather than converting the value.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Conversion validates values using the containing type's state; constructing that type is a different operation, not duplicate conversion logic."
+    },
+    {
+      "repo": "click",
+      "commit": "3155dcac03fec1bbbcca5afcec10d1c097ad8092",
+      "findingId": "2b2484c365df6e8734eca480582015e78e74c03a",
+      "label": "disagree",
+      "reason": "MissingParameter is an exception class with initialization and formatting behavior; its format_message method is part of that class, not a replacement exception implementation.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "An exception type supplies initialization/state and contains the formatting method; there are not two independent exception implementations."
+    },
+    {
+      "repo": "click",
+      "commit": "3155dcac03fec1bbbcca5afcec10d1c097ad8092",
+      "findingId": "53adb191fa423a833819539454c6eb36305beeb9",
+      "label": "disagree",
+      "reason": "MissingParameter.format_message produces text from exception state; invoking MissingParameter instead produces another exception object. The commit changes a type annotation, not duplicated behavior.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Formatting an exception's message and constructing a new exception have different return types, state effects and responsibilities."
+    },
+    {
+      "repo": "click",
+      "commit": "a1235aacb1be55dc66ddcfefbf64dec44b6ab54d",
+      "findingId": "c8d39ae535db31a22d67997baccc7ab65c0d172c",
+      "label": "disagree",
+      "reason": "ZshComplete supplies a Zsh-specific completion protocol and escaping; FishComplete.get_completion_args parses Fish-specific partial-word conventions and cannot replace an entire Zsh class.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Zsh's completion implementation and Fish's argument parsing obey different shell protocols and cannot share the claimed class-level implementation."
+    },
+    {
+      "repo": "click",
+      "commit": "a1235aacb1be55dc66ddcfefbf64dec44b6ab54d",
+      "findingId": "087b521d2ef7a9e3c6b81f21bd27e296029855e3",
+      "label": "disagree",
+      "reason": "ZshComplete.format_completion escapes colons and serializes one item; example list_users filters demo users into CompletionItem objects. Input, output and purpose differ.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Zsh completion serialization/escaping and a demo user-filtering function have different inputs, outputs and purposes despite completion vocabulary."
+    },
+    {
+      "repo": "pytest",
+      "commit": "c5a75f2498c86850c4ce13bcf10d56efc92394a4",
+      "findingId": "fa86e43819cb39536cca75a44b10a72e699fc930",
+      "label": "disagree",
+      "reason": "_get_progress_information_message formats count/time/percentage strings; _is_last_item returns a boolean. The commit fixes timing aggregation for skipped modules, not duplicated progress detection.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Progress text formatting returns strings, whereas the last-item predicate returns a boolean; the shared session vocabulary is not duplicate behavior."
+    },
+    {
+      "repo": "pytest",
+      "commit": "c02465cee0250cd8040a06032ec8732a6228bd13",
+      "findingId": "3d3a7906f4ad88e36a71f94b16f998b5bee861c2",
+      "label": "disagree",
+      "reason": "Session is the collection-root class with lifecycle and state; perform_collect is already a contained instance method. Replacing the class with its method destroys the session interface.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "A session collection-root class contains perform_collect as one of its own methods; this is one implementation, not independent duplicate code."
+    },
+    {
+      "repo": "pytest",
+      "commit": "c02465cee0250cd8040a06032ec8732a6228bd13",
+      "findingId": "eb09cad8fad52ada4dade3b8cd507204fea653ed",
+      "label": "disagree",
+      "reason": "Session.perform_collect expands initial arguments into collected items using session state; calling Session constructs a collection root and does not perform this operation.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Collecting session items uses existing session state; constructing the session root is a distinct operation and already owns that method."
+    },
+    {
+      "repo": "pytest",
+      "commit": "c02465cee0250cd8040a06032ec8732a6228bd13",
+      "findingId": "d7d13494c064a08bcd6e8c658a3cd7840ccecb9c",
+      "label": "disagree",
+      "reason": "search_pypath finds a module and returns its path or None, with new namespace-package handling; spec_matches_module_path tests a supplied spec/path pair and returns bool. Neither replaces the other.",
+      "set": "before",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Module lookup returns a path or None; testing whether a supplied spec matches a path returns a boolean. These are distinct resolution responsibilities."
+    },
+    {
+      "repo": "got",
+      "commit": "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+      "findingId": "e0857812836bfa8b6f6a510491004b7abd05c454",
+      "label": "disagree",
+      "reason": "Options.request validates and stores a request function; Options.encoding validates and stores a BufferEncoding and rejects null. These property setters have different fields, types and effects; calling encoding cannot replace request. The commit updates assertion API names, not duplicate behavior.",
+      "set": "heldout",
+      "reuseOrExtendLabel": "disagree",
+      "reuseOrExtendReason": "Request-function and BufferEncoding setters validate different types and write different option fields; common setter scaffolding does not justify consolidating their contracts."
+    }
+  ],
+  "standardHash": "e8ec0dd223921af5bb95241a0c916daabca48cbd151b5c104e653bce8960c404",
+  "reviewer": "agent",
+  "method": "Both previously inspected sites reconsidered under the separately frozen REUSE-or-EXTEND standard; strict label/reason fields remain unchanged and original artifacts are untouched."
+}

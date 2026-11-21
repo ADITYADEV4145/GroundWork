@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { evaluateReviewEvidence as evaluateRealRepoReview, evaluateRealRepoReview as evaluateFinalReview, reviewModelHash } from '../src/selftest/real-repo-review.js';
+import { evaluateExpandedReview, evaluateReviewEvidence as evaluateRealRepoReview, evaluateRealRepoReview as evaluateFinalReview, reviewModelHash, wilson } from '../src/selftest/real-repo-review.js';
 import { monthBounds, project, sampleCommits } from '../scripts/real-repos.js';
 
 const roots: string[] = [];
@@ -29,6 +29,66 @@ function fixture(agree = 9, count = 10) {
   return root;
 }
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
+
+function expandedFixture() {
+  const root = fixture(); mkdirSync(path.join(root, 'step3'));
+  const standardHash = createHash('sha256').update(readFileSync(path.join(project, 'bench/real-history/review-standard.md'))).digest('hex');
+  write(root, 'step3/freeze.json', { modelCommit: 'f'.repeat(40), modelHash: reviewModelHash(readFileSync(path.join(project, 'src/reuse/model.json'), 'utf8')), standardHash });
+  for (const [i, set] of ['original', 'heldout', 'new-1', 'new-2'].entries()) {
+    mkdirSync(path.join(root, 'step3', set, 'runs'), { recursive: true });
+    const manifest = read(root, 'repos.json');
+    for (const [j, repo] of manifest.repositories.entries()) {
+      repo.month = `2025-0${i + 1}`; repo.start = (i + 10).toString(16).repeat(40); repo.end = (i + 11).toString(16).repeat(40);
+      const data = read(root, `runs/${repo.id}.json`), commit = (i * 3 + j + 1).toString(16).repeat(40);
+      data.repository = repo; data.toolCommit = 'f'.repeat(40); data.sampling = 'none; all non-merge commits in the UTC calendar window';
+      data.selectedCommits = data.eligibleCommits = [commit]; data.runs[0].commit = commit;
+      write(root, `step3/${set}/runs/${repo.id}.json`, data);
+    }
+    write(root, i === 0 ? 'repos.json' : i === 1 ? 'heldout-repos.json' : `step3/${set}-repos.json`, manifest);
+    const review = read(root, 'reviews.json'); review.standardHash = standardHash;
+    for (const row of review.reviews) { row.commit = (i * 3 + 1).toString(16).repeat(40); row.reuseOrExtendLabel = row.label; row.reuseOrExtendReason = row.reason; row.label = 'disagree'; }
+    write(root, `step3/${set}/reviews.json`, review);
+  }
+  return root;
+}
+
+describe('frozen expanded reuse-or-extend history gate', () => {
+  it('computes two-sided Wilson intervals without a vacuous empty interval', () => {
+    expect(wilson(0, 0)).toBeNull();
+    expect(wilson(0, 1)![1]).toBeCloseTo(0.7934506856);
+    expect(wilson(1, 1)![0]).toBeCloseTo(0.2065493144);
+    expect(() => wilson(2, 1)).toThrow('Invalid');
+  });
+  it('uses separate new-standard labels without changing strict labels', () => {
+    const result = evaluateFinalReview(expandedFixture());
+    expect(result.ok, result.detail).toBe(true);
+    expect(result.metrics?.heldoutAgreement).toBe(0.9);
+    expect(result.detail).toContain('Wilson 95%');
+  });
+  it('fails clearly rather than accepting empty expanded BLOCK support', () => {
+    const root = expandedFixture();
+    for (const set of ['original', 'heldout', 'new-1', 'new-2']) {
+      const review = read(root, `step3/${set}/reviews.json`); review.reviews = []; write(root, `step3/${set}/reviews.json`, review);
+      for (const repo of ['got', 'click', 'pytest']) {
+        const r = read(root, `step3/${set}/runs/${repo}.json`); r.runs[0].findings = []; r.runs[0].status = 'PASS'; r.runs[0].exitCode = 0;
+        write(root, `step3/${set}/runs/${repo}.json`, r);
+      }
+    }
+    const result = evaluateFinalReview(root);
+    expect(result.ok).toBe(false); expect(result.metrics?.heldoutBlocks).toBe(0);
+    expect(result.detail).toContain('Wilson 95% undefined');
+  });
+  it('rejects unreviewed new months, stale freezes, sampling and reused commits', () => {
+    for (const mutation of ['review', 'freeze', 'sampling', 'repeat']) {
+      const root = expandedFixture();
+      if (mutation === 'review') { const r = read(root, 'step3/new-2/reviews.json'); delete r.reviews[0].reuseOrExtendReason; write(root, 'step3/new-2/reviews.json', r); }
+      if (mutation === 'freeze') { const r = read(root, 'step3/freeze.json'); r.modelCommit = 'e'.repeat(40); write(root, 'step3/freeze.json', r); }
+      if (mutation === 'sampling') { const r = read(root, 'step3/new-2/runs/got.json'); r.eligibleCommits.push('e'.repeat(40)); write(root, 'step3/new-2/runs/got.json', r); }
+      if (mutation === 'repeat') { const r = read(root, 'step3/new-2/runs/got.json'); r.selectedCommits = r.eligibleCommits = ['1'.repeat(40)]; r.runs[0].commit = '1'.repeat(40); write(root, 'step3/new-2/runs/got.json', r); }
+      expect(evaluateFinalReview(root).ok, mutation).toBe(false);
+    }
+  });
+});
 
 describe('stored real-repository review gate', () => {
   it('matches the captured source model hash even when tsc reformats its copied JSON', () => {
@@ -100,6 +160,15 @@ describe('stored real-repository review gate', () => {
 });
 
 describe('dev replay selection and cache safety', () => {
+  it('fails stored expanded evidence on reviewed agreement, not missing provenance', () => {
+    const result = evaluateExpandedReview(path.join(project, 'bench/real-repos'));
+    expect(result.ok).toBe(false);
+    expect(result.detail).not.toContain('Invalid expanded history evidence');
+    expect(result.metrics?.commits).toBe(250);
+    expect(result.metrics?.heldoutBlocks).toBe(3);
+    expect(result.metrics?.heldoutAgree).toBe(0);
+    expect(result.metrics?.unavailable).toBe(0);
+  });
   it('uses UTC calendar bounds and deterministic endpoint-inclusive sampling', () => {
     expect(monthBounds('2025-02').map((n) => new Date(n).toISOString())).toEqual(['2025-02-01T00:00:00.000Z', '2025-03-01T00:00:00.000Z']);
     const commits = Array.from({ length: 10 }, (_, i) => String(i));

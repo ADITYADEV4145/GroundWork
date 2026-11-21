@@ -52,7 +52,7 @@ export function suggest(missing: string, opts: SuggestOptions): Suggestion[] {
   const add = (s: SymbolFact, bonus: number) => {
     if (s.name === missing || s.name === 'default' || s.name.startsWith('__')) return;
     const score = nameSimilarity(missing, s.name) + bonus;
-    if (score < 0.5 + bonus) return;
+    if (score < 0.55 + bonus) return;
     const prev = scored.get(s.id);
     if (prev && prev.score >= score) return;
     scored.set(s.id, { name: s.name, qualifiedName: s.qualifiedName, file: s.file, line: s.line, signature: s.signature, score: Math.round(score * 100) / 100 });

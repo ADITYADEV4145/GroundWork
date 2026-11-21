@@ -94,6 +94,29 @@ const hook = (root: string, payload: unknown) => spawnSync(process.execPath, ['-
 });
 
 describe('git-scripted reuse check scenarios (also exercised by selftest)', () => {
+  it.each(['ts', 'py'])('excludes resolved delegation pairs from symbol and file duplication (%s)', async (extension) => {
+    await withCheckScenario('clean', async (root) => {
+      const source = readFileSync(path.resolve(__dirname, `../fixtures/reuse-check/delegating.${extension}`), 'utf8');
+      rmSync(path.join(root, extension === 'ts' ? 'dates.py' : 'utils.ts'));
+      const file = `calendar.${extension}`;
+      writeScenarioFile(root, file, source);
+      const report = await checkRepository(root);
+      expect(report.findings.filter(f => f.added.file === file)).toEqual([]);
+
+      const clone = extension === 'ts' ? source.replace('return parseExisting(value);', 'return new Date(Date.UTC(year, month - 1, day));') :
+        source.replace('return parse_existing(value)', 'return year, month, day');
+      writeScenarioFile(root, file, clone);
+      const copied = (await checkRepository(root)).findings.filter(f => f.added.file === file);
+      expect(copied.some(f => f.kind === 'duplicate')).toBe(true);
+      expect(copied.some(f => f.kind === 'duplicate-file')).toBe(true);
+
+      if (extension === 'ts') {
+        writeScenarioFile(root, file, source.replace(/^import.*\n/, '').replace('parseExisting(value)', 'parseDateString(value)'));
+        expect((await checkRepository(root)).findings.some(f => f.kind === 'duplicate' && f.added.file === file)).toBe(true);
+      }
+    });
+  });
+
   it.each(CHECK_SCENARIOS)('%s', async (name) => {
     await withCheckScenario(name, async (root) => {
       const report = await checkRepository(root);

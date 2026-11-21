@@ -119,7 +119,11 @@ function cursorHooks(file: string, map: HookMap): JsonEdit {
   };
 }
 
-const mcpKey = (entry: unknown) => `mcp:${JSON.stringify(entry)}`;
+/** Order-independent, so a formatter reordering the entry's keys does not hide it from setup. */
+function mcpKey(entry: unknown): string {
+  const e = asObject(entry);
+  return `mcp:${JSON.stringify(Object.fromEntries(Object.keys(e).sort().map((k) => [k, e[k]])))}`;
+}
 
 function mcpServer(file: string, gw: string): JsonEdit {
   const [command, ...prefix] = gw.split(' ');

@@ -126,6 +126,18 @@ describe('gw setup ignores look-alikes', () => {
   });
 });
 
+describe('gw setup after a formatter', () => {
+  it('still removes an MCP entry whose keys were reordered', () => {
+    const root = tempDir('gw-setup-root-');
+    dirs.push(root);
+    const targets = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === 'claude');
+    applySetup(root, planSetup(root, targets, 'add'), 'add');
+    writeFileSync(path.join(root, '.mcp.json'), JSON.stringify({ mcpServers: { groundwork: { args: ['mcp'], command: 'gw' } } }, null, 2) + '\n');
+    applySetup(root, planSetup(root, targets, 'remove'), 'remove');
+    expect(snapshot(root)).toEqual({});
+  });
+});
+
 describe('hook rendering', () => {
   it('cursor permission hooks always answer with valid JSON', () => {
     const ev = normalise('cursor', 'pre_tool', { tool_name: 'Shell', tool_input: { command: 'ls' }, workspace_roots: ['/w'] });

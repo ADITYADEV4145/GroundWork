@@ -10,6 +10,7 @@ import { languageForPath } from '../lang/index.js';
 import { initSqlBackend, openDb } from '../store/db.js';
 import { sha1 } from '../util/hash.js';
 import { ensureGwDir } from '../util/paths.js';
+import { estimateTokens, fitToBudget } from '../util/tokens.js';
 import { git, readBase, symbolSource } from './base.js';
 import { CandidateIndex } from './candidates.js';
 import { allowReason, configName, inspectSource } from './inspection.js';
@@ -64,7 +65,15 @@ export function formatFinding(f: CheckFinding): string {
 }
 
 export function formatCheck(report: CheckReport): string {
-  return report.findings.length ? report.findings.map(formatFinding).join('\n\n') : 'PASS: no reuse findings.';
+  if (!report.findings.length) return 'PASS: no reuse findings.';
+  const ranked = [...report.findings].sort((a, b) => Number(b.severity === 'BLOCK') - Number(a.severity === 'BLOCK'));
+  const render = (finding: CheckFinding): string => {
+    const full = formatFinding(finding);
+    return estimateTokens(full) <= 460 ? full : `${finding.severity} ${finding.kind}: details exceed output budget; run gw check --json for the full finding.`;
+  };
+  const { items, truncated } = fitToBudget(ranked, render, 500);
+  const output = items.map(render).join('\n\n');
+  return truncated ? `${output}\n\n${truncated} more findings; run gw check --json for all findings.` : output;
 }
 
 /** Worktree (including staged and untracked files) versus a Git commit, never index versus index. */

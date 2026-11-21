@@ -8,15 +8,41 @@ import { HANDLERS } from '../src/hooks/handlers/index.js';
 import { dispatch, normalise, render } from '../src/hooks/run.js';
 import { readFingerprintedSymbols } from '../src/index/query.js';
 import { indexDbPath } from '../src/index/store.js';
-import { checkRepository, formatCheck, formatFinding } from '../src/reuse/check.js';
+import { checkRepository, formatCheck, formatFinding, type CheckReport } from '../src/reuse/check.js';
 import { CandidateIndex } from '../src/reuse/candidates.js';
 import { inspectSource } from '../src/reuse/inspection.js';
 import { thresholds } from '../src/reuse/model.js';
 import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, scenarioGit, stopEvent, withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
 import { openDb } from '../src/store/db.js';
+import { estimateTokens } from '../src/util/tokens.js';
 
 const MAIN = path.resolve(__dirname, '../src/cli/main.ts');
 const TSX = import.meta.resolve('tsx');
+
+describe('budgeted check output', () => {
+  it('ranks blocks before warnings, bounds output, and points to complete JSON', () => {
+    const findings: CheckReport['findings'] = Array.from({ length: 100 }, (_, i) => ({
+      id: String(i), kind: 'duplicate', severity: i === 99 ? 'BLOCK' : 'WARN',
+      added: { file: `added-${i}.ts`, symbol: `clone${i}`, line: 1 },
+      existing: { file: 'original.ts', symbol: 'original', line: 1 },
+      signals: [], fix: 'Reuse original from original.ts.',
+    }));
+    const report: CheckReport = { status: 'BLOCK', blocked: true, base: 'HEAD', findings, allows: [], ms: 0 };
+    const output = formatCheck(report);
+    expect(output.startsWith('BLOCK duplicate: clone99')).toBe(true);
+    expect(output).toMatch(/\d+ more findings.*--json/);
+    expect(estimateTokens(output)).toBeLessThanOrEqual(500);
+    expect(report.findings[0]!.severity).toBe('WARN');
+    const small = { ...report, findings: [findings[99]!] };
+    expect(formatCheck(small)).toBe(formatFinding(findings[99]!));
+    expect(formatCheck({ ...report, findings: [] })).toBe('PASS: no reuse findings.');
+    const huge = { ...findings[99]!, fix: '界'.repeat(10000) };
+    const hugeOutput = formatCheck({ ...report, findings: [huge] });
+    expect(estimateTokens(hugeOutput)).toBeLessThanOrEqual(500);
+    expect(hugeOutput).toContain('BLOCK');
+    expect(hugeOutput).toContain('--json');
+  });
+});
 const cli = (root: string, ...args: string[]) => spawnSync(process.execPath, ['--import', TSX, MAIN, '--root', root, ...args], { encoding: 'utf8' });
 const hook = (root: string, payload: unknown) => spawnSync(process.execPath, ['--import', TSX, MAIN, 'hook', 'claude', 'stop'], {
   cwd: root, encoding: 'utf8', input: typeof payload === 'string' ? payload : JSON.stringify(payload),

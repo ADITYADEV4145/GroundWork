@@ -1,6 +1,8 @@
 # Security
 
-Groundwork runs entirely on your machine. It makes no network calls and has no telemetry. Its state lives in `.groundwork/` inside your repository.
+Groundwork runs on your machine and has no telemetry. Its state lives in `.groundwork/` inside your repository. Runtime operation is offline, with one explicit, consented setup exception: `gw init --embeddings` downloads the selected model to the local `.groundwork/models/` cache. No model is downloaded without that command. Runtime embedding inference loads local files only; a missing model falls back to no-meaning scoring rather than downloading anything.
+
+Dev-only benchmark scripts such as `scripts/calibrate-mine.ts` and `scripts/setup-real-repos.ts` clone pinned public repositories into external caches. These scripts are not part of the shipped tool.
 
 ## What the hooks do
 

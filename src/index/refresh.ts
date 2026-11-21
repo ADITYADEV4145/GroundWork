@@ -31,6 +31,8 @@ export interface RefreshOptions {
   full?: boolean;
   /** Limit the walk to these repo-relative paths (hook fast path). Others are left as they are. */
   paths?: string[];
+  /** How long to wait for another writer before giving up (hooks pass a short budget). */
+  lockTimeoutMs?: number;
 }
 
 /** Bring .groundwork/index.db up to date with the work tree; only new or changed files are re-parsed. */
@@ -132,5 +134,5 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
     } finally {
       db.close();
     }
-  });
+  }, opts.lockTimeoutMs);
 }

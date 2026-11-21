@@ -13,7 +13,10 @@ export const refreshOnEdit: HookHandler = {
   async run(ev, { root, config }) {
     const file = typeof ev.input.file_path === 'string' ? ev.input.file_path : typeof ev.input.path === 'string' ? ev.input.path : null;
     const rel = file ? toPosix(path.relative(root, path.resolve(ev.cwd, file))) : null;
-    await refreshIndex(root, rel && !rel.startsWith('..') ? { config, paths: [rel] } : { config });
+    // Hooks run synchronously inside the agent's turn: never wait long for another writer (the
+    // in-process timeout cannot fire while indexing blocks the event loop).
+    const lockTimeoutMs = 300;
+    await refreshIndex(root, rel && !rel.startsWith('..') ? { config, paths: [rel], lockTimeoutMs } : { config, lockTimeoutMs });
     return null;
   },
 };

@@ -125,6 +125,8 @@ function openSqlJs(file: string, readonly: boolean): Db {
     if (readonly || file === ':memory:' || !dirty) return;
     const tmp = `${file}.tmp-${process.pid}`;
     writeFileSync(tmp, db.export());
+    // export() reopens the database, which resets connection pragmas.
+    db.exec('PRAGMA foreign_keys = ON');
     renameSync(tmp, file);
     dirty = false;
   };

@@ -43,6 +43,20 @@ describe('refreshIndex', () => {
     expect(count(dir, 'SELECT COUNT(*) n FROM symbols')).toBe(before);
   });
 
+  it('full rebuild on sql.js does not keep stale export aliases', async () => {
+    process.env.GW_FORCE_SQLJS = '1';
+    resetBackendForTests();
+    await initSqlBackend();
+    const dir = mk();
+    cpSync(path.join(FIXTURES_DIR, 'ts-app'), dir, { recursive: true, filter: (s) => !s.endsWith('expected.json') });
+    await refreshIndex(dir);
+    expect(count(dir, 'SELECT COUNT(*) n FROM export_aliases')).toBe(1);
+    await refreshIndex(dir, { full: true });
+    await refreshIndex(dir, { full: true });
+    expect(count(dir, 'SELECT COUNT(*) n FROM export_aliases')).toBe(1);
+    expect(count(dir, 'SELECT COUNT(*) n FROM export_aliases a LEFT JOIN files f ON f.id = a.file_id WHERE f.id IS NULL')).toBe(0);
+  });
+
   it('a scoped refresh on an empty index indexes every file', async () => {
     await initSqlBackend();
     const dir = mk();

@@ -47,7 +47,7 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
       const isTest = makeTestMatcher(config);
       if (opts.full)
         db.transaction(() =>
-          db.exec('DELETE FROM symbols_fts; DELETE FROM literals; DELETE FROM calls; DELETE FROM imports; DELETE FROM symbols; DELETE FROM files;'),
+          db.exec('DELETE FROM symbols_fts; DELETE FROM export_aliases; DELETE FROM literals; DELETE FROM calls; DELETE FROM imports; DELETE FROM symbols; DELETE FROM files;'),
         );
       const existing = new Map<string, { id: number; hash: string; size: number; mtime: number; indexedAt: number }>();
       for (const r of db.prepare('SELECT id, path, hash, size, mtime_ms, indexed_at FROM files').all())

@@ -269,7 +269,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
       const match = matches.get(s.id);
       if (!match || match.target.file === file.file || !oldFiles.has(match.target.file)) continue;
       const group = targets.get(match.target.file) ?? { count: 0, blocks: 0 };
-      group.count++; if (match.p >= match.score.thresholds.block) group.blocks++;
+      group.count++; if (match.p >= match.score.thresholds.block && canBlock(s, match.target, match.signals)) group.blocks++;
       targets.set(match.target.file, group);
     }
     for (const [existing, group] of [...targets].sort((a, b) => b[1].count - a[1].count).slice(0, 1)) {

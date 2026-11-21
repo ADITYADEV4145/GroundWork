@@ -1,7 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import * as policy from '../src/reuse/policy.js';
 import { defaultConfig } from '../src/config/load.js';
 import { duplicateGate } from '../src/hooks/handlers/duplicate_gate.js';
 import { HANDLERS } from '../src/hooks/handlers/index.js';
@@ -407,6 +408,19 @@ describe('check command and Stop gate', () => {
         expect(malformed.status).toBe(0);
         expect(malformed.stdout).toBe('');
       }
+    });
+  });
+
+  it('does not promote policy-rejected advisory matches into whole-file BLOCKs', async () => {
+    await withCheckScenario('file', async (root) => {
+      const eligibility = vi.spyOn(policy, 'canBlock').mockReturnValue(false);
+      try {
+        const report = await checkRepository(root);
+        const advisory = report.findings.find((f) => f.kind === 'duplicate');
+        expect(advisory).toMatchObject({ severity: 'WARN' });
+        expect(advisory!.probability).toBeGreaterThanOrEqual(thresholds.block);
+        expect(report.findings.find((f) => f.kind === 'duplicate-file')).toMatchObject({ severity: 'WARN' });
+      } finally { eligibility.mockRestore(); }
     });
   });
 

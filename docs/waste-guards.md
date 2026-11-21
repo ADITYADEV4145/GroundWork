@@ -14,7 +14,7 @@ session ID. Settings live under `guards` in `.groundwork/config.json`:
 }
 ```
 
-Repeat-command checks normalize whitespace and compare HEAD, git status and dirty
+Repeat-command checks trim command ends and compare HEAD, git status and dirty
 or untracked non-ignored contents. Different working directories are distinct.
 Files above 1 MiB use size, mtime and ctime instead of content hashing. Unknown
 fingerprints, excessive changes and git failures always allow. Exemptions prefix-match; include time/network-dependent commands in your

@@ -6,7 +6,7 @@ import path from 'node:path';
 export function commandInfo(command: string): { command: string; normalized: string; forced: boolean } {
   const forced = /^\s*GW_FORCE=1\s+/.test(command) || /\s+#\s*gw:force\s*$/.test(command);
   command = command.replace(/^\s*GW_FORCE=1\s+/, '').replace(/\s+#\s*gw:force\s*$/, '');
-  return { command, normalized: command.trim().replace(/\s+/g, ' '), forced };
+  return { command, normalized: command.trim(), forced };
 }
 export function workspaceFingerprint(root: string): string {
   const start = performance.now();

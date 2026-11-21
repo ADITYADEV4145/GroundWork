@@ -112,9 +112,12 @@ describe('session ledger', () => {
 describe('repeat guard', () => {
   for (const scenario of ['repeat-intercept', 'changed-then-allowed', 'force', 'time-dependent exemption'])
     it(scenario, async () => { expect(await repeatScenario(scenario)).toBe(true); });
-  it('normalizes whitespace and strips either force marker', () => {
-    expect(commandInfo('  GW_FORCE=1 ls   -al ')).toEqual({ command: 'ls   -al ', normalized: 'ls -al', forced: true });
+  it('trims ends and strips force markers without changing interior whitespace', () => {
+    expect(commandInfo('  GW_FORCE=1 ls   -al ')).toEqual({ command: 'ls   -al ', normalized: 'ls   -al', forced: true });
     expect(commandInfo(' ls # gw:force').normalized).toBe('ls');
+    expect(commandInfo('grep "a  b"').normalized).not.toBe(commandInfo('grep "a b"').normalized);
+    expect(commandInfo('echo a\necho b').normalized).toBe('echo a\necho b');
+    expect(commandInfo('echo a\necho b').normalized).not.toBe(commandInfo('echo a echo b').normalized);
     expect(lastSummary('a\n\nb\nc\n')).toBe('b\nc');
   });
   it('fingerprints dirty and untracked contents, ignores ignored files and fails open outside git', () => {

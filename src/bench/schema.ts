@@ -37,7 +37,7 @@ export const observationSchema = z.object({
     readBytes: count.optional(),
     file: z.string().optional(),
     blocked: z.boolean().optional(),
-  })).min(1).max(1_000),
+  })).max(1_000),
 });
 export type Observation = z.infer<typeof observationSchema>;
 
@@ -62,7 +62,7 @@ export const gradeSchema = z.union([z.boolean(), z.object({
 export const sampleSchema = z.object({
   task: label,
   success: z.boolean(),
-  toolCalls: count.positive(),
+  toolCalls: count,
   toolOutputBytes: count,
   filesRead: count,
   readBytes: count,

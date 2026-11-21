@@ -67,13 +67,14 @@ describe('benchmark reporting', () => {
       for (const arm of evidence().captures) {
         const { samples: _, ...meta } = arm;
         writeFileSync(path.join(root, meta.condition + '.json'), JSON.stringify({ ...meta, observations: nav.tasks.map((task) => ({
-          task: task.id, startedAt: 0, wallMs: 10, answer: [], tools: [{ action: 'shell', bytes: 24 }],
+          task: task.id, startedAt: 0, wallMs: 10, answer: [], tools: task.id === 'gw-01' ? [] : [{ action: 'shell', bytes: 24 }],
         })) }));
       }
       const output = await runBenchmark({ suite: 'nav', runs: 1, observations: root, outputDir: root });
       expect(output.summaries).toHaveLength(1);
       expect(readFileSync(output.markdown, 'utf8')).toContain('30 tasks × 1 paired repeats');
       expect(JSON.parse(readFileSync(output.json, 'utf8'))[0].summary.tasks).toHaveLength(30);
+      expect(output.summaries[0]?.tasks.find((task) => task.task === 'gw-01')?.estimatedReductionPct).toBeNull();
     } finally {
       rmSync(root, { force: true, recursive: true });
     }

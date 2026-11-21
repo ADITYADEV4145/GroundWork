@@ -18,6 +18,11 @@ node dist/cli/main.js bench --suite nav --runs 3
 
 The latter reads `bench/nav/evidence.json`, validates the task/verifier digest and complete pairing, and recalculates the report without new measurements. Add `--json` for machine output and `--output-dir <dir>` to choose a destination.
 
+Offline `--suite all` replays installed suites with active `evidence.json` files,
+skipping suites without recorded evidence. Invalid or stale evidence still fails
+validation. With `--observations`, `--suite all` instead grades every installed
+suite with a task manifest and requires captures for each suite.
+
 ## Capture protocol
 
 For each condition (`baseline` and `groundwork`) and repeat, start a separate agent session in the same mode. Use a fresh state directory that does not yet exist. Each task starts from the same pinned source, and its result is checked against a fixed answer or behavioral test. Choose order before observing results; use the same order for both arms of a repeat.
@@ -56,4 +61,4 @@ Every task passed all three repeats in both arms. The follow-up interval spans z
 1. Add `bench/<suite>/tasks.json` with a pinned Groundwork Git `revision`, optional `mcpTools`, and `tasks` with unique `id`, `repo` (`groundwork` or a directory under that revision's `fixtures/`), `category`, `prompt`, and optional `edit`. Set `edit: true` for a task that submits a patch (default for `fix` and `feature`).
 2. To carry a repo across tasks, set matching `sequence` on related tasks and give each a contiguous `step` starting at 1. The collector reapplies earlier patches in the sequence as commits, then measures the next step. All steps in a sequence use the same repo.
 3. Add `bench/<suite>/grade.mjs` exporting `grade(task, observation, context)`. Return a boolean or `{success, metrics: {duplicatesAdded: 0, inventedCalls: 0}}` with suite-specific numeric metrics. `context.withWorkspace(async (root) => ...)` gives the verifier the pinned worktree with prior sequence patches and the current patch applied.
-4. Capture with `GW_BENCH_SUITE=<suite>` set for every capture action. Grade with `gw bench --suite <suite>`. Use `--suite all` to report every suite with a task manifest.
+4. Capture with `GW_BENCH_SUITE=<suite>` set for every capture action. Grade with `gw bench --suite <suite>`. `--suite all` replays suites with recorded evidence; with `--observations` it grades every suite with a task manifest and requires captures for each.

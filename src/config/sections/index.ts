@@ -9,6 +9,6 @@ export const indexConfigSchema = z
     skipGenerated: z.boolean().default(true),
     testGlobs: z
       .array(z.string())
-      .default(['**/*.test.*', '**/*.spec.*', '**/__tests__/**', '**/test/**', '**/tests/**', '**/test_*.py', '**/*_test.py', '**/conftest.py']),
+      .default(['**/*.test.*', '**/*.spec.*', '**/__tests__/**', '**/test/**', '**/tests/**', '**/testing/**', '**/spec/**', '**/specs/**', '**/test_*.py', '**/*_test.py', '**/conftest.py']),
   })
   .strict();

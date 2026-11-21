@@ -9,6 +9,7 @@ import { meaningModel } from './model.js';
 import { buildIdf, vectorCosine, wordsOf, type ComparableSymbol } from './signals.js';
 import { extractReuseSource } from './source.js';
 import { relatedSymbols, type PairIdentity } from './policy.js';
+import type { Contract } from './contracts.js';
 
 function bands(s: ComparableSymbol): string[] {
   const hash = s.fingerprint?.minhash;
@@ -16,7 +17,7 @@ function bands(s: ComparableSymbol): string[] {
   return Array.from({ length: 16 }, (_, i) => `${i}:${hash.slice(i * 8, i * 8 + 8).join(',')}`);
 }
 
-type Candidate = FingerprintedSymbol & { bindingHash?: string | null; embedding?: Embedding };
+type Candidate = FingerprintedSymbol & { bindingHash?: string | null; contract?: Contract | null; embedding?: Embedding };
 export class CandidateIndex {
   readonly symbols: Candidate[];
   readonly idf: Map<string, number>;
@@ -25,20 +26,20 @@ export class CandidateIndex {
   private meaningContext?: { root: string; config: GroundworkConfig; factory?: EmbedderFactory };
 
   constructor(db: Db, skipTests = true) {
-    const files = new Map<string, Map<string, string | null>>();
+    const files = new Map<string, Map<string, { bindingHash: string | null; contract?: Contract | null }>>();
     const all = readFingerprintedSymbols(db).map((symbol) => {
       if (!files.has(symbol.file)) {
-        const hashes = new Map<string, string | null>();
+        const hashes = new Map<string, { bindingHash: string | null; contract?: Contract | null }>();
         const language = languageForPath(symbol.file);
         if (language && path.isAbsolute(db.path)) {
           try {
             const source = readFileSync(path.join(path.dirname(path.dirname(db.path)), symbol.file), 'utf8');
-            for (const s of extractReuseSource(source, language).symbols) hashes.set(s.qualifiedName, s.bindingHash);
+            for (const s of extractReuseSource(source, language).symbols) hashes.set(s.qualifiedName, { bindingHash: s.bindingHash, contract: 'contract' in s ? s.contract : null });
           } catch { /* Missing source leaves the optional signal unavailable. */ }
         }
         files.set(symbol.file, hashes);
       }
-      return { ...symbol, bindingHash: files.get(symbol.file)!.get(symbol.qualifiedName) ?? null };
+      return { ...symbol, ...(files.get(symbol.file)!.get(symbol.qualifiedName) ?? { bindingHash: null, contract: null }) };
     });
     this.idf = buildIdf(all);
     this.symbols = all.filter((s) => !(skipTests && s.isTest) && !s.isGenerated &&

@@ -1,9 +1,17 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { project, type Repository } from './real-repos.js';
 import type { CheckFinding, CheckLocation } from '../src/reuse/check.js';
 
 const root = path.join(project, 'bench/real-repos');
+if (!existsSync(path.join(root, 'reviews.json')) && !existsSync(path.join(root, 'step3/freeze.json'))) {
+  console.log('skipped: evidence not stored; gate deferred to Benchmark v2');
+  process.exit(0);
+}
+if (existsSync(path.join(root, 'step3/freeze.json'))) {
+  await import('./render-step3-review.js');
+  process.exit(0);
+}
 const read = (file: string) => JSON.parse(readFileSync(file, 'utf8'));
 interface Row { repo: string; commit: string; findingId: string; label: string; reason: string }
 interface Run { commit: string; subject: string; status: string; exitCode: number; findings: CheckFinding[] }

@@ -52,7 +52,7 @@ const literalValue = (l: Pick<Literal, 'kind' | 'value'>) => {
 };
 
 function topSignals(signals: Signals, score: ReturnType<typeof scoreSignals>): CheckFinding['signals'] {
-  const keys: (keyof Signals)[] = ['bindingExact', 'vocabulary', 'structure', 'exact', 'paramCount', 'paramNames', 'returnType', 'name'];
+  const keys: (keyof Signals)[] = ['bindingExact', 'vocabulary', 'structure', 'exact', 'paramCount', 'paramNames', 'returnType', 'name', 'contractCalls', 'contractReads', 'contractEarlyReturns', 'contractReturnShape', 'contractValidation'];
   return [...keys.sort((a, b) => (score.weights[b] ?? 0) * (signals[b] ?? 0) - (score.weights[a] ?? 0) * (signals[a] ?? 0)).slice(0, 2)
     .map((name) => ({ name, value: signals[name] ?? 0 })), ...(score.meaning ? [{ name: 'meaning', value: signals.meaning! }] : [])];
 }
@@ -204,7 +204,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     if (!best || best.p < best.score.thresholds.warn) continue;
     matches.set(s.id, best);
     add({ kind: 'duplicate', severity: best.p >= best.score.thresholds.block && canBlock(query, best.target, best.signals) ? 'BLOCK' : 'WARN', added: location(s), existing: location(best.target),
-      probability: best.p, signals: topSignals(best.signals, best.score), fix: `Replace the body of ${s.qualifiedName} with a call to ${best.target.qualifiedName}.` });
+      probability: best.p, signals: topSignals(best.signals, best.score), fix: `Duplicate of ${best.target.qualifiedName}: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations.` });
   }
   const callKey = (c: ReuseState['calls'][number]) => `${c.file}\0${c.callerId ?? '<module>'}`;
   const currentCallers = new Map<string, ReuseState['calls']>();

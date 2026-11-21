@@ -167,6 +167,8 @@ describe('MCP navigation', () => {
         'def authenticate():\n    """Require 2fa for login."""\n    pass\n',
         'def profile():\n    """Load a 3gpp2Profile."""\n    pass\n',
         'def other_profile():\n    """Load a 3gpp20Profile."""\n    pass\n',
+        'def retain():\n    """Keep files for 3days."""\n    pass\n',
+        'def render():\n    """Draw a 3-D scene."""\n    pass\n',
       ].join('\n'));
       await initSqlBackend();
       await refreshIndex(root);
@@ -187,6 +189,8 @@ describe('MCP navigation', () => {
         const profiles = await runNavigationTool('find_code', { query: '3gpp2' }, { root, db, config });
         expect(profiles).toContain('profile (function)');
         expect(profiles).not.toContain('other_profile (function)');
+        const geometry = await runNavigationTool('find_code', { query: '3d', limit: 1 }, { root, db, config });
+        expect(geometry.split('\n')[1]).toContain('render (function)');
       } finally {
         db.close();
       }

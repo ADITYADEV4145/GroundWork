@@ -41,9 +41,11 @@ function rankingTokens(value: string): string[] {
   return searchWords(value).flatMap((w) => separateLetterNumber(w.toLowerCase(), true).split(' '));
 }
 
-function matchesTerm(tokens: string[], parts: string[]): boolean {
-  return tokens.some((_, i) => parts.every((part, j) =>
-    j === parts.length - 1 && isPrefixTerm(part) ? tokens[i + j]?.startsWith(part) : tokens[i + j] === part));
+function matchesTerm(tokens: string[], parts: string[], allowPrefix: boolean): boolean {
+  return tokens.some((_, i) => parts.every((part, j) => {
+    const token = tokens[i + j];
+    return token === part || (allowPrefix && j === parts.length - 1 && isPrefixTerm(part) && token?.startsWith(part));
+  }));
 }
 
 interface SearchTerm {
@@ -57,12 +59,12 @@ function matchWeight(value: string, terms: SearchTerm[]): number {
   return terms.reduce((weight, { word, parts }) => {
     if (raw.includes(word)) return weight + 1;
     const compound = parts.length > 1;
-    if (raw.some((token) => token.startsWith(word) &&
-      (isPrefixTerm(word) || (compound && !/^\p{N}/u.test(token.slice(word.length)))))) {
-      return weight + (compound ? 0.75 : 1);
-    }
+    const prefix = raw.some((token) => token.startsWith(word) &&
+      (isPrefixTerm(word) || (compound && !/^\p{N}/u.test(token.slice(word.length)))));
+    if (prefix && !compound) return weight + 1;
     normalized ??= rankingTokens(value);
-    return weight + (matchesTerm(normalized, parts) ? (compound ? 0.5 : 1) : 0);
+    if (compound && matchesTerm(normalized, parts, false)) return weight + 0.9;
+    return weight + (prefix || matchesTerm(normalized, parts, true) ? (compound ? 0.5 : 1) : 0);
   }, 0);
 }
 

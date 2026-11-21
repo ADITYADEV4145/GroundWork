@@ -89,7 +89,10 @@ The npm package itself is still unpublished, so do not use `npx groundwork-agent
 
 ## What it does
 
-<img src="docs/assets/groundwork-workflow.webp" alt="Three parts of the Groundwork workflow: navigate to the right symbol, reuse existing code, and ground calls in real definitions." width="100%">
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/assets/groundwork-workflow-mobile.webp">
+  <img src="docs/assets/groundwork-workflow.webp" alt="Three parts of the Groundwork workflow: navigate to the right symbol, reuse existing code, and ground calls in real definitions." width="100%">
+</picture>
 
 ### One skill. Three better habits.
 
@@ -121,7 +124,10 @@ Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): strin
 
 ## How it works
 
-<img src="docs/assets/architecture.svg" alt="Claude Code, Codex and Cursor connect through Groundwork's MCP navigation and hooks to a local tree-sitter and SQLite index. Hooks refresh changed files and fail open on errors. No hosted service or telemetry." width="100%">
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/assets/architecture-mobile.svg">
+  <img src="docs/assets/architecture.svg" alt="Claude Code, Codex and Cursor connect through Groundwork's MCP navigation and hooks to a local tree-sitter and SQLite index. Hooks refresh changed files and fail open on errors. No hosted service or telemetry." width="100%">
+</picture>
 
 1. **Map once.** `gw init` parses the repository with tree-sitter and stores files, symbols, imports, calls, literals and fingerprints in SQLite (`node:sqlite`, with a `sql.js` fallback).
 2. **Navigate precisely.** MCP tools answer with ranked, token-budgeted context. [SKILL.md](SKILL.md) teaches the agent to look for existing code before writing.

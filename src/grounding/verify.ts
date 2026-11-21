@@ -141,7 +141,7 @@ export class Grounder {
     if (name === 'default') {
       const d = tops.find((s) => s.isDefaultExport);
       if (d) return d;
-      if (this.importsOf(fileId).some((i) => i.kind === 'reexport-all' || (i.kind === 'reexport' && (i.alias ?? i.name) === 'default'))) return 'unknown';
+      if (this.importsOf(fileId).some((i) => i.kind === 'reexport' && (i.alias ?? i.name) === 'default')) return 'unknown';
       return /\bexport\s+default\b|\bas\s+default\b|\bexport\s*\{[^}]*\bdefault\b/.test(text) ? 'unknown' : null;
     }
     const local = this.aliasesOf(fileId).find((a) => a.exported === name)?.local ?? name;

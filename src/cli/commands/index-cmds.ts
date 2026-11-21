@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import type { Command } from 'commander';
-import { configPath, defaultConfig } from '../../config/load.js';
+import { configPath } from '../../config/load.js';
 import { refreshIndex, type RefreshResult } from '../../index/refresh.js';
 import { indexStats } from '../../index/query.js';
 import { initSqlBackend } from '../../store/db.js';
@@ -25,7 +25,8 @@ export function register(program: Command): void {
       const root = repoRoot(opts);
       mkdirSync(gwPath(root), { recursive: true });
       const created = !existsSync(configPath(root));
-      if (created) writeFileSync(configPath(root), JSON.stringify(defaultConfig(), null, 2) + '\n');
+      // Only what the user sets goes in config.json, so a profile's presets fill in the rest.
+      if (created) writeFileSync(configPath(root), '{}\n');
       // Keep the cache out of git but let teams commit config.json.
       writeFileSync(gwPath(root, '.gitignore'), '*\n!.gitignore\n!config.json\n');
       await initSqlBackend();

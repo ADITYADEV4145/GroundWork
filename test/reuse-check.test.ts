@@ -22,6 +22,7 @@ const TSX = import.meta.resolve('tsx');
 describe('combined reuse and grounding check', () => {
   it('blocks definite grounding errors through check and Stop, then passes after correction', async () => {
     await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile: 'strict' }));
       writeScenarioFile(root, 'caller.ts', "import { parseDateString } from './utils.js';\nparseDateString();\n");
       const report = await checkRepository(root);
       expect(report.status).toBe('BLOCK');
@@ -348,13 +349,18 @@ describe('check command and Stop gate', () => {
   it('blocks once per finding set, remembers earlier sets and isolates sessions', async () => {
     await withCheckScenario('duplicate', async (root) => {
       await assertStopScenario(root);
-      const ctx = { root, config: defaultConfig() };
+      const ctx = { root, config: { ...defaultConfig(), profile: 'strict' as const } };
       const source = readFileSync(path.join(root, 'calendar.ts'), 'utf8');
       writeScenarioFile(root, 'z-calendar.ts', source.replaceAll('decodeCalendar', 'readCalendar'));
       expect((await duplicateGate.run(stopEvent(root), ctx))?.action).toBe('deny');
       rmSync(path.join(root, 'z-calendar.ts'));
       expect((await duplicateGate.run(stopEvent(root), ctx))?.action).toBe('allow');
       expect((await duplicateGate.run(stopEvent(root, false, 'another-session'), ctx))?.action).toBe('deny');
+      writeScenarioFile(root, 'y-calendar.ts', source.replaceAll('decodeCalendar', 'loadCalendar'));
+      const standard = await duplicateGate.run(stopEvent(root, false, 'standard-session'), { root, config: defaultConfig() });
+      expect(standard?.action).toBe('context');
+      expect(standard?.message).toContain('BLOCK');
+      rmSync(path.join(root, 'y-calendar.ts'));
       ctx.config.reuse.duplicateGate = false;
       expect((await duplicateGate.run(stopEvent(root, false, 'disabled-session'), ctx))?.action).toBe('allow');
       expect(HANDLERS).toContain(duplicateGate);
@@ -363,6 +369,7 @@ describe('check command and Stop gate', () => {
 
   it('renders a real Stop block, then stays silent on ignored, active and malformed stops', async () => {
     await withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile: 'strict' }));
       await checkRepository(root);
       const event = normalise('claude', 'stop', { cwd: root, session_id: 'dispatch-test' });
       const result = await dispatch(event, root);
@@ -381,7 +388,7 @@ describe('check command and Stop gate', () => {
   it('prioritizes Stop denial while preserving opt-in nonblocking waste summaries', async () => {
     await withCheckScenario('duplicate', async (root) => {
       await checkRepository(root);
-      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ guards: { sessionSummary: true } }));
+      writeScenarioFile(root, '.groundwork/config.json', JSON.stringify({ profile: 'strict', guards: { sessionSummary: true } }));
       const payload = { cwd: root, session_id: 'combined-summary' };
       const first = hook(root, payload);
       expect(first.status).toBe(0);

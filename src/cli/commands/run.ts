@@ -45,7 +45,7 @@ export async function runCommand(root: string, command: string, sessionId?: stri
   return { output: printed, logPath, exitCode, signal };
 }
 export function register(program: Command): void {
-  program.command('run').description('run a noisy command, retaining its full local log').argument('<command...>').passThroughOptions()
+  program.command('run').description('run a noisy command, retaining its full local log').argument('<command...>')
     .action(async (args: string[], _options, cmd: Command) => {
       const opts = globalOpts(cmd);
       // Hook rewrites pass one complete shell command; direct argv remains safely quoted.

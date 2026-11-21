@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,7 +17,7 @@ import { failureCorpus, repeatScenario } from '../src/selftest/checks/phase5.js'
 
 let root: string;
 const git = (args: string[]) => execFileSync('git', args, { cwd: root, stdio: 'ignore' });
-const ctx = () => ({ root, config: defaultConfig() });
+const ctx = () => ({ root, config: structuredClone(defaultConfig()) });
 const event = (event: HookEvent['event'] = 'pre_tool', tool = 'Bash', input: Record<string, unknown> = { command: 'ls' }): HookEvent => ({ agent: 'claude', sessionId: 'test', cwd: root, event, tool, input, response: 'one\ntwo\n', raw: {} });
 beforeEach(() => { root = mkdtempSync(path.join(os.tmpdir(), 'gw-guards-test-')); });
 afterEach(() => { rmSync(root, { recursive: true, force: true }); });
@@ -76,7 +76,7 @@ describe('repeat guard', () => {
     writeFileSync(path.join(root, 'new'), 'one'); const changed = workspaceFingerprint(root);
     expect(changed).not.toBe(initial); writeFileSync(path.join(root, 'new'), 'two'); expect(workspaceFingerprint(root)).not.toBe(changed);
     rmSync(path.join(root, 'new')); mkdirSync(path.join(root, '.groundwork')); writeFileSync(path.join(root, '.groundwork/log'), 'ignored'); expect(workspaceFingerprint(root)).toBe(initial);
-    writeFileSync(path.join(root, 'large'), Buffer.alloc(1024 * 1024 + 1)); expect(workspaceFingerprint(root)).toBe('unknown');
+    writeFileSync(path.join(root, 'large'), Buffer.alloc(1024 * 1024 + 1)); expect(workspaceFingerprint(root)).not.toBe('unknown');
   });
   it('counts saved bytes and force, respects toggles and no-session, never blocks unknown fingerprints', async () => {
     const ev = event('post_tool'); await wasteGuards.run(ev, ctx());
@@ -152,6 +152,7 @@ describe('waste CLI', () => {
   it('reports latest, explicit and aggregate sessions as JSON, including empty state', () => {
     expect(JSON.parse(invoke(['report'])).forced).toBe(0);
     bumpCounter(root, 'first', 'duplicatesPrevented', 2); bumpCounter(root, 'second', 'inventedCallsCaught', 3);
+    utimesSync(path.join(root, '.groundwork/sessions/first.json'), new Date(0), new Date(0));
     expect(JSON.parse(invoke(['report', '--session', 'first'])).duplicatesPrevented).toBe(2);
     expect(JSON.parse(invoke(['report', '--all'])).inventedCallsCaught).toBe(3);
     expect(JSON.parse(invoke(['report'])).sessionId).toBe('second');

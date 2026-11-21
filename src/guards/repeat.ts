@@ -27,10 +27,9 @@ export function workspaceFingerprint(root: string): string {
         const s = lstatSync(p);
         if (s.isSymbolicLink()) hash.update(readlinkSync(p));
         else if (!s.isFile()) return 'unknown';
-        else if (s.size > 1024 * 1024 || bytes + s.size > 8 * 1024 * 1024) {
-          // Large files cannot be proven unchanged from metadata alone; never block on them.
-          return 'unknown';
-        } else { hash.update(readFileSync(p)); bytes += s.size; }
+        else if (s.size > 1024 * 1024) hash.update(`${s.size}:${s.mtimeMs}:${s.ctimeMs}:${s.ino}`);
+        else if (bytes + s.size > 8 * 1024 * 1024) return 'unknown';
+        else { hash.update(readFileSync(p)); bytes += s.size; }
       } catch { hash.update('deleted'); }
     }
     return hash.digest('hex');

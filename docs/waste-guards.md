@@ -16,8 +16,8 @@ session ID. Settings live under `guards` in `.groundwork/config.json`:
 
 Repeat-command checks normalize whitespace and compare HEAD, git status and dirty
 or untracked non-ignored contents. Different working directories are distinct.
-Unknown fingerprints, large files, excessive changes and git failures always
-allow. Exemptions prefix-match; include time/network-dependent commands in your
+Files above 1 MiB use size, mtime and ctime instead of content hashing. Unknown
+fingerprints, excessive changes and git failures always allow. Exemptions prefix-match; include time/network-dependent commands in your
 list (the defaults also include git pull, wget, npm view and gh).
 
 To rerun intentionally, use `GW_FORCE=1 npm test` or `npm test # gw:force`.

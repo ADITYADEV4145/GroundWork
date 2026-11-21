@@ -70,9 +70,11 @@ function transform(edit: Edit, before: string | null, mode: 'add' | 'remove', kn
       throw new Error(`${edit.file} is not valid JSON; fix or remove it and run gw setup again`);
     }
   }
+  const original = JSON.stringify(doc);
   if (mode === 'add') edit.add(doc, known);
   else edit.remove(doc, known);
   if (mode === 'remove' && before === null) return null;
+  if (before !== null && JSON.stringify(doc) === original) return before;
   // Keep the file's own indentation and trailing newline so add + remove round-trips byte for byte.
   const indent = before ? (/\n([ \t]+)\S/.exec(before)?.[1] ?? 2) : 2;
   const eol = before === null || before.endsWith('\n') ? '\n' : '';
@@ -131,8 +133,9 @@ export function applySetup(root: string, changes: PlannedChange[], mode: 'add' |
     ...(mode === 'add' ? changes.flatMap((c) => c.owned.map((k) => `${c.file}${SEP}${k}`)) : []),
   ];
   if (mode === 'remove') {
-    // Deepest first, and only directories that are empty now.
-    for (const d of [...manifest.createdDirs].sort((a, b) => b.length - a.length)) {
+    // Deepest first, and only directories that are empty now. .groundwork/ holds the manifest, so it goes last.
+    const gwDir = gwPath(root);
+    for (const d of [...manifest.createdDirs].filter((x) => x !== gwDir).sort((a, b) => b.length - a.length)) {
       try {
         if (readdirSync(d).length === 0) rmdirSync(d);
         manifest.createdDirs = manifest.createdDirs.filter((x) => x !== d);
@@ -140,8 +143,10 @@ export function applySetup(root: string, changes: PlannedChange[], mode: 'add' |
         manifest.createdDirs = manifest.createdDirs.filter((x) => x !== d);
       }
     }
-    if (!manifest.created.length && !manifest.createdDirs.length && !manifest.installed.length) {
+    const ownsGwDir = manifest.createdDirs.includes(gwDir);
+    if (!manifest.created.length && manifest.createdDirs.every((x) => x === gwDir) && !manifest.installed.length) {
       rmSync(manifestPath(root), { force: true });
+      if (ownsGwDir && readdirSync(gwDir).length === 0) rmdirSync(gwDir);
       return;
     }
   }

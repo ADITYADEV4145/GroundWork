@@ -2,7 +2,7 @@ import { createInterface } from 'node:readline/promises';
 import type { Command } from 'commander';
 import type { AgentName } from '../../hooks/types.js';
 import { applySetup, planSetup } from '../../setup/apply.js';
-import { detectAgents, targetsFor } from '../../setup/targets.js';
+import { detectAgents, PROFILES, profileTarget, targetsFor } from '../../setup/targets.js';
 import { globalOpts, repoRoot } from '../context.js';
 import { emit, fail } from '../output.js';
 
@@ -24,17 +24,23 @@ export function register(program: Command): void {
     .description('wire Groundwork into Claude Code, Codex and Cursor (hooks + MCP); shows every change and asks first')
     .option('-a, --agent <agents>', `comma-separated: ${ALL.join(',')} (default: detected agents)`)
     .option('--command <cmd>', 'how agents launch Groundwork', 'gw')
+    .option('--profile <profile>', `${PROFILES.join(' | ')}: minimal = navigation only, standard = + reuse and grounding warnings (default), strict = + blocking Stop gate`)
     .option('--remove', 'undo everything gw setup added')
     .option('-y, --yes', 'apply without asking')
     .option('--dry-run', 'show the plan only')
-    .action(async (o: { agent?: string; command: string; remove?: boolean; yes?: boolean; dryRun?: boolean }, cmd: Command) => {
+    .action(async (o: { agent?: string; command: string; profile?: string; remove?: boolean; yes?: boolean; dryRun?: boolean }, cmd: Command) => {
       const opts = globalOpts(cmd);
       const root = repoRoot(opts);
       const wanted = o.agent ? (o.agent.split(',').map((s) => s.trim()) as AgentName[]) : o.remove ? ALL : detectAgents();
       const bad = wanted.filter((a) => !ALL.includes(a));
       if (bad.length) fail(opts, `unknown agent(s): ${bad.join(', ')}`);
       if (!wanted.length) fail(opts, 'no supported agent found; pass --agent claude,codex,cursor');
-      const targets = targetsFor({ root, gw: o.command }).filter((t) => wanted.includes(t.agent));
+      if (o.profile && !(PROFILES as readonly string[]).includes(o.profile)) fail(opts, `unknown profile: ${o.profile} (use ${PROFILES.join(', ')})`);
+      const profile = o.profile as (typeof PROFILES)[number] | undefined;
+      const targets = [
+        ...targetsFor({ root, gw: o.command }).filter((t) => (wanted as string[]).includes(t.agent)),
+        ...(o.remove || profile ? [profileTarget(root, profile)] : []),
+      ];
       const mode = o.remove ? 'remove' : 'add';
       const plan = planSetup(root, targets, mode);
       const changing = plan.filter((c) => c.action !== 'unchanged');

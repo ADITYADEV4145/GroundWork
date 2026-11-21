@@ -27,9 +27,11 @@ export const duplicateGate: HookHandler = {
         log(root, 'info', 'duplicate_gate', { status: 'ignored', sessionId: ev.sessionId, findingSet });
         return { action: 'allow' };
       }
-      log(root, 'info', 'duplicate_gate', { status: 'blocked', sessionId: ev.sessionId, findingSet });
+      const strict = config.profile === 'strict';
+      log(root, 'info', 'duplicate_gate', { status: strict ? 'blocked' : 'warned', sessionId: ev.sessionId, findingSet });
       const budgeted = fitToBudget(blocks, formatFinding, 500);
-      return { action: 'deny', message: budgeted.items.map(formatFinding).join('\n\n') };
+      // Only the strict profile blocks the stop; standard reports the same findings without holding the agent.
+      return { action: strict ? 'deny' : 'context', message: budgeted.items.map(formatFinding).join('\n\n') };
     } catch (error) {
       log(root, 'warn', 'duplicate_gate_failed_open', { error: (error as Error).message });
       return { action: 'allow' };

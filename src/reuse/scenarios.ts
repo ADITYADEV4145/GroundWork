@@ -81,7 +81,7 @@ export const stopEvent = (root: string, active = false, sessionId = 'reuse-fixtu
 });
 
 export async function assertStopScenario(root: string): Promise<void> {
-  const context = { root, config: defaultConfig() };
+  const context = { root, config: { ...defaultConfig(), profile: 'strict' as const } };
   // Warm the index before testing the hook's bounded execution path.
   await checkRepository(root);
   assert.equal((await duplicateGate.run(stopEvent(root, true), context))?.action, 'allow');

@@ -27,7 +27,7 @@ export interface BlockEdit {
 export type Edit = JsonEdit | BlockEdit;
 
 export interface AgentTarget {
-  agent: AgentName;
+  agent: AgentName | 'groundwork';
   label: string;
   edits: Edit[];
   notes: string[];
@@ -227,4 +227,28 @@ export function detectAgents(home = os.homedir()): AgentName[] {
   if (onPath('codex') || existsSync(path.join(home, '.codex'))) found.push('codex');
   if (onPath('cursor') || onPath('cursor-agent') || existsSync(path.join(home, '.cursor'))) found.push('cursor');
   return found;
+}
+
+export const PROFILES = ['minimal', 'standard', 'strict'] as const;
+
+/** Sets `profile` in .groundwork/config.json, unless the user already chose one there. */
+export function profileTarget(root: string, profile?: (typeof PROFILES)[number]): AgentTarget {
+  const key = (p: unknown) => `profile:${String(p)}`;
+  return {
+    agent: 'groundwork',
+    label: 'Groundwork',
+    edits: [{
+      kind: 'json',
+      file: path.join(root, '.groundwork', 'config.json'),
+      owned: profile ? [key(profile)] : [],
+      add(doc, known) {
+        if (!profile || ('profile' in doc && !known.has(key(doc.profile)))) return;
+        doc.profile = profile;
+      },
+      remove(doc, known) {
+        if ('profile' in doc && known.has(key(doc.profile))) delete doc.profile;
+      },
+    }],
+    notes: [],
+  };
 }

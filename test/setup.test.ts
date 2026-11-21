@@ -3,7 +3,8 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { normalise, render, failOpenOutput } from '../src/hooks/run.js';
 import { applySetup, planSetup } from '../src/setup/apply.js';
-import { targetsFor } from '../src/setup/targets.js';
+import { profileTarget, targetsFor } from '../src/setup/targets.js';
+import { loadConfig } from '../src/config/load.js';
 import { tempDir } from '../src/selftest/fixtures.js';
 
 const dirs: string[] = [];
@@ -135,6 +136,34 @@ describe('gw setup after a formatter', () => {
     writeFileSync(path.join(root, '.mcp.json'), JSON.stringify({ mcpServers: { groundwork: { args: ['mcp'], command: 'gw' } } }, null, 2) + '\n');
     applySetup(root, planSetup(root, targets, 'remove'), 'remove');
     expect(snapshot(root)).toEqual({});
+  });
+});
+
+describe('gw setup --profile', () => {
+  it('writes the profile, keeps a user-chosen one, and removes without a trace', () => {
+    const root = tempDir('gw-setup-root-');
+    dirs.push(root);
+    const targets = [...targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === 'claude'), profileTarget(root, 'strict')];
+    applySetup(root, planSetup(root, targets, 'add'), 'add');
+    expect(loadConfig(root).profile).toBe('strict');
+    applySetup(root, planSetup(root, [targetsFor({ root, gw: 'gw' })[0]!, profileTarget(root)], 'remove'), 'remove');
+    expect(snapshot(root)).toEqual({});
+
+    mkdirSync(path.join(root, '.groundwork'));
+    writeFileSync(path.join(root, '.groundwork', 'config.json'), '{ "profile": "minimal" }\n');
+    applySetup(root, planSetup(root, [profileTarget(root, 'strict')], 'add'), 'add');
+    expect(loadConfig(root).profile).toBe('minimal');
+    applySetup(root, planSetup(root, [profileTarget(root)], 'remove'), 'remove');
+    expect(readFileSync(path.join(root, '.groundwork', 'config.json'), 'utf8')).toBe('{ "profile": "minimal" }\n');
+  });
+
+  it('minimal turns off reuse, grounding and waste guards unless set explicitly', () => {
+    const root = tempDir('gw-setup-root-');
+    dirs.push(root);
+    mkdirSync(path.join(root, '.groundwork'));
+    writeFileSync(path.join(root, '.groundwork', 'config.json'), JSON.stringify({ profile: 'minimal', grounding: { enabled: true } }));
+    const c = loadConfig(root);
+    expect([c.reuse.duplicateGate, c.grounding.enabled, c.guards.repeatCommand.enabled, c.navigation.readGuard.enabled]).toEqual([false, true, false, true]);
   });
 });
 

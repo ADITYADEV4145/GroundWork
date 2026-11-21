@@ -187,4 +187,13 @@ describe('reports and cheap acceptance gates', () => {
     expect(JSON.parse(readFileSync(path.join(dir, 'report.json'), 'utf8')).arms.baseline.n).toBe(0);
     expect(JSON.parse(readFileSync(path.join(dir, 'block-review.json'), 'utf8'))).toEqual([]);
   });
+  it('rejects caches at or inside the repository before creating directories', () => {
+    const dir = temp();
+    for (const cache of ['.', './bench/cache', path.resolve('bench/cache'), './bench/../bench/cache']) {
+      const run = spawnSync(process.execPath, ['--import', 'tsx', 'scripts/bench-v2.ts', '--cache', cache,
+        '--runs', path.join(dir, 'missing'), '--out', dir, '--no-install'], { encoding: 'utf8', timeout: 20_000 });
+      expect(run.status).toBe(1);
+      expect(run.stderr).toContain('Benchmark cache must be outside the GroundWork repository.');
+    }
+  });
 });

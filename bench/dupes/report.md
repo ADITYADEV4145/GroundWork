@@ -1,5 +1,7 @@
 # Reuse calibration report
 
+Independent-history audit: [three pinned real repositories and full agent-reviewed BLOCK table](../real-repos/review.md). **0/14 agree (0%); the >=90% real-repository gate is not met.** No model tuning was performed on that review set.
+
 ## Method and scope
 
 - 510 labeled pairs: 243 duplicates, 267 negatives; TypeScript/JavaScript and Python.
@@ -11,7 +13,7 @@
 - All labels are authored/reviewed by the coding agent from explicit domains and behavioral differences; no independent human review has occurred. Type 1 formatting, Type 2 identifier rename, Type 3 control-flow refactor, Type 4 alternate implementation. Short bodies are retained for signal evaluation, including bodies the runtime candidate filter would skip.
 - Hard negatives include changed policy/boundaries, operator changes, same-name textual overloads, and same-purpose implementations with differing NaN equality. Some are deliberately indistinguishable after token normalization. Repeated template variants and overload scaffolds limit diversity despite family grouping.
 - Six real history pairs from MIT-licensed sindresorhus/array-uniq are included (see corpus/unique-values/oss/LICENSE and oss-pairs.jsonl). These are compatibility implementations and their modern replacement, not six independently discovered refactorings. Both commits are pinned; `node --import tsx scripts/calibrate-mine.ts` fetches snapshots into a home-directory cache. Calibration/selftests make no network calls.
-- This is a small planted-corpus operating point, NOT a claim of >=95% production precision, language-general semantic equivalence, or independent benchmark success. Selection uncertainty and the small number of task families matter; Phase 3's other gate checks are not implemented here.
+- This is a small planted-corpus operating point, NOT a claim of >=95% production precision, language-general semantic equivalence, or independent benchmark success. Selection uncertainty and the small number of task families matter; the separate real-history audit is linked above.
 - No corpus sources or labels were changed to improve the score. Previous seven-feature model: 14 TP / 0 FP, 5.8% recall, Type 1 0%, Type 2 25%, Type 3 1.4%. Binding-aware hashing is a lexical approximation rather than scope-resolved equivalence; shadowing and dynamic dispatch remain limitations. Multiple feature designs have now been examined on these OOF folds; an independent evaluation set is still needed.
 
 ## Operating point

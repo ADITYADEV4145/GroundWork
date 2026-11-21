@@ -88,5 +88,5 @@ node --import tsx scripts/render-real-repo-review.ts
 
 This is **not** 90% human agreement or a production-precision success. It measures flagged occurrences only, not recall or unflagged defects. Labels are from one coding agent, sample support is small, months have limited source changes, and no upstream tests were executed. Get an independent human review and evaluate any later fixes on new pinned history before claiming the gate is satisfied.
 `);
-writeFileSync(path.join(directory, 'review.md'), lines.join('\n') + '\n');
+writeFileSync(path.join(directory, 'review.md'), lines.join('\n').trimEnd() + '\n');
 console.log(`Wrote review.md: ${agrees}/${blocks.length} agree; ${(100 * agrees / blocks.length).toFixed(1)}% (agent review).`);

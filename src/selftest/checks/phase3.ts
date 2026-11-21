@@ -12,6 +12,7 @@ import { findRepoRoot } from '../../util/paths.js';
 import { checkRepository } from '../../reuse/check.js';
 import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, withCheckScenario } from '../../reuse/scenarios.js';
 import type { Check } from '../registry.js';
+import { evaluateRealRepoReview } from '../real-repo-review.js';
 
 export const PHASE3_CHECKS: Check[] = [{
   phase: 3,
@@ -50,6 +51,13 @@ export const PHASE3_CHECKS: Check[] = [{
       metrics: { precision: result.precision, recall: result.recall, pairs: dataset.examples.length,
         ...Object.fromEntries(byType.map((r) => [`recallType${r.type}`, r.recall])) },
     };
+  },
+}, {
+  phase: 3,
+  slow: true,
+  name: 'real-repo BLOCK agreement >= 90% (stored agent review, not human approval)',
+  async run() {
+    return evaluateRealRepoReview(fileURLToPath(new URL('../../../bench/real-repos/', import.meta.url)));
   },
 }, ...CHECK_SCENARIOS.map((name): Check => ({
   phase: 3,

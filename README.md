@@ -1,109 +1,165 @@
 # Groundwork
 
-Your agent spends most of its tokens finding its way around, then rewrites code you already have. Groundwork fixes both.
+**A live, local map of your codebase for coding agents.** Claude Code, Codex and Cursor use it to find code without grep loops, reuse what already exists, and stop calling functions that aren't there.
 
-Groundwork is an open-source tool and agent skill for Claude Code, Codex and Cursor. It keeps a live, local map of your codebase and uses it to:
+Coding agents waste most of their context finding their way around. They also rewrite helpers you already have under new names, and invent imports and calls that look plausible. Groundwork indexes your repository and hooks into the agent, so these problems are caught as they happen rather than in code review.
 
-- **navigate cheaply**: find a symbol, read only its definition, and skip re-reading unchanged files
-- **reuse first**: find existing code before writing new code, and catch semantic clones and dead code before the agent stops
-- **stay grounded**: flag invented imports, calls and members, and wrong arguments, right after each edit
-- **cut waste**: answer repeated commands from the earlier result and trim huge outputs without dropping failures
+```text
+$ gw check
+BLOCK grounding (unknown-export): label.ts:1
+Why: 'formatCurrency' is not exported in money.ts. Did you mean formatPrice (money.ts:1, formatPrice(cents: number): string)?
+Fix: Use formatPrice (money.ts:1): formatPrice(cents: number): string.
 
-It is 100% local: no network calls and no telemetry.
+BLOCK grounding (arity): label.ts:3
+Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): string (money.ts:1).
+```
+
+Everything runs on your machine. There is no telemetry and no network access at runtime.
+
+## What it does
+
+| Problem | What Groundwork does |
+| --- | --- |
+| **Token waste**: grep loops, whole-file reads, re-reading unchanged files, huge command output | MCP tools return just the symbol you need within a token budget. A read guard catches repeat reads of unchanged files. Repeated commands get the earlier result, and noisy output is trimmed but keeps every failure. |
+| **Duplication**: semantic clones, new code instead of changing old code, dead code left behind | `find_similar` shows existing code before the agent writes new code, and the agent states `REUSE`, `EXTEND` or `NEW because …`. At Stop, `gw check` flags clones, duplicate constants and files, and code left dead by a change. |
+| **Invented code**: imports, functions and members that don't exist, wrong arguments | After every edit, Groundwork checks the new calls against the index and suggests the real symbol. `gw verify` and `gw check` report the same in CI. |
+
+Supported languages are TypeScript, JavaScript (including JSX and CommonJS) and Python. Other files fall back to the agent's normal tools.
 
 ## Install
 
-Requires Node.js 22+.
+Requires Node.js 22 or later. Groundwork is not on npm yet, so install it from source:
 
 ```sh
-npm install -g groundwork-agent
-cd your-repo && gw init      # builds the index in .groundwork/
-gw setup                     # wires Claude Code, Codex and Cursor; shows every file it will change and asks first
+git clone https://github.com/ADITYADEV4145/GroundWork.git
+cd GroundWork && npm ci && npm run build && npm link   # puts `gw` on your PATH
 ```
 
-Other ways to install:
+Then, in the repository you want your agent to work in:
 
+```sh
+gw init     # builds the index in .groundwork/ (about 1 s for 15k lines)
+gw setup    # wires up Claude Code, Codex and Cursor; lists every file it will change and asks first
+```
+
+Restart your agent after setup. Codex asks you to trust the new hooks once, under `/hooks`.
+
+| Flag | Effect |
+| --- | --- |
+| `--agent claude,codex,cursor` | set up only these agents (default: every agent installed) |
+| `--profile minimal\|standard\|strict` | choose how strict the guards are (see [Profiles](#profiles)) |
+| `--dry-run` | show the plan and write nothing |
+| `--yes` | apply without asking (required when there is no terminal) |
+| `--command "<cmd>"` | how agents launch Groundwork (default `gw`) |
+| `--remove` | remove exactly what setup added, and nothing else |
+
+Setup only writes project-level files: `.claude/settings.json`, `.mcp.json`, `.codex/hooks.json`, `.codex/config.toml`, `.cursor/hooks.json` and `.cursor/mcp.json`. It keeps your existing settings, and `gw setup --remove` returns each file to exactly how it was before setup.
+
+Once `groundwork-agent` is published to npm, two more options will work:
 - **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
-- **Skill only (any agent that reads skills):** `npx skills add ADITYADEV4145/GroundWork`.
-- **Any MCP client:** run `gw mcp` as a stdio server from the repository root, or with `npx -y groundwork-agent mcp`.
-
-`gw setup --remove` removes exactly what setup added. `gw setup --dry-run` shows the plan without writing anything.
-
-### Optional local meaning signal
-
-The default needs no embedding model or optional runtime. To consent to a model download:
-
-```sh
-gw init --embeddings                         # downloads the calibrated small model
-gw init --embeddings --model owner/model     # explicitly choose another Transformers.js ONNX model
-```
-
-Model files stay in `.groundwork/models/`; consent is recorded in `.groundwork/config.json` only after installation succeeds. Subsequent `gw check`, `gw similar` and `find_similar` use local files only: there are no runtime downloads. Vectors are cached in the index by exact symbol-content hash and model id, so unchanged symbols are not re-embedded. Missing models or an unavailable optional `@huggingface/transformers` runtime warn once per process/model and fall back to the default classifier. Set `reuse.embeddings.enabled` to `false` to disable meaning.
-
-Only the selected, calibrated model uses the meaning classifier; other model ids retain baseline scoring. [Candidate evaluation](bench/dupes/embeddings.md) documents precision, recall, size and speed. Meaning did **not** improve recall on the current labeled corpus; it remains opt-in. Description-only similarity scores are extrapolations, not separately calibrated natural-language probabilities.
-
-For a CPU-only source installation if ONNX Runtime's optional CUDA installer fails, use `ONNXRUNTIME_NODE_INSTALL_CUDA=skip npm install`. `npm install --omit=optional` omits the embedding runtime entirely; all default functionality still works.
+- **Any MCP client:** run `npx -y groundwork-agent mcp`.
 
 ## How it works
 
-```
- edit / read / run           hooks (fail open, 2 s budget)          .groundwork/index.db
- ┌───────────────┐  PreToolUse   ┌──────────────────────────┐  query  ┌──────────────────────────┐
- │ Claude Code   │ ────────────▶ │ read guard, repeat guard │ ──────▶ │ files, symbols, imports, │
- │ Codex         │  PostToolUse  │ refresh, grounding notes │         │ calls, literals,         │
- │ Cursor        │ ────────────▶ │ output trimmer           │ ◀────── │ fingerprints (MinHash)   │
- │               │  Stop         │ gw check duplicate gate  │ refresh └──────────────────────────┘
- │               │ ────────────▶ └──────────────────────────┘                     ▲
- │               │  MCP tools: repo_map, find_code, outline, read_symbol,          │
- │               │  callers, callees, where_used, find_similar, verify_calls ──────┘
- └───────────────┘
+```text
+  agent                   hooks (fail open, 2 s budget)          .groundwork/index.db
+┌─────────────┐ PreToolUse  ┌──────────────────────────┐  query  ┌──────────────────────────┐
+│ Claude Code │ ──────────▶ │ read guard, repeat guard │ ──────▶ │ files, symbols, imports, │
+│ Codex       │ PostToolUse │ refresh, grounding notes │         │ calls, literals,         │
+│ Cursor      │ ──────────▶ │ output trimmer           │ ◀────── │ fingerprints             │
+│             │ Stop        │ gw check duplicate gate  │ refresh └──────────────────────────┘
+│             │ ──────────▶ └──────────────────────────┘                    ▲
+│             │ MCP: repo_map, find_code, outline, read_symbol, callers,    │
+│             │      callees, where_used, find_similar, verify_calls ───────┘
+└─────────────┘
 ```
 
-The index covers TypeScript, JavaScript (JSX and CommonJS) and Python. It is parsed with tree-sitter and refreshed incrementally: only files whose content changed are re-parsed. Storage is `node:sqlite`, with a `sql.js` fallback. [SKILL.md](SKILL.md) teaches the agent the protocol: navigate with the index, run `find_similar` before writing and answer `REUSE` / `EXTEND` / `NEW`, then act on gate and grounding feedback.
+The index is built with tree-sitter and stored in SQLite (`node:sqlite`, falling back to `sql.js`). After each edit, only the changed files are parsed again; refreshing one to five files takes under 300 ms. [SKILL.md](SKILL.md) teaches the agent the workflow: navigate with the index, check for existing code before writing, and act on what the hooks report.
+
+### MCP tools
+
+| Tool | Returns |
+| --- | --- |
+| `repo_map` | a ranked directory tree with each file's top symbols; narrow it by path |
+| `find_code` | symbols that match a name or description, with signatures |
+| `outline` | a file's symbols and signatures without their bodies |
+| `read_symbol` | one symbol's source, without the rest of the file |
+| `callers` / `callees` / `where_used` | who calls a symbol, what it calls, and every reference to it |
+| `find_similar` | existing code that already does what the agent is about to write |
+| `verify_calls` | whether the imports and calls in a snippet exist, and how many arguments each call takes |
+| `index_status` | index freshness and size |
+
+Each answer has a token budget. When an answer is longer than its budget, it is cut short and gives a way to fetch the rest.
 
 ## Profiles
 
 | Profile | What runs |
 | --- | --- |
-| `minimal` | navigation tools and the read guard only |
-| `standard` (default) | adds Reuse First, grounding notes after edits, waste guards, and Stop gate findings as warnings |
-| `strict` | as `standard`, plus a Stop gate that blocks once on BLOCK findings |
+| `minimal` | the navigation tools and the read guard only |
+| `standard` (default) | adds Reuse First, grounding notes after edits and waste guards. Findings at Stop are shown as warnings. |
+| `strict` | as `standard`, but the Stop gate blocks once on each new BLOCK finding |
 
-Choose one with `gw setup --profile strict`, or set `"profile"` in `.groundwork/config.json`. Every guard can also be switched on or off on its own in that file, and an explicit setting overrides the profile.
+Choose a profile with `gw setup --profile strict`, or set `"profile"` in `.groundwork/config.json`. Every guard can also be turned on or off on its own, and a setting you write overrides the profile:
+
+```json
+{
+  "profile": "standard",
+  "grounding": { "enabled": true },
+  "guards": { "repeatCommand": { "enabled": false }, "explorationHint": { "threshold": 20 } }
+}
+```
+
+You can commit `config.json` so your team shares one profile. Everything else in `.groundwork/` is git-ignored.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `gw symbols <query>`, `gw show <symbol>` | search symbols; show one symbol's signature, docs, callers and callees |
+| `gw symbols <query>` / `gw show <symbol>` | search symbols; show one symbol's signature, callers and callees |
 | `gw similar "<description>"` | find existing code to reuse before writing a symbol |
-| `gw check [--base <ref>]` | duplicate gate over changed code; exits 1 on BLOCK findings (works in CI too) |
-| `gw verify [files...]` | grounding check; exits 1 on definite errors |
-| `gw run -- <cmd>` | run a noisy command, keep the full log locally, and print a trimmed summary |
+| `gw check [--base <ref>]` | duplicate and grounding gate over changed code; exits 1 on BLOCK findings, so it works as a CI step |
+| `gw verify [files...]` | grounding check alone; exits 1 on definite errors |
+| `gw run -- <cmd>` | run a noisy command, keep the full log locally and print a trimmed summary |
 | `gw report` | what the guards saved in a session |
-| `gw stats`, `gw doctor`, `gw selftest` | index contents, environment checks, phase acceptance checks |
+| `gw refresh`, `gw stats`, `gw doctor`, `gw selftest` | update the index, show its contents, check the environment, run the acceptance checks |
 
-Every command takes `--json`.
+Every command accepts `--json`.
+
+## Accuracy
+
+On the labeled duplicate corpus, BLOCK findings are 95% precise. They catch 100% of exact copies and 96% of renamed copies, but fewer heavily rewritten clones, which are reported as warnings or not at all. See [references/reuse.md](references/reuse.md).
+
+Grounding reports only calls it can resolve definitely: it skips dynamic dispatch, computed member names and external packages. On this repository, 99% of internal imports resolve.
+
+Corpus figures come from planted examples, not production repositories.
 
 ## Privacy and security
 
-Everything stays in `.groundwork/` in your repository. Hooks run with your user permissions, never run your commands for you, and fail open: if Groundwork errors or times out, the agent carries on. See [SECURITY.md](SECURITY.md) for what each hook does and how to audit it.
+- All state lives in `.groundwork/` in your repository.
+- The only download is `gw init --embeddings`, which fetches a local embedding model when you ask for one. Without it, `find_similar` runs fine without a model.
+- Hooks run with your user permissions and never run commands for the agent.
+- Hooks fail open: on any error or timeout, the agent continues as if Groundwork were not there.
+
+See [SECURITY.md](SECURITY.md) for what each hook does and how to audit it.
 
 ## FAQ
 
-**Does it slow my agent down?** Hooks have a 2-second budget and usually answer in milliseconds. On timeout they allow the action.
+**Does it slow my agent down?** Hooks usually answer in milliseconds and have a 2-second limit. If one times out, the action goes ahead.
 
-**What if a guard is wrong?** Repeat the read once, rerun the command with `GW_FORCE=1`, or mark an intended duplicate with `// groundwork: allow-duplicate <reason>`. Forces are counted so you can tune the config. See [troubleshooting](references/troubleshooting.md).
+**What if a guard is wrong?** Retry the read once, rerun the command with `GW_FORCE=1`, or mark an intended duplicate with `// groundwork: allow-duplicate <reason>`. Each override is logged, so you can tune the config. See [troubleshooting](references/troubleshooting.md).
 
-**Which languages?** TypeScript, JavaScript and Python today. For other files, the agent falls back to its normal tools.
+**Will it block my agent?** Only in the `strict` profile, and only once for each set of findings.
 
-**Does it send my code anywhere?** No. There are no runtime network calls and no telemetry. Optional model installation downloads model files only after explicit consent; inference stays local.
+**Does Cursor get everything?** It gets navigation, the read guard and grounding notes. Cursor's Stop hook cannot show a warning without blocking, so in `standard` Cursor shows no Stop findings. Use `strict` there, or run `gw check` yourself.
 
-**How do I remove it?** Run `gw setup --remove` and delete `.groundwork/`.
+**How do I remove it?** Run `gw setup --remove`, then delete `.groundwork/`.
 
-## Development
+## Learn more
 
-See [AGENTS.md](AGENTS.md). Benchmarks (`gw bench`) are not part of this release yet.
+- [SKILL.md](SKILL.md): the protocol the agent follows
+- [references/navigation.md](references/navigation.md), [reuse.md](references/reuse.md), [grounding.md](references/grounding.md), [docs/waste-guards.md](docs/waste-guards.md): how each part works
+- [references/troubleshooting.md](references/troubleshooting.md): common problems and fixes
+- [AGENTS.md](AGENTS.md): developing Groundwork (`npm test`, `npm run selftest -- --through 5`)
 
 ## License
 

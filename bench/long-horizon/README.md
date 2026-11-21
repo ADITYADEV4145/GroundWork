@@ -155,8 +155,12 @@ Grade all six trusted capture exports using the shared harness:
 
 ```sh
 node dist/cli/main.js bench --suite long-horizon --runs 3 \
-  --observations /path/to/captures --output-dir bench/long-horizon/results
+  --observations /path/to/captures --output-dir /path/to/grading-results
 ```
+
+Keep ad-hoc grading output outside `bench/long-horizon/results/`. That directory
+contains the published reports checked by `verify-results.mjs`; regrading must
+not add extra reports beside them or replace the published evidence.
 
 Only score **trusted patches**: this executes submitted JavaScript. Worktrees and
 timeouts provide reproducibility, not a security sandbox. The recorded results

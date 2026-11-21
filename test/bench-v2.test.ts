@@ -70,6 +70,26 @@ describe('reuse call heuristics', () => {
     expect(classify("import {existing} from './other.js';\nexisting(1);").label).toBe('duplicate');
     expect(classify("import type {existing} from './utils.js';\nexport const x = 1;").label).toBe('duplicate');
   });
+  it('ignores root and colocated test helper calls when labeling production implementations', () => {
+    for (const file of ['test_work.py', 'work_test.py', 'src/pkg/test_work.py', 'src/pkg/work_test.py']) {
+      const test = { file, source: 'from pkg.utils import existing\nexisting(1)', addedLines: new Set([1, 2]) };
+      const production = { file: 'src/pkg/new.py', source: 'def work(x):\n    return x + 1', addedLines: new Set([1, 2]) };
+      expect(labelReuse(task, [test]).label).toBe('unknown');
+      expect(labelReuse(task, [test, production]).label).toBe('duplicate');
+      expect(labelReuse(task, [test], '/missing/python').reason).toBe('No added production implementation to classify.');
+    }
+    const tsTask = { helpers: [{ file: 'source/utils.ts', name: 'existing' }] } as Task;
+    for (const extension of ['ts', 'tsx', 'js', 'jsx', 'mts', 'cts']) for (const suffix of ['test', 'spec']) {
+      for (const directory of ['', 'source/']) {
+        const test = { file: `${directory}new.${suffix}.${extension}`,
+          source: `import {existing} from '${directory ? './utils.js' : './source/utils.js'}';\nexisting(1);`, addedLines: new Set([1, 2]) };
+        const production = { file: 'source/new.ts', source: 'export const work = (x: number) => x + 1;', addedLines: new Set([1]) };
+        expect(labelReuse(tsTask, [test]).label).toBe('unknown');
+        expect(labelReuse(tsTask, [production, test]).label).toBe('duplicate');
+      }
+    }
+    expect(python('from pkg.utils import existing\nexisting(1)', 'src/pkg/latest_work.py').label).toBe('reused');
+  });
   it('human overrides take precedence with attribution', () => {
     const automatic = python('def f():\n    return 1');
     expect(applyOverride(automatic)).toEqual(automatic);

@@ -147,7 +147,9 @@ print('')
 `;
 
 export function labelReuse(task: Task, files: AddedFile[], python = 'python3'): ReuseLabel {
-  const production = files.filter(f => /\.(?:py|[cm]?[jt]sx?)$/.test(f.file) && !/(?:^|\/)(?:tests?|testing|__tests__|specs?|docs?|fixtures|node_modules)\//.test(f.file));
+  const production = files.filter(f => /\.(?:py|[cm]?[jt]sx?)$/.test(f.file)
+    && !/(?:^|\/)(?:tests?|testing|__tests__|specs?|docs?|fixtures|node_modules)\//.test(f.file)
+    && !/(?:^|\/)(?:test_[^/]*\.py|[^/]*_test\.py|[^/]*\.(?:test|spec)\.[cm]?[jt]sx?)$/.test(f.file));
   for (const file of production) {
     let helper: string | undefined;
     if (file.file.endsWith('.py')) {

@@ -20,6 +20,13 @@
   "files": [
     "dist",
     "fixtures",
+    "SKILL.md",
+    "references",
+    "docs",
+    "hooks",
+    ".claude-plugin",
+    ".mcp.json",
+    "SECURITY.md",
     "README.md",
     "LICENSE"
   ],
@@ -33,7 +40,8 @@
     "gw": "node --import tsx src/cli/main.ts",
     "selftest": "node --import tsx src/cli/main.ts selftest",
     "golden": "node --import tsx scripts/update-golden.ts",
-    "calibrate": "node --import tsx scripts/calibrate.ts"
+    "calibrate": "node --import tsx scripts/calibrate.ts",
+    "prepublishOnly": "npm run build && npm test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
@@ -58,5 +66,19 @@
   },
   "optionalDependencies": {
     "@huggingface/transformers": "^4.3.2"
+  },
+  "keywords": [
+    "claude-code",
+    "codex",
+    "cursor",
+    "mcp",
+    "coding-agent",
+    "agent-skill",
+    "code-index",
+    "tree-sitter"
+  ],
+  "homepage": "https://github.com/ADITYADEV4145/GroundWork#readme",
+  "bugs": {
+    "url": "https://github.com/ADITYADEV4145/GroundWork/issues"
   }
 }

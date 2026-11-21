@@ -141,4 +141,12 @@ describe('MCP navigation', () => {
       rmSync(root, { recursive: true, force: true });
     }
   });
+
+  it('finds interior name fragments without treating underscores as wildcards', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      expect(await runNavigationTool('find_code', { query: 'leep' }, ctx)).toContain('sleep (function)');
+      expect(await runNavigationTool('find_code', { query: '_leep' }, ctx)).not.toContain('sleep (function)');
+    });
+  });
 });

@@ -42,9 +42,10 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
   const filter = (kind ? ' AND s.kind = ?' : '') + (file ? ' AND f.path = ?' : '');
   const filterArgs = [...(kind ? [kind] : []), ...(file ? [file] : [])];
   const escaped = q.replace(/[%_\\]/g, (c) => `\\${c}`);
+  const fragment = `%${escaped}%`;
   const names = db.prepare(`${select} ${FROM}
-    WHERE (lower(s.qualified_name) = ? OR lower(s.name) LIKE ? ESCAPE '\\')${filter}
-    ORDER BY f.path, s.start_line, s.id`).all(q, escaped + '%', ...filterArgs);
+    WHERE (lower(s.qualified_name) LIKE ? ESCAPE '\\' OR lower(s.name) LIKE ? ESCAPE '\\')${filter}
+    ORDER BY f.path, s.start_line, s.id`).all(fragment, fragment, ...filterArgs);
   const candidates = new Map(names.map((r) => [String(r.id), r]));
   if (words.length) {
     // A sql.js-created FTS4 table can survive a switch to native SQLite even when refresh labels it FTS5.
@@ -65,9 +66,10 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
       return words.filter((w) => tokens.some((token) => token.startsWith(w))).length / Math.max(1, words.length);
     };
     const name = String(r.name).toLowerCase();
+    const qualified = s.name.toLowerCase();
     const lexical = Math.max(0, -Number(r.rank ?? 0));
     const score =
-      (s.name.toLowerCase() === q || name === q ? 100 : name.startsWith(q) ? 50 : 0)
+      (qualified === q || name === q ? 100 : name.startsWith(q) ? 50 : qualified.includes(q) || name.includes(q) ? 20 : 0)
       + 30 * overlap(s.name) + 12 * overlap(doc) + 10 * overlap(s.signature) + 8 * overlap(s.file)
       + (8 * lexical) / (1 + lexical) + Math.min(6, Math.log2(1 + Number(r.caller_count)))
       + Number(r.exported) * 2 - Number(r.is_test) * 3;

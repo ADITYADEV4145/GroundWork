@@ -25,10 +25,12 @@ const ledgerSchema = z.object({
   commands: z.record(z.string(), z.object({ step: count, fingerprint: z.string(), summary: z.string(), logPath: z.string().nullable(), outputBytes: count })),
   exploration: z.object({ files: z.array(z.string()), hinted: z.boolean() }),
   duplicatesPrevented: count, inventedCallsCaught: count, ignores: count,
-});
+}).passthrough();
 function parseLedger(value: unknown, id: string): Ledger {
   const parsed = ledgerSchema.safeParse(value);
-  return parsed.success && parsed.data.sessionId === id ? parsed.data : emptyLedger(id);
+  if (parsed.success && parsed.data.sessionId === id) return parsed.data;
+  const document = z.record(z.string(), z.unknown()).safeParse(value);
+  return { ...(document.success ? document.data : {}), ...emptyLedger(id) };
 }
 export const tokens = (text: string) => Buffer.byteLength(text) / 4;
 export function emptyLedger(sessionId: string): Ledger {

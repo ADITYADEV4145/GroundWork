@@ -62,7 +62,7 @@ describe('session ledger', () => {
   it('fails open on an occupied session lock and unwritable state', () => {
     mkdirSync(path.join(root, '.groundwork/sessions'), { recursive: true });
     writeFileSync(path.join(root, '.groundwork/sessions/test.json.lock'), 'busy');
-    expect(() => updateSessionLedger(root, 'test', (l) => ({ ...l }))).toThrow('locked');
+    expect(() => updateSessionLedger(root, 'test', (l) => ({ ...l }))).toThrow(/lock/);
     expect(() => updateLedger(root, 'test', (l) => { l.step++; })).not.toThrow();
     expect(updateLedger(root, 'test', (l) => { l.step++; })).toBe(false);
     expect(readLedger(root, 'test').step).toBe(0);
@@ -88,10 +88,13 @@ describe('session ledger', () => {
     finally { spy.mockRestore(); }
   });
   it('validates malformed guard state and fails open for invalid ids in every wrapper', () => {
-    updateSessionLedger(root, 'test', () => ({ navigation: { intact: true }, guards: { sessionId: 'test', step: 'broken' } }));
+    updateSessionLedger(root, 'test', () => ({ navigation: { intact: true }, guards: { sessionId: 'test', step: 'broken', retained: true } }));
     updateLedger(root, 'test', (l) => { l.step++; });
     expect(readLedger(root, 'test').step).toBe(1);
     expect(readSessionLedger(root, 'test').navigation).toEqual({ intact: true });
+    expect(readSessionLedger(root, 'test').guards).toMatchObject({ retained: true });
+    bumpCounter(root, 'test', 'ignores');
+    expect(readSessionLedger(root, 'test').guards).toMatchObject({ retained: true });
     for (const id of ['bad/id', 'bad.id']) {
       expect(() => readSessionLedger(root, id)).toThrow();
       expect(() => updateSessionLedger(root, id, (l) => l)).toThrow();

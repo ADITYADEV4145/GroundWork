@@ -2,7 +2,7 @@ import type { Db } from './db.js';
 
 // Bump on any change to the DDL or to what extraction writes. The index is a cache: on mismatch it is
 // rebuilt from scratch rather than migrated.
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const DDL = `
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);

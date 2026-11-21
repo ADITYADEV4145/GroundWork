@@ -3,8 +3,9 @@ import path from 'node:path';
 import type { GroundworkConfig } from '../config/schema.js';
 import { loadConfig } from '../config/load.js';
 import { adapterFor, initParsers, languageForPath } from '../lang/index.js';
+import { loadTsPaths } from '../resolve/imports.js';
 import { linkIndex, type LinkStats } from '../resolve/link.js';
-import { writeMeta } from '../store/schema.js';
+import { readMeta, writeMeta } from '../store/schema.js';
 import { sha1 } from '../util/hash.js';
 import { log } from '../util/log.js';
 import { discoverFiles, looksGenerated, makeTestMatcher } from './discover.js';
@@ -126,7 +127,11 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
           if (prev) res.changed++;
           else res.added++;
         }
-        if (res.added || res.changed || res.removed || rebuilt || opts.full) res.link = linkIndex(db, root);
+        // Import resolution also depends on tsconfig/jsconfig paths, which are not indexed files.
+        const resolverKey = sha1(JSON.stringify(loadTsPaths(root)));
+        const resolverChanged = readMeta(db, 'resolver_key') !== resolverKey;
+        if (res.added || res.changed || res.removed || rebuilt || opts.full || resolverChanged) res.link = linkIndex(db, root);
+        if (resolverChanged) writeMeta(db, 'resolver_key', resolverKey);
         writeMeta(db, 'last_refresh', String(now));
       });
       res.ms = Math.round(performance.now() - t0);

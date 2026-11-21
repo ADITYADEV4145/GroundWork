@@ -72,6 +72,21 @@ describe('gw setup edge cases', () => {
   });
 });
 
+describe('gw setup keeps user config', () => {
+  it('never overwrites or removes a groundwork MCP entry the user wrote', () => {
+    const root = tempDir('gw-setup-root-');
+    const home = tempDir('gw-setup-home-');
+    dirs.push(root, home);
+    const mine = JSON.stringify({ mcpServers: { groundwork: { command: 'gw', args: ['mcp'], env: { GW_LOG: '1' } } } }, null, 2) + '\n';
+    writeFileSync(path.join(root, '.mcp.json'), mine);
+    const targets = targetsFor({ root, home, gw: 'gw' }).filter((t) => t.agent === 'claude');
+    applySetup(root, planSetup(root, targets, 'add'), 'add');
+    expect(readFileSync(path.join(root, '.mcp.json'), 'utf8')).toBe(mine);
+    applySetup(root, planSetup(root, targets, 'remove'), 'remove');
+    expect(readFileSync(path.join(root, '.mcp.json'), 'utf8')).toBe(mine);
+  });
+});
+
 describe('hook rendering', () => {
   it('cursor permission hooks always answer with valid JSON', () => {
     const ev = normalise('cursor', 'pre_tool', { tool_name: 'Shell', tool_input: { command: 'ls' }, workspace_roots: ['/w'] });

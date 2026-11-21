@@ -115,6 +115,16 @@ function cursorHooks(file: string, gw: string, map: HookMap): JsonEdit {
   };
 }
 
+const OUR_MCP = /(?:^|[\s/])(?:gw|groundwork-agent)(?:\s+\S+)*\s+mcp$/;
+
+/** An entry `gw setup` wrote: only `command` and `args`, launching `gw mcp`. Anything else is the user's and is left alone. */
+function isOurMcp(entry: unknown): boolean {
+  const e = asObject(entry);
+  if (Object.keys(e).some((k) => k !== 'command' && k !== 'args')) return false;
+  if (typeof e.command !== 'string' || !Array.isArray(e.args)) return false;
+  return OUR_MCP.test([e.command, ...(e.args as unknown[]).map(String)].join(' '));
+}
+
 function mcpServer(file: string, gw: string): JsonEdit {
   const [command, ...prefix] = gw.split(' ');
   return {
@@ -122,12 +132,13 @@ function mcpServer(file: string, gw: string): JsonEdit {
     file,
     add(doc) {
       const servers = asObject(doc.mcpServers);
+      if ('groundwork' in servers && !isOurMcp(servers.groundwork)) return;
       servers.groundwork = { command, args: [...prefix, 'mcp'] };
       doc.mcpServers = servers;
     },
     remove(doc) {
       const servers = asObject(doc.mcpServers);
-      if (!('groundwork' in servers)) return;
+      if (!('groundwork' in servers) || !isOurMcp(servers.groundwork)) return;
       delete servers.groundwork;
       if (Object.keys(servers).length) doc.mcpServers = servers;
       else delete doc.mcpServers;

@@ -75,6 +75,8 @@ describe('benchmark reporting', () => {
       expect(readFileSync(output.markdown, 'utf8')).toContain('30 tasks × 1 paired repeats');
       expect(JSON.parse(readFileSync(output.json, 'utf8'))[0].summary.tasks).toHaveLength(30);
       expect(output.summaries[0]?.tasks.find((task) => task.task === 'gw-01')?.estimatedReductionPct).toBeNull();
+      const repeated = await runBenchmark({ suite: 'nav', runs: 1, observations: root, outputDir: root });
+      expect(repeated.summaries).toEqual(output.summaries);
     } finally {
       rmSync(root, { force: true, recursive: true });
     }

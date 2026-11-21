@@ -146,7 +146,8 @@ export async function runBenchmark(options: BenchmarkOptions) {
 
 function readCaptures(directory: string): unknown[] {
   return readdirSync(directory, { withFileTypes: true }).filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
-    .map((entry) => readJson(path.join(directory, entry.name)));
+    .map((entry) => readJson(path.join(directory, entry.name)))
+    .filter((entry) => entry !== null && typeof entry === 'object' && Object.hasOwn(entry, 'observations'));
 }
 
 const estimate = (n: number) => n.toFixed(1);

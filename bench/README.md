@@ -36,7 +36,13 @@ node bench/capture.mjs export "$state" > groundwork-1.json
 
 During a task, give the agent access to the task workspace only via the capture tools. In both arms, use `shell <state> <task> '<command>'` for shell search and edits, and `read <state> <task> <path> [start [count]]` for full/range reads. In Groundwork, add the navigation section of the skill to the agent's instructions, enable the MCP action and use the Read wrapper to dispatch the actual Claude read hooks. The baseline has no MCP action, Groundwork skill guidance or read hooks. Omit the answer argument for edit tasks; `finish` takes the working-tree patch relative to that step's baseline.
 
+For the recorded navigation benchmark, both arms followed the same rotation: Groundwork → TypeScript → Python in repeat 1, TypeScript → Python → Groundwork in repeat 2, and Python → Groundwork → TypeScript in repeat 3. Tasks within each group followed manifest order; all six edits came last. Each task used a fresh checkout, so the navigation instructions could prompt a new repository map even when an agent had seen that repository earlier in the session.
+
 The collector measures actual response bytes delivered through these actions. It converts those bytes to **estimated tool-output tokens** by dividing by four. It doesn't count messages, private model context, setup and skill instructions, or shell harness wrappers. Provider input/output counters are separate optional `usage: {inputTokens, outputTokens}` fields per task; never substitute the estimate for that counter. Devin did not expose provider counters or temperature/seed settings; we used the same Devin mode and isolated worktrees, but one conversation per arm/repeat means knowledge and compaction can carry over between its tasks.
+
+In the first run, both arms solved every task on every repeat, but Groundwork used **14.3% more estimated tool-output tokens** at the median (95% interval: 5.5% fewer to 35.2% more). Direct source-read bytes fell 57%, but search results, symbol bodies, outlines and repository maps made up 80% of the Groundwork arm's output. No repeated reads were blocked. Some agents retried invalid tool arguments or skipped the outline before reading a small file; those outputs still count.
+
+The follow-up repeats the same pinned tasks, order, baseline instructions, graders and estimator with the updated navigation tools and their published skill. The tools can return just locations for directed lookups, and repository maps use smaller pages. The updated skill calls for a map only when orientation is needed and for reading bodies only when locations or call edges are insufficient.
 
 ## Add a suite
 

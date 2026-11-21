@@ -1,0 +1,280 @@
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { defaultConfig } from '../src/config/load.js';
+import { duplicateGate } from '../src/hooks/handlers/duplicate_gate.js';
+import { HANDLERS } from '../src/hooks/handlers/index.js';
+import { dispatch, normalise, render } from '../src/hooks/run.js';
+import { readFingerprintedSymbols } from '../src/index/query.js';
+import { indexDbPath } from '../src/index/store.js';
+import { checkRepository, formatCheck, formatFinding } from '../src/reuse/check.js';
+import { thresholds } from '../src/reuse/model.js';
+import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, scenarioGit, stopEvent, withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
+import { openDb } from '../src/store/db.js';
+
+const MAIN = path.resolve(__dirname, '../src/cli/main.ts');
+const TSX = import.meta.resolve('tsx');
+const cli = (root: string, ...args: string[]) => spawnSync(process.execPath, ['--import', TSX, MAIN, '--root', root, ...args], { encoding: 'utf8' });
+const hook = (root: string, payload: unknown) => spawnSync(process.execPath, ['--import', TSX, MAIN, 'hook', 'claude', 'stop'], {
+  cwd: root, encoding: 'utf8', input: typeof payload === 'string' ? payload : JSON.stringify(payload),
+});
+
+describe('git-scripted reuse check scenarios (also exercised by selftest)', () => {
+  it.each(CHECK_SCENARIOS)('%s', async (name) => {
+    await withCheckScenario(name, async (root) => {
+      const report = await checkRepository(root);
+      assertCheckScenario(name, report, root);
+      for (const f of report.findings) {
+        expect(formatFinding(f).split('\n').length).toBeLessThanOrEqual(6);
+        expect(f.signals).toHaveLength(2);
+        expect(formatFinding(f)).toContain('Fix:');
+        if (f.kind === 'duplicate') expect(f.severity).toBe(f.probability! >= thresholds.block ? 'BLOCK' : 'WARN');
+      }
+      if (!report.findings.length) expect(formatCheck(report)).toBe('PASS: no reuse findings.');
+    });
+  });
+
+  it('counts getter noise independently of the tiny-body filter and honors skipTests', async () => {
+    await withCheckScenario('getters', async (root) => {
+      await checkRepository(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const symbols = readFingerprintedSymbols(db);
+        expect(symbols.find((s) => s.qualifiedName === 'Settings.current')!.fingerprint.tokenCount).toBeGreaterThanOrEqual(15);
+        expect(symbols.find((s) => s.name === 'shortFormat')!.fingerprint.tokenCount).toBeLessThan(15);
+      } finally { db.close(); }
+    });
+    await withCheckScenario('tests', async (root) => {
+      const config = defaultConfig(); config.reuse.skipTests = false;
+      expect((await checkRepository(root, { config })).blocked).toBe(true);
+    });
+    await withCheckScenario('generated', async (root) => {
+      const config = defaultConfig(); config.index.skipGenerated = false;
+      expect((await checkRepository(root, { config })).findings).toEqual([]);
+    });
+  });
+
+  it('finds Python versioned files and same basenames in another directory', async () => {
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'dates_v2.py', readFileSync(path.join(root, 'dates.py'), 'utf8'));
+      writeScenarioFile(root, 'other/utils.ts', readFileSync(path.join(root, 'utils.ts'), 'utf8'));
+      const files = (await checkRepository(root)).findings.filter((f) => f.kind === 'duplicate-file').map((f) => f.added.file);
+      expect(files).toEqual(expect.arrayContaining(['dates_v2.py', 'other/utils.ts']));
+    });
+  });
+});
+
+describe('scope, call provenance and literal provenance', () => {
+  it('compares staged, untracked and modified bodies to HEAD; explicit base includes committed changes', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      expect((await checkRepository(root)).blocked).toBe(true);
+      scenarioGit(root, 'add', 'calendar.ts');
+      expect((await checkRepository(root)).blocked).toBe(true);
+      scenarioGit(root, '-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'add clone');
+      expect((await checkRepository(root)).findings).toEqual([]);
+      expect((await checkRepository(root, { base: 'HEAD~1' })).blocked).toBe(true);
+      const source = readFileSync(path.join(root, 'calendar.ts'), 'utf8');
+      writeScenarioFile(root, 'calendar.ts', source.replace('const parts', '/* edited body */ const parts'));
+      expect((await checkRepository(root)).findings.some((f) => f.kind === 'duplicate' && f.added.file === 'calendar.ts')).toBe(true);
+    });
+  });
+
+  it('does not report existing literals just because their line or containing body changed', async () => {
+    await withCheckScenario('constant', async (root) => {
+      scenarioGit(root, 'add', 'request.ts');
+      scenarioGit(root, '-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'existing config consumer');
+      writeScenarioFile(root, 'request.ts', '\n\n' + readFileSync(path.join(root, 'request.ts'), 'utf8').replace('const region', '/* unchanged values */ const region'));
+      const report = await checkRepository(root);
+      expect(report.findings.filter((f) => f.kind === 'duplicate-constant')).toEqual([]);
+    });
+  });
+
+  it('does not suggest a constant deleted by this change, or an arbitrary arithmetic number', async () => {
+    await withCheckScenario('constant', async (root) => {
+      rmSync(path.join(root, 'config.ts'));
+      expect((await checkRepository(root)).findings.filter((f) => f.kind === 'duplicate-constant')).toEqual([]);
+    });
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'math.ts', 'export function offset(value: number) { const squared = value * value; const shifted = squared + 5000; return Math.sqrt(shifted); }\n');
+      expect((await checkRepository(root)).findings.filter((f) => f.kind === 'duplicate-constant')).toEqual([]);
+    });
+  });
+
+  it('preserves signed numeric values and does not collapse distinct bigint literals', async () => {
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'numeric.ts', 'export const MAX_TIMEOUT = 25n;\n');
+      scenarioGit(root, 'add', 'numeric.ts');
+      scenarioGit(root, '-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'bigint config constant');
+      writeScenarioFile(root, 'numeric-use.ts', 'export function configure(timeoutMs = -5000) { const maxTimeout = 26n; const config = { timeoutMs, maxTimeout }; return Object.freeze(config); }\n');
+      expect((await checkRepository(root)).findings.filter((f) => f.kind === 'duplicate-constant')).toEqual([]);
+    });
+  });
+
+  it('finds config numbers in default parameters without changing Phase 1 extraction', async () => {
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'defaults.ts', 'export function configure(timeoutMs = 5000) { const config = { timeoutMs, enabled: true }; return Object.freeze(config); }\n');
+      expect((await checkRepository(root)).findings.some((f) => f.fix === 'use REQUEST_TIMEOUT_MS from config.ts')).toBe(true);
+    });
+  });
+
+  it('resolves caller moves through import aliases at base and in the worktree', async () => {
+    await withCheckScenario('replaced', async (root) => {
+      const source = readFileSync(path.join(root, 'app.ts'), 'utf8');
+      writeScenarioFile(root, 'app.ts', source.replace('{ decodeCalendar }', '{ decodeCalendar as parseDateString }').replace('const date = decodeCalendar(', 'const date = parseDateString('));
+      const finding = (await checkRepository(root)).findings.find((f) => f.kind === 'dead-after-change');
+      expect(finding?.existing?.symbol).toBe('parseDateString');
+      expect(finding?.added.symbol).toBe('decodeCalendar');
+    });
+  });
+
+  it('does not flag dead-after-change if a caller remains or callers were merely removed', async () => {
+    await withCheckScenario('replaced', async (root) => {
+      writeScenarioFile(root, 'remaining.ts', "import { parseDateString } from './utils.js';\nparseDateString('2024-01-01');\n");
+      expect((await checkRepository(root)).findings.filter((f) => f.kind === 'dead-after-change')).toEqual([]);
+      rmSync(path.join(root, 'remaining.ts'));
+      writeScenarioFile(root, 'app.ts', 'export const noLongerUsed = true;\n');
+      expect((await checkRepository(root)).findings.filter((f) => f.kind === 'dead-after-change')).toEqual([]);
+    });
+  });
+
+  it('does not block partial syntax or an empty indexed repository, and rejects an invalid base', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, 'calendar.ts', readFileSync(path.join(root, 'calendar.ts'), 'utf8') + '\nfunction {\n');
+      expect((await checkRepository(root)).findings).toEqual([]);
+      await expect(checkRepository(root, { base: 'nonexistent-reuse-base' })).rejects.toThrow();
+      await expect(checkRepository(root, { timeoutMs: 0 })).rejects.toThrow('timed out');
+      for (const file of ['utils.ts', 'dates.py', 'config.ts', 'getters.ts', 'app.ts', 'calendar.ts']) rmSync(path.join(root, file));
+      scenarioGit(root, 'add', '-u');
+      scenarioGit(root, '-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'empty source tree');
+      expect((await checkRepository(root)).findings).toEqual([]);
+    });
+  });
+});
+
+describe('scoped duplicate exemptions', () => {
+  it.each(['needed', 'different', 'ok', 'temp', 'only two', 'needed because different', 'it is needed'])('rejects vague reason: %s', async (reason) => {
+    await withCheckScenario('duplicate', async (root) => {
+      writeScenarioFile(root, 'calendar.ts', `// groundwork: allow-duplicate ${reason}\n` + readFileSync(path.join(root, 'calendar.ts'), 'utf8'));
+      const report = await checkRepository(root);
+      expect(report.blocked).toBe(true);
+      expect(report.findings.some((f) => f.kind === 'invalid-allow')).toBe(true);
+      expect(report.allows).toEqual([]);
+    });
+  });
+
+  it('accepts a comment on the first symbol line and above an exported arrow declaration', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      const source = readFileSync(path.join(root, 'calendar.ts'), 'utf8');
+      writeScenarioFile(root, 'calendar.ts', source.replace('Date | null {', 'Date | null { /* groundwork: allow-duplicate preserves isolated legacy runtime compatibility */'));
+      expect((await checkRepository(root)).findings).toEqual([]);
+      writeScenarioFile(root, 'calendar.ts', '// groundwork: allow-duplicate preserves isolated legacy runtime compatibility\n' +
+        source.replace('export function decodeCalendar(value: string): Date | null {', 'export const decodeCalendar = (value: string): Date | null => {') + ';\n');
+      expect((await checkRepository(root)).findings).toEqual([]);
+    });
+  });
+
+  it('does not interpret a string or a detached comment as an exemption', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      const source = readFileSync(path.join(root, 'calendar.ts'), 'utf8');
+      writeScenarioFile(root, 'calendar.ts', "const note = 'groundwork: allow-duplicate preserves isolated legacy runtime compatibility';\n" + source);
+      expect((await checkRepository(root)).blocked).toBe(true);
+      writeScenarioFile(root, 'calendar.ts', '// groundwork: allow-duplicate preserves isolated legacy runtime compatibility\nconst unrelated = 42;\n' + source);
+      expect((await checkRepository(root)).findings.some((f) => f.kind === 'duplicate')).toBe(true);
+    });
+  });
+});
+
+describe('check command and Stop gate', () => {
+  it('emits JSON and short human BLOCK output; PASS and unavailable checks exit zero', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      const json = cli(root, 'check', '--json');
+      expect(json.status).toBe(1);
+      expect(JSON.parse(json.stdout)).toMatchObject({ blocked: true, status: 'BLOCK' });
+      const human = cli(root, 'check');
+      expect(human.status).toBe(1);
+      expect(human.stdout).toContain('Replace the body of decodeCalendar with a call to parseDateString');
+      expect(human.stdout).not.toContain('\x1b');
+      const unavailable = cli(root, '--json', 'check', '--base', 'does-not-exist');
+      expect(unavailable.status).toBe(0);
+      expect(JSON.parse(unavailable.stdout)).toMatchObject({ blocked: false, status: 'UNAVAILABLE', findings: [] });
+    });
+    await withCheckScenario('clean', async (root) => {
+      const passed = cli(root, 'check', '--json');
+      expect(passed.status).toBe(0);
+      expect(JSON.parse(passed.stdout)).toMatchObject({ status: 'PASS', findings: [] });
+    });
+  });
+
+  it('keeps calibrated medium-band findings as WARN and exits zero', async () => {
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'utils3.ts', readFileSync(path.join(root, 'utils.ts'), 'utf8').replace('month > 12', 'month > 11'));
+      const result = cli(root, 'check', '--json');
+      expect(result.status).toBe(0);
+      const report = JSON.parse(result.stdout);
+      expect(report.status).toBe('WARN');
+      expect(report.blocked).toBe(false);
+      expect(report.findings.some((f: { kind: string }) => f.kind === 'duplicate')).toBe(true);
+      expect(report.findings.every((f: { severity: string }) => f.severity === 'WARN')).toBe(true);
+    });
+  });
+
+  it('blocks once per finding set, remembers earlier sets and isolates sessions', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await assertStopScenario(root);
+      const ctx = { root, config: defaultConfig() };
+      const source = readFileSync(path.join(root, 'calendar.ts'), 'utf8');
+      writeScenarioFile(root, 'z-calendar.ts', source.replaceAll('decodeCalendar', 'readCalendar'));
+      expect((await duplicateGate.run(stopEvent(root), ctx))?.action).toBe('deny');
+      rmSync(path.join(root, 'z-calendar.ts'));
+      expect((await duplicateGate.run(stopEvent(root), ctx))?.action).toBe('allow');
+      expect((await duplicateGate.run(stopEvent(root, false, 'another-session'), ctx))?.action).toBe('deny');
+      ctx.config.reuse.duplicateGate = false;
+      expect((await duplicateGate.run(stopEvent(root, false, 'disabled-session'), ctx))?.action).toBe('allow');
+      expect(HANDLERS).toContain(duplicateGate);
+    });
+  });
+
+  it('renders a real Stop block, then stays silent on ignored, active and malformed stops', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await checkRepository(root);
+      const event = normalise('claude', 'stop', { cwd: root, session_id: 'dispatch-test' });
+      const result = await dispatch(event, root);
+      expect(JSON.parse(render(event, result))).toMatchObject({ decision: 'block' });
+      const first = hook(root, { cwd: root, session_id: 'process-test' });
+      expect(first.status).toBe(0);
+      expect(JSON.parse(first.stdout)).toMatchObject({ decision: 'block' });
+      for (const payload of [{ cwd: root, session_id: 'process-test' }, { cwd: root, session_id: 'other', stop_hook_active: true }, 'not JSON']) {
+        const result = hook(root, payload);
+        expect(result.status).toBe(0);
+        expect(result.stdout).toBe('');
+      }
+    });
+  });
+
+  it('fails open on missing Git history, index lock timeouts and unwritable session state', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await checkRepository(root);
+      const ctx = { root, config: defaultConfig() };
+      const event = stopEvent(root);
+      const lock = path.join(root, '.groundwork/index.lock');
+      writeFileSync(lock, String(process.pid));
+      expect((await duplicateGate.run(event, ctx))?.action).toBe('allow');
+      const timedOut = hook(root, { cwd: root, session_id: 'locked-process' });
+      expect(timedOut.status).toBe(0); expect(timedOut.stdout).toBe('');
+      rmSync(lock);
+      writeFileSync(path.join(root, '.groundwork/sessions'), 'not a directory');
+      expect((await duplicateGate.run(event, ctx))?.action).toBe('allow');
+      renameSync(path.join(root, '.git'), path.join(root, 'saved-git'));
+      expect((await duplicateGate.run(event, ctx))?.action).toBe('allow');
+    });
+  });
+
+  it('does not silently accept an unloggable exemption', async () => {
+    await withCheckScenario('allow', async (root) => {
+      mkdirSync(path.join(root, '.groundwork/logs/allows.jsonl'), { recursive: true });
+      await expect(checkRepository(root)).rejects.toThrow();
+      expect((await duplicateGate.run(stopEvent(root), { root, config: defaultConfig() }))?.action).toBe('allow');
+    });
+  });
+});

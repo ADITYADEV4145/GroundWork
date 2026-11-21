@@ -5,6 +5,7 @@ import { parse } from '../lang/parser.js';
 import type { ExtractedSymbol } from '../lang/adapter.js';
 import type { Language } from '../types.js';
 import { sha1 } from '../util/hash.js';
+import { contractOf } from './contracts.js';
 
 function bindingHash(body: Node, symbol: ExtractedSymbol): string {
   const locals = new Map<string, string>();
@@ -58,7 +59,8 @@ export function extractReuseSource(source: string, language: Language) {
       if (!symbol.fingerprint) return { ...symbol, bindingHash: null };
       const node = nodes.find((node) => node.startIndex >= symbol.startByte && node.endIndex <= symbol.endByte &&
         fingerprint(node.childForFieldName('body')!, [symbol.name]).normHash === symbol.fingerprint!.normHash);
-      return { ...symbol, bindingHash: node ? bindingHash(node.childForFieldName('body')!, symbol) : null };
+      return { ...symbol, bindingHash: node ? bindingHash(node.childForFieldName('body')!, symbol) : null,
+        contract: node ? contractOf(source, language, symbol, node.childForFieldName('body')!) : null };
     }) };
   } finally {
     tree.delete();

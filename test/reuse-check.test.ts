@@ -321,7 +321,7 @@ describe('check command and Stop gate', () => {
       expect(JSON.parse(json.stdout)).toMatchObject({ blocked: true, status: 'BLOCK' });
       const human = cli(root, 'check');
       expect(human.status).toBe(1);
-      expect(human.stdout).toContain('Replace the body of decodeCalendar with a call to parseDateString');
+      expect(human.stdout).toContain('Duplicate of parseDateString: REUSE it as-is or EXTEND/parameterize it');
       expect(human.stdout).not.toContain('\x1b');
       const unavailable = cli(root, '--json', 'check', '--base', 'does-not-exist');
       expect(unavailable.status).toBe(0);

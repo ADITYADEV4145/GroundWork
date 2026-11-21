@@ -353,7 +353,7 @@ describe('consented, offline-only optional meaning', () => {
     });
   });
 
-  it('keeps all saved candidate OOF operating points >=95% and the chosen classifier tied to this corpus', async () => {
+  it('preserves archived embedding OOF evidence and ties current optional scoring to the contract classifier', async () => {
     const dataset = await loadDataset(path.resolve('bench/dupes'));
     expect(evaluation.datasetDigest).toBe(dataset.digest);
     const picked = chooseEmbeddingCandidate(evaluation.candidates);
@@ -369,8 +369,9 @@ describe('consented, offline-only optional meaning', () => {
       const folds = new Map(dataset.examples.map((e) => [e.label.id, groups.indexOf(e.group) % 5]));
       for (const p of candidate.oof) expect(p.fold).toBe(folds.get(p.id));
     }
-    expect(meaningModel.weights).toEqual(picked.coefficients.weights);
-    expect(meaningModel.intercept).toBe(picked.coefficients.intercept);
+    expect(meaningModel.weights).toEqual({ ...model.weights, meaning: 0 });
+    expect(meaningModel.intercept).toBe(model.intercept);
+    expect(meaningModel.calibration).toEqual(model.calibration);
     expect(readFileSync(path.resolve('src/reuse/model.json'), 'utf8')).not.toContain('meaning');
   });
 });

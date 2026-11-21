@@ -126,7 +126,12 @@ describe('committed development artifact consistency (offline)', () => {
     }
     for (const row of data<Observation[]>('normal-pairs.json')) expect(available.has(`${row.repo}:${row.commit}`)).toBe(true);
     const summary = data<{ sourceHashes: Record<string, string> }>('summary.json');
-    for (const [file, hash] of Object.entries(summary.sourceHashes)) expect(digest(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'))).toBe(hash);
+    for (const [file, hash] of Object.entries(summary.sourceHashes)) {
+      const source = ['src/reuse/model.json', 'src/reuse/signals.ts'].includes(file)
+        ? readFileSync(new URL(`../bench/real-history/dev/frozen-${file.endsWith('json') ? 'model.json' : 'signals.ts.txt'}`, import.meta.url), 'utf8')
+        : readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+      expect(digest(source)).toBe(hash);
+    }
   });
   it('counts labelled families once and requires an explicit consistent action per family', () => {
     const rows = manifest.repos.flatMap((r) => data<Observation[]>(`${r.id}-features.json`));

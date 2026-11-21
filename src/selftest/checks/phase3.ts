@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { chooseBlock, loadDataset, metrics, outOfFold, recallByType, SIGNAL_KEYS, train } from '../../reuse/calibration.js';
+import { chooseBlock, loadTrainingDataset, metrics, outOfFold, recallByType, SIGNAL_KEYS, train } from '../../reuse/calibration.js';
 import { model, meaningModel } from '../../reuse/model.js';
 import { loadConfig } from '../../config/load.js';
 import { DEFAULT_EMBEDDING_MODEL, embedSources } from '../../reuse/embeddings.js';
@@ -19,11 +19,11 @@ export const PHASE3_CHECKS: Check[] = [{
   name: 'reuse BLOCK precision >= 95% (family-disjoint OOF)',
   async run(options) {
     const directory = fileURLToPath(new URL('../../../', import.meta.url));
-    const dataset = await loadDataset(path.join(directory, 'bench/dupes'));
+    const dataset = await loadTrainingDataset(path.join(directory, 'bench/dupes'));
     const root = options.root ?? findRepoRoot();
     const config = loadConfig(root);
     let meaning = false;
-    if (config.reuse.embeddings.enabled && (config.reuse.embeddings.model ?? DEFAULT_EMBEDDING_MODEL) === meaningModel.embeddingModel) {
+    if (meaningModel.weights.meaning !== 0 && config.reuse.embeddings.enabled && (config.reuse.embeddings.model ?? DEFAULT_EMBEDDING_MODEL) === meaningModel.embeddingModel) {
       const sources = dataset.symbols.map((s, i) => ({ id: String(i), text: dataset.sources.get(s)! }));
       const vectors = await embedSources(root, config, sources);
       meaning = vectors.size === sources.length;
@@ -38,16 +38,18 @@ export const PHASE3_CHECKS: Check[] = [{
     const predictions = outOfFold(dataset, keys);
     const threshold = chooseBlock(predictions);
     const result = metrics(predictions, active.thresholds.block, true);
+    const planted = predictions.filter((p) => p.example.population === 'planted');
+    const plantedResult = metrics(planted, active.thresholds.block, true);
     const final = train(dataset.examples, keys);
     const weights: Partial<Record<keyof typeof final.weights, number>> = active.weights;
     const fresh = dataset.digest === active.calibration.datasetDigest && dataset.examples.length === active.calibration.pairs &&
       Math.abs(threshold - active.thresholds.block) < 1e-12 && Math.abs(final.intercept - active.intercept) < 1e-12 &&
       keys.every((key) => Math.abs((final.weights[key] ?? 0) - (weights[key] ?? 0)) < 1e-12);
-    const byType = recallByType(predictions, active.thresholds.block);
+    const byType = recallByType(planted, active.thresholds.block);
     const recall = byType.map((r) => `Type ${r.type} ${r.tp}/${r.support} (${(100 * r.recall).toFixed(1)}%)`).join(', ');
     return {
-      ok: fresh && dataset.examples.length >= 400 && result.tp > 0 && result.precision >= 0.95,
-      detail: `Meaning ${meaning ? `active (${meaningModel.embeddingModel})` : 'inactive (no-meaning model)'}; ${fresh ? '' : 'STALE calibration; rerun the corresponding calibration script. '}${result.tp} TP, ${result.fp} FP, precision ${(100 * result.precision).toFixed(1)}%; recall ${recall}. Planted-corpus calibration; not independent production evidence.`,
+      ok: fresh && dataset.examples.length >= 400 && result.tp > 0 && result.precision >= 0.95 && plantedResult.precision >= 0.95,
+      detail: `Meaning ${meaning ? `active (${meaningModel.embeddingModel})` : 'inactive (baseline contract scoring)'}; ${fresh ? '' : 'STALE calibration; rerun npm run calibrate. '}${result.tp} TP, ${result.fp} FP combined, precision ${(100 * result.precision).toFixed(1)}%; planted precision ${(100 * plantedResult.precision).toFixed(1)}%; recall ${recall}. Dev+planted OOF calibration; not independent production evidence.`,
       metrics: { precision: result.precision, recall: result.recall, pairs: dataset.examples.length,
         ...Object.fromEntries(byType.map((r) => [`recallType${r.type}`, r.recall])) },
     };

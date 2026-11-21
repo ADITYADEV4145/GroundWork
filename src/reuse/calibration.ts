@@ -6,6 +6,7 @@ import { sha1 } from '../util/hash.js';
 import { buildIdf, pairSignals, type ComparableSymbol, type Signals } from './signals.js';
 import { extractReuseSource } from './source.js';
 import { canBlock, BLOCK_SCORE_FLOOR } from './policy.js';
+import { contractSignals } from './contracts.js';
 
 const refSchema = z.object({ file: z.string().startsWith('corpus/'), symbol: z.string().min(1) });
 export const labelSchema = z.object({
@@ -14,9 +15,9 @@ export const labelSchema = z.object({
   negativeKind: z.string().optional(), reasoning: z.string().min(15),
 }).refine((p) => p.label === 'dup' ? p.cloneType !== null : p.cloneType === null && !!p.negativeKind, 'Labels require a clone type or a negative kind');
 export type Label = z.infer<typeof labelSchema>;
-export interface Example { label: Label; a: ComparableSymbol; b: ComparableSymbol; group: string; signals: Signals }
+export interface Example { label: Label; a: ComparableSymbol; b: ComparableSymbol; group: string; signals: Signals; fixedSignals?: Signals; eligible?: boolean; population?: 'dev' | 'planted'; weight?: number }
 export interface Dataset { examples: Example[]; digest: string; symbols: ComparableSymbol[] }
-export const SIGNAL_KEYS: (keyof Signals)[] = ['structure', 'exact', 'vocabulary', 'paramCount', 'paramNames', 'returnType', 'name', 'bindingExact', 'structureVocabulary', 'exactVocabulary'];
+export const SIGNAL_KEYS: (keyof Signals)[] = ['structure', 'exact', 'vocabulary', 'paramCount', 'paramNames', 'returnType', 'name', 'bindingExact', 'structureVocabulary', 'exactVocabulary', 'contractCalls', 'contractReads', 'contractEarlyReturns', 'contractReturnShape', 'contractValidation'];
 export const COMBINATIONS: Record<string, (keyof Signals)[]> = {
   structure: ['structure', 'exact'], vocabulary: ['vocabulary'],
   'signature+name': ['paramCount', 'paramNames', 'returnType', 'name'],
@@ -70,6 +71,29 @@ export async function loadDataset(directory: string): Promise<Dataset & { source
 }
 
 export interface Coefficients { intercept: number; weights: Signals }
+export async function loadTrainingDataset(directory: string) {
+  const dataset = await loadDataset(directory);
+  const devDirectory = path.resolve(directory, '../real-history/dev');
+  const manifest = JSON.parse(readFileSync(path.join(devDirectory, 'repos.json'), 'utf8')) as { repos: { id: string }[] };
+  type Row = { id: string; repo: string; a: { file: string; symbol: string; kind: string }; b: Row['a'];
+    review: { label: string; family: string; reason: string }; current: { signals: Signals; related: boolean; compatible: boolean };
+    contracts: { a: Parameters<typeof contractSignals>[0]; b: Parameters<typeof contractSignals>[1] } };
+  const rows = manifest.repos.flatMap((r) => JSON.parse(readFileSync(path.join(devDirectory, `${r.id}-features.json`), 'utf8')) as Row[]).filter((r) => r.review.label !== 'unknown');
+  const examples: Example[] = [...dataset.examples.map((e) => ({ ...e, population: 'planted' as const }))];
+  for (const row of rows) {
+    const symbol = (r: Row['a']): ComparableSymbol => ({ name: r.symbol.split('.').at(-1)!, qualifiedName: r.symbol, kind: r.kind,
+      file: r.file, params: null, returnType: null, docstring: null, fingerprint: null });
+    const signals = { ...row.current.signals, ...contractSignals(row.contracts.a, row.contracts.b) };
+    examples.push({ label: { id: `dev:${row.id}`, a: { file: `corpus/dev/${row.a.file}`, symbol: row.a.symbol }, b: { file: `corpus/dev/${row.b.file}`, symbol: row.b.symbol },
+      label: row.review.label === 'positive' ? 'dup' : 'not', cloneType: null, reasoning: row.review.reason, ...(row.review.label === 'negative' ? { negativeKind: 'real-different-contract' } : {}) },
+      a: symbol(row.a), b: symbol(row.b), group: `dev:${row.repo}:${row.review.family}`, population: 'dev', signals, fixedSignals: signals,
+      eligible: !row.current.related && row.current.compatible && (signals.structure >= 0.5 || signals.exact === 1 || signals.bindingExact === 1) });
+  }
+  const counts = new Map<string, number>();
+  for (const e of examples) counts.set(e.group, (counts.get(e.group) ?? 0) + 1);
+  for (const e of examples) e.weight = e.population === 'dev' ? 1 / counts.get(e.group)! : 1;
+  return { ...dataset, examples, plantedDigest: dataset.digest, digest: sha1(dataset.digest + JSON.stringify(rows)) };
+}
 export function predict(model: Coefficients, signals: Signals): number {
   let value = model.intercept;
   for (const key of Object.keys(model.weights) as (keyof Signals)[]) value += (model.weights[key] ?? 0) * (signals[key] ?? 0);
@@ -79,16 +103,17 @@ export function predict(model: Coefficients, signals: Signals): number {
 export function train(examples: Example[], keys: (keyof Signals)[], iterations = 1800): Coefficients {
   if (!examples.length || !examples.some((e) => e.label.label === 'dup') || !examples.some((e) => e.label.label === 'not')) throw new Error('Training requires both classes');
   const model: Coefficients = { intercept: 0, weights: Object.fromEntries([...new Set([...SIGNAL_KEYS, ...keys])].map((k) => [k, 0])) as unknown as Signals };
+  const totalWeight = examples.reduce((n, e) => n + (e.weight ?? 1), 0);
   for (let iteration = 0; iteration < iterations; iteration++) {
     const gradient = Object.fromEntries(keys.map((key) => [key, 0])) as Record<keyof Signals, number>;
     let bias = 0;
     for (const example of examples) {
-      const error = predict(model, example.signals) - (example.label.label === 'dup' ? 1 : 0);
+      const error = (predict(model, example.signals) - (example.label.label === 'dup' ? 1 : 0)) * (example.weight ?? 1);
       bias += error;
       for (const key of keys) gradient[key] += error * (example.signals[key] ?? 0);
     }
-    model.intercept -= 0.4 * bias / examples.length;
-    for (const key of keys) model.weights[key] = (model.weights[key] ?? 0) - 0.4 * (gradient[key] / examples.length + 0.002 * (model.weights[key] ?? 0));
+    model.intercept -= 0.4 * bias / totalWeight;
+    for (const key of keys) model.weights[key] = (model.weights[key] ?? 0) - 0.4 * (gradient[key] / totalWeight + 0.002 * (model.weights[key] ?? 0));
   }
   return model;
 }
@@ -102,11 +127,11 @@ export function outOfFold(dataset: Dataset, keys: (keyof Signals)[], folds = 5):
   for (let fold = 0; fold < folds; fold++) {
     const training = dataset.examples.filter((e) => assignments.get(e.group) !== fold);
     const idf = buildIdf([...new Set(training.flatMap((e) => [e.a, e.b]))]);
-    const features = (e: Example) => ({ ...e, signals: pairSignals(e.a, e.b, idf) });
+    const features = (e: Example) => ({ ...e, signals: e.fixedSignals ?? pairSignals(e.a, e.b, idf) });
     const model = train(training.map(features), keys);
     for (const example of dataset.examples.filter((e) => assignments.get(e.group) === fold)) {
       const signals = features(example).signals;
-      predictions.push({ example, probability: predict(model, signals), fold, blockEligible: canBlock(example.a, example.b, signals) });
+      predictions.push({ example, probability: predict(model, signals), fold, blockEligible: example.eligible ?? canBlock(example.a, example.b, signals) });
     }
   }
   return predictions;
@@ -124,7 +149,8 @@ export function chooseBlock(predictions: Prediction[], target = 0.95): number {
   const candidates = [...new Set(predictions.map((p) => p.probability))].filter((p) => p >= BLOCK_SCORE_FLOOR).sort((a, b) => a - b);
   for (const threshold of candidates) {
     const result = metrics(predictions, threshold, true);
-    if (result.tp > 0 && result.precision >= target) return threshold;
+    const planted = metrics(predictions.filter((p) => p.example.population !== 'dev'), threshold, true);
+    if (result.tp > 0 && result.precision >= target && planted.precision >= target) return threshold;
   }
   throw new Error('No nonempty BLOCK threshold reaches target precision');
 }

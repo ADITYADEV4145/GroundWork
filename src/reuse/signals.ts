@@ -1,7 +1,9 @@
 import { minhashSimilarity, splitWords, vocabulary } from '../extract/fingerprint.js';
 import type { BodyFingerprint, Param } from '../types.js';
+import { contractSignals, type Contract } from './contracts.js';
 
 export interface ComparableSymbol {
+  contract?: Contract | null;
   kind?: string;
   file?: string;
   qualifiedName?: string;
@@ -17,6 +19,11 @@ export interface ComparableSymbol {
 }
 
 export interface Signals {
+  contractCalls?: number;
+  contractReads?: number;
+  contractEarlyReturns?: number;
+  contractReturnShape?: number;
+  contractValidation?: number;
   structure: number;
   exact: number;
   vocabulary: number;
@@ -74,6 +81,7 @@ export function pairSignals(a: ComparableSymbol, b: ComparableSymbol, idf: Map<s
     paramNames: overlap((a.params ?? []).flatMap((p) => splitWords(p.name)), (b.params ?? []).flatMap((p) => splitWords(p.name))),
     returnType: a.returnType && b.returnType && a.returnType.replace(/\s/g, '') === b.returnType.replace(/\s/g, '') ? 1 : 0,
     name: overlap(splitWords(a.name), splitWords(b.name)),
+    ...contractSignals(a.contract, b.contract),
   };
 }
 

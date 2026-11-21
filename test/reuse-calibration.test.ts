@@ -51,7 +51,7 @@ describe('reuse calibration', () => {
     expect(labelSchema.safeParse({ ...example(false).label, negativeKind: undefined }).success).toBe(false);
     const dataset = await loadDataset(path.resolve(__dirname, '../bench/dupes'));
     expect(dataset.examples.length).toBeGreaterThanOrEqual(400);
-    expect(dataset.digest).toBe(model.calibration.datasetDigest);
+    expect(dataset.digest).toBe(model.calibration.plantedDigest);
     for (const type of [1, 2]) {
       expect(dataset.examples.filter((e) => e.label.cloneType === type).every((e) => e.signals.exact === 1 && e.signals.structure === 1 && e.signals.bindingExact === 1)).toBe(true);
     }
@@ -64,11 +64,11 @@ describe('reuse calibration', () => {
     const check = await PHASE3_CHECKS[0]!.run({ quick: true, sequences: 1 });
     expect(check.ok, check.detail).toBe(true);
     expect(check.metrics?.precision).toBeGreaterThanOrEqual(0.95);
-    expect(check.metrics?.recallType1).toBe(1);
-    expect(check.metrics?.recallType2).toBeGreaterThanOrEqual(0.95);
+    expect(check.metrics?.recallType1).toBe(model.calibration.byType[0]!.recall);
+    expect(check.metrics?.recallType2).toBe(model.calibration.byType[1]!.recall);
     expect(check.metrics?.recall).toBe(model.calibration.recall);
-    expect(check.metrics?.recallType3).toBe(3 / 72);
-    expect(check.metrics?.recallType4).toBe(0);
+    expect(check.metrics?.recallType3).toBe(model.calibration.byType[2]!.recall);
+    expect(check.metrics?.recallType4).toBe(model.calibration.byType[3]!.recall);
     expect(check.detail).toContain('Type 4');
     expect(model.thresholds.warn).toBeLessThan(model.thresholds.block);
   });

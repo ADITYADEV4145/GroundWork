@@ -4,7 +4,11 @@ import { existsSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { chooseBlock, loadDataset, metrics, outOfFold, recallByType, SIGNAL_KEYS, train } from '../../reuse/calibration.js';
-import { model } from '../../reuse/model.js';
+import { model, meaningModel } from '../../reuse/model.js';
+import { loadConfig } from '../../config/load.js';
+import { DEFAULT_EMBEDDING_MODEL, embedSources } from '../../reuse/embeddings.js';
+import { pairSignals, buildIdf } from '../../reuse/signals.js';
+import { findRepoRoot } from '../../util/paths.js';
 import { checkRepository } from '../../reuse/check.js';
 import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, withCheckScenario } from '../../reuse/scenarios.js';
 import type { Check } from '../registry.js';
@@ -12,21 +16,37 @@ import type { Check } from '../registry.js';
 export const PHASE3_CHECKS: Check[] = [{
   phase: 3,
   name: 'reuse BLOCK precision >= 95% (family-disjoint OOF)',
-  async run() {
+  async run(options) {
     const directory = fileURLToPath(new URL('../../../', import.meta.url));
     const dataset = await loadDataset(path.join(directory, 'bench/dupes'));
-    const predictions = outOfFold(dataset, SIGNAL_KEYS);
+    const root = options.root ?? findRepoRoot();
+    const config = loadConfig(root);
+    let meaning = false;
+    if (config.reuse.embeddings.enabled && (config.reuse.embeddings.model ?? DEFAULT_EMBEDDING_MODEL) === meaningModel.embeddingModel) {
+      const sources = dataset.symbols.map((s, i) => ({ id: String(i), text: dataset.sources.get(s)! }));
+      const vectors = await embedSources(root, config, sources);
+      meaning = vectors.size === sources.length;
+      if (meaning) {
+        for (let i = 0; i < dataset.symbols.length; i++) dataset.symbols[i]!.embedding = vectors.get(String(i));
+        const idf = buildIdf(dataset.symbols);
+        for (const example of dataset.examples) example.signals = pairSignals(example.a, example.b, idf);
+      }
+    }
+    const active = meaning ? meaningModel : model;
+    const keys = meaning ? [...SIGNAL_KEYS, 'meaning' as const] : SIGNAL_KEYS;
+    const predictions = outOfFold(dataset, keys);
     const threshold = chooseBlock(predictions);
-    const result = metrics(predictions, model.thresholds.block);
-    const final = train(dataset.examples, SIGNAL_KEYS);
-    const fresh = dataset.digest === model.calibration.datasetDigest && dataset.examples.length === model.calibration.pairs &&
-      Math.abs(threshold - model.thresholds.block) < 1e-12 && Math.abs(final.intercept - model.intercept) < 1e-12 &&
-      SIGNAL_KEYS.every((key) => Math.abs(final.weights[key] - model.weights[key]) < 1e-12);
-    const byType = recallByType(predictions, model.thresholds.block);
+    const result = metrics(predictions, active.thresholds.block);
+    const final = train(dataset.examples, keys);
+    const weights: Partial<Record<keyof typeof final.weights, number>> = active.weights;
+    const fresh = dataset.digest === active.calibration.datasetDigest && dataset.examples.length === active.calibration.pairs &&
+      Math.abs(threshold - active.thresholds.block) < 1e-12 && Math.abs(final.intercept - active.intercept) < 1e-12 &&
+      keys.every((key) => Math.abs((final.weights[key] ?? 0) - (weights[key] ?? 0)) < 1e-12);
+    const byType = recallByType(predictions, active.thresholds.block);
     const recall = byType.map((r) => `Type ${r.type} ${r.tp}/${r.support} (${(100 * r.recall).toFixed(1)}%)`).join(', ');
     return {
       ok: fresh && dataset.examples.length >= 400 && result.tp > 0 && result.precision >= 0.95,
-      detail: `${fresh ? '' : 'STALE calibration; run npm run calibrate. '}${result.tp} TP, ${result.fp} FP, precision ${(100 * result.precision).toFixed(1)}%; recall ${recall}. Planted-corpus calibration; not independent production evidence.`,
+      detail: `Meaning ${meaning ? `active (${meaningModel.embeddingModel})` : 'inactive (no-meaning model)'}; ${fresh ? '' : 'STALE calibration; rerun the corresponding calibration script. '}${result.tp} TP, ${result.fp} FP, precision ${(100 * result.precision).toFixed(1)}%; recall ${recall}. Planted-corpus calibration; not independent production evidence.`,
       metrics: { precision: result.precision, recall: result.recall, pairs: dataset.examples.length,
         ...Object.fromEntries(byType.map((r) => [`recallType${r.type}`, r.recall])) },
     };

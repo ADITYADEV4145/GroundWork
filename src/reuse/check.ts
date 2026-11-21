@@ -15,7 +15,7 @@ import { estimateTokens, fitToBudget } from '../util/tokens.js';
 import { git, readBase, symbolSource } from './base.js';
 import { CandidateIndex } from './candidates.js';
 import { allowReason, configName, inspectSource } from './inspection.js';
-import { model, probability, thresholds } from './model.js';
+import { scoreSignals } from './model.js';
 import { pairSignals, type Signals } from './signals.js';
 
 type IndexedSymbol = ReuseState['symbols'][number];
@@ -49,10 +49,10 @@ const literalValue = (l: Pick<Literal, 'kind' | 'value'>) => {
   return `${l.kind === 'number' ? 'number' : 'string'}:${l.kind === 'number' && Number.isFinite(number) ? number : l.value}`;
 };
 
-function topSignals(signals: Signals): CheckFinding['signals'] {
+function topSignals(signals: Signals, score: ReturnType<typeof scoreSignals>): CheckFinding['signals'] {
   const keys: (keyof Signals)[] = ['bindingExact', 'vocabulary', 'structure', 'exact', 'paramCount', 'paramNames', 'returnType', 'name'];
-  return keys.sort((a, b) => model.weights[b] * signals[b] - model.weights[a] * signals[a]).slice(0, 2)
-    .map((name) => ({ name, value: signals[name] }));
+  return [...keys.sort((a, b) => (score.weights[b] ?? 0) * (signals[b] ?? 0) - (score.weights[a] ?? 0) * (signals[a] ?? 0)).slice(0, 2)
+    .map((name) => ({ name, value: signals[name] ?? 0 })), ...(score.meaning ? [{ name: 'meaning', value: signals.meaning! }] : [])];
 }
 
 export function formatFinding(f: CheckFinding): string {
@@ -66,7 +66,7 @@ export function formatFinding(f: CheckFinding): string {
   return [
     `${f.severity} ${f.kind}: ${ref(f.added)}`,
     `Existing: ${f.existing ? ref(f.existing) : 'no valid duplicate exemption'}`,
-    `Why: ${f.signals.slice(0, 2).map((s) => `${s.name}=${Number(s.value.toFixed(3))}`).join(', ')}${f.probability === undefined ? '' : `; p=${f.probability.toFixed(3)}`}`,
+    `Why: ${f.signals.slice(0, 3).map((s) => `${s.name}=${Number(s.value.toFixed(3))}`).join(', ')}${f.probability === undefined ? '' : `; p=${f.probability.toFixed(3)}`}`,
     `Fix: ${clean(f.fix)}`,
   ].join('\n');
 }
@@ -103,6 +103,8 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
   }
   finally { db.close(); }
+  await candidates.prepareMeaning(root, config);
+  checkDeadline();
   const baseSymbols = new Map(base.state.symbols.map((s) => [s.id, s]));
   const symbols = new Map(state.symbols.map((s) => [s.id, s]));
   const oldFiles = new Map(base.state.files.map((f) => [f.file, f]));
@@ -174,22 +176,23 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     if (allowed.has(id)) return true;
     return exempt(symbols.get(id)?.parentId ?? null);
   };
-  const matches = new Map<string, { target: IndexedSymbol; p: number; signals: Signals }>();
+  const matches = new Map<string, { target: IndexedSymbol; p: number; signals: Signals; score: ReturnType<typeof scoreSignals> }>();
   for (const s of changed) {
     checkDeadline();
     if (!eligible.has(s.id) || exempt(s.id)) continue;
     const query = candidateById.get(s.id)!;
-    let best: { target: IndexedSymbol; p: number; signals: Signals } | undefined;
+    let best: { target: IndexedSymbol; p: number; signals: Signals; score: ReturnType<typeof scoreSignals> } | undefined;
     for (const candidate of candidates.find(query)) {
       if (!eligible.has(candidate.id) || (!baseSymbols.has(candidate.id) && order(candidate) >= order(s))) continue;
       const signals = pairSignals(query, candidate, candidates.idf);
-      const p = probability(signals);
-      if (!best || p > best.p) best = { target: symbols.get(candidate.id)!, p, signals };
+      const score = scoreSignals(signals, query.embedding?.model);
+      const p = score.probability;
+      if (!best || p > best.p) best = { target: symbols.get(candidate.id)!, p, signals, score };
     }
-    if (!best || best.p < thresholds.warn) continue;
+    if (!best || best.p < best.score.thresholds.warn) continue;
     matches.set(s.id, best);
-    add({ kind: 'duplicate', severity: best.p >= thresholds.block ? 'BLOCK' : 'WARN', added: location(s), existing: location(best.target),
-      probability: best.p, signals: topSignals(best.signals), fix: `Replace the body of ${s.qualifiedName} with a call to ${best.target.qualifiedName}.` });
+    add({ kind: 'duplicate', severity: best.p >= best.score.thresholds.block ? 'BLOCK' : 'WARN', added: location(s), existing: location(best.target),
+      probability: best.p, signals: topSignals(best.signals, best.score), fix: `Replace the body of ${s.qualifiedName} with a call to ${best.target.qualifiedName}.` });
   }
   const callKey = (c: ReuseState['calls'][number]) => `${c.file}\0${c.callerId ?? '<module>'}`;
   const currentCallers = new Map<string, ReuseState['calls']>();
@@ -263,7 +266,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
       const match = matches.get(s.id);
       if (!match || match.target.file === file.file || !oldFiles.has(match.target.file)) continue;
       const group = targets.get(match.target.file) ?? { count: 0, blocks: 0 };
-      group.count++; if (match.p >= thresholds.block) group.blocks++;
+      group.count++; if (match.p >= match.score.thresholds.block) group.blocks++;
       targets.set(match.target.file, group);
     }
     for (const [existing, group] of [...targets].sort((a, b) => b[1].count - a[1].count).slice(0, 1)) {

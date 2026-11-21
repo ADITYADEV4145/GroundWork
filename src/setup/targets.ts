@@ -36,8 +36,8 @@ export const BLOCK_END = '# <<< groundwork';
 
 type HookMap = Record<string, { matcher?: string; command: string }[]>;
 
-/** Any Groundwork hook, whichever launch command installed it, so removal and re-setup with a new `--command` find it. */
-const OUR_HOOK = /(?:^|[\s/])(?:gw|groundwork-agent)(?:\s+\S+)*\s+hook\s+(?:claude|codex|cursor)\s+\w+$/;
+/** Any Groundwork hook, whichever launcher installed it (`gw`, `npx -y groundwork-agent@x`, `node dist/cli/main.js`), so removal and re-setup with a new `--command` find it. */
+const OUR_HOOK = /\shook\s+(?:claude|codex|cursor)\s+(?:pre_tool|post_tool|session_start|prompt|stop|pre_compact)$/;
 
 function isOurs(command: unknown): boolean {
   return typeof command === 'string' && OUR_HOOK.test(command.trim());
@@ -115,14 +115,12 @@ function cursorHooks(file: string, gw: string, map: HookMap): JsonEdit {
   };
 }
 
-const OUR_MCP = /(?:^|[\s/])(?:gw|groundwork-agent)(?:\s+\S+)*\s+mcp$/;
-
-/** An entry `gw setup` wrote: only `command` and `args`, launching `gw mcp`. Anything else is the user's and is left alone. */
+/** An entry `gw setup` wrote: only `command` and `args`, ending in `mcp`. Anything else (env, cwd, other args) is the user's and is left alone. */
 function isOurMcp(entry: unknown): boolean {
   const e = asObject(entry);
   if (Object.keys(e).some((k) => k !== 'command' && k !== 'args')) return false;
   if (typeof e.command !== 'string' || !Array.isArray(e.args)) return false;
-  return OUR_MCP.test([e.command, ...(e.args as unknown[]).map(String)].join(' '));
+  return e.args.length > 0 && e.args[e.args.length - 1] === 'mcp';
 }
 
 function mcpServer(file: string, gw: string): JsonEdit {

@@ -13,7 +13,7 @@ Groundwork is built in phases by parallel streams on top of the Phase 1 index. K
 
 | What | Where | How |
 | --- | --- | --- |
-| CLI command | `src/cli/commands/<name>.ts` | export `register(program)`, add it to the list in `src/cli/main.ts` |
+| CLI command | `src/cli/commands/<name>.ts` | export `register(program)`, add it to the list in `src/cli/program.ts` (the hook bootstrap stays lightweight) |
 | MCP tool | `src/mcp/tools/<name>.ts` | `defineTool({...})`, add it to `TOOLS` in `src/mcp/tools/index.ts` |
 | Hook handler | `src/hooks/handlers/<name>.ts` | implement `HookHandler`, add it to `HANDLERS` in `src/hooks/handlers/index.ts` |
 | Config | `src/config/sections/<phase>.ts` | each stream owns its section's zod schema |

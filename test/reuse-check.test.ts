@@ -385,6 +385,30 @@ describe('check command and Stop gate', () => {
     });
   });
 
+  it('keeps fast and global-option hook routes equivalent without the compile cache', async () => {
+    await withCheckScenario('duplicate', async (root) => {
+      await checkRepository(root);
+      for (const [i, args] of [['hook', 'claude', 'stop'], ['--root', root, 'hook', 'claude', 'stop']].entries()) {
+        const run = (input: string) => spawnSync(process.execPath, ['--import', TSX, MAIN, ...args], {
+          cwd: root, encoding: 'utf8', input, env: { ...process.env, NODE_DISABLE_COMPILE_CACHE: '1' },
+        });
+        const payload = { cwd: root, session_id: `route-${i}` };
+        const first = run(JSON.stringify(payload));
+        expect(first.status).toBe(0);
+        expect(JSON.parse(first.stdout)).toMatchObject({ decision: 'block' });
+        const second = run(JSON.stringify(payload));
+        expect(second.status).toBe(0);
+        expect(second.stdout).toBe('');
+        const active = run(JSON.stringify({ ...payload, stop_hook_active: true }));
+        expect(active.status).toBe(0);
+        expect(active.stdout).toBe('');
+        const malformed = run('not JSON');
+        expect(malformed.status).toBe(0);
+        expect(malformed.stdout).toBe('');
+      }
+    });
+  });
+
   it('prioritizes Stop denial while preserving opt-in nonblocking waste summaries', async () => {
     await withCheckScenario('duplicate', async (root) => {
       await checkRepository(root);

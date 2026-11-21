@@ -307,7 +307,7 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
             ctx.literals.push({ symbol: idx, value: right.text, kind: 'number', line: node.startPosition.row + 1, constName: left.text });
             return;
           }
-          walk(ctx, right, parent, scope, false);
+          if (right) visit(ctx, right, parent, scope, false);
           return;
         }
       }

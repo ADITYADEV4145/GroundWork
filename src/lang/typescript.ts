@@ -214,7 +214,10 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
       const value = node.childForFieldName('value') ?? node.namedChildren.find((c) => c && c.type !== 'comment' && c.type !== 'decorator') ?? null;
       if (value && isDefault) {
         if (value.type === 'identifier') ctx.exportedNames.set(value.text, 'default');
-        else if (FN_VALUE.has(value.type)) addSymbol(ctx, value, 'default', 'function', parent, { fnNode: value, exported: true, isDefault: true, docNode: node });
+        else if (FN_VALUE.has(value.type)) {
+          const idx = addSymbol(ctx, value, 'default', 'function', parent, { fnNode: value, exported: true, isDefault: true, docNode: node });
+          walkBody(ctx, value.childForFieldName('body'), idx);
+        }
         else visitOne(ctx, value, parent, scope);
       }
       return;
@@ -236,7 +239,7 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
           if (m && right.type === 'identifier') ctx.exportedNames.set(right.text, m[1]!);
           else if (m && FN_VALUE.has(right.type)) {
             const idx = addSymbol(ctx, node, m[1]!, 'function', null, { fnNode: right, exported: true });
-            walkChildren(ctx, right.childForFieldName('body'), idx, idx);
+            walkBody(ctx, right.childForFieldName('body'), idx);
             return;
           }
         }
@@ -247,7 +250,7 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
     case 'generator_function_declaration': {
       const name = node.childForFieldName('name')?.text ?? 'default';
       const idx = addSymbol(ctx, node, name, 'function', parent, { fnNode: node, exported: exportCtx.exported, isDefault: exportCtx.isDefault });
-      walkChildren(ctx, node.childForFieldName('body'), idx, idx);
+      walkBody(ctx, node.childForFieldName('body'), idx);
       return;
     }
     case 'function_signature': {
@@ -278,13 +281,13 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
         if (m.type === 'method_definition') {
           const mname = m.childForFieldName('name')?.text ?? '?';
           const midx = addSymbol(ctx, m, mname, 'method', idx, { fnNode: m });
-          walkChildren(ctx, m.childForFieldName('body'), midx, midx);
+          walkBody(ctx, m.childForFieldName('body'), midx);
         } else if (m.type === 'public_field_definition' || m.type === 'field_definition') {
           const v = m.childForFieldName('value');
           const fname = (m.childForFieldName('name') ?? m.childForFieldName('property'))?.text ?? '?';
           if (v && FN_VALUE.has(v.type)) {
             const midx = addSymbol(ctx, m, fname, 'method', idx, { fnNode: v });
-            walkChildren(ctx, v.childForFieldName('body'), midx, midx);
+            walkBody(ctx, v.childForFieldName('body'), midx);
           } else if (v) visitOne(ctx, v, idx, idx);
         } else if (m.type === 'method_signature' || m.type === 'abstract_method_signature') {
           continue;
@@ -319,7 +322,7 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
         const name = nameNode.text;
         if (value && FN_VALUE.has(value.type)) {
           const idx = addSymbol(ctx, d, name, 'function', parent, { fnNode: value, exported: exportCtx.exported, docNode: node });
-          walkChildren(ctx, value.childForFieldName('body'), idx, idx);
+          walkBody(ctx, value.childForFieldName('body'), idx);
           continue;
         }
         if (value?.type === 'class') {
@@ -396,6 +399,13 @@ function isRequire(n: Node): boolean {
 
 function visitOne(ctx: Ctx, node: Node, parent: number | null, scope: number | null): void {
   visit(ctx, node, parent, scope, { exported: false, isDefault: false }, false);
+}
+
+/** Arrow functions can have an expression body (`() => helper()`), which is itself a node to visit. */
+function walkBody(ctx: Ctx, body: Node | null, owner: number): void {
+  if (!body) return;
+  if (body.type === 'statement_block' || body.type === 'class_body') walkChildren(ctx, body, owner, owner);
+  else visitOne(ctx, body, owner, owner);
 }
 
 function walkChildren(ctx: Ctx, node: Node | null, parent: number | null, scope: number | null): void {

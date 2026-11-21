@@ -43,11 +43,11 @@ export function noisyTool(command: string): NoisyTool | null {
   if (/(?:^|[\s;&|])(?:npm|pnpm|yarn)\s+(?:run\s+)?(?:test|build|lint)(?:\s|$)/.test(command)) return 'generic';
   return null;
 }
-export const failurePattern = /FAIL|Error|error TS|✗|failed|^\s*E {2}|Traceback|ERR!|AssertionError|assert |Assertion|\berror\b|\bF\d{3}\b|\bE\d{3}\b/i;
+export const failurePattern = /FAIL|Error|error TS|✗|✕|×|❯|failed|^\s*E {2}|Traceback|ERR[_!]|AssertionError|assert |Assertion|\berror\b|\bF\d{3}\b|\bE\d{3}\b/i;
 const parsers: Record<NoisyTool, RegExp> = {
   pytest: /_{3,}|^\s*>|^\s*E\s|short test summary|=+.*(?:failed|passed)|\.py:\d+/,
   vitest: /[❯×✗]|Assertion|Expected:|Received:|Test Files|Tests\s|\.\w+:[0-9]+/,
-  jest: /●|Expected:|Received:|Test Suites:|Tests:|Snapshots:|\bat .+:\d+/,
+  jest: /●|Expected\b|Received\b|Test Suites:|Tests:|Snapshots:|\bat .+:\d+/,
   tsc: /\(\d+,\d+\)|error TS|Found \d+ error/,
   eslint: /^\S+\.[cm]?[jt]sx?$|^\s*\d+:\d+\s+(?:error|warning)\b|problems? \(/,
   ruff: /\w+\.py:\d+:\d+|Found \d+ error|\[\*\]/,

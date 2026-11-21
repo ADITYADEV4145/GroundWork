@@ -1,1 +1,30 @@
-{"tool":"ruff","output":"checking src/batch25/module0 ... ok\nchecking src/batch25/module1 ... ok\nchecking src/batch25/module2 ... ok\nchecking src/batch25/module3 ... ok\nchecking src/batch25/module4 ... ok\nchecking src/batch25/module5 ... ok\nchecking src/batch25/module6 ... ok\nchecking src/batch25/module7 ... ok\nchecking src/batch25/module8 ... ok\nchecking src/batch25/module9 ... ok\nchecking src/batch25/module10 ... ok\nchecking src/batch25/module11 ... ok\nchecking src/batch25/module12 ... ok\nchecking src/batch25/module13 ... ok\nchecking src/batch25/module14 ... ok\nchecking src/batch25/module15 ... ok\nchecking src/batch25/module16 ... ok\nchecking src/batch25/module17 ... ok\nchecking src/batch25/module18 ... ok\nchecking src/batch25/module19 ... ok\nchecking src/batch25/module20 ... ok\nchecking src/batch25/module21 ... ok\nchecking src/batch25/module22 ... ok\nchecking src/batch25/module23 ... ok\nchecking src/batch25/module24 ... ok\nsrc/accounts.py:42:9: F821 Undefined name `account`\n 42 |     return account\nFound 1 error.\nchecking src/batch25/module25 ... ok\nchecking src/batch25/module26 ... ok\nchecking src/batch25/module27 ... ok\nchecking src/batch25/module28 ... ok\nchecking src/batch25/module29 ... ok\nchecking src/batch25/module30 ... ok\nchecking src/batch25/module31 ... ok\nchecking src/batch25/module32 ... ok\nchecking src/batch25/module33 ... ok\nchecking src/batch25/module34 ... ok\nchecking src/batch25/module35 ... ok\nchecking src/batch25/module36 ... ok\nchecking src/batch25/module37 ... ok\nchecking src/batch25/module38 ... ok\nchecking src/batch25/module39 ... ok\nchecking src/batch25/module40 ... ok\nchecking src/batch25/module41 ... ok\nchecking src/batch25/module42 ... ok\nchecking src/batch25/module43 ... ok\nchecking src/batch25/module44 ... ok\nchecking src/batch25/module45 ... ok\nchecking src/batch25/module46 ... ok\nchecking src/batch25/module47 ... ok\nchecking src/batch25/module48 ... ok\nchecking src/batch25/module49 ... ok\nchecking src/batch25/module50 ... ok\nchecking src/batch25/module51 ... ok\nchecking src/batch25/module52 ... ok\nchecking src/batch25/module53 ... ok\nchecking src/batch25/module54 ... ok\nchecking src/batch25/module55 ... ok\nchecking src/batch25/module56 ... ok\nchecking src/batch25/module57 ... ok\nchecking src/batch25/module58 ... ok\nchecking src/batch25/module59 ... ok\nchecking src/batch25/module60 ... ok\nchecking src/batch25/module61 ... ok\nchecking src/batch25/module62 ... ok\nchecking src/batch25/module63 ... ok\nchecking src/batch25/module64 ... ok\nchecking src/batch25/module65 ... ok\nchecking src/batch25/module66 ... ok\nchecking src/batch25/module67 ... ok\nchecking src/batch25/module68 ... ok\nchecking src/batch25/module69 ... ok\nNo fixes available.\n","expected":["src/accounts.py:42:9: F821 Undefined name `account`"," 42 |     return account","Found 1 error.","No fixes available."]}
+{
+  "tool": "ruff",
+  "output": "\u001b[1msample.py\u001b[0m\u001b[36m:\u001b[0m2\u001b[36m:\u001b[0m8\u001b[36m:\u001b[0m \u001b[1;31mF811\u001b[0m [\u001b[36m*\u001b[0m] Redefinition of unused `os` from line 1\n  \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m1 |\u001b[0m import os\n\u001b[1m\u001b[94m2 |\u001b[0m import os\n  \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[91m^^\u001b[0m \u001b[1m\u001b[91mF811\u001b[0m\n  \u001b[1m\u001b[94m|\u001b[0m\n  \u001b[1m\u001b[94m= \u001b[0m\u001b[1m\u001b[96mhelp\u001b[0m: Remove definition: `os`\n\n\u001b[1msample.py\u001b[0m\u001b[36m:\u001b[0m2\u001b[36m:\u001b[0m8\u001b[36m:\u001b[0m \u001b[1;31mF401\u001b[0m [\u001b[36m*\u001b[0m] `os` imported but unused\n  \u001b[1m\u001b[94m|\u001b[0m\n\u001b[1m\u001b[94m1 |\u001b[0m import os\n\u001b[1m\u001b[94m2 |\u001b[0m import os\n  \u001b[1m\u001b[94m|\u001b[0m        \u001b[1m\u001b[91m^^\u001b[0m \u001b[1m\u001b[91mF401\u001b[0m\n  \u001b[1m\u001b[94m|\u001b[0m\n  \u001b[1m\u001b[94m= \u001b[0m\u001b[1m\u001b[96mhelp\u001b[0m: Remove unused import: `os`\n\nFound 2 errors.\n[\u001b[36m*\u001b[0m] 2 fixable with the `--fix` option.\n",
+  "expected": [
+    "sample.py:2:8: F811 [*] Redefinition of unused `os` from line 1",
+    "  |        ^^ F811",
+    "sample.py:2:8: F401 [*] `os` imported but unused",
+    "  |        ^^ F401",
+    "Found 2 errors."
+  ],
+  "provenance": {
+    "suite": "ruff",
+    "scenario": 2,
+    "command": [
+      "/home/ubuntu/groundwork-capture-python/bin/python",
+      "-m",
+      "ruff",
+      "check",
+      "--output-format",
+      "full",
+      "sample.py"
+    ],
+    "toolVersion": "ruff 0.11.13",
+    "capturedAt": "2026-11-21T20:33:18.100Z",
+    "exitCode": 1,
+    "files": {
+      "sample.py": "import os\nimport os\n"
+    }
+  }
+}

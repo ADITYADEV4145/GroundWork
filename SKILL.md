@@ -1,19 +1,18 @@
 ---
 name: groundwork
-description: Use for any coding task in a repository: to find code, read only what's needed, check for existing code before writing new code, and verify calls exist.
+description: "Use for any coding task in a repository: to find code, read only what's needed, check for existing code before writing new code, and verify calls exist."
 ---
 
 # Groundwork
 
-Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to spend fewer tokens finding your way around, to reuse code that already exists, and to call only functions that exist.
+Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
 
 ## 1. Navigate: index first, whole files last
 
-1. Once per repository, run `repo_map()` to see the main directories. To go deeper, narrow by `path` rather than asking for a bigger global map.
-2. Use `find_code({ "query": "what you need" })` before grep. Search with a name, a name fragment, or words from the signature or docs. Use `kind` to narrow noisy results.
-3. Before reading an unfamiliar file, use `outline({ "file": "path/to/file.ts" })`.
-4. Read one definition with `read_symbol({ "symbol": "symbol-id" })`. If the name is ambiguous, pick the ID whose location fits the task. Ask for a few `context_lines` only if you need them. Read a whole file only when you need all of it.
-5. Trace a change with `callers`, `callees` and `where_used`. Treat `name-only` and unresolved edges as leads, not proof. When you want more results, follow the exact `Next` call.
+1. Start with the clue you have. If a symbol name or behavior is known, use `find_code({ "query": "what you need", "locations_only": true })` before grep. Use `kind` to narrow results. If you only need a definition's location, stop when you have it. Omit `locations_only` when signatures or docs are needed to choose a match.
+2. If you have a file but not a symbol, use `outline({ "file": "path/to/file.ts", "locations_only": true })` before reading the whole file. If you already know the symbol and need its body, go straight to `read_symbol({ "symbol": "exact name or ID" })`.
+3. Use `repo_map({ "depth": 1 })` once if you need orientation in an unfamiliar repo. Skip the map for a targeted lookup; go deeper by narrowing `path`.
+4. Trace with `callers`, `callees`, or `where_used` when you know the anchor name. Treat `name-only` and unresolved edges as leads. Verify only missing details with a symbol or ranged read. Follow the exact `Next` call if you need more results.
 
 Fall back to ordinary search and ranged reads for docs, logs, config, unsupported languages, and raw text the index does not hold. If a result is missing or incomplete, check the lines directly. If the MCP server is not connected, `gw symbols` and `gw show` find symbols from the shell.
 

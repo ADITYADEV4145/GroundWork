@@ -4,10 +4,10 @@ Run `gw mcp` as a local stdio MCP server rooted in the repository (set its worki
 
 ### Find a definition and inspect its neighborhood
 
-1. `repo_map({"path":"src","depth":2})` lists the most important indexed paths and their top symbols.
-2. `find_code({"query":"format date","kind":"function"})` returns signatures, first doc lines, and symbol IDs.
-3. `outline({"file":"src/utils/date.ts"})` shows signatures and source ranges without bodies.
-4. `read_symbol({"symbol":"src/utils/date.ts:formatDate","context_lines":1})` reads the definition. If multiple declarations match, pass a candidate ID instead. With zero context, only the indexed declaration is returned.
+- `find_code({"query":"format date","kind":"function","locations_only":true})` returns the top three matching locations and IDs. Omit `locations_only` to include signatures, first doc lines, and scores.
+- `outline({"file":"src/utils/date.ts","locations_only":true})` shows symbol names and ranges without signatures or bodies.
+- `read_symbol({"symbol":"src/utils/date.ts:formatDate","context_lines":1})` reads the body. If multiple declarations match, pass a candidate ID instead. With zero context, only the indexed declaration is returned.
+- `repo_map({"depth":1})` gives an overview when you don't know where to start. Narrow with `path` to explore a folder; maps default to 12 rows per page.
 
 ### Trace a change
 

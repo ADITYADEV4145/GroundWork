@@ -172,19 +172,27 @@ describe('output trimmer', () => {
     const proof = analyzeCorpus(corpus); expect(proof.issues).toEqual([]); expect(proof.averageByteReduction).toBeGreaterThanOrEqual(0.5);
     for (const f of corpus) {
       const compact = compactOutput(f.output, f.tool);
-      for (const line of f.expected) expect(compact).toContain(line);
-      for (const line of f.output.split('\n').filter((line) => failurePattern.test(line))) expect(compact).toContain(line);
-      expect(compact.length).toBeLessThan(f.output.length);
+      const plain = (s: string) => s.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '');
+      for (const line of f.expected) expect(plain(compact)).toContain(line);
+      for (const line of plain(f.output).split('\n').filter((line) => failurePattern.test(line))) expect(plain(compact)).toContain(line);
+      expect(compact.length).toBeLessThanOrEqual(f.output.length);
     }
   });
-  it('rejects vacuous short fixtures and outputs that do not compact', () => {
-    expect(analyzeCorpus([{ tool: 'generic', output: 'FAIL small\n', expected: ['FAIL small'] }]).issues.join('\n')).toContain('input lines');
-    expect(analyzeCorpus([{ tool: 'generic', output: 'FAIL error\n'.repeat(70), expected: ['FAIL error'] }]).issues.join('\n')).toContain('not compacted');
+  it('rejects fixtures without provenance or independently derived failures', () => {
+    expect(analyzeCorpus([{ tool: 'generic', output: 'FAIL small\n', expected: ['FAIL small'] }]).issues.join('\n')).toContain('provenance');
+    expect(analyzeCorpus([{ tool: 'generic', output: 'FAIL error\n'.repeat(70), expected: [] }]).issues.join('\n')).toContain('independent raw-output evidence');
     expect(analyzeCorpus([]).averageByteReduction).toBe(0);
   });
   it('generic fallback keeps failures plus three context lines and final summary', () => {
     const lines = Array.from({ length: 100 }, (_, i) => `line ${i}`); lines[40] = '✗ unexpected failure';
     const out = compactOutput(lines.join('\n')); expect(out).toContain(lines.slice(37, 44).join('\n')); expect(out).toContain('line 99');
+  });
+  it('retains pnpm error codes and failing-test glyphs in otherwise noisy logs', () => {
+    for (const failure of ['ERR_PNPM_ENOENT missing tarball', '  ✕ rejects an invalid account', '  × rejects an invalid age']) {
+      const lines = Array.from({ length: 100 }, (_, i) => `progress ${i}`);
+      lines[30] = failure;
+      expect(compactOutput(lines.join('\n'), 'generic')).toContain(lines.slice(27, 34).join('\n'));
+    }
   });
   it('only rewrites simple noisy commands without overriding permission checks', async () => {
     for (const command of ['rm -rf x; npm test', 'npm test | tee log', 'npm test && git push', 'npm test || git push', 'npm test &', 'npm test > log', 'npm test < input', 'npm test\nwhoami', 'npm test $(whoami)', 'npm test "$(whoami)"', 'npm test `whoami`', 'npm test <(cat input)', 'echo "npm test"', '']) {

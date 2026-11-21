@@ -135,6 +135,18 @@ describe('repeat guard', () => {
     const c = ctx(); c.config.guards.repeatCommand.enabled = false; ev.input.command = 'ls'; expect((await wasteGuards.run(ev, c))?.action).not.toBe('deny');
     ev.sessionId = null; expect(await wasteGuards.run(ev, ctx())).toBeNull();
   });
+  it('allows a command after a staged file is edited and staged again', async () => {
+    initGit();
+    const file = path.join(root, 'tracked.txt');
+    writeFileSync(file, 'base'); git(['add', 'tracked.txt']); git(['-c', 'user.name=Test', '-c', 'user.email=test@localhost', 'commit', '-qm', 'tracked']);
+    writeFileSync(file, 'first edit'); git(['add', 'tracked.txt']);
+    const before = workspaceFingerprint(root);
+    await wasteGuards.run(event('post_tool'), ctx());
+    expect((await wasteGuards.run(event(), ctx()))?.action).toBe('deny');
+    writeFileSync(file, 'second edit'); git(['add', 'tracked.txt']);
+    expect(workspaceFingerprint(root)).not.toBe(before);
+    expect((await wasteGuards.run(event(), ctx()))?.action).not.toBe('deny');
+  });
 });
 
 describe('output trimmer', () => {

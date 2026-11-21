@@ -15,7 +15,7 @@ export function workspaceFingerprint(root: string): string {
     const hash = createHash('sha256');
     hash.update(git(['rev-parse', 'HEAD']));
     hash.update(git(['status', '--porcelain', '-z', '--untracked-files=all']));
-    const names = git(['ls-files', '-z', '--modified', '--others', '--exclude-standard']).toString().split('\0').filter(Boolean);
+    const names = Buffer.concat([git(['diff', '--name-only', '-z', 'HEAD']), git(['ls-files', '--others', '--exclude-standard', '-z'])]).toString().split('\0').filter(Boolean);
     if (names.length > 2000) return 'unknown';
     let bytes = 0;
     for (const name of [...new Set(names)].sort()) {

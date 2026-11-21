@@ -2,6 +2,7 @@ import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { loadConfig } from '../config/load.js';
 import type { GroundworkConfig } from '../config/schema.js';
+import { groundingGate, type Finding as GroundingFinding } from '../grounding/index.js';
 import { looksGenerated } from '../index/discover.js';
 import { readReuseState, type ReuseState } from '../index/query.js';
 import { refreshIndex } from '../index/refresh.js';
@@ -22,13 +23,14 @@ type Literal = ReuseState['literals'][number] & { configish?: boolean };
 export interface CheckLocation { file: string; symbol: string; line: number }
 export interface CheckFinding {
   id: string;
-  kind: 'duplicate' | 'dead-after-change' | 'duplicate-constant' | 'duplicate-file' | 'invalid-allow';
+  kind: 'duplicate' | 'dead-after-change' | 'duplicate-constant' | 'duplicate-file' | 'invalid-allow' | 'grounding';
   severity: 'BLOCK' | 'WARN';
   added: CheckLocation;
   existing: CheckLocation | null;
   signals: { name: string; value: number }[];
   probability?: number;
   fix: string;
+  grounding?: GroundingFinding;
 }
 export interface CheckReport {
   status: 'BLOCK' | 'WARN' | 'PASS';
@@ -55,6 +57,11 @@ function topSignals(signals: Signals): CheckFinding['signals'] {
 
 export function formatFinding(f: CheckFinding): string {
   const clean = (s: string) => s.replace(/[\x00-\x1f\x7f]/g, ' ');
+  if (f.grounding) return [
+    `${f.severity} grounding (${f.grounding.kind}): ${clean(f.added.file)}:${f.added.line}`,
+    `Why: ${clean(f.grounding.message)}`,
+    `Fix: ${clean(f.fix)}`,
+  ].join('\n');
   const ref = (s: CheckLocation) => f.kind === 'duplicate-file' ? `${clean(s.file)}:${s.line}` : `${clean(s.symbol)} (${clean(s.file)}:${s.line})`;
   return [
     `${f.severity} ${f.kind}: ${ref(f.added)}`,
@@ -89,7 +96,12 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   const base = readBase(root, commit, config, deadline);
   const db = openDb(indexDbPath(root), { readonly: true });
   let state: ReuseState, candidates: CandidateIndex;
-  try { state = readReuseState(db); candidates = new CandidateIndex(db, config.reuse.skipTests); }
+  let groundingFindings: GroundingFinding[] = [];
+  try {
+    state = readReuseState(db);
+    candidates = new CandidateIndex(db, config.reuse.skipTests);
+    if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
+  }
   finally { db.close(); }
   const baseSymbols = new Map(base.state.symbols.map((s) => [s.id, s]));
   const symbols = new Map(state.symbols.map((s) => [s.id, s]));
@@ -136,6 +148,16 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
       finding.existing?.file, finding.existing?.symbol, detail]));
     if (!findings.some((f) => f.id === id)) findings.push({ id, ...finding });
   };
+  for (const finding of groundingFindings) {
+    const suggestion = finding.suggestions[0];
+    add({ kind: 'grounding', severity: finding.blocking ? 'BLOCK' : 'WARN',
+      added: { file: finding.file, symbol: finding.name, line: finding.line },
+      existing: suggestion ? { file: suggestion.file, symbol: suggestion.name, line: suggestion.line } : null,
+      signals: [{ name: 'groundingCheck', value: 1 }, { name: 'definiteError', value: Number(finding.blocking) }],
+      fix: suggestion ? `Use ${suggestion.name} (${suggestion.file}:${suggestion.line}): ${suggestion.signature}.` :
+        `Correct ${finding.name} to match the module exports and callable signature.`,
+      grounding: finding }, `${finding.kind}:${finding.line}:${finding.message}`);
+  }
   for (const s of changed) {
     const allow = allowReason(text(s.file), s, inspect(s.file));
     if (!allow) continue;

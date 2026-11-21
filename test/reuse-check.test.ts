@@ -19,6 +19,49 @@ import { estimateTokens } from '../src/util/tokens.js';
 const MAIN = path.resolve(__dirname, '../src/cli/main.ts');
 const TSX = import.meta.resolve('tsx');
 
+describe('combined reuse and grounding check', () => {
+  it('blocks definite grounding errors through check and Stop, then passes after correction', async () => {
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'caller.ts', "import { parseDateString } from './utils.js';\nparseDateString();\n");
+      const report = await checkRepository(root);
+      expect(report.status).toBe('BLOCK');
+      expect(report.findings).toHaveLength(1);
+      expect(report.findings[0]).toMatchObject({ kind: 'grounding', severity: 'BLOCK', grounding: { kind: 'arity', blocking: true } });
+      expect(formatCheck(report)).toContain('BLOCK grounding (arity): caller.ts:2');
+      const json = cli(root, 'check', '--json');
+      expect(json.status).toBe(1);
+      expect(JSON.parse(json.stdout).findings[0].grounding.kind).toBe('arity');
+      const payload = { cwd: root, session_id: 'grounding-stop' };
+      expect(JSON.parse(hook(root, payload).stdout)).toMatchObject({ decision: 'block', reason: expect.stringContaining('grounding') });
+      expect(hook(root, payload).stdout).toBe('');
+      writeScenarioFile(root, 'caller.ts', "import { parseDateString } from './utils.js';\nparseDateString('2024-01-01');\n");
+      expect((await checkRepository(root)).findings).toEqual([]);
+      expect(cli(root, 'check').status).toBe(0);
+    });
+  });
+
+  it('keeps uncertain grounding findings nonblocking and honors changed lines, base and config', async () => {
+    await withCheckScenario('clean', async (root) => {
+      writeScenarioFile(root, 'caller.ts', "import * as dates from './utils.js';\ndates.missing('2024-01-01');\n");
+      const report = await checkRepository(root);
+      expect(report.status).toBe('WARN');
+      expect(report.findings[0]).toMatchObject({ kind: 'grounding', severity: 'WARN', grounding: { kind: 'unknown-member', blocking: false } });
+      expect(cli(root, 'check').status).toBe(0);
+      scenarioGit(root, 'add', 'caller.ts');
+      scenarioGit(root, 'commit', '-qm', 'existing grounding warning');
+      writeScenarioFile(root, 'caller.ts', readFileSync(path.join(root, 'caller.ts'), 'utf8') + '\n// unrelated edit\n');
+      expect((await checkRepository(root)).findings).toEqual([]);
+      expect((await checkRepository(root, { base: 'HEAD~1' })).findings).toHaveLength(1);
+      const config = defaultConfig();
+      config.grounding.enabled = false;
+      expect((await checkRepository(root, { base: 'HEAD~1', config })).findings).toEqual([]);
+      config.grounding.enabled = true;
+      config.grounding.exclude = ['caller.ts'];
+      expect((await checkRepository(root, { base: 'HEAD~1', config })).findings).toEqual([]);
+    });
+  });
+});
+
 describe('budgeted check output', () => {
   it('ranks blocks before warnings, bounds output, and points to complete JSON', () => {
     const findings: CheckReport['findings'] = Array.from({ length: 100 }, (_, i) => ({

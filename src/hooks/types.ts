@@ -17,6 +17,7 @@ export interface HookEvent {
 }
 
 export interface HookResult {
+  updatedInput?: Record<string, unknown>;
   /** 'deny' blocks a pre_tool call; 'context' adds a note for the agent; 'allow' does nothing. */
   action: 'allow' | 'deny' | 'context';
   message?: string;

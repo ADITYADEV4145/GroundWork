@@ -6,6 +6,7 @@ import { register as doctor } from './commands/doctor.js';
 import { register as indexCmds } from './commands/index-cmds.js';
 import { register as query } from './commands/query.js';
 import { register as selftest } from './commands/selftest.js';
+import { register as waste } from './commands/waste.js';
 
 // Feature streams add a module under commands/ and one register() call below.
 const program = new Command()
@@ -15,7 +16,7 @@ const program = new Command()
   .option('--json', 'machine-readable output')
   .option('--root <dir>', 'repository root (default: git toplevel of cwd)');
 
-for (const register of [indexCmds, query, doctor, selftest, agent]) register(program);
+for (const register of [indexCmds, query, doctor, selftest, agent, waste]) register(program);
 
 program.parseAsync(process.argv).catch((e: unknown) => {
   process.stderr.write(`gw: ${(e as Error).message}\n`);

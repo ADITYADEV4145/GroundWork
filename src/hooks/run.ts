@@ -36,6 +36,9 @@ export function normalise(agent: AgentName, event: HookEventName, raw: unknown):
 
 /** Agent-specific stdout for a combined result. Claude Code's format is used for codex/cursor until their adapters land. */
 export function render(ev: HookEvent, r: HookResult): string {
+  if (ev.agent === 'claude' && ev.event === 'pre_tool' && r.updatedInput && r.action !== 'deny')
+    return JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', updatedInput: r.updatedInput } });
+  if (ev.event === 'stop') return r.message ? JSON.stringify({ systemMessage: r.message }) : '';
   if (r.action === 'allow' || !r.message) return '';
   if (ev.event === 'pre_compact') return r.message;
   if (ev.event === 'pre_tool' && r.action === 'deny')
@@ -47,19 +50,22 @@ export function render(ev: HookEvent, r: HookResult): string {
 export async function dispatch(ev: HookEvent, root: string): Promise<HookResult> {
   const config = loadConfig(root);
   const notes: string[] = [];
+  let updatedInput: Record<string, unknown> | undefined;
   for (const h of HANDLERS) {
     if (!h.events.includes(ev.event)) continue;
     if (h.tools && (!ev.tool || !h.tools.includes(ev.tool))) continue;
     try {
       const r = await h.run(ev, { root, config });
-      if (!r || r.action === 'allow') continue;
+      if (!r) continue;
+      if (r.updatedInput) updatedInput = r.updatedInput;
+      if (r.action === 'allow') continue;
       if (r.action === 'deny') return r;
       if (r.message) notes.push(r.message);
     } catch (e) {
       log(root, 'error', 'hook_handler_failed', { handler: h.name, error: (e as Error).message });
     }
   }
-  return notes.length ? { action: 'context', message: notes.join('\n') } : { action: 'allow' };
+  return notes.length ? { action: 'context', message: notes.join('\n'), updatedInput } : { action: 'allow', updatedInput };
 }
 
 async function readStdin(): Promise<string> {

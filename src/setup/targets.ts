@@ -151,7 +151,7 @@ export const FIND_CODE_TOOLS = ['mcp__groundwork__find_code', 'mcp__plugin_groun
 export function claudeHookMap(gw: string): HookMap {
   return {
     PreToolUse: [{ matcher: 'Read|Bash', command: `${gw} hook claude pre_tool` }],
-    PostToolUse: [{ matcher: ['Read', 'Edit', 'Write', 'MultiEdit', 'NotebookEdit', ...FIND_CODE_TOOLS].join('|'), command: `${gw} hook claude post_tool` }],
+    PostToolUse: [{ matcher: ['Read', 'Bash', 'Edit', 'Write', 'MultiEdit', 'NotebookEdit', ...FIND_CODE_TOOLS].join('|'), command: `${gw} hook claude post_tool` }],
     PreCompact: [{ command: `${gw} hook claude pre_compact` }],
     Stop: [{ command: `${gw} hook claude stop` }],
   };
@@ -198,7 +198,7 @@ export function targetsFor(opts: TargetOptions): AgentTarget[] {
       edits: [
         cursorHooks(path.join(root, '.cursor', 'hooks.json'), gw, {
           preToolUse: [{ matcher: 'Read|Shell', command: `${gw} hook cursor pre_tool` }],
-          postToolUse: [{ matcher: 'Read|Write|Edit|MCP:find_code', command: `${gw} hook cursor post_tool` }],
+          postToolUse: [{ matcher: 'Read|Shell|Write|Edit|MCP:find_code', command: `${gw} hook cursor post_tool` }],
           preCompact: [{ command: `${gw} hook cursor pre_compact` }],
           stop: [{ command: `${gw} hook cursor stop` }],
         }),

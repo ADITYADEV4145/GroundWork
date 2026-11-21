@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 // Phase 4 (grounding). Owner: grounding stream.
 export const groundingConfigSchema = z

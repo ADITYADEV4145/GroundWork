@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { z } from 'zod';
+import * as z from 'zod';
 import { readSessionLedger, updateSessionLedger } from '../hooks/session-ledger.js';
 import { log } from '../util/log.js';
 

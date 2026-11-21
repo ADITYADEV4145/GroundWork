@@ -1,5 +1,16 @@
 # Agent benchmarks
 
+## Grounding gate repository cache
+
+Before a full Phase 4 selftest, explicitly populate its three pinned upstream checkouts:
+
+```sh
+npm run setup:grounding-repos
+npm run selftest -- --through 4
+```
+
+The developer-only setup script uses shallow fetches into `~/work/gw-real-repos/grounding/<id>/<pin>` (override the external cache with `GW_REAL_REPOS_CACHE`). Like `scripts/setup-real-repos.ts`, it is not shipped in the npm package. It refuses dirty or unexpected-origin checkouts and reuses available pins offline. The selftest itself only validates the local origin, pin and cleanliness: it never fetches or changes checkouts. Missing pins **fail** a full run with setup instructions; `--quick` explicitly skips this check.
+
 The benchmark is a **source checkout** tool. It does not call an agent provider or ask for credentials. Collect observations with the same agent and settings in both arms, then score them locally:
 
 ```sh
@@ -22,6 +33,8 @@ Offline `--suite all` replays installed suites with active `evidence.json` files
 skipping suites without recorded evidence. Invalid or stale evidence still fails
 validation. With `--observations`, `--suite all` instead grades every installed
 suite with a task manifest and requires captures for each suite.
+
+Generic suites provide both `tasks.json` and `grade.mjs`; standalone harnesses such as `bench/grounding/` keep their own commands and are not generic suites. A manifest with recorded `evidence.json` remains discoverable even if its grader is missing, so broken recorded suites still fail validation rather than disappearing.
 
 ## Capture protocol
 

@@ -1,5 +1,5 @@
 import { readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
-import { z } from 'zod';
+import * as z from 'zod';
 import { withFileLock } from '../index/lock.js';
 import { ensureGwDir, gwPath } from '../util/paths.js';
 

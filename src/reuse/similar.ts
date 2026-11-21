@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { vocabulary } from '../extract/fingerprint.js';
 import { initParsers } from '../lang/index.js';
 import { estimateTokens, fitToBudget } from '../util/tokens.js';

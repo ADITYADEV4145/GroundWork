@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 // Phase 1 (index). Owner: index stream.
 export const indexConfigSchema = z

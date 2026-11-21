@@ -1,5 +1,5 @@
 import { TextDecoder } from 'node:util';
-import { z } from 'zod';
+import * as z from 'zod';
 import { fileOutline, findCode } from '../../index/navigation.js';
 import { indexDbPath } from '../../index/store.js';
 import { openDb } from '../../store/db.js';

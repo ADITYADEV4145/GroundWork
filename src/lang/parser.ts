@@ -12,6 +12,7 @@ const GRAMMARS: Record<Language, string> = {
 };
 
 let initPromise: Promise<void> | null = null;
+const loading = new Map<Language, Promise<void>>();
 const languages = new Map<Language, TsLanguage>();
 const parsers = new Map<Language, Parser>();
 
@@ -21,13 +22,16 @@ export function grammarPath(lang: Language): string {
 
 /** Load the WASM runtime and every v1 grammar once per process. */
 export async function initParsers(): Promise<void> {
-  initPromise ??= (async () => {
-    await Parser.init();
-    await Promise.all((Object.keys(GRAMMARS) as Language[]).map(async (lang) => {
-      languages.set(lang, await TsLanguage.load(grammarPath(lang)));
-    }));
-  })();
-  return initPromise;
+  return initParsersFor(Object.keys(GRAMMARS) as Language[]);
+}
+
+export async function initParsersFor(needed: Language[]): Promise<void> {
+  initPromise ??= Parser.init();
+  await initPromise;
+  await Promise.all(needed.map((lang) => {
+    if (!loading.has(lang)) loading.set(lang, TsLanguage.load(grammarPath(lang)).then((grammar) => { languages.set(lang, grammar); }));
+    return loading.get(lang)!;
+  }));
 }
 
 export function parse(lang: Language, source: string): Tree {

@@ -104,7 +104,7 @@ export function summarize(suite: Suite, suiteName: string, evidence: Evidence, r
   const estimatedReductions = valid(rows.map((row) => row.estimatedReductionPct));
   const modelReductions = valid(rows.map((row) => row.modelInputReductionPct));
   return {
-    suite: suiteName, revision: suite.revision, agent: first.agent, model: first.model, runs,
+    suite: suiteName, revision: suite.revision, captureRevision: first.captureRevision, agent: first.agent, model: first.model, runs,
     baseline: baselineTotals, groundwork: treatmentTotals, categories, tasks: rows, metrics,
     estimatedToolOutputReductionPct: interval(estimatedReductions), toolOutputReductionCoverage: estimatedReductions.length,
     modelInputReductionPct: modelReductions.length === rows.length ? interval(modelReductions) : null,

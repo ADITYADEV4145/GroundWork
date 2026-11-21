@@ -37,6 +37,7 @@ describe('benchmark reporting', () => {
     expect(report.metrics.duplicatesAdded?.pairedDeltaPerTask).toEqual({ median: -1, low: -2, high: 0 });
     expect(renderReport(report)).toContain('| second | trace | 1/1 | 0/1 |');
     expect(renderReport(report)).toContain('| Provider input tokens per attempt | unavailable | unavailable |');
+    expect(renderReport(report)).toContain(`Capture implementation: \`${revision}\`.`);
   });
 
   it('rejects mixed revisions and missing, duplicated or unmatched observations', () => {

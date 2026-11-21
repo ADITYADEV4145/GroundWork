@@ -162,6 +162,7 @@ export function renderReport(report: BenchmarkSummary): string {
     `# Groundwork benchmark: ${report.suite}`,
     '',
     `${report.agent}; model: ${report.model ?? 'not exposed'}; pinned source: \`${report.revision}\`.`,
+    `Capture implementation: \`${report.captureRevision}\`.`,
     `${report.tasks.length} tasks × ${report.runs} paired repeats (${b.attempts} attempts per arm).`,
     '',
     '| Measure | Baseline | Groundwork |',

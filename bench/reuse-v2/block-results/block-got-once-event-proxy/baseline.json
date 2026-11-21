@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block-got-once-event-proxy",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "9f78f61046ed77e870c288e417dfcb06cdcd0e39",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "source/core/utils/proxy-events-once.ts",
+          "symbol": "source/core/utils/proxy-events-once.ts",
+          "line": 1
+        },
+        "existing": {
+          "file": "source/core/utils/proxy-events.ts",
+          "symbol": "source/core/utils/proxy-events.ts",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete source/core/utils/proxy-events-once.ts and update its 3 callers to use source/core/utils/proxy-events.ts."
+      },
+      {
+        "id": "1f4baabc7aab7d745cca3b8f48263030df1a59f4",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "source/core/utils/proxy-events-once.ts",
+          "symbol": "proxyEventsOnce",
+          "line": 6
+        },
+        "existing": {
+          "file": "source/core/utils/proxy-events.ts",
+          "symbol": "proxyEvents",
+          "line": 6
+        },
+        "probability": 0.8000401166120246,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.948873165402942
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of proxyEvents: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

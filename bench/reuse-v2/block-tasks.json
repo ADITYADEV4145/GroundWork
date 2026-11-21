@@ -1,0 +1,162 @@
+[
+  {
+    "id": "block-got-download-size",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add a default-exported async getDownloadSize(body, headers) in source/core/utils/get-download-size.ts for a download-cache adapter. Its behavior should follow getBodySize in get-body-size.ts: honor content-length first, return zero for absent bodies, measure strings in bytes, handle Buffers and callback-based FormData lengths, and return undefined for unknown sizes. The adapter additionally accepts Uint8Array bodies and should return their byteLength. Keep the existing upload helper's behavior unchanged.",
+    "reference_symbol": {"file": "source/core/utils/get-body-size.ts", "name": "getBodySize"},
+    "why": "A sibling body-size routine with one additional typed-array branch invites a near-Type-3 adaptation of the existing multi-branch body."
+  },
+  {
+    "id": "block-got-cache-url-options",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add default-exported cacheUrlToOptions in source/core/utils/cache-url-to-options.ts. The cache transport needs the same protocol, host, hostname, hash, search, pathname, href, path, numeric port and optional auth fields as urlToOptions, with its existing IPv6 bracket handling and absent-field behavior. This sibling accepts the same URL inputs, but must omit the hash fragment from the returned href while leaving the hash field intact. Do not change urlToOptions.",
+    "reference_symbol": {"file": "source/core/utils/url-to-options.ts", "name": "urlToOptions"},
+    "why": "Almost all of the existing URL field conversion and conditional port/auth assembly remains applicable; only href treatment differs."
+  },
+  {
+    "id": "block-got-once-event-proxy",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Introduce default-exported proxyEventsOnce(from, to, events) in source/core/utils/proxy-events-once.ts for one-shot connection lifecycle events. Match proxyEvents' argument forwarding and returned listener-cleanup callback, but each named source event should forward at most once per registration. Calling cleanup before an event fires must detach that listener. Leave the existing continuous proxy untouched.",
+    "reference_symbol": {"file": "source/core/utils/proxy-events.ts", "name": "proxyEvents"},
+    "why": "The registration loop, argument-forwarding closure, listener registry and disposal loop are unchanged except for one-shot registration."
+  },
+  {
+    "id": "block-got-trailer-links",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add default-exported parseTrailerLinks(link: string) in source/core/parse-trailer-links.ts for Link values delivered in HTTP trailers. Follow parseLinkHeader's parsing contract exactly: comma-separated references in angle brackets, semicolon-separated parameter assignments, whitespace trimming, the same returned reference/parameters records and the same validation cases. Diagnostics should refer to a trailer Link rather than a Link header. Keep the header parser unchanged.",
+    "reference_symbol": {"file": "source/core/parse-link-header.ts", "name": "parseLinkHeader"},
+    "why": "A sibling parser with identical grammar and only diagnostic wording changes is a Type-2 clone opportunity with nested loops and validation branches."
+  },
+  {
+    "id": "block-got-event-journal",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "hard-negative",
+    "prompt": "Add default-exported recordEvents(source, names, capacity) in source/core/utils/record-events.ts for debugging flaky transfers. Register a listener for each requested event, append {name, arguments} records to a shared chronological array, discard the oldest entries beyond capacity, and return {records, dispose}. Zero capacity records nothing; negative or noninteger capacity must throw. dispose removes every registered listener. This is an in-memory journal: it must never emit or forward an event to another emitter.",
+    "reference_symbol": {"file": "source/core/utils/proxy-events.ts", "name": "proxyEvents"},
+    "why": "Listener-registration and cleanup loops resemble proxyEvents, but bounded observation rather than event forwarding is a different operation; shared event boilerplate should not establish a BLOCK."
+  },
+  {
+    "id": "block-got-admission-budget",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "hard-negative",
+    "prompt": "Add default-exported admissionBudget(context) in source/core/utils/admission-budget.ts for a local request quota preview. Context supplies suspended, used, limit, method, allowedMethods, requested and perRequestCap. Return zero for suspended tenants, exhausted quotas or disallowed methods. Otherwise return the minimum of remaining quota, requested credits and perRequestCap. Reject negative or nonfinite numeric inputs with RangeError. This function returns a number of credits, not a delay, and must not use retries, randomness or HTTP response status.",
+    "reference_symbol": {"file": "source/core/calculate-retry-delay.ts", "name": "calculateRetryDelay"},
+    "why": "Early numeric returns, method-membership guards and a final capped number resemble retry policy control flow, but quota admission has unrelated inputs, units and behavior."
+  },
+  {
+    "id": "block-click-menu-summary",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add make_menu_summary(help: str, max_length: int = 60) in src/click/menu_summary.py for a compact command palette. Follow make_default_short_help's first-paragraph selection, whitespace collapsing, leading no-rewrap marker handling, sentence-stop rule and whole-word truncation. The palette wants a single Unicode ellipsis character instead of three periods when truncated, and its length must count toward max_length. Keep the original short-help formatter unchanged.",
+    "reference_symbol": {"file": "src/click/utils.py", "name": "make_default_short_help"},
+    "why": "The sizable word-counting and truncation body changes only in its default width and truncation suffix, inviting a close sibling implementation."
+  },
+  {
+    "id": "block-click-audit-filename",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add format_audit_filename(filename, shorten=False) in src/click/audit_filename.py. The audit display must accept the same str, bytes and PathLike inputs as format_filename and retain its basename option and invalid-byte/surrogate replacement behavior. For this sibling only, normalize the resulting text to Unicode NFC before returning it, so canonically equivalent filenames look identical in audit records. Leave format_filename as it is.",
+    "reference_symbol": {"file": "src/click/utils.py", "name": "format_filename"},
+    "why": "The existing roughly dozen-line conversion body and branches apply verbatim apart from final normalization."
+  },
+  {
+    "id": "block-click-profile-app-dir",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add get_profile_app_dir(app_name, profile, roaming=True, force_posix=False) in src/click/profile_dirs.py. This sibling of get_app_dir should follow its Windows APPDATA/LOCALAPPDATA fallback, macOS Application Support, XDG_CONFIG_HOME and force_posix rules, then place configuration under a profile subdirectory. Require profile to be a nonempty single path component other than '.' or '..', rejecting either slash style with ValueError. Do not change get_app_dir or create directories on disk.",
+    "reference_symbol": {"file": "src/click/utils.py", "name": "get_app_dir"},
+    "why": "The platform-specific path selection branches remain the same, with small profile validation and suffix additions."
+  },
+  {
+    "id": "block-click-repl-split",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add split_repl_line(string: str) -> list[str] in src/click/repl_parser.py for an interactive command editor. Match split_arg_string's tolerant shlex behavior, including preservation of the unfinished token when quotes or escapes are incomplete. The editor additionally treats commas as token separators outside quotes, just like whitespace; commas inside quoted values remain literal. Keep shell completion's split_arg_string unchanged.",
+    "reference_symbol": {"file": "src/click/shell_completion.py", "name": "split_arg_string"},
+    "why": "The shlex setup, token loop and recovery branches are a direct fit, with only lexer whitespace configuration differing."
+  },
+  {
+    "id": "block-click-option-conflicts",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "hard-negative",
+    "prompt": "Add find_option_conflicts(options: Sequence[str]) -> tuple[list[str], bool] in src/click/option_conflicts.py for a command declaration linter. Parse each spelling's prefix with _split_opt, track whether any prefix is '/', and group spellings by casefolded name after removing the prefix. Return all spellings in groups of size greater than one, ordered by prefix length with stable input order for ties, plus the slash flag. For example '-q', '--Q' conflict; '--quiet' and '--quick' do not. Do not format or join the names into help text.",
+    "reference_symbol": {"file": "src/click/formatting.py", "name": "join_options"},
+    "why": "Prefix extraction, slash detection and stable prefix-length sorting overlap join_options structurally; conflict detection and filtered list output are distinct from formatting every option."
+  },
+  {
+    "id": "block-pytest-report-relpath",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add report_relpath(directory: Path, dest: Path) -> str in src/_pytest/report_relpath.py for a machine-readable report writer. Follow bestrelpath's behavior for identical paths, common ancestors, incompatible drives and mixed absolute/relative paths. Unlike bestrelpath, compose the relative output with '/' separators on every platform; return dest.as_posix() when no relative path is possible. Do not resolve symlinks or touch the filesystem, and leave bestrelpath unchanged.",
+    "reference_symbol": {"file": "src/_pytest/pathlib.py", "name": "bestrelpath"},
+    "why": "The common-base and relative-component algorithm remains intact; only output path composition differs."
+  },
+  {
+    "id": "block-pytest-stub-module-name",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add stub_module_name_from_path(path: Path, root: Path) -> str in src/_pytest/stub_module_names.py. Tooling needs a sibling of module_name_from_path for .pyi stubs: preserve its root-relative handling, outside-root fallback, __init__ package treatment, dot replacement inside path components and nonempty-name behavior, but remove a .pyi suffix rather than .py. Keep the source-module helper's existing behavior unchanged.",
+    "reference_symbol": {"file": "src/_pytest/pathlib.py", "name": "module_name_from_path"},
+    "why": "This is the same multi-step path-to-module conversion for a neighboring file type, with minimal suffix adaptation."
+  },
+  {
+    "id": "block-pytest-optional-fixture-names",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add get_optional_fixture_names(function, *, name='', cls=None) -> tuple[str, ...] in src/_pytest/optional_fixture_names.py for a fixture documentation exporter. Follow getfuncargnames' signature inspection and its handling of bound instance methods, static methods, decorated mock arguments, and invalid-signature failures. This sibling should select positional-or-keyword and keyword-only parameters that HAVE defaults rather than required parameters. Preserve signature order and do not change getfuncargnames.",
+    "reference_symbol": {"file": "src/_pytest/compat.py", "name": "getfuncargnames"},
+    "why": "The long signature-inspection, error handling and method/decorator adjustment routine needs only a predicate change to describe optional arguments."
+  },
+  {
+    "id": "block-pytest-report-root",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add get_report_root(invocation_dir: Path, paths: Iterable[Path]) -> Path in src/_pytest/report_root.py. Match get_common_ancestor's handling of nonexistent entries, ancestor/descendant paths, disjoint drives and file-valued results. For an empty or wholly nonexistent input, use invocation_dir.parent instead of invocation_dir. This is for reports stored beside the invocation directory; keep the configuration root finder unchanged.",
+    "reference_symbol": {"file": "src/_pytest/config/findpaths.py", "name": "get_common_ancestor"},
+    "why": "The ancestor accumulation loop and file-to-parent normalization remain unchanged, with one fallback expression adapted to a reporting context."
+  },
+  {
+    "id": "block-pytest-artifact-route",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add artifact_route(source: tuple[str, ...], destination: tuple[str, ...]) -> tuple[str, ...] in src/_pytest/artifact_route.py for an in-memory report tree. Nodes are arbitrary labels, not filesystem paths. Find the longest common label prefix, return one 'leave' operation for each remaining source label followed by an 'enter:' plus label operation for each remaining destination label. Equal nodes yield an empty tuple; empty endpoints are valid. Never normalize '.', '..', separators or drive names: those are literal labels here. Do not inspect the filesystem or return a path string.",
+    "reference_symbol": {"file": "src/_pytest/pathlib.py", "name": "bestrelpath"},
+    "why": "Common-prefix removal followed by backward and forward steps resembles relative-path construction, but abstract tree-edit operations on literal labels have a different contract from filesystem navigation."
+  }
+]

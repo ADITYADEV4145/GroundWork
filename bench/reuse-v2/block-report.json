@@ -1,0 +1,788 @@
+{
+  "schemaVersion": 1,
+  "suite": "block-v2",
+  "mode": "check-only",
+  "expectedTasks": 16,
+  "runs": [
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-click-audit-filename",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "PASS",
+        "findings": []
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-click-menu-summary",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "PASS",
+        "findings": []
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "hard-negative",
+      "task_id": "block-click-option-conflicts",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "WARN",
+        "findings": [
+          {
+            "id": "02d0f6753d16d64b626e17f38353c5e9d1052752",
+            "kind": "duplicate-file",
+            "severity": "WARN",
+            "added": {
+              "file": "src/click/option_conflicts.py",
+              "symbol": "src/click/option_conflicts.py",
+              "line": 1
+            },
+            "existing": {
+              "file": "src/click/core.py",
+              "symbol": "src/click/core.py",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete src/click/option_conflicts.py and update its 1 caller to use src/click/core.py."
+          },
+          {
+            "id": "1055c84189a7a6ad718b50a38247e6d75b1cc75d",
+            "kind": "duplicate",
+            "severity": "WARN",
+            "added": {
+              "file": "src/click/option_conflicts.py",
+              "symbol": "find_option_conflicts",
+              "line": 9
+            },
+            "existing": {
+              "file": "src/click/core.py",
+              "symbol": "Option.get_help_record._write_opts",
+              "line": 2789
+            },
+            "probability": 0.5516550819153264,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.3715279283470656
+              },
+              {
+                "name": "paramCount",
+                "value": 1
+              }
+            ],
+            "fix": "Duplicate of Option.get_help_record._write_opts: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-click-profile-app-dir",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "PASS",
+        "findings": []
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-click-repl-split",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "WARN",
+        "findings": [
+          {
+            "id": "c1ec652cf26a8808f7a6e5a047030f7017e412f8",
+            "kind": "duplicate-file",
+            "severity": "WARN",
+            "added": {
+              "file": "src/click/repl_parser.py",
+              "symbol": "src/click/repl_parser.py",
+              "line": 1
+            },
+            "existing": {
+              "file": "src/click/shell_completion.py",
+              "symbol": "src/click/shell_completion.py",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete src/click/repl_parser.py and update its 1 caller to use src/click/shell_completion.py."
+          },
+          {
+            "id": "a140c414162f3f503bb2fc2f9b128db4670dbf80",
+            "kind": "duplicate",
+            "severity": "WARN",
+            "added": {
+              "file": "src/click/repl_parser.py",
+              "symbol": "split_repl_line",
+              "line": 4
+            },
+            "existing": {
+              "file": "src/click/shell_completion.py",
+              "symbol": "split_arg_string",
+              "line": 464
+            },
+            "probability": 0.44745567540157594,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.6905671101940507
+              },
+              {
+                "name": "paramCount",
+                "value": 1
+              }
+            ],
+            "fix": "Duplicate of split_arg_string: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "hard-negative",
+      "task_id": "block-got-admission-budget",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "WARN",
+        "findings": [
+          {
+            "id": "e1adf7b5b87f9de3759652d9055415a3bec5e1df",
+            "kind": "duplicate",
+            "severity": "WARN",
+            "added": {
+              "file": "source/core/utils/admission-budget.ts",
+              "symbol": "admissionBudget",
+              "line": 22
+            },
+            "existing": {
+              "file": "source/core/options.ts",
+              "symbol": "Options.method",
+              "line": 2156
+            },
+            "probability": 0.48850660130665774,
+            "signals": [
+              {
+                "name": "paramCount",
+                "value": 1
+              },
+              {
+                "name": "vocabulary",
+                "value": 0.33918068386003714
+              }
+            ],
+            "fix": "Duplicate of Options.method: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-got-cache-url-options",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "WARN",
+        "findings": [
+          {
+            "id": "4463d66c6e30ebfaaeb36242a5cf78e9e9e4818a",
+            "kind": "duplicate-file",
+            "severity": "WARN",
+            "added": {
+              "file": "source/core/utils/cache-url-to-options.ts",
+              "symbol": "source/core/utils/cache-url-to-options.ts",
+              "line": 1
+            },
+            "existing": {
+              "file": "source/core/utils/is-unix-socket-url.ts",
+              "symbol": "source/core/utils/is-unix-socket-url.ts",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete source/core/utils/cache-url-to-options.ts and update its 10 callers to use source/core/utils/is-unix-socket-url.ts."
+          },
+          {
+            "id": "79217794458d5855d8a0112212e00c779b1c9552",
+            "kind": "duplicate",
+            "severity": "WARN",
+            "added": {
+              "file": "source/core/utils/cache-url-to-options.ts",
+              "symbol": "cacheUrlToOptions",
+              "line": 7
+            },
+            "existing": {
+              "file": "source/core/utils/is-unix-socket-url.ts",
+              "symbol": "isUnixSocketURL",
+              "line": 2
+            },
+            "probability": 0.576135377354215,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.43923306280167557
+              },
+              {
+                "name": "paramCount",
+                "value": 1
+              }
+            ],
+            "fix": "Duplicate of isUnixSocketURL: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-got-download-size",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "PASS",
+        "findings": []
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "hard-negative",
+      "task_id": "block-got-event-journal",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "PASS",
+        "findings": []
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-got-once-event-proxy",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "BLOCK",
+        "findings": [
+          {
+            "id": "9f78f61046ed77e870c288e417dfcb06cdcd0e39",
+            "kind": "duplicate-file",
+            "severity": "BLOCK",
+            "added": {
+              "file": "source/core/utils/proxy-events-once.ts",
+              "symbol": "source/core/utils/proxy-events-once.ts",
+              "line": 1
+            },
+            "existing": {
+              "file": "source/core/utils/proxy-events.ts",
+              "symbol": "source/core/utils/proxy-events.ts",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete source/core/utils/proxy-events-once.ts and update its 3 callers to use source/core/utils/proxy-events.ts."
+          },
+          {
+            "id": "1f4baabc7aab7d745cca3b8f48263030df1a59f4",
+            "kind": "duplicate",
+            "severity": "BLOCK",
+            "added": {
+              "file": "source/core/utils/proxy-events-once.ts",
+              "symbol": "proxyEventsOnce",
+              "line": 6
+            },
+            "existing": {
+              "file": "source/core/utils/proxy-events.ts",
+              "symbol": "proxyEvents",
+              "line": 6
+            },
+            "probability": 0.8000401166120246,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.948873165402942
+              },
+              {
+                "name": "paramCount",
+                "value": 1
+              }
+            ],
+            "fix": "Duplicate of proxyEvents: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-got-trailer-links",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "WARN",
+        "findings": [
+          {
+            "id": "cf7df582defbcb9008844a433878b201138fdd52",
+            "kind": "duplicate",
+            "severity": "WARN",
+            "added": {
+              "file": "source/core/parse-trailer-links.ts",
+              "symbol": "parseTrailerLinks",
+              "line": 1
+            },
+            "existing": {
+              "file": "source/core/parse-link-header.ts",
+              "symbol": "parseLinkHeader",
+              "line": 1
+            },
+            "probability": 0.680164303965158,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.9920306439002212
+              },
+              {
+                "name": "paramCount",
+                "value": 1
+              }
+            ],
+            "fix": "Duplicate of parseLinkHeader: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          },
+          {
+            "id": "d631603f79495554c5757a5439624451d48b7927",
+            "kind": "duplicate-file",
+            "severity": "WARN",
+            "added": {
+              "file": "source/core/parse-trailer-links.ts",
+              "symbol": "source/core/parse-trailer-links.ts",
+              "line": 1
+            },
+            "existing": {
+              "file": "source/core/parse-link-header.ts",
+              "symbol": "source/core/parse-link-header.ts",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete source/core/parse-trailer-links.ts and update its 14 callers to use source/core/parse-link-header.ts."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "hard-negative",
+      "task_id": "block-pytest-artifact-route",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "PASS",
+        "findings": []
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-pytest-optional-fixture-names",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "BLOCK",
+        "findings": [
+          {
+            "id": "1a6d4a04dc8db9fa8a8e7140f13ea907a9bcbf59",
+            "kind": "duplicate-file",
+            "severity": "BLOCK",
+            "added": {
+              "file": "src/_pytest/optional_fixture_names.py",
+              "symbol": "src/_pytest/optional_fixture_names.py",
+              "line": 1
+            },
+            "existing": {
+              "file": "src/_pytest/compat.py",
+              "symbol": "src/_pytest/compat.py",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete src/_pytest/optional_fixture_names.py and update its 12 callers to use src/_pytest/compat.py."
+          },
+          {
+            "id": "2a10e7864a60ed0585833aea37fde57cd22240ab",
+            "kind": "duplicate",
+            "severity": "BLOCK",
+            "added": {
+              "file": "src/_pytest/optional_fixture_names.py",
+              "symbol": "get_optional_fixture_names",
+              "line": 13
+            },
+            "existing": {
+              "file": "src/_pytest/compat.py",
+              "symbol": "getfuncargnames",
+              "line": 107
+            },
+            "probability": 0.8190409549573725,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.7943480059948324
+              },
+              {
+                "name": "paramCount",
+                "value": 1
+              }
+            ],
+            "fix": "Duplicate of getfuncargnames: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-pytest-report-relpath",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "WARN",
+        "findings": [
+          {
+            "id": "2b525138a2501baf00068572138b3643cf660571",
+            "kind": "duplicate-file",
+            "severity": "WARN",
+            "added": {
+              "file": "src/_pytest/report_relpath.py",
+              "symbol": "src/_pytest/report_relpath.py",
+              "line": 1
+            },
+            "existing": {
+              "file": "src/_pytest/pathlib.py",
+              "symbol": "src/_pytest/pathlib.py",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete src/_pytest/report_relpath.py; use src/_pytest/pathlib.py instead."
+          },
+          {
+            "id": "4578feeb691dc7fc9da0eb95cdf00a0d263f6b4d",
+            "kind": "duplicate",
+            "severity": "WARN",
+            "added": {
+              "file": "src/_pytest/report_relpath.py",
+              "symbol": "report_relpath",
+              "line": 11
+            },
+            "existing": {
+              "file": "src/_pytest/pathlib.py",
+              "symbol": "bestrelpath",
+              "line": 1019
+            },
+            "probability": 0.6469648561574859,
+            "signals": [
+              {
+                "name": "vocabulary",
+                "value": 0.8071634542784993
+              },
+              {
+                "name": "paramCount",
+                "value": 1
+              }
+            ],
+            "fix": "Duplicate of bestrelpath: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-pytest-report-root",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "PASS",
+        "findings": []
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    },
+    {
+      "suite": "block-v2",
+      "task_kind": "clone-prone",
+      "task_id": "block-pytest-stub-module-name",
+      "arm": "baseline",
+      "session_id": "",
+      "acus": null,
+      "status": "scored",
+      "success": null,
+      "acceptance": null,
+      "check": {
+        "status": "WARN",
+        "findings": [
+          {
+            "id": "e904c896da0dd4c03c29fbf71ef70521985e0e61",
+            "kind": "duplicate-file",
+            "severity": "WARN",
+            "added": {
+              "file": "src/_pytest/stub_module_names.py",
+              "symbol": "src/_pytest/stub_module_names.py",
+              "line": 1
+            },
+            "existing": {
+              "file": "src/_pytest/pathlib.py",
+              "symbol": "src/_pytest/pathlib.py",
+              "line": 1
+            },
+            "signals": [
+              {
+                "name": "symbolOverlap",
+                "value": 1
+              },
+              {
+                "name": "versionOrSameBasename",
+                "value": 0
+              }
+            ],
+            "fix": "Delete src/_pytest/stub_module_names.py and update its 7 callers to use src/_pytest/pathlib.py."
+          },
+          {
+            "id": "02796697ffc104ea12a64c99eb1a3a54e1be4cb7",
+            "kind": "duplicate",
+            "severity": "WARN",
+            "added": {
+              "file": "src/_pytest/stub_module_names.py",
+              "symbol": "stub_module_name_from_path",
+              "line": 6
+            },
+            "existing": {
+              "file": "src/_pytest/pathlib.py",
+              "symbol": "insert_missing_modules",
+              "line": 801
+            },
+            "probability": 0.42194236618571396,
+            "signals": [
+              {
+                "name": "paramCount",
+                "value": 1
+              },
+              {
+                "name": "vocabulary",
+                "value": 0.3061853458893445
+              }
+            ],
+            "fix": "Duplicate of insert_missing_modules: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+          }
+        ]
+      },
+      "reuse": {
+        "label": "unknown",
+        "reason": "Check-only suite; no reuse label or acceptance evaluation",
+        "source": "automated"
+      }
+    }
+  ]
+}

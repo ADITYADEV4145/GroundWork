@@ -1,0 +1,76 @@
+{
+  "task_id": "got-upload-budget",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": true,
+  "acceptance": {
+    "exitCode": 0,
+    "output": "\n  ✔ upload budgeting\n  ─\n\n  1 test passed\n"
+  },
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "b210a53e01c034edbf53f0991c976388da82992a",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "source/upload-budget.ts",
+          "symbol": "getContentLength",
+          "line": 20
+        },
+        "existing": {
+          "file": "source/core/options.ts",
+          "symbol": "Options.maxHeaderSize",
+          "line": 2381
+        },
+        "probability": 0.40824228937193935,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.26339447097006896
+          }
+        ],
+        "fix": "Duplicate of Options.maxHeaderSize: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "bdf644f119c001d326c9a12727581b396678bdc4",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "source/upload-budget.ts",
+          "symbol": "getKnownBodySize",
+          "line": 44
+        },
+        "existing": {
+          "file": "source/core/utils/is-form-data.ts",
+          "symbol": "isFormData",
+          "line": 9
+        },
+        "probability": 0.5535820493055132,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.38023383936964067
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of isFormData: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "duplicate",
+    "reason": "Devin lead review (agent, not Aditya): Reimplements null, string, buffer and form-data sizing instead of calling getBodySize.",
+    "source": "human"
+  }
+}

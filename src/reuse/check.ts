@@ -187,6 +187,12 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     return exempt(symbols.get(id)?.parentId ?? null);
   };
   const matches = new Map<string, { target: IndexedSymbol; p: number; signals: Signals; score: ReturnType<typeof scoreSignals> }>();
+  const delegates = new Map<string, Set<string>>();
+  for (const call of state.calls) {
+    if (!call.callerId || !call.calleeId || !['exact', 'import-resolved'].includes(call.confidence ?? '')) continue;
+    if (!delegates.has(call.callerId)) delegates.set(call.callerId, new Set());
+    delegates.get(call.callerId)!.add(call.calleeId);
+  }
   for (const s of changed) {
     checkDeadline();
     if (!eligible.has(s.id) || exempt(s.id)) continue;
@@ -194,6 +200,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     let best: { target: IndexedSymbol; p: number; signals: Signals; score: ReturnType<typeof scoreSignals> } | undefined;
     for (const candidate of candidates.find(query)) {
       if (!eligible.has(candidate.id) || (!baseSymbols.has(candidate.id) && order(candidate) >= order(s))) continue;
+      if (delegates.get(s.id)?.has(candidate.id)) continue;
       const signals = pairSignals(query, candidate, candidates.idf);
       const score = scoreSignals(signals, query.embedding?.model);
       const p = score.probability;

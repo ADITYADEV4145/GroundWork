@@ -1,0 +1,75 @@
+{
+  "task_id": "pytest-plugin_metadata",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": true,
+  "acceptance": {
+    "exitCode": 0,
+    "output": ".                                                                        [100%]\n1 passed in 0.02s\n"
+  },
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "db54eae45ece45dd28a78b848bdf04047859e823",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/plugin_metadata.py",
+          "symbol": "src/_pytest/plugin_metadata.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/compat.py",
+          "symbol": "src/_pytest/compat.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/plugin_metadata.py and update its 9 callers to use src/_pytest/compat.py."
+      },
+      {
+        "id": "f1c55f07d48e7ca88a62022d83aa37fd73b835b1",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/plugin_metadata.py",
+          "symbol": "plugin_metadata",
+          "line": 14
+        },
+        "existing": {
+          "file": "src/_pytest/compat.py",
+          "symbol": "safe_getattr",
+          "line": 235
+        },
+        "probability": 0.5086210607911567,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.3136905283921903
+          }
+        ],
+        "fix": "Duplicate of safe_getattr: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "duplicate",
+    "reason": "Devin lead review (agent, not Aditya): Reimplements guarded getattr with TEST_OUTCOME handling instead of calling safe_getattr.",
+    "source": "human"
+  }
+}

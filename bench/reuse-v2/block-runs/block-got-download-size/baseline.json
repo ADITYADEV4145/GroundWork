@@ -1,0 +1,9 @@
+{
+  "task_id": "block-got-download-size",
+  "arm": "baseline",
+  "patch": "diff --git a/source/core/utils/get-download-size.ts b/source/core/utils/get-download-size.ts\nnew file mode 100644\nindex 0000000..35aefd1\n--- /dev/null\n+++ b/source/core/utils/get-download-size.ts\n@@ -0,0 +1,33 @@\n+import {Buffer} from 'node:buffer';\n+import {promisify} from 'node:util';\n+import type {ClientRequestArgs} from 'node:http';\n+import is from '@sindresorhus/is';\n+import isFormData from './is-form-data.js';\n+\n+export default async function getDownloadSize(body: unknown, headers: ClientRequestArgs['headers']): Promise<number | undefined> {\n+\tif (headers && 'content-length' in headers) {\n+\t\treturn Number(headers['content-length']);\n+\t}\n+\n+\tif (!body) {\n+\t\treturn 0;\n+\t}\n+\n+\tif (is.string(body)) {\n+\t\treturn Buffer.byteLength(body);\n+\t}\n+\n+\tif (is.buffer(body)) {\n+\t\treturn body.length;\n+\t}\n+\n+\tif (body instanceof Uint8Array) {\n+\t\treturn body.byteLength;\n+\t}\n+\n+\tif (isFormData(body)) {\n+\t\treturn promisify(body.getLength.bind(body))();\n+\t}\n+\n+\treturn undefined;\n+}\n",
+  "decisions": [],
+  "notes": "Created get-download-size.ts as a sibling of get-body-size.ts with identical behavior plus an instanceof Uint8Array branch returning byteLength; get-body-size.ts untouched.\nAgent-reported tests_run (not independently verified): \"npx tsc --noEmit on the new file (clean), npx xo (clean), tsx runtime check: string=6, Buffer=3, Uint8Array=7, absent=0, content-length=42, stream=undefined, FormData=161\"",
+  "session_id": "",
+  "acus": null
+}

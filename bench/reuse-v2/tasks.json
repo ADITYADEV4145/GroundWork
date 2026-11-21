@@ -1,0 +1,402 @@
+[
+  {
+    "id": "got-upload-budget",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "prompt": "Add source/upload-budget.ts exporting async uploadFits(body, headers, limit), for callers deciding whether an upload fits a byte budget before opening a connection. Return {bytes, fits}, with fits null when the size cannot be known without consuming the body; an explicit content-length takes priority, strings use UTF-8 bytes, and no body is zero bytes. Reject negative or non-finite limits with RangeError and do not consume streams.",
+    "helpers": [
+      {
+        "file": "source/core/utils/get-body-size.ts",
+        "name": "getBodySize"
+      }
+    ],
+    "acceptance": {
+      "path": "test/bench-v2-upload-budget.ts",
+      "contents": "import test from 'ava';\nimport {Readable} from 'node:stream';\nimport {uploadFits} from '../source/upload-budget.js';\ntest('upload budgeting', async t => {\n t.deepEqual(await uploadFits('\u00e9', {}, 1), {bytes: 2, fits: false});\n t.deepEqual(await uploadFits(Buffer.from('abc'), {}, 3), {bytes: 3, fits: true});\n t.deepEqual(await uploadFits(undefined, {}, 0), {bytes: 0, fits: true});\n t.deepEqual(await uploadFits('abc', {'content-length': '8'}, 7), {bytes: 8, fits: false});\n const stream = Readable.from(['abc']);\n t.deepEqual(await uploadFits(stream, {}, 8), {bytes: undefined, fits: null});\n t.false(stream.readableDidRead);\n for (const limit of [-1, Infinity, NaN]) await t.throwsAsync(uploadFits('', {}, limit), {instanceOf: RangeError});\n});\n",
+      "command": "NODE_OPTIONS='--import=tsx/esm' npx --no-install ava test/bench-v2-upload-budget.ts"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/source/upload-budget.ts\n@@ -0,0 +1,8 @@\n+import getBodySize from './core/utils/get-body-size.js';\n+import type {ClientRequestArgs} from 'node:http';\n+\n+export async function uploadFits(body: unknown, headers: ClientRequestArgs['headers'], limit: number) {\n+\tif (!Number.isFinite(limit) || limit < 0) throw new RangeError('Invalid byte budget');\n+\tconst bytes = await getBodySize(body, headers);\n+\treturn {bytes, fits: bytes === undefined ? null : bytes <= limit};\n+}\n",
+    "why": "Reusing getBodySize preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "got-connection-record",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "prompt": "Add source/connection-record.ts exporting connectionRecord(address), accepting an absolute URL string and returning {hostname, port, path, auth} suitable for a connection diagnostic. Strip IPv6 brackets, convert explicit ports to numbers, combine pathname and query without a fragment, preserve URL-encoded credentials joined by a colon, and use null for absent port/auth. Invalid URLs must throw.",
+    "helpers": [
+      {
+        "file": "source/core/utils/url-to-options.ts",
+        "name": "urlToOptions"
+      }
+    ],
+    "acceptance": {
+      "path": "test/bench-v2-connection-record.ts",
+      "contents": "import test from 'ava';\nimport {connectionRecord} from '../source/connection-record.js';\ntest('connection record', t => {\n t.deepEqual(connectionRecord('https://u:p%20q@[::1]:8443/a?x=1#f'), {hostname: '::1', port: 8443, path: '/a?x=1', auth: 'u:p%20q'});\n t.deepEqual(connectionRecord('https://example.com'), {hostname: 'example.com', port: null, path: '/', auth: null});\n t.deepEqual(connectionRecord('http://u@example.com/x'), {hostname: 'example.com', port: null, path: '/x', auth: 'u:'});\n t.throws(() => connectionRecord(''), {instanceOf: TypeError});\n});\n",
+      "command": "NODE_OPTIONS='--import=tsx/esm' npx --no-install ava test/bench-v2-connection-record.ts"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/source/connection-record.ts\n@@ -0,0 +1,6 @@\n+import urlToOptions from './core/utils/url-to-options.js';\n+\n+export function connectionRecord(address: string) {\n+\tconst options = urlToOptions(new URL(address));\n+\treturn {hostname: options.hostname, port: options.port ?? null, path: options.path, auth: options.auth ?? null};\n+}\n",
+    "why": "Reusing urlToOptions preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "got-endpoint-preview",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "prompt": "Add source/endpoint-preview.ts exporting endpointPreview(origin, changes), which returns the final URL string for a request-options preview without modifying changes. Support protocol, hostname/host, port, pathname, search, and the legacy combined path field; origin may be empty when protocol and host information are supplied. Reject path combined with pathname, search or searchParams, and reject search combined with searchParams, rather than silently ignoring ambiguity.",
+    "helpers": [
+      {
+        "file": "source/core/utils/options-to-url.ts",
+        "name": "optionsToUrl"
+      }
+    ],
+    "acceptance": {
+      "path": "test/bench-v2-endpoint-preview.ts",
+      "contents": "import test from 'ava';\nimport {endpointPreview} from '../source/endpoint-preview.js';\ntest('endpoint preview', t => {\n const changes = {path: '/new?q=1'};\n t.is(endpointPreview('https://example.com/old', changes), 'https://example.com/new?q=1');\n t.deepEqual(changes, {path: '/new?q=1'});\n t.is(endpointPreview('', {protocol: 'http:', hostname: 'localhost', port: 8080, pathname: '/x'}), 'http://localhost:8080/x');\n t.is(endpointPreview('https://example.com/a', {}), 'https://example.com/a');\n t.throws(() => endpointPreview('', {}));\n for (const conflict of [{pathname: '/b'}, {search: '?b'}, {searchParams: {b: '1'}}]) t.throws(() => endpointPreview('https://example.com', {path: '/a', ...conflict}));\n t.throws(() => endpointPreview('https://example.com', {search: '?a', searchParams: {b: '1'}}));\n});\n",
+      "command": "NODE_OPTIONS='--import=tsx/esm' npx --no-install ava test/bench-v2-endpoint-preview.ts"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/source/endpoint-preview.ts\n@@ -0,0 +1,5 @@\n+import optionsToUrl, {type URLOptions} from './core/utils/options-to-url.js';\n+\n+export function endpointPreview(origin: string, changes: URLOptions) {\n+\treturn optionsToUrl(origin, {...changes}).href;\n+}\n",
+    "why": "Reusing optionsToUrl preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "got-transfer-relay",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "prompt": "Add source/transfer-relay.ts exporting relayTransfer(source, destination, onClose) for EventEmitters. While active, forward uploadProgress, downloadProgress and error with all original arguments, but no other events; return an idempotent disposer that removes only the listeners it installed and calls onClose exactly once. Disposing before any events must work.",
+    "helpers": [
+      {
+        "file": "source/core/utils/proxy-events.ts",
+        "name": "proxyEvents"
+      }
+    ],
+    "acceptance": {
+      "path": "test/bench-v2-transfer-relay.ts",
+      "contents": "import test from 'ava';\nimport {EventEmitter} from 'node:events';\nimport {relayTransfer} from '../source/transfer-relay.js';\ntest('transfer relay lifecycle', t => {\n const a = new EventEmitter(), b = new EventEmitter();\n const seen: unknown[] = []; let closed = 0; let own = 0;\n a.on('uploadProgress', () => own++);\n for (const name of ['uploadProgress', 'downloadProgress', 'error', 'other']) b.on(name, (...args) => seen.push([name, ...args]));\n const dispose = relayTransfer(a, b, () => closed++);\n const error = new Error('network');\n a.emit('uploadProgress', 1, 2); a.emit('downloadProgress', {n: 3}); a.emit('error', error); a.emit('other', 1);\n t.deepEqual(seen, [['uploadProgress', 1, 2], ['downloadProgress', {n: 3}], ['error', error]]);\n dispose(); dispose(); a.emit('uploadProgress', 5);\n t.is(seen.length, 3); t.is(own, 2); t.is(closed, 1); t.is(a.listenerCount('error'), 0);\n const stop = relayTransfer(a, b, () => closed++); stop(); t.is(closed, 2);\n});\n",
+      "command": "NODE_OPTIONS='--import=tsx/esm' npx --no-install ava test/bench-v2-transfer-relay.ts"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/source/transfer-relay.ts\n@@ -0,0 +1,13 @@\n+import type {EventEmitter} from 'node:events';\n+import proxyEvents from './core/utils/proxy-events.js';\n+\n+export function relayTransfer(source: EventEmitter, destination: EventEmitter, onClose: () => void) {\n+\tconst detach = proxyEvents(source, destination, ['uploadProgress', 'downloadProgress', 'error']);\n+\tlet closed = false;\n+\treturn () => {\n+\t\tif (closed) return;\n+\t\tclosed = true;\n+\t\tdetach();\n+\t\tonClose();\n+\t};\n+}\n",
+    "why": "Reusing proxyEvents preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "got-first-outcome",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "prompt": "Add source/first-outcome.ts exporting watchOutcome(emitter, callback), returning a cancellation function. The first response or error event calls callback with the event name and first payload, then both installed listeners must be removed; later events must not call it again. Cancellation before an event must remove both listeners without calling callback and must leave unrelated listeners intact.",
+    "helpers": [
+      {
+        "file": "source/core/utils/unhandle.ts",
+        "name": "unhandle"
+      }
+    ],
+    "acceptance": {
+      "path": "test/bench-v2-first-outcome.ts",
+      "contents": "import test from 'ava';\nimport {EventEmitter} from 'node:events';\nimport {watchOutcome} from '../source/first-outcome.js';\ntest('first outcome and cancellation', t => {\n for (const event of ['response', 'error']) {\n  const e = new EventEmitter(); const seen: unknown[] = []; const own = () => {};\n  e.on('error', own);\n  const cancel = watchOutcome(e, (...args) => seen.push(args));\n  const payload = {ok: true}; e.emit(event, payload); e.emit('response', 2); e.emit('error', 3); cancel();\n  t.deepEqual(seen, [[event, payload]]); t.is(e.listenerCount('response'), 0); t.deepEqual(e.listeners('error'), [own]);\n }\n const e = new EventEmitter(); let called = false;\n const cancel = watchOutcome(e, () => {called = true;}); cancel(); cancel(); e.emit('response');\n t.false(called); t.is(e.listenerCount('error'), 0);\n});\n",
+      "command": "NODE_OPTIONS='--import=tsx/esm' npx --no-install ava test/bench-v2-first-outcome.ts"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/source/first-outcome.ts\n@@ -0,0 +1,13 @@\n+import type {EventEmitter} from 'node:events';\n+import unhandle from './core/utils/unhandle.js';\n+\n+export function watchOutcome(emitter: EventEmitter, callback: (event: string, payload: unknown) => void) {\n+\tconst listeners = unhandle();\n+\tfor (const event of ['response', 'error']) {\n+\t\tlisteners.once(emitter, event, (payload: unknown) => {\n+\t\t\tlisteners.unhandleAll();\n+\t\t\tcallback(event, payload);\n+\t\t});\n+\t}\n+\treturn () => listeners.unhandleAll();\n+}\n",
+    "why": "Reusing unhandle preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "got-pagination-target",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "prompt": "Add source/pagination-target.ts exporting paginationTarget(header, currentUrl, relation), returning the absolute URL of the first Link entry whose rel value includes the requested whitespace-separated relation, or null when absent. Accept quoted or unquoted rel values and resolve relative targets against currentUrl; absent or whitespace-only headers return null. Malformed nonempty Link syntax must throw instead of being treated as a missing page.",
+    "helpers": [
+      {
+        "file": "source/core/parse-link-header.ts",
+        "name": "parseLinkHeader"
+      }
+    ],
+    "acceptance": {
+      "path": "test/bench-v2-pagination-target.ts",
+      "contents": "import test from 'ava';\nimport {paginationTarget} from '../source/pagination-target.js';\ntest('page relation resolution', t => {\n t.is(paginationTarget('</p?x=2>; rel=\"next alternate\", <https://other.test/>; rel=last', 'https://example.com/p', 'next'), 'https://example.com/p?x=2');\n t.is(paginationTarget('<../last>; rel=last', 'https://example.com/a/b', 'last'), 'https://example.com/last');\n t.is(paginationTarget('<a>; title=x', 'https://example.com', 'next'), null);\n for (const h of [undefined, '', '  ']) t.is(paginationTarget(h, 'https://example.com', 'next'), null);\n for (const h of ['oops; rel=next', '<a>', '<a>; broken']) t.throws(() => paginationTarget(h, 'https://example.com', 'next'));\n});\n",
+      "command": "NODE_OPTIONS='--import=tsx/esm' npx --no-install ava test/bench-v2-pagination-target.ts"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/source/pagination-target.ts\n@@ -0,0 +1,10 @@\n+import parseLinkHeader from './core/parse-link-header.js';\n+\n+export function paginationTarget(header: string | undefined, currentUrl: string, relation: string) {\n+\tif (!header?.trim()) return null;\n+\tfor (const link of parseLinkHeader(header)) {\n+\t\tconst relations = (link.parameters.rel ?? '').replace(/^\"|\"$/g, '').split(/\\s+/);\n+\t\tif (relations.includes(relation)) return new URL(link.reference, currentUrl).href;\n+\t}\n+\treturn null;\n+}\n",
+    "why": "Reusing parseLinkHeader preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "got-retry-schedule",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "prompt": "Add source/retry-schedule.ts exporting retrySchedule(contexts), a side-effect-free batch diagnostic returning one retry delay per context, using Got retry-context objects with noise explicitly set to zero. Preserve method/code/status eligibility, attempt limits, RetryError handling, exponential delay capped by backoffLimit, and Retry-After bounds; reject any nonzero noise with RangeError so previews are deterministic. Empty input returns an empty array.",
+    "helpers": [
+      {
+        "file": "source/core/calculate-retry-delay.ts",
+        "name": "calculateRetryDelay"
+      }
+    ],
+    "acceptance": {
+      "path": "test/bench-v2-retry-schedule.ts",
+      "contents": "import test from 'ava';\nimport {retrySchedule} from '../source/retry-schedule.js';\ntest('deterministic retry preview', t => {\n const base: any = {attemptCount: 1, retryOptions: {limit: 3, methods: ['GET'], errorCodes: ['ECONNRESET'], statusCodes: [429, 413], noise: 0, backoffLimit: 2500}, error: {name: 'RequestError', code: 'ECONNRESET', options: {method: 'GET'}}, computedValue: 5000};\n t.deepEqual(retrySchedule([base, {...base, attemptCount: 2}, {...base, attemptCount: 3}, {...base, attemptCount: 4}]), [1000, 2000, 2500, 0]);\n t.deepEqual(retrySchedule([{...base, error: {...base.error, options: {method: 'POST'}}}, {...base, error: {...base.error, name: 'RetryError'}}]), [0, 1]);\n const response = {...base, error: {...base.error, code: 'OTHER', response: {statusCode: 429}}};\n t.deepEqual(retrySchedule([{...response, retryAfter: 100}, {...response, retryAfter: 6000}, {...response, error: {...response.error, response: {statusCode: 413}}}]), [100, 0, 0]);\n t.deepEqual(retrySchedule([]), []);\n t.throws(() => retrySchedule([{...base, retryOptions: {...base.retryOptions, noise: 1}}]), {instanceOf: RangeError});\n});\n",
+      "command": "NODE_OPTIONS='--import=tsx/esm' npx --no-install ava test/bench-v2-retry-schedule.ts"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/source/retry-schedule.ts\n@@ -0,0 +1,8 @@\n+import calculateRetryDelay from './core/calculate-retry-delay.js';\n+\n+export function retrySchedule(contexts: Array<Parameters<typeof calculateRetryDelay>[0]>) {\n+\treturn contexts.map(context => {\n+\t\tif (context.retryOptions.noise !== 0) throw new RangeError('Preview requires zero noise');\n+\t\treturn calculateRetryDelay(context);\n+\t});\n+}\n",
+    "why": "Reusing calculateRetryDelay preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "click-command_catalog",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "prompt": "Add click.command_catalog.command_catalog(commands, width=45), taking an iterable of (command_name, help_text) pairs and returning a list of (name, concise_description) pairs in order. Descriptions should use the first paragraph only, collapse whitespace, stop at the first sentence-ending period, omit a leading backspace no-wrap marker, and truncate on word boundaries with three dots within width. Reject widths below 4 with ValueError, and do not modify the input.",
+    "helpers": [
+      {
+        "file": "src/click/utils.py",
+        "name": "make_default_short_help"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_command_catalog.py",
+      "contents": "import pytest\nfrom click.command_catalog import command_catalog\n\n\ndef test_catalog():\n    rows = [(\"run\", \"  Run  jobs. More words\\n\\nDetails\"), (\"ls\", \"alpha beta gamma delta\"), (\"empty\", \"\"), (\"raw\", \"\\b Keep this.\")]\n    assert command_catalog(rows, 16) == [(\"run\", \"Run jobs.\"), (\"ls\", \"alpha beta...\"), (\"empty\", \"\"), (\"raw\", \"Keep this.\")]\n    assert len(rows) == 4\n    assert command_catalog(iter([])) == []\n    with pytest.raises(ValueError):\n        command_catalog([], 3)\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_command_catalog.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/click/command_catalog.py\n@@ -0,0 +1,7 @@\n+from .utils import make_default_short_help\n+\n+\n+def command_catalog(commands, width=45):\n+    if width < 4:\n+        raise ValueError(\"width must be at least 4\")\n+    return [(name, make_default_short_help(text, width)) for name, text in commands]\n",
+    "why": "Reusing make_default_short_help preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "click-notice_panel",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "prompt": "Add click.notice_panel.notice_panel(text, width=78), returning a string whose every line starts with two spaces and whose total line width is bounded by width for ordinary prose. Retain blank paragraph separators, preserve the relative indentation of paragraphs, and honor a paragraph starting with a backspace marker as literal preformatted text without wrapping it. Empty text returns an empty string, and widths below 4 raise ValueError.",
+    "helpers": [
+      {
+        "file": "src/click/formatting.py",
+        "name": "wrap_text"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_notice_panel.py",
+      "contents": "import pytest\nfrom click.notice_panel import notice_panel\n\n\ndef test_panel():\n    assert notice_panel(\"one two three four\", 12) == \"  one two\\n  three four\"\n    assert notice_panel(\"alpha\\n\\nbeta\", 20) == \"  alpha\\n  \\n  beta\"\n    assert notice_panel(\"\\b\\n  raw    code that is long\", 10) == \"    raw    code that is long\"\n    assert notice_panel(\"  indented text\", 30) == \"    indented text\"\n    assert notice_panel(\"\") == \"\"\n    with pytest.raises(ValueError):\n        notice_panel(\"text\", 3)\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_notice_panel.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/click/notice_panel.py\n@@ -0,0 +1,10 @@\n+from .formatting import wrap_text\n+\n+\n+def notice_panel(text, width=78):\n+    if width < 4:\n+        raise ValueError(\"width must be at least 4\")\n+    if not text:\n+        return \"\"\n+    wrapped = wrap_text(text, width - 2, preserve_paragraphs=True)\n+    return \"\\n\".join(\"  \" + line for line in wrapped.split(\"\\n\"))\n",
+    "why": "Reusing wrap_text preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "click-option_badge",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "prompt": "Add click.option_badge.option_badge(spellings, metavar=None) for help-card rendering, returning {text, windows_style}. Order option spellings stably by prefix length (unprefixed, then single-character prefixes, then double-dash), join them with comma-space, and append a space plus metavar only when both spellings and metavar are nonempty. windows_style is true if any spelling has a slash prefix; an empty sequence produces empty text and false.",
+    "helpers": [
+      {
+        "file": "src/click/formatting.py",
+        "name": "join_options"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_option_badge.py",
+      "contents": "from click.option_badge import option_badge\n\n\ndef test_badge():\n    values = [\"--verbose\", \"-v\", \"/V\", \"plain\", \"--version\"]\n    assert option_badge(values, \"LEVEL\") == {\"text\": \"plain, -v, /V, --verbose, --version LEVEL\", \"windows_style\": True}\n    assert values[0] == \"--verbose\"\n    assert option_badge([\"--foo\", \"-f\"]) == {\"text\": \"-f, --foo\", \"windows_style\": False}\n    assert option_badge([], \"X\") == {\"text\": \"\", \"windows_style\": False}\n    assert option_badge([\"-x\"], \"\") == {\"text\": \"-x\", \"windows_style\": False}\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_option_badge.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/click/option_badge.py\n@@ -0,0 +1,8 @@\n+from .formatting import join_options\n+\n+\n+def option_badge(spellings, metavar=None):\n+    text, windows_style = join_options(spellings)\n+    if text and metavar:\n+        text += \" \" + metavar\n+    return {\"text\": text, \"windows_style\": windows_style}\n",
+    "why": "Reusing join_options preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "click-completion_cursor",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "prompt": "Add click.completion_cursor.completion_cursor(line), returning {complete, current} for a shell completion UI. Tokenize shell-style quotes and backslash escapes, treat # as ordinary text, and tolerate unfinished quotes or trailing escapes by retaining the partial token. If the line ends in whitespace all parsed tokens are complete and current is empty; otherwise the last token is current, with empty input yielding an empty list and empty current.",
+    "helpers": [
+      {
+        "file": "src/click/shell_completion.py",
+        "name": "split_arg_string"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_completion_cursor.py",
+      "contents": "from click.completion_cursor import completion_cursor\n\n\ndef test_cursor():\n    assert completion_cursor(\"run 'my file\") == {\"complete\": [\"run\"], \"current\": \"my file\"}\n    assert completion_cursor('run \"my file\" ') == {\"complete\": [\"run\", \"my file\"], \"current\": \"\"}\n    assert completion_cursor(\"run my\\\\\") == {\"complete\": [\"run\"], \"current\": \"my\"}\n    assert completion_cursor(\"run #tag\") == {\"complete\": [\"run\"], \"current\": \"#tag\"}\n    assert completion_cursor(\"\") == {\"complete\": [], \"current\": \"\"}\n    assert completion_cursor(\"   \") == {\"complete\": [], \"current\": \"\"}\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_completion_cursor.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/click/completion_cursor.py\n@@ -0,0 +1,8 @@\n+from .shell_completion import split_arg_string\n+\n+\n+def completion_cursor(line):\n+    tokens = split_arg_string(line)\n+    if not tokens or (line and line[-1].isspace()):\n+        return {\"complete\": tokens, \"current\": \"\"}\n+    return {\"complete\": tokens[:-1], \"current\": tokens[-1]}\n",
+    "why": "Reusing split_arg_string preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "click-file_diagnostics",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "prompt": "Add click.file_diagnostics.file_diagnostics(paths, shorten=False), returning one string per path in the form Cannot open: <display name>. Accept strings, bytes and path-like objects, safely replacing undecodable filesystem bytes or surrogate-escaped characters rather than raising UnicodeError; shorten=True displays only the basename. Preserve order, do not open any files, and return [] for no paths.",
+    "helpers": [
+      {
+        "file": "src/click/utils.py",
+        "name": "format_filename"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_file_diagnostics.py",
+      "contents": "from pathlib import Path\nfrom click.file_diagnostics import file_diagnostics\n\n\ndef test_diagnostics():\n    assert file_diagnostics([Path(\"a/b.txt\"), b\"dir/bad\\xff\", \"x/\\udcff\"]) == [\"Cannot open: a/b.txt\", \"Cannot open: dir/bad\\ufffd\", \"Cannot open: x/\\ufffd\"]\n    assert file_diagnostics([b\"dir/bad\\xff\", Path(\"a/b\")], shorten=True) == [\"Cannot open: bad\\ufffd\", \"Cannot open: b\"]\n    assert file_diagnostics([]) == []\n    assert file_diagnostics([\"\"]) == [\"Cannot open: \"]\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_file_diagnostics.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/click/file_diagnostics.py\n@@ -0,0 +1,5 @@\n+from .utils import format_filename\n+\n+\n+def file_diagnostics(paths, shorten=False):\n+    return [\"Cannot open: \" + format_filename(path, shorten=shorten) for path in paths]\n",
+    "why": "Reusing format_filename preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "click-column_layout",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "prompt": "Add click.column_layout.column_layout(rows, padding=2) to compute help-table column starting offsets. Determine the maximum visible length in each column ignoring ANSI color sequences, then return cumulative offsets starting at zero and separated by padding; support ragged rows and one-shot iterables. Empty input returns (), and negative padding raises ValueError.",
+    "helpers": [
+      {
+        "file": "src/click/formatting.py",
+        "name": "measure_table"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_column_layout.py",
+      "contents": "import pytest\nfrom click.column_layout import column_layout\n\n\ndef test_columns():\n    rows = iter([(\"\\x1b[31mred\\x1b[0m\", \"12345\"), (\"long\", \"x\", \"z\"), (\"a\",)])\n    assert column_layout(rows) == (0, 6, 13)\n    assert column_layout([(\"ab\", \"c\")], padding=0) == (0, 2)\n    assert column_layout([]) == ()\n    assert column_layout([(), ()]) == ()\n    with pytest.raises(ValueError):\n        column_layout([], padding=-1)\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_column_layout.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/click/column_layout.py\n@@ -0,0 +1,13 @@\n+from .formatting import measure_table\n+\n+\n+def column_layout(rows, padding=2):\n+    if padding < 0:\n+        raise ValueError(\"padding must be nonnegative\")\n+    widths = measure_table(rows)\n+    offsets = []\n+    offset = 0\n+    for width in widths:\n+        offsets.append(offset)\n+        offset += width + padding\n+    return tuple(offsets)\n",
+    "why": "Reusing measure_table preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "click-cleanup_batch",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "prompt": "Add click.cleanup_batch.cleanup_batch(callbacks), running zero-argument cleanup callbacks in order and returning their results. Ordinary exceptions from one callback must become None without preventing later callbacks; successful None results remain None, but KeyboardInterrupt and SystemExit must propagate. Accept iterables, run each callback once, and return [] for no callbacks.",
+    "helpers": [
+      {
+        "file": "src/click/utils.py",
+        "name": "safecall"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_cleanup_batch.py",
+      "contents": "import pytest\nfrom click.cleanup_batch import cleanup_batch\n\n\ndef test_cleanup():\n    calls = []\n    def ok():\n        calls.append(\"ok\")\n        return 4\n    def bad():\n        calls.append(\"bad\")\n        raise ValueError(\"cleanup failed\")\n    assert cleanup_batch(iter([bad, ok, lambda: None])) == [None, 4, None]\n    assert calls == [\"bad\", \"ok\"]\n    assert cleanup_batch([]) == []\n    for error in (KeyboardInterrupt, SystemExit):\n        def abort():\n            raise error()\n        with pytest.raises(error):\n            cleanup_batch([abort])\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_cleanup_batch.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/click/cleanup_batch.py\n@@ -0,0 +1,5 @@\n+from .utils import safecall\n+\n+\n+def cleanup_batch(callbacks):\n+    return [safecall(callback)() for callback in callbacks]\n",
+    "why": "Reusing safecall preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "pytest-id_preview",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "prompt": "Add _pytest.id_preview.id_preview(values), returning a list of single-line ASCII-only display labels for string or bytes parameter values without surrounding quotes. Escape non-ASCII strings with Python unicode escapes and bytes as individual byte escapes rather than decoding UTF-8; show tab, newline and carriage return as backslash letters, and other control bytes as hex escapes. Keep printable ASCII unchanged and preserve order, including empty values.",
+    "helpers": [
+      {
+        "file": "src/_pytest/compat.py",
+        "name": "ascii_escaped"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_id_preview.py",
+      "contents": "from _pytest.id_preview import id_preview\n\n\ndef test_ids():\n    assert id_preview([\"abc\", \"\u00e9\\n\\t\", b\"\\xc3\\xa9\\r\\x00\", \"\", b\"\", \"\ud83d\ude00\"]) == [\"abc\", r\"\\xe9\\n\\t\", r\"\\xc3\\xa9\\r\\x00\", \"\", \"\", r\"\\U0001f600\"]\n    assert id_preview(iter([])) == []\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_id_preview.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/_pytest/id_preview.py\n@@ -0,0 +1,5 @@\n+from .compat import ascii_escaped\n+\n+\n+def id_preview(values):\n+    return [ascii_escaped(value) for value in values]\n",
+    "why": "Reusing ascii_escaped preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "pytest-default_manifest",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "prompt": "Add _pytest.default_manifest.default_manifest(functions), returning a mapping from each callable name to a list of its parameter names that have defaults, in declaration order. Include positional-or-keyword and keyword-only parameters but exclude positional-only, *args and **kwargs; respect wrapped function signatures. Empty input returns {}, and an invalid callable signature must raise rather than be silently omitted.",
+    "helpers": [
+      {
+        "file": "src/_pytest/compat.py",
+        "name": "get_default_arg_names"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_default_manifest.py",
+      "contents": "import functools\nimport pytest\nfrom _pytest.default_manifest import default_manifest\n\n\ndef test_defaults():\n    def sample(a=1, /, b=2, *args, c=3, d, **kwargs):\n        pass\n    @functools.wraps(sample)\n    def wrapped(*args, **kwargs):\n        pass\n    assert default_manifest([wrapped]) == {\"sample\": [\"b\", \"c\"]}\n    def empty(x):\n        pass\n    assert default_manifest([empty]) == {\"empty\": []}\n    assert default_manifest([]) == {}\n    class Invalid:\n        __name__ = \"broken\"\n        __signature__ = 42\n        def __call__(self):\n            pass\n    with pytest.raises(TypeError):\n        default_manifest([Invalid()])\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_default_manifest.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/_pytest/default_manifest.py\n@@ -0,0 +1,5 @@\n+from .compat import get_default_arg_names\n+\n+\n+def default_manifest(functions):\n+    return {function.__name__: list(get_default_arg_names(function)) for function in functions}\n",
+    "why": "Reusing get_default_arg_names preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "pytest-module_inventory",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "prompt": "Add _pytest.module_inventory.module_inventory(paths, root), returning unique dotted module labels in first-seen order for filesystem paths. Drop file suffixes, omit a trailing __init__ except for a root-level __init__.py, normalize dots within path components to underscores, and for paths outside root derive the label from the full path without its filesystem anchor. Accept pathlib paths or strings, do not require files to exist, and return [] for no inputs.",
+    "helpers": [
+      {
+        "file": "src/_pytest/pathlib.py",
+        "name": "module_name_from_path"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_module_inventory.py",
+      "contents": "from pathlib import Path\nfrom _pytest.module_inventory import module_inventory\n\n\ndef test_inventory():\n    root = Path(\"/project\")\n    assert module_inventory([\"/project/pkg/__init__.py\", \"/project/pkg/test_a.py\", \"/project/pkg/__init__.py\", \"/project/.env.310/test_a.py\", \"/project/__init__.py\", \"/outside/x.py\"], root) == [\"pkg\", \"pkg.test_a\", \"_env_310.test_a\", \"__init__\", \"outside.x\"]\n    assert module_inventory(iter([]), root) == []\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_module_inventory.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/_pytest/module_inventory.py\n@@ -0,0 +1,8 @@\n+from pathlib import Path\n+\n+from .pathlib import module_name_from_path\n+\n+\n+def module_inventory(paths, root):\n+    names = (module_name_from_path(Path(path), Path(root)) for path in paths)\n+    return list(dict.fromkeys(names))\n",
+    "why": "Reusing module_name_from_path preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "pytest-report_paths",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "prompt": "Add _pytest.report_paths.report_paths(directory, destinations), producing report-friendly relative path strings from directory to each destination while preserving order. Use a dot for the directory itself, parent traversals for siblings, and retain the destination spelling when an absolute/relative mismatch makes a relative path impossible. Accept strings and pathlib paths without touching the filesystem, and return [] for no destinations.",
+    "helpers": [
+      {
+        "file": "src/_pytest/pathlib.py",
+        "name": "bestrelpath"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_report_paths.py",
+      "contents": "from pathlib import Path\nfrom _pytest.report_paths import report_paths\n\n\ndef test_paths():\n    assert report_paths(\"/work/tests\", [\"/work/tests\", Path(\"/work/tests/a.py\"), \"/work/src/b.py\", \"relative.py\"]) == [\".\", \"a.py\", \"../src/b.py\", \"relative.py\"]\n    assert report_paths(\"a\", [\"a/b\", \"/absolute\"]) == [\"b\", \"/absolute\"]\n    assert report_paths(\"/work\", iter([])) == []\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_report_paths.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/_pytest/report_paths.py\n@@ -0,0 +1,8 @@\n+from pathlib import Path\n+\n+from .pathlib import bestrelpath\n+\n+\n+def report_paths(directory, destinations):\n+    directory = Path(directory)\n+    return [bestrelpath(directory, Path(destination)) for destination in destinations]\n",
+    "why": "Reusing bestrelpath preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "pytest-fixture_contract",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "prompt": "Add _pytest.fixture_contract.fixture_contract(function, cls=None), returning {name, required} for a plugin diagnostic where required is the ordered list of mandatory fixture-style arguments. Exclude parameters with defaults, positional-only parameters, variadics and mock-injected arguments; when cls is provided treat ordinary unbound methods as bound but retain static-method parameters. Preserve the function name and let invalid-signature failures propagate.",
+    "helpers": [
+      {
+        "file": "src/_pytest/compat.py",
+        "name": "getfuncargnames"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_fixture_contract.py",
+      "contents": "from unittest.mock import patch\nimport pytest\nfrom _pytest.fixture_contract import fixture_contract\n\n\ndef test_contract():\n    def sample(a, /, b, c=1, *args, d, e=2, **kwargs):\n        pass\n    assert fixture_contract(sample) == {\"name\": \"sample\", \"required\": [\"b\", \"d\"]}\n    class Suite:\n        def method(self, resource, optional=1):\n            pass\n        @staticmethod\n        def static(resource):\n            pass\n    assert fixture_contract(Suite.method, Suite)[\"required\"] == [\"resource\"]\n    assert fixture_contract(Suite.static, Suite)[\"required\"] == [\"resource\"]\n    @patch(\"os.getcwd\")\n    def mocked(mock_getcwd, resource):\n        pass\n    assert fixture_contract(mocked)[\"required\"] == [\"resource\"]\n    def empty():\n        pass\n    assert fixture_contract(empty)[\"required\"] == []\n    empty.__signature__ = 42\n    with pytest.raises(pytest.fail.Exception):\n        fixture_contract(empty)\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_fixture_contract.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/_pytest/fixture_contract.py\n@@ -0,0 +1,5 @@\n+from .compat import getfuncargnames\n+\n+\n+def fixture_contract(function, cls=None):\n+    return {\"name\": function.__name__, \"required\": list(getfuncargnames(function, cls=cls))}\n",
+    "why": "Reusing getfuncargnames preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  },
+  {
+    "id": "pytest-plugin_metadata",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "prompt": "Add _pytest.plugin_metadata.plugin_metadata(plugin, names, default=None), returning a dictionary of requested attributes for diagnostic display. Missing attributes or attributes whose descriptors raise ordinary exceptions or pytest outcome exceptions should use default; valid falsey values must be kept, and BaseException control-flow signals such as KeyboardInterrupt must still propagate. Return {} for no requested names.",
+    "helpers": [
+      {
+        "file": "src/_pytest/compat.py",
+        "name": "safe_getattr"
+      }
+    ],
+    "acceptance": {
+      "path": "bench_v2_test_plugin_metadata.py",
+      "contents": "import pytest\nfrom _pytest.plugin_metadata import plugin_metadata\n\n\ndef test_metadata():\n    class Plugin:\n        zero = 0\n        blank = \"\"\n        @property\n        def broken(self):\n            raise ValueError(\"bad descriptor\")\n        @property\n        def skipped(self):\n            pytest.skip(\"not available\")\n        @property\n        def interrupted(self):\n            raise KeyboardInterrupt()\n    plugin = Plugin()\n    sentinel = object()\n    assert plugin_metadata(plugin, [\"zero\", \"blank\", \"missing\", \"broken\", \"skipped\"], sentinel) == {\"zero\": 0, \"blank\": \"\", \"missing\": sentinel, \"broken\": sentinel, \"skipped\": sentinel}\n    assert plugin_metadata(plugin, []) == {}\n    with pytest.raises(KeyboardInterrupt):\n        plugin_metadata(plugin, [\"interrupted\"])\n",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider bench_v2_test_plugin_metadata.py -q"
+    },
+    "reference_patch": "--- /dev/null\n+++ b/src/_pytest/plugin_metadata.py\n@@ -0,0 +1,5 @@\n+from .compat import safe_getattr\n+\n+\n+def plugin_metadata(plugin, names, default=None):\n+    return {name: safe_getattr(plugin, name, default) for name in names}\n",
+    "why": "Reusing safe_getattr preserves the repository's established edge-case semantics instead of maintaining a second implementation."
+  }
+]

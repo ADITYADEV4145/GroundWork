@@ -1,0 +1,120 @@
+[
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block-got-once-event-proxy",
+    "arm": "baseline",
+    "added": {
+      "file": "source/core/utils/proxy-events-once.ts",
+      "symbol": "source/core/utils/proxy-events-once.ts",
+      "line": 1
+    },
+    "existing": {
+      "file": "source/core/utils/proxy-events.ts",
+      "symbol": "source/core/utils/proxy-events.ts",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The new proxy-events-once module duplicates proxy-events' registration, forwarding and cleanup body with on changed to once."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block-got-once-event-proxy",
+    "arm": "baseline",
+    "added": {
+      "file": "source/core/utils/proxy-events-once.ts",
+      "symbol": "proxyEventsOnce",
+      "line": 6
+    },
+    "existing": {
+      "file": "source/core/utils/proxy-events.ts",
+      "symbol": "proxyEvents",
+      "line": 6
+    },
+    "probability": 0.8000401166120246,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.948873165402942
+      },
+      {
+        "name": "paramCount",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "proxyEventsOnce duplicates proxyEvents' listener registry, forwarding closure and cleanup loop, changing on to once."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block-pytest-optional-fixture-names",
+    "arm": "baseline",
+    "added": {
+      "file": "src/_pytest/optional_fixture_names.py",
+      "symbol": "src/_pytest/optional_fixture_names.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/compat.py",
+      "symbol": "src/_pytest/compat.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The optional_fixture_names module duplicates compat.getfuncargnames' signature inspection, failure handling, parameter-kind filtering and mock logic."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block-pytest-optional-fixture-names",
+    "arm": "baseline",
+    "added": {
+      "file": "src/_pytest/optional_fixture_names.py",
+      "symbol": "get_optional_fixture_names",
+      "line": 13
+    },
+    "existing": {
+      "file": "src/_pytest/compat.py",
+      "symbol": "getfuncargnames",
+      "line": 107
+    },
+    "probability": 0.8190409549573725,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.7943480059948324
+      },
+      {
+        "name": "paramCount",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "get_optional_fixture_names duplicates getfuncargnames' signature/fail/kind-filter/mock logic while selecting defaulted rather than required parameters."
+  }
+]

@@ -62,7 +62,7 @@ describe('gw setup edge cases', () => {
 
   it('removes hooks installed with a custom --command and does not duplicate them on re-setup', () => {
     const { root, home } = fresh();
-    const custom = targetsFor({ root, home, gw: 'npx -y groundwork-agent' });
+    const custom = targetsFor({ root, home, gw: 'npx -y groundwork-agent@0.0.1' });
     applySetup(root, planSetup(root, custom, 'add'), 'add');
     const plain = targetsFor({ root, home, gw: 'gw' });
     applySetup(root, planSetup(root, plain, 'add'), 'add');
@@ -93,7 +93,7 @@ describe('gw setup with Codex config', () => {
     const root = tempDir('gw-setup-root-');
     dirs.push(root);
     mkdirSync(path.join(root, '.codex'));
-    const mine = '[mcp_servers.groundwork]\ncommand = "node"\nargs = ["dist/cli/main.js", "mcp"]\n';
+    const mine = '[mcp_servers.groundwork] # local server\ncommand = "node"\nargs = ["dist/cli/main.js", "mcp"]\n';
     writeFileSync(path.join(root, '.codex', 'config.toml'), mine);
     const targets = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === 'codex');
     applySetup(root, planSetup(root, targets, 'add'), 'add');

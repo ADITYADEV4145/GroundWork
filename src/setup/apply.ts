@@ -46,7 +46,8 @@ function transform(edit: Edit, before: string | null, mode: 'add' | 'remove'): s
     if (mode === 'remove') return before === null ? null : base;
     // A table the user declared themselves wins; TOML rejects a second declaration.
     const table = /^\s*(\[[^\]\n]+\])/.exec(edit.block)?.[1];
-    if (table && base.split('\n').some((l) => l.trim() === table)) return before;
+    const bare = (l: string) => l.replace(/#.*/, '').replace(/[\s"']/g, '');
+    if (table && base.split('\n').some((l) => bare(l) === bare(table))) return before;
     const head = base ? `${base.endsWith('\n') ? base : `${base}\n`}\n` : '';
     return `${head}${BLOCK_START}\n${edit.block}\n${BLOCK_END}\n`;
   }

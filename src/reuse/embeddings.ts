@@ -62,6 +62,7 @@ export async function initializeEmbeddings(root: string, options: { consent: boo
   if (!options.consent) throw new Error('Model downloads require explicit consent: gw init --embeddings.');
   const model = options.model ?? DEFAULT_EMBEDDING_MODEL;
   if (!/^[\w.-]+\/[\w.-]+$/.test(model) || model.split('/').some((p) => p === '.' || p === '..')) throw new Error('Expected a Hugging Face model id: owner/name.');
+  loadConfig(root);
   const cacheDir = embeddingCacheDir(root);
   mkdirSync(cacheDir, { recursive: true });
   await (options.factory ?? transformersEmbedder)(model, { cacheDir, download: true });
@@ -69,8 +70,8 @@ export async function initializeEmbeddings(root: string, options: { consent: boo
     const p = path.join(dir, entry.name); return entry.isDirectory() ? files(p) : [path.relative(cacheDir, p)];
   });
   writeFileSync(manifestPath(root, model), JSON.stringify({ model, format: EMBEDDING_FORMAT, files: files(path.join(cacheDir, model)) }) + '\n');
-  const config = loadConfig(root);
-  config.reuse.embeddings = { enabled: true, model };
+  const config = existsSync(configPath(root)) ? JSON.parse(readFileSync(configPath(root), 'utf8')) : {};
+  config.reuse = { ...config.reuse, embeddings: { enabled: true, model } };
   writeFileSync(configPath(root), JSON.stringify(config, null, 2) + '\n');
   return model;
 }

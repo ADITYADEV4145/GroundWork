@@ -16,6 +16,8 @@ import { buildIdf, pairSignals, vectorCosine, type ComparableSymbol } from '../s
 import { withIndexedFixture } from '../src/selftest/fixtures.js';
 import { loadDataset } from '../src/reuse/calibration.js';
 import { withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
+import { applySetup, planSetup } from '../src/setup/apply.js';
+import { profileTarget } from '../src/setup/targets.js';
 import evaluation from '../bench/dupes/embeddings-oof.json' with { type: 'json' };
 
 const fake = () => {
@@ -107,6 +109,21 @@ describe('consented, offline-only optional meaning', () => {
       const db = openDb(indexDbPath(root), { readonly: true });
       try { expect(readEmbedding(db, meaningModel.embeddingModel, embeddingHash(sources[0]!.text))).toEqual([0.6, 0.8]); }
       finally { db.close(); }
+    });
+  });
+
+  it.each([undefined, 'minimal'] as const)('writes only embedding keys and preserves an explicit %s profile choice', async (profile) => {
+    await withIndexedFixture('reuse-app', async (_db, root) => {
+      const file = path.join(root, '.groundwork', 'config.json');
+      const raw = profile ? { profile, reuse: { duplicateGate: false }, grounding: { enabled: true } } : {};
+      if (profile) writeFileSync(file, JSON.stringify(raw));
+      const selected = await initializeEmbeddings(root, { consent: true, factory: fake().factory });
+      const embeddings = { enabled: true, model: selected };
+      expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ ...raw, reuse: { ...raw.reuse, embeddings } });
+      applySetup(root, planSetup(root, [profileTarget(root, 'strict')], 'add'), 'add');
+      const configured = JSON.parse(readFileSync(file, 'utf8'));
+      expect(configured.profile).toBe(profile ?? 'strict');
+      expect(configured.reuse.embeddings).toEqual(embeddings);
     });
   });
 

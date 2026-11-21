@@ -1,0 +1,654 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "id": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "role": "mid-size TypeScript",
+    "license": "MIT",
+    "month": "2024-07",
+    "start": "eccfcce064fd879581d75777720a55409bd6be35",
+    "end": "d754e732466bea16cb8118994d6faba9b26196de"
+  },
+  "toolCommit": "50412e5a8e4deacf6e0c82b0d88b7d685ff0de3c",
+  "modelHash": "3d2aa690e5261d9f4893910ded6a7d084a49ef5c22461c49a33a17a1558c6642",
+  "node": "v24.22.2",
+  "meaning": false,
+  "config": "unmodified defaults",
+  "eligibleCommits": [
+    "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+    "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+    "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+    "bc17e8120b527bb54352474300b5c71cf465ee7f",
+    "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+    "d754e732466bea16cb8118994d6faba9b26196de"
+  ],
+  "excludedOutOfMonth": [],
+  "sampling": "none; all non-merge commits in the UTC calendar window",
+  "selectedCommits": [
+    "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+    "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+    "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+    "bc17e8120b527bb54352474300b5c71cf465ee7f",
+    "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+    "d754e732466bea16cb8118994d6faba9b26196de"
+  ],
+  "totalMs": 10509.440587999998,
+  "runs": [
+    {
+      "commit": "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+      "parent": "eccfcce064fd879581d75777720a55409bd6be35",
+      "subject": "Remove unnecessary type assertions (#2362)",
+      "committedAt": "2024-07-10T15:14:43+02:00",
+      "checkoutMs": 22.788726999999994,
+      "durationMs": 1901.194372,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "97a94ab0f2af880fefbb6754cccc884c3cd970e6",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "getHttp2TimeoutOption",
+            "line": 952
+          },
+          "existing": {
+            "file": "source/core/timed-out.ts",
+            "symbol": "timedOut",
+            "line": 46
+          },
+          "probability": 0.7304368946457854,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.47098880804844667
+            },
+            {
+              "name": "paramCount",
+              "value": 0.33333333333333337
+            }
+          ],
+          "fix": "Replace the body of getHttp2TimeoutOption with a call to timedOut."
+        },
+        {
+          "id": "04f411dd30ba4328a73aadb17fb48ba30f4f7e11",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/utils/options-to-url.ts",
+            "symbol": "optionsToUrl",
+            "line": 23
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.searchParams",
+            "line": 1568
+          },
+          "probability": 0.4653358982334103,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3620019243516467
+            },
+            {
+              "name": "paramCount",
+              "value": 0.5
+            }
+          ],
+          "fix": "Replace the body of optionsToUrl with a call to Options.searchParams."
+        }
+      ]
+    },
+    {
+      "commit": "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+      "parent": "561a37648e0b8d51a5bd163d64fe4f658769ff0a",
+      "subject": "Update packagephobia badges and link in readme (#2364)",
+      "committedAt": "2024-07-11T12:16:42+02:00",
+      "checkoutMs": 12.15644199999997,
+      "durationMs": 1494.2472869999997,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    },
+    {
+      "commit": "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+      "parent": "3c3b23368d90fd1ef7c9cbafced7add14a299a2f",
+      "subject": "Update @sindresorhus/is to v7 (#2363)",
+      "committedAt": "2024-07-11T12:17:23+02:00",
+      "checkoutMs": 7.873625999999604,
+      "durationMs": 2041.2711160000003,
+      "exitCode": 1,
+      "status": "BLOCK",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "e0857812836bfa8b6f6a510491004b7abd05c454",
+          "kind": "duplicate",
+          "severity": "BLOCK",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.encoding",
+            "line": 2257
+          },
+          "probability": 0.7697187228438456,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.6251223216052567
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.request with a call to Options.encoding."
+        },
+        {
+          "id": "3b14cff18ae33d6c6d9eb46c050bbb468769f3e4",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/index.ts",
+            "symbol": "Request._makeRequest",
+            "line": 1069
+          },
+          "existing": {
+            "file": "source/core/index.ts",
+            "symbol": "Request._onResponseBase",
+            "line": 639
+          },
+          "probability": 0.6419879943154033,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.4536214362670191
+            },
+            {
+              "name": "returnType",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Request._makeRequest with a call to Request._onResponseBase."
+        },
+        {
+          "id": "50d8b15eed79086695d79213a42eda06a590ee07",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "validateSearchParameters",
+            "line": 620
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.searchParams",
+            "line": 1568
+          },
+          "probability": 0.7534943403783622,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.6228080900610459
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of validateSearchParameters with a call to Options.searchParams."
+        },
+        {
+          "id": "8cad54b169310793d91b0e922d4c0f629f939da7",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.cookieJar",
+            "line": 1467
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.6298195817147291,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.34692599478265307
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.cookieJar with a call to Options.request."
+        },
+        {
+          "id": "ed0bd0edd59a2226e6bf503d46b055347671e3b5",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.dnsLookup",
+            "line": 1637
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.https",
+            "line": 2209
+          },
+          "probability": 0.7447898975878092,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.38848073503554775
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.dnsLookup with a call to Options.https."
+        },
+        {
+          "id": "5b08928452a4933fcc8cc360facc2a336e391a28",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.hooks",
+            "line": 1722
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.697642963550162,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3274369035303205
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.hooks with a call to Options.request."
+        },
+        {
+          "id": "255c2061a9a364d23ef068467f06c5fca743ce9e",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.followRedirect",
+            "line": 1772
+          },
+          "existing": {
+            "file": "source/core/response.ts",
+            "symbol": "isResponseOk",
+            "line": 115
+          },
+          "probability": 0.7921786098018555,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.45641676485605426
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.followRedirect with a call to isResponseOk."
+        },
+        {
+          "id": "85427c7dadf5e864e6c32362d21210b5cc9b8dc8",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.parseJson",
+            "line": 2015
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.form",
+            "line": 1338
+          },
+          "probability": 0.7563039348877488,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.4023620456329859
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.parseJson with a call to Options.form."
+        },
+        {
+          "id": "edc8f05425e84fbc2ce3720770392e6c7f476247",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.stringifyJson",
+            "line": 2066
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.form",
+            "line": 1338
+          },
+          "probability": 0.7531236516431932,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3995698631584145
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.stringifyJson with a call to Options.form."
+        },
+        {
+          "id": "d55b47385542565d9c38439d7a619bf4b826e0a9",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.retry",
+            "line": 2098
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.865855073077195,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.4973878119766231
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.retry with a call to Options.request."
+        },
+        {
+          "id": "21fae586162d6da458c50efe02aaf158b0feb75f",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.createConnection",
+            "line": 2166
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.https",
+            "line": 2209
+          },
+          "probability": 0.7601425836348452,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.40186664075324313
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.createConnection with a call to Options.https."
+        },
+        {
+          "id": "ff026d4e3081f28b0d1df45af4a2d784c7f089ac",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.https",
+            "line": 2209
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.request",
+            "line": 1104
+          },
+          "probability": 0.8823213865690034,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.5416800801279351
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Options.https with a call to Options.request."
+        },
+        {
+          "id": "4c7f7c3cd3b8baa7c6951cc9cca4b8233ca446d9",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/utils/is-form-data.ts",
+            "symbol": "isFormData",
+            "line": 9
+          },
+          "existing": {
+            "file": "source/core/options.ts",
+            "symbol": "Options.body",
+            "line": 1310
+          },
+          "probability": 0.7964353375344236,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.48804369594975655
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of isFormData with a call to Options.body."
+        },
+        {
+          "id": "84dca5c360c29e17bec303d5f675c3ebc2240a22",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create",
+            "line": 36
+          },
+          "existing": {
+            "file": "source/as-promise/index.ts",
+            "symbol": "asPromise.shortcut",
+            "line": 185
+          },
+          "probability": 0.5389856224657704,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.2823323847408244
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of create with a call to asPromise.shortcut."
+        }
+      ]
+    },
+    {
+      "commit": "bc17e8120b527bb54352474300b5c71cf465ee7f",
+      "parent": "5e2f0b32901f8af3abf3eb2b25f563e68582521f",
+      "subject": "Make `get-stream` a devDependency (#2365)",
+      "committedAt": "2024-07-11T17:52:51+02:00",
+      "checkoutMs": 8.017303000000538,
+      "durationMs": 1615.0724200000004,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "bb726f160aaabb3fb1f4a9e10211f620a5728050",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/core/index.ts",
+            "symbol": "Request._setRawBody",
+            "line": 872
+          },
+          "existing": {
+            "file": "source/core/index.ts",
+            "symbol": "Request._onResponseBase",
+            "line": 638
+          },
+          "probability": 0.45342338992764775,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.23093107384148645
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of Request._setRawBody with a call to Request._onResponseBase."
+        }
+      ]
+    },
+    {
+      "commit": "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+      "parent": "bc17e8120b527bb54352474300b5c71cf465ee7f",
+      "subject": "Fix handling of invalid arguments (#2367)",
+      "committedAt": "2024-07-24T12:56:41+02:00",
+      "checkoutMs": 16.06740499999978,
+      "durationMs": 1704.957863999999,
+      "exitCode": 0,
+      "status": "WARN",
+      "stderr": "",
+      "findings": [
+        {
+          "id": "84dca5c360c29e17bec303d5f675c3ebc2240a22",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create",
+            "line": 36
+          },
+          "existing": {
+            "file": "source/as-promise/index.ts",
+            "symbol": "asPromise.shortcut",
+            "line": 185
+          },
+          "probability": 0.5389324633754299,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.28229804368553935
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of create with a call to asPromise.shortcut."
+        },
+        {
+          "id": "2c745bbec4b2e5320fecb68b6c42fccea4692b8e",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create.lastHandler",
+            "line": 54
+          },
+          "existing": {
+            "file": "source/create.ts",
+            "symbol": "create.iterateHandlers",
+            "line": 70
+          },
+          "probability": 0.6877671646986118,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.3368665070710036
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of create.lastHandler with a call to create.iterateHandlers."
+        },
+        {
+          "id": "7897b4bc560bd6a0710e688e3adaf918d52a88e0",
+          "kind": "duplicate",
+          "severity": "WARN",
+          "added": {
+            "file": "source/create.ts",
+            "symbol": "create.iterateHandlers",
+            "line": 70
+          },
+          "existing": {
+            "file": "source/as-promise/index.ts",
+            "symbol": "asPromise.shortcut",
+            "line": 185
+          },
+          "probability": 0.7692292084024321,
+          "signals": [
+            {
+              "name": "vocabulary",
+              "value": 0.45832810991605294
+            },
+            {
+              "name": "paramCount",
+              "value": 1
+            }
+          ],
+          "fix": "Replace the body of create.iterateHandlers with a call to asPromise.shortcut."
+        }
+      ]
+    },
+    {
+      "commit": "d754e732466bea16cb8118994d6faba9b26196de",
+      "parent": "f44ef4388e0b56c8b0abd30d5161fe39053e3ce8",
+      "subject": "14.4.2",
+      "committedAt": "2024-07-24T13:01:14+02:00",
+      "checkoutMs": 12.36236899999858,
+      "durationMs": 1673.4316569999992,
+      "exitCode": 0,
+      "status": "PASS",
+      "stderr": "",
+      "findings": []
+    }
+  ]
+}

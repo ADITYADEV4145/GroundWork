@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { evaluateRealRepoReview } from '../src/selftest/real-repo-review.js';
+import { evaluateReviewEvidence as evaluateRealRepoReview, evaluateRealRepoReview as evaluateFinalReview, reviewModelHash } from '../src/selftest/real-repo-review.js';
 import { monthBounds, project, sampleCommits } from '../scripts/real-repos.js';
 
 const roots: string[] = [];
@@ -31,6 +31,12 @@ function fixture(agree = 9, count = 10) {
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('stored real-repository review gate', () => {
+  it('matches the captured source model hash even when tsc reformats its copied JSON', () => {
+    const raw = readFileSync(path.join(project, 'src/reuse/model.json'), 'utf8');
+    const expected = createHash('sha256').update(raw).digest('hex');
+    expect(reviewModelHash(raw)).toBe(expected);
+    expect(reviewModelHash(JSON.stringify(JSON.parse(raw), null, 4))).toBe(expected);
+  });
   it('accepts exactly 90% and rejects lower agreement without changing labels', () => {
     expect(evaluateRealRepoReview(fixture()).ok).toBe(true);
     const result = evaluateRealRepoReview(fixture(8));
@@ -67,6 +73,29 @@ describe('stored real-repository review gate', () => {
       const result = evaluateRealRepoReview(root);
       expect(result.ok).toBe(false); expect(result.detail).toContain(reason);
     }
+  });
+  it('uses held-out alone when stricter than the combined rate and rejects reused windows', () => {
+    const root = fixture(20, 20), held = fixture(8, 10);
+    mkdirSync(path.join(root, 'heldout', 'runs'), { recursive: true });
+    const manifest = read(held, 'repos.json');
+    for (const repo of manifest.repositories) {
+      repo.end = 'c'.repeat(40);
+      const data = read(held, `runs/${repo.id}.json`); data.repository.end = repo.end;
+      write(root, `heldout/runs/${repo.id}.json`, data);
+    }
+    write(root, 'heldout-repos.json', manifest);
+    write(root, 'heldout/reviews.json', read(held, 'reviews.json'));
+    const result = evaluateFinalReview(root);
+    expect(result.ok).toBe(false);
+    expect(result.metrics?.combinedAgreement).toBeCloseTo(28 / 30);
+    expect(result.metrics?.agreement).toBe(0.8);
+    const reviews = read(root, 'heldout/reviews.json'); reviews.reviews[8].label = 'agree';
+    write(root, 'heldout/reviews.json', reviews);
+    expect(evaluateFinalReview(root).ok).toBe(true);
+    write(root, 'heldout-repos.json', read(root, 'repos.json'));
+    expect(evaluateFinalReview(root).detail).toContain('not a different window');
+    rmSync(path.join(root, 'heldout-repos.json'));
+    expect(evaluateFinalReview(root).detail).toContain('Held-out manifest missing');
   });
 });
 

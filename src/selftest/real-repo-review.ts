@@ -17,16 +17,18 @@ const reviewSchema = z.object({ reviewer: z.literal('agent'), method: z.string()
   repo: z.string(), commit: hash, findingId: hash, label: z.enum(['agree', 'disagree']), reason: z.string().trim().min(20),
 })) });
 const json = (file: string): unknown => JSON.parse(readFileSync(file, 'utf8'));
+export const reviewModelHash = (serialized: string) => createHash('sha256')
+  .update(JSON.stringify(JSON.parse(serialized), null, 2) + '\n').digest('hex');
 
-export function evaluateRealRepoReview(directory: string): CheckResult {
+export function evaluateReviewEvidence(directory: string, manifestFile = path.join(directory, 'repos.json'), reviewFile = path.join(directory, 'review.md')): CheckResult {
   const reviewsPath = path.join(directory, 'reviews.json');
-  if (!existsSync(reviewsPath) || !existsSync(path.join(directory, 'review.md')))
+  if (!existsSync(reviewsPath) || !existsSync(reviewFile))
     return { ok: true, skipped: true, detail: 'Real-repo review file missing (review.md or reviews.json); run the dev-only replay and review first. No clones or network attempted.' };
   try {
-    const manifest = manifestSchema.parse(json(path.join(directory, 'repos.json')));
+    const manifest = manifestSchema.parse(json(manifestFile));
     if (new Set(manifest.repositories.map((r) => r.id)).size !== 3) throw new Error('Repeated repository ids.');
     const review = reviewSchema.parse(json(reviewsPath));
-    const expectedHash = createHash('sha256').update(readFileSync(new URL('../reuse/model.json', import.meta.url))).digest('hex');
+    const expectedHash = reviewModelHash(readFileSync(new URL('../reuse/model.json', import.meta.url), 'utf8'));
     const blocks = new Set<string>();
     let unavailable = 0, commits = 0, warnings = 0;
     for (const repo of manifest.repositories) {
@@ -64,4 +66,33 @@ export function evaluateRealRepoReview(directory: string): CheckResult {
       metrics: { agreement: rate, agree, disagree: blocks.size - agree, blocks: blocks.size, warnings, commits, unavailable },
     };
   } catch (error) { return { ok: false, detail: `Invalid real-repo review evidence: ${(error as Error).message}` }; }
+}
+
+export function evaluateRealRepoReview(directory: string): CheckResult {
+  const original = evaluateReviewEvidence(directory);
+  const heldoutManifest = path.join(directory, 'heldout-repos.json');
+  if (original.skipped || !original.metrics) return original;
+  if (!existsSync(heldoutManifest)) return { ok: false, detail: 'Held-out manifest missing; final agreement requires independent history.' };
+  try {
+    const first = manifestSchema.parse(json(path.join(directory, 'repos.json')));
+    const second = manifestSchema.parse(json(heldoutManifest));
+    for (const repo of second.repositories) {
+      const prior = first.repositories.find((r) => r.id === repo.id);
+      if (!prior || (prior.start === repo.start && prior.end === repo.end)) throw new Error(`${repo.id}: held-out pins are not a different window.`);
+    }
+    const heldout = evaluateReviewEvidence(path.join(directory, 'heldout'), heldoutManifest, path.join(directory, 'review.md'));
+    if (heldout.skipped || !heldout.metrics) return { ok: false, detail: `Held-out evidence is missing or invalid: ${heldout.detail}` };
+    const a = original.metrics, b = heldout.metrics;
+    const blocks = a.blocks! + b.blocks!, agree = a.agree! + b.agree!;
+    const combinedRate = blocks ? agree / blocks : 0;
+    const rate = Math.min(combinedRate, b.agreement!);
+    const unavailable = a.unavailable! + b.unavailable!;
+    return {
+      ok: blocks > 0 && b.blocks! > 0 && unavailable === 0 && rate >= 0.9,
+      detail: `Agent-reviewed, not human-approved: original ${a.agree}/${a.blocks}; held-out ${b.agree}/${b.blocks} (${b.blocks ? (100 * b.agreement!).toFixed(1) + '%' : 'n/a'}); combined ${agree}/${blocks} (${blocks ? (100 * combinedRate).toFixed(1) + '%' : 'n/a'}). Require both held-out and combined >=90%; zero BLOCKs cannot establish agreement. ${unavailable} unavailable runs. ${blocks < 10 ? `Only ${blocks} BLOCK finding${blocks === 1 ? '' : 's'}: low support; see WARN spot-checks. ` : ''}Stored evidence only; no clones or network.`,
+      metrics: { agreement: rate, combinedAgreement: combinedRate, heldoutAgreement: b.agreement!, blocks, agree,
+        disagree: blocks - agree, originalBlocks: a.blocks!, heldoutBlocks: b.blocks!, warnings: a.warnings! + b.warnings!,
+        commits: a.commits! + b.commits!, unavailable },
+    };
+  } catch (error) { return { ok: false, detail: `Invalid held-out evidence: ${(error as Error).message}` }; }
 }

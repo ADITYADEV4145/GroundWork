@@ -38,11 +38,12 @@ export interface LinkStats {
   ms: number;
 }
 
-export function linkIndex(db: Db, root: string): LinkStats {
+export function linkIndex(db: Db, root: string, changed?: { files: number[]; names: string[] }): LinkStats {
   const t0 = performance.now();
   const files = db.prepare('SELECT id, path, language FROM files').all() as unknown as FileInfo[];
   const fileById = new Map(files.map((f) => [f.id, f]));
   const resolver = new ImportResolver(root, files);
+  const changedFiles = changed ? new Set(changed.files) : null;
 
   // --- imports
   const imports: Imp[] = db
@@ -59,6 +60,7 @@ export function linkIndex(db: Db, root: string): LinkStats {
       reason: r.unresolved_reason === null ? null : String(r.unresolved_reason),
     }))
     .map((im) => {
+      if (changedFiles && !changedFiles.has(im.fileId)) return im;
       const from = fileById.get(im.fileId)!;
       const res = from.language === 'python' ? resolver.resolvePy(from.path, im.module, im.kind === 'named' ? im.name : null) : resolver.resolveTs(from.path, im.module);
       if (res.fileId !== im.resolvedFileId || res.reason !== im.reason)
@@ -68,24 +70,25 @@ export function linkIndex(db: Db, root: string): LinkStats {
   const external = imports.filter((i) => i.resolvedFileId === null && i.reason === 'external').length;
 
   // --- symbol tables
-  const syms: Sym[] = db
-    .prepare('SELECT id, file_id, name, kind, parent_id, exported, is_default_export FROM symbols')
-    .all()
-    .map((r) => ({
-      id: String(r.id),
-      fileId: Number(r.file_id),
-      name: String(r.name),
-      kind: String(r.kind),
-      parentId: r.parent_id === null ? null : String(r.parent_id),
-      exported: Number(r.exported) === 1,
-      isDefault: Number(r.is_default_export) === 1,
-    }));
-  const symById = new Map(syms.map((s) => [s.id, s]));
+  const symbolColumns = 'id, file_id, name, kind, parent_id, exported, is_default_export';
+  const toSym = (r: Row): Sym => ({
+    id: String(r.id),
+    fileId: Number(r.file_id),
+    name: String(r.name),
+    kind: String(r.kind),
+    parentId: r.parent_id === null ? null : String(r.parent_id),
+    exported: Number(r.exported) === 1,
+    isDefault: Number(r.is_default_export) === 1,
+  });
+  const syms: Sym[] = changed ? [] : db.prepare(`SELECT ${symbolColumns} FROM symbols`).all().map(toSym);
+  const symById = new Map<string, Sym>();
   const topByFile = new Map<number, Map<string, Sym>>();
   const defaultByFile = new Map<number, Sym>();
   const members = new Map<string, Map<string, Sym>>();
   const globalByName = new Map<string, Sym[]>();
-  for (const s of syms) {
+  const addSymbol = (s: Sym) => {
+    if (symById.has(s.id)) return;
+    symById.set(s.id, s);
     if (s.parentId === null) {
       let m = topByFile.get(s.fileId);
       if (!m) topByFile.set(s.fileId, (m = new Map()));
@@ -101,7 +104,15 @@ export function linkIndex(db: Db, root: string): LinkStats {
       if (l) l.push(s);
       else globalByName.set(s.name, [s]);
     }
-  }
+  };
+  for (const s of syms) addSymbol(s);
+  const loadedFiles = new Set<number>();
+  const ensureFile = (fileId: number) => {
+    if (!changed || loadedFiles.has(fileId)) return;
+    loadedFiles.add(fileId);
+    for (const row of db.prepare(`SELECT ${symbolColumns} FROM symbols WHERE file_id = ?`).all(fileId)) addSymbol(toSym(row));
+  };
+  const globalCandidates = new Map<string, Sym[]>();
   const importsByFile = new Map<number, Imp[]>();
   for (const im of imports) {
     const l = importsByFile.get(im.fileId);
@@ -120,6 +131,7 @@ export function linkIndex(db: Db, root: string): LinkStats {
   /** Follow re-exports (and Python package __init__ imports) to the defining symbol. */
   const exportOf = (fileId: number, name: string, depth = 0): Sym | null => {
     if (depth > 5) return null;
+    ensureFile(fileId);
     const aliased = aliasByFile.get(fileId)?.get(name);
     if (aliased !== undefined) {
       const local = topByFile.get(fileId)?.get(aliased);
@@ -165,6 +177,7 @@ export function linkIndex(db: Db, root: string): LinkStats {
 
   /** What a bare local name refers to in a file: a local top-level symbol, an imported symbol, or an imported module. */
   const bind = (fileId: number, name: string): { sym?: Sym; moduleFile?: number; conf: CallConfidence } | null => {
+    ensureFile(fileId);
     const local = topByFile.get(fileId)?.get(name);
     if (local) return { sym: local, conf: 'exact' };
     for (const im of importsByFile.get(fileId) ?? []) {
@@ -193,6 +206,7 @@ export function linkIndex(db: Db, root: string): LinkStats {
     );
 
   const resolveCall = (fileId: number, callerId: string | null, text: string, name: string): { id: string; conf: CallConfidence } | null => {
+    ensureFile(fileId);
     const parts = text.replace(/\?\./g, '.').split('.');
     if (parts.length === 1) {
       const b = bind(fileId, name);
@@ -235,12 +249,20 @@ export function linkIndex(db: Db, root: string): LinkStats {
     }
     if (parts.length > 1 && boundExternally(fileId, parts[0]!)) return null;
     const py = fileById.get(fileId)?.language === 'python';
-    const cands = globalByName.get(name)?.filter((s) => (fileById.get(s.fileId)?.language === 'python') === py);
+    if (changed && !globalCandidates.has(name)) globalCandidates.set(name,
+      db.prepare(`SELECT ${symbolColumns} FROM symbols WHERE name = ?`).all(name).map(toSym).filter((s) => CALLABLE.has(s.kind)));
+    const cands = (changed ? globalCandidates : globalByName).get(name)?.filter((s) => (fileById.get(s.fileId)?.language === 'python') === py);
     if (cands && cands.length === 1) return { id: cands[0]!.id, conf: 'name-only' };
     return null;
   };
 
-  const calls = db.prepare('SELECT id, file_id, caller_id, callee_text, callee_name, callee_id, confidence FROM calls').all();
+  const marks = (items: unknown[]) => items.map(() => '?').join(',');
+  const affected = changed ? db.prepare(`WITH RECURSIVE affected(id) AS (
+    SELECT id FROM files WHERE id IN (${marks(changed.files)})
+    UNION SELECT i.file_id FROM imports i JOIN affected a ON i.resolved_file_id = a.id
+  ) SELECT id FROM affected`).all(...changed.files).map((r) => Number(r.id)) : [];
+  const calls = db.prepare(`SELECT id, file_id, caller_id, callee_text, callee_name, callee_id, confidence FROM calls${changed
+    ? ` WHERE file_id IN (${marks(affected)}) OR callee_name IN (${marks(changed.names)})` : ''}`).all(...(changed ? [...affected, ...changed.names] : []));
   const upd = db.prepare('UPDATE calls SET callee_id = ?, confidence = ? WHERE id = ?');
   let resolved = 0;
   for (const c of calls) {

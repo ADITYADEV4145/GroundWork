@@ -1,6 +1,5 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { checkRepository, formatFinding } from '../../reuse/check.js';
 import { sha1 } from '../../util/hash.js';
 import { log } from '../../util/log.js';
 import { ensureGwDir } from '../../util/paths.js';
@@ -14,6 +13,7 @@ export const duplicateGate: HookHandler = {
     const raw = ev.raw as { stop_hook_active?: unknown } | null;
     if (!config.reuse.duplicateGate || raw?.stop_hook_active === true) return { action: 'allow' };
     try {
+      const { checkRepository, formatFinding } = await import('../../reuse/check.js');
       const report = await checkRepository(root, { config, timeoutMs: 1500 });
       const blocks = report.findings.filter((f) => f.severity === 'BLOCK');
       if (!blocks.length) return { action: 'allow' };

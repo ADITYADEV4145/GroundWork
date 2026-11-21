@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 // Phase 3 (reuse first + duplicate gate). Owner: reuse stream.
 export const reuseConfigSchema = z

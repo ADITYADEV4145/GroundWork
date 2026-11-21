@@ -1,16 +1,20 @@
 // Bundles the hook runner into one file so each hook process loads one module instead of ~170.
 // Native/wasm packages stay external so they keep resolving their own assets.
 import { build } from 'esbuild';
+import { rm } from 'node:fs/promises';
+
+await rm('dist/hooks/run.bundle.js', { force: true });
 
 await build({
   entryPoints: ['dist/hooks/run.js'],
-  outfile: 'dist/hooks/run.bundle.js',
+  outfile: 'dist/hooks/run.bundle.cjs',
   bundle: true,
   platform: 'node',
-  format: 'esm',
+  format: 'cjs',
   target: 'node22',
   minify: true,
   external: ['web-tree-sitter', 'tree-sitter-*', 'sql.js', '@huggingface/*'],
-  banner: { js: "import { createRequire as __gwCreateRequire } from 'node:module'; const require = __gwCreateRequire(import.meta.url);" },
+  define: { 'import.meta.url': '__gwImportMetaUrl', 'import.meta.resolve': '__gwImportMetaResolve' },
+  banner: { js: "const __gwImportMetaUrl = require('node:url').pathToFileURL(__filename).href; const __gwImportMetaResolve = id => { const target = require.resolve(id); return require('node:module').isBuiltin(target) ? 'node:' + target.replace(/^node:/, '') : require('node:url').pathToFileURL(target).href; };" },
   logLevel: 'warning',
 });

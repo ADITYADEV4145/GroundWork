@@ -1,0 +1,177 @@
+{
+  "version": 3,
+  "tasks": [
+    {
+      "id": "customer-welcome",
+      "repo": "customer-desk",
+      "entry": "welcomeByAddress",
+      "prompt": "Find a customer by their email address and draft a greeting in the requested language. Implement welcomeByAddress. Ignore surrounding spaces and email case; return null for an unknown customer. Use the existing directory and mail services.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/users.ts#getUserByEmail",
+        "src/mail.ts#renderWelcome"
+      ]
+    },
+    {
+      "id": "customer-cases",
+      "repo": "customer-desk",
+      "entry": "openCasesByAddress",
+      "prompt": "Implement openCasesByAddress for the support dashboard: find the customer by email and return the IDs of their open cases in ascending order. Closed cases and other customers' cases must be excluded; unknown email means an empty list.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/users.ts#getUserByEmail",
+        "src/tickets.ts#TicketStore.listOpenForUser"
+      ]
+    },
+    {
+      "id": "customer-contact",
+      "repo": "customer-desk",
+      "entry": "contactableAddresses",
+      "prompt": "Implement contactableAddresses for a product announcement. Return sorted, normalized primary email addresses only for customers who consent to contact. Billing consent is not marketing consent; a missing policy means no consent. Reuse existing policy and address services.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/policies.ts#readContactPolicy",
+        "src/addresses.ts#getPrimaryAddress"
+      ]
+    },
+    {
+      "id": "customer-priority",
+      "repo": "customer-desk",
+      "entry": "priorityCaseIds",
+      "prompt": "Implement priorityCaseIds for the fast-lane queue: identify a customer by email, check whether their subscription permits priority support, then return their sorted open case IDs. Unknown customer, missing subscription, or no priority entitlement should give an empty list. Reuse domain services.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/users.ts#getUserByEmail",
+        "src/plans.ts#lookupPlan",
+        "src/plans.ts#allowsPriority",
+        "src/tickets.ts#TicketStore.listOpenForUser"
+      ]
+    },
+    {
+      "id": "customer-snapshot",
+      "repo": "customer-desk",
+      "entry": "accountSnapshot",
+      "prompt": "Implement accountSnapshot for the support sidebar. Look up a customer by email and return their ID, number of open cases, and contact-consent flag. Do not use billing consent. Return null when no customer matches, and default missing contact policy to false. Reuse existing services.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/users.ts#getUserByEmail",
+        "src/tickets.ts#TicketStore.listOpenForUser",
+        "src/policies.ts#readContactPolicy"
+      ]
+    },
+    {
+      "id": "parcel-total",
+      "repo": "parcel-ops",
+      "entry": "accountTotal",
+      "prompt": "Implement accountTotal: sum tax-inclusive order amounts for one account, excluding cancelled orders and all other accounts. Keep amounts in integer cents and apply the established per-order rounding rules. No matching orders means zero. Use order and pricing services.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/orders.ts#listOrders",
+        "src/totals.ts#summarizeOrder"
+      ]
+    },
+    {
+      "id": "parcel-quote",
+      "repo": "parcel-ops",
+      "entry": "shippingOffer",
+      "prompt": "Implement shippingOffer: find the order using its reference and price its outbound shipment for the requested zone using the supplied rate table. Unknown or cancelled orders and unsupported zones should return null. Reuse lookup, eligibility and outbound-pricing services, not return-label pricing.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/orders.ts#getOrderByReference",
+        "src/validation.ts#isDispatchable",
+        "src/shipping.ts#quoteShipment"
+      ]
+    },
+    {
+      "id": "parcel-reserve",
+      "repo": "parcel-ops",
+      "entry": "reserveForOrder",
+      "prompt": "Implement reserveForOrder: locate an order by reference and set aside all its requested stock in the provided inventory. Unknown/cancelled orders or insufficient stock should return false without reducing inventory. Successful reservations must really consume stock, so a repeat can fail. Use domain services.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/orders.ts#getOrderByReference",
+        "src/validation.ts#isDispatchable",
+        "src/stock.ts#Inventory.reserve"
+      ]
+    },
+    {
+      "id": "parcel-dispatch",
+      "repo": "parcel-ops",
+      "entry": "dispatchSummary",
+      "prompt": "Implement dispatchSummary: locate an eligible order by reference, obtain an outbound shipping quote for its zone, and format a dispatch label using that quote. Return null for missing/cancelled orders or unavailable rates. Use the existing eligibility, pricing and dispatch-label services.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/orders.ts#getOrderByReference",
+        "src/validation.ts#isDispatchable",
+        "src/shipping.ts#quoteShipment",
+        "src/labels.ts#formatDispatch"
+      ]
+    },
+    {
+      "id": "parcel-cancelled",
+      "repo": "parcel-ops",
+      "entry": "cancelledReferences",
+      "prompt": "Implement cancelledReferences for the account audit view: return sorted references of cancelled orders belonging to the account. The normal active-order listing is not enough here; use the existing listing service with its cancellation-inclusion option. No matches means an empty list.",
+      "target": "src/workflows.ts",
+      "symbols": [
+        "src/orders.ts#listOrders"
+      ]
+    },
+    {
+      "id": "dispatch-balance",
+      "repo": "dispatch-desk",
+      "entry": "customer_balance",
+      "prompt": "Implement customer_balance: retrieve a customer's active orders and sum their tax-inclusive amounts in cents, using the pricing service's per-order rounding. Exclude cancelled orders and other customers; an empty account owes zero. Reuse the order and pricing services.",
+      "target": "dispatch/workflows.py",
+      "symbols": [
+        "dispatch/orders.py#list_orders",
+        "dispatch/pricing.py#total_due"
+      ]
+    },
+    {
+      "id": "dispatch-delivery",
+      "repo": "dispatch-desk",
+      "entry": "delivery_offer",
+      "prompt": "Implement delivery_offer: find the order by reference, then obtain an outbound delivery price for the supplied region and express choice. Unknown or cancelled orders, or an unsupported region, should return None. Use the existing lookup and delivery services; preserve their keyword-only API.",
+      "target": "dispatch/workflows.py",
+      "symbols": [
+        "dispatch/orders.py#get_order",
+        "dispatch/delivery.py#quote_delivery"
+      ]
+    },
+    {
+      "id": "dispatch-hold",
+      "repo": "dispatch-desk",
+      "entry": "hold_order",
+      "prompt": "Implement hold_order: find an order by reference and set aside all its units in the supplied warehouse ledger. No partial allocations are allowed. Return the number allocated, or zero for missing/cancelled orders or insufficient stock. Successful allocations must decrease stock. Use the lookup and ledger services.",
+      "target": "dispatch/workflows.py",
+      "symbols": [
+        "dispatch/orders.py#get_order",
+        "dispatch/warehouse.py#StockLedger.hold"
+      ]
+    },
+    {
+      "id": "dispatch-receipt",
+      "repo": "dispatch-desk",
+      "entry": "customer_receipt",
+      "prompt": "Implement customer_receipt: format a receipt addressed to the customer's normalized primary email, not their billing address, for the sum of active order amounts including tax. Use the existing order, pricing, contact and receipt services. Empty accounts still receive a zero-cent receipt.",
+      "target": "dispatch/workflows.py",
+      "symbols": [
+        "dispatch/orders.py#list_orders",
+        "dispatch/pricing.py#total_due",
+        "dispatch/contacts.py#get_primary_email",
+        "dispatch/receipts.py#render_receipt"
+      ]
+    },
+    {
+      "id": "dispatch-cancelled",
+      "repo": "dispatch-desk",
+      "entry": "cancelled_references",
+      "prompt": "Implement cancelled_references: get a customer's orders including cancellations, then return just the cancelled references in sorted order. Exclude other customers. Reuse the order-listing service and its existing cancellation-inclusion keyword; return an empty list when none match.",
+      "target": "dispatch/workflows.py",
+      "symbols": [
+        "dispatch/orders.py#list_orders"
+      ]
+    }
+  ]
+}

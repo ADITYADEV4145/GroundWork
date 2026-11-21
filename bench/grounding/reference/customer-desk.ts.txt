@@ -1,0 +1,26 @@
+import type { User, Ticket, Policy, Plan } from './types.ts';
+import { getUserByEmail } from './users.ts';
+import { TicketStore } from './tickets.ts';
+import { readContactPolicy } from './policies.ts';
+import { renderWelcome } from './mail.ts';
+import { lookupPlan, allowsPriority } from './plans.ts';
+import { getPrimaryAddress } from './addresses.ts';
+export function welcomeByAddress(users: User[], email: string, locale: string): string | null {
+  const user = getUserByEmail(users, email);
+  return user ? renderWelcome(user.name, locale) : null;
+}
+export function openCasesByAddress(users: User[], tickets: Ticket[], email: string): string[] {
+  const user = getUserByEmail(users, email);
+  return user ? new TicketStore(tickets).listOpenForUser(user.id).map((t) => t.id) : [];
+}
+export function contactableAddresses(users: User[], policies: Policy[]): string[] {
+  return users.filter((u) => readContactPolicy(policies, u.id)).map(getPrimaryAddress).sort();
+}
+export function priorityCaseIds(users: User[], tickets: Ticket[], plans: Plan[], email: string): string[] {
+  const user = getUserByEmail(users, email);
+  return user && allowsPriority(lookupPlan(plans, user.plan)) ? new TicketStore(tickets).listOpenForUser(user.id).map((t) => t.id) : [];
+}
+export function accountSnapshot(users: User[], tickets: Ticket[], policies: Policy[], email: string): { id: string; open: number; contact: boolean } | null {
+  const user = getUserByEmail(users, email);
+  return user ? { id: user.id, open: new TicketStore(tickets).listOpenForUser(user.id).length, contact: readContactPolicy(policies, user.id) } : null;
+}

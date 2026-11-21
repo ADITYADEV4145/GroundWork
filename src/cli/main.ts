@@ -9,10 +9,13 @@ if (command === 'hook' && process.argv.length === 5 &&
   ['claude', 'codex', 'cursor'].includes(agent ?? '') &&
   ['pre_tool', 'post_tool', 'session_start', 'prompt', 'stop', 'pre_compact'].includes(event ?? '')) {
   try {
+    const startupMs = performance.now();
     // The build bundles the hook runner (scripts/bundle-hook.mjs) so a hook process loads one module; source runs fall back.
-    const bundle = '../hooks/run.bundle.js';
-    const { runHook } = await (import(bundle) as Promise<typeof import('../hooks/run.js')>).catch(() => import('../hooks/run.js'));
-    await runHook(agent as AgentName, event as HookEventName);
+    let runner: typeof import('../hooks/run.js');
+    try { runner = nodeModule.createRequire(import.meta.url)('../hooks/run.bundle.cjs') as typeof runner; }
+    catch { runner = await import('../hooks/run.js'); }
+    const { runHook } = runner;
+    await runHook(agent as AgentName, event as HookEventName, 2000, { startupMs, bundleMs: performance.now() - startupMs });
   } catch {
     if (agent === 'cursor' && event === 'pre_tool') process.stdout.write('{"permission":"allow"}\n');
   }

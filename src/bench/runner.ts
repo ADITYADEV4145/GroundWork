@@ -124,13 +124,17 @@ export interface BenchmarkOptions {
   observations?: string;
   outputDir?: string;
 }
+export function benchmarkSuites(benchDir = BENCH, recordedOnly = false): string[] {
+  return readdirSync(benchDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && existsSync(path.join(benchDir, entry.name, 'tasks.json')) &&
+      (existsSync(path.join(benchDir, entry.name, 'grade.mjs')) || existsSync(path.join(benchDir, entry.name, 'evidence.json'))) &&
+      (!recordedOnly || existsSync(path.join(benchDir, entry.name, 'evidence.json'))))
+    .map((entry) => entry.name).sort();
+}
 export async function runBenchmark(options: BenchmarkOptions) {
   if (!Number.isSafeInteger(options.runs) || options.runs < 1) throw new Error('--runs must be a positive integer');
   const replayAll = options.suite === 'all' && !options.observations;
-  const names = options.suite === 'all' ? readdirSync(BENCH, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(path.join(BENCH, entry.name, 'tasks.json')) &&
-      (!replayAll || existsSync(path.join(BENCH, entry.name, 'evidence.json'))))
-    .map((entry) => entry.name).sort() : [suiteName(options.suite)];
+  const names = options.suite === 'all' ? benchmarkSuites(BENCH, replayAll) : [suiteName(options.suite)];
   if (!names.length) throw new Error(replayAll ? 'No recorded benchmark suites found' : 'No benchmark suites found');
   const input = options.observations ? readCaptures(options.observations) : undefined;
   const reports = [];

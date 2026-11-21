@@ -47,25 +47,32 @@ const TS_EXTS = ['.ts', '.tsx', '.d.ts', '.mts', '.cts', '.js', '.jsx', '.mjs', 
 
 export class ImportResolver {
   private readonly byPath = new Map<string, FileInfo>();
-  private readonly pySuffix = new Map<string, string[]>();
+  private pySuffix: Map<string, string[]> | null = null;
   private readonly topDirs = new Set<string>();
   private readonly tsPaths: TsPaths;
 
   constructor(root: string, files: FileInfo[]) {
     this.tsPaths = loadTsPaths(root);
-    for (const f of files) {
-      this.byPath.set(f.path, f);
+    for (const f of files) this.byPath.set(f.path, f);
+  }
+
+  private pythonSuffixes(): Map<string, string[]> {
+    if (this.pySuffix) return this.pySuffix;
+    const suffixes = new Map<string, string[]>();
+    for (const f of this.byPath.values()) {
       this.topDirs.add(f.path.split('/')[0]!.replace(/\.py$/, ''));
       if (f.language === 'python') {
         const segs = f.path.split('/');
         for (let i = 0; i < segs.length; i++) {
           const suf = segs.slice(i).join('/');
-          const list = this.pySuffix.get(suf);
+          const list = suffixes.get(suf);
           if (list) list.push(f.path);
-          else this.pySuffix.set(suf, [f.path]);
+          else suffixes.set(suf, [f.path]);
         }
       }
     }
+    this.pySuffix = suffixes;
+    return suffixes;
   }
 
   private file(p: string): FileInfo | undefined {
@@ -147,8 +154,9 @@ export class ImportResolver {
       }
       return { fileId: null, reason: 'not-found' };
     }
+    const suffixes = this.pythonSuffixes();
     const pick = (suffix: string): FileInfo | undefined => {
-      const list = this.pySuffix.get(suffix);
+      const list = suffixes.get(suffix);
       if (!list?.length) return undefined;
       const best = [...list].sort((a, b) => a.length - b.length || a.localeCompare(b))[0]!;
       return this.file(best);

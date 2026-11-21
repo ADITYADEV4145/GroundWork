@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { z } from 'zod';
+import * as z from 'zod';
 import { initParsers, languageForPath } from '../lang/index.js';
 import { sha1 } from '../util/hash.js';
 import { buildIdf, pairSignals, type ComparableSymbol, type Signals } from './signals.js';

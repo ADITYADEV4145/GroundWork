@@ -1,7 +1,8 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { loadConfig } from '../config/load.js';
 import { initSqlBackend } from '../store/db.js';
 import { log } from '../util/log.js';
+import { hookTiming, printHookTimings } from '../util/hook-timing.js';
 import { findRepoRoot } from '../util/paths.js';
 import { HANDLERS } from './handlers/index.js';
 import type { AgentName, HookEvent, HookEventName, HookResult } from './types.js';
@@ -101,7 +102,9 @@ export async function dispatch(ev: HookEvent, root: string): Promise<HookResult>
     if (!h.events.includes(ev.event)) continue;
     if (h.tools && (!ev.tool || !h.tools.includes(ev.tool))) continue;
     try {
+      const t = performance.now();
       const r = await h.run(ev, { root, config });
+      hookTiming(h.name, performance.now() - t);
       if (!r) continue;
       if (r.updatedInput) updatedInput = r.updatedInput;
       if (r.action === 'allow') continue;
@@ -122,21 +125,28 @@ async function readStdin(): Promise<string> {
 }
 
 /** Entry point for `gw hook`. Fails open: any error or timeout means "allow" and exit 0. */
-export async function runHook(agent: AgentName, event: HookEventName, timeoutMs = 2000): Promise<void> {
+export async function runHook(agent: AgentName, event: HookEventName, timeoutMs = 2000, startup: Record<string, number> = {}): Promise<void> {
+  for (const [name, ms] of Object.entries(startup)) hookTiming(name, ms);
   let root = process.cwd();
   try {
     const text = await readStdin();
     const raw: unknown = text.trim() ? JSON.parse(text) : {};
     const ev = normalise(agent, event, raw);
     root = findRepoRoot(ev.cwd);
+    const sqlStart = performance.now();
     await initSqlBackend();
+    hookTiming('sqlInitMs', performance.now() - sqlStart);
     const timeout = new Promise<HookResult>((res) => setTimeout(() => res({ action: 'allow' }), timeoutMs).unref());
     const r = await Promise.race([dispatch(ev, root), timeout]);
+    const renderStart = performance.now();
     const out = render(ev, r);
     if (out) process.stdout.write(out + '\n');
+    hookTiming('renderMs', performance.now() - renderStart);
   } catch (e) {
     log(root, 'error', 'hook_failed', { agent, event, error: (e as Error).message });
     const out = failOpenOutput(agent, event);
     if (out) process.stdout.write(out + '\n');
+  } finally {
+    printHookTimings();
   }
 }

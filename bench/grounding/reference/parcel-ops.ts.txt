@@ -1,0 +1,26 @@
+import type { Order, Rate } from './types.ts';
+import type { Inventory } from './stock.ts';
+import { listOrders, getOrderByReference } from './orders.ts';
+import { summarizeOrder } from './totals.ts';
+import { quoteShipment } from './shipping.ts';
+import { isDispatchable } from './validation.ts';
+import { formatDispatch } from './labels.ts';
+export function accountTotal(orders: Order[], account: string, taxRate: number): number {
+  return listOrders(orders, account).reduce((sum, order) => sum + summarizeOrder(order, taxRate), 0);
+}
+export function shippingOffer(orders: Order[], reference: string, zone: string, rates: Rate[]): number | null {
+  const order = getOrderByReference(orders, reference);
+  return isDispatchable(order) ? quoteShipment(order.weight, zone, rates) : null;
+}
+export function reserveForOrder(orders: Order[], reference: string, inventory: Inventory): boolean {
+  const order = getOrderByReference(orders, reference);
+  return isDispatchable(order) && inventory.reserve(order.sku, order.quantity);
+}
+export function dispatchSummary(orders: Order[], reference: string, zone: string, rates: Rate[]): string | null {
+  const order = getOrderByReference(orders, reference);
+  const quote = isDispatchable(order) ? quoteShipment(order.weight, zone, rates) : null;
+  return order && quote !== null ? formatDispatch(order, quote) : null;
+}
+export function cancelledReferences(orders: Order[], account: string): string[] {
+  return listOrders(orders, account, {includeCancelled:true}).filter((o) => o.cancelled).map((o) => o.reference).sort();
+}

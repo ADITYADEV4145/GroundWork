@@ -9,9 +9,17 @@ import { GW_DIR, toPosix } from '../util/paths.js';
 
 const ALWAYS_SKIP_DIRS = new Set(['node_modules', '.git', GW_DIR, 'dist', 'build', '.next', '__pycache__', '.venv', 'venv', '.tox', 'coverage']);
 
-function gitFiles(root: string): string[] | null {
+function gitFiles(root: string, paths?: string[]): string[] | null {
+  if (!process.env.GIT_DIR) {
+    let dir = path.resolve(root);
+    while (!existsSync(path.join(dir, '.git'))) {
+      const parent = path.dirname(dir);
+      if (parent === dir) return null;
+      dir = parent;
+    }
+  }
   try {
-    const out = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], {
+    const out = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z', ...(paths ? ['--', ...paths] : [])], {
       cwd: root,
       stdio: ['ignore', 'pipe', 'ignore'],
       maxBuffer: 256 * 1024 * 1024,
@@ -22,11 +30,24 @@ function gitFiles(root: string): string[] | null {
   }
 }
 
-function walkFiles(root: string): string[] {
+function walkFiles(root: string, paths?: string[]): string[] {
   const ig = ignore();
   const gi = path.join(root, '.gitignore');
   if (existsSync(gi)) ig.add(readFileSync(gi, 'utf8'));
   const out: string[] = [];
+  if (paths) {
+    for (const candidate of new Set(paths)) {
+      const rel = toPosix(candidate);
+      const parts = rel.split('/');
+      if (path.isAbsolute(rel) || parts.some((part) => !part || part === '.' || part === '..') || ig.ignores(rel)) continue;
+      try {
+        if (parts.slice(0, -1).some((_, i) => !lstatSync(path.join(root, ...parts.slice(0, i + 1))).isDirectory())) continue;
+        const st = lstatSync(path.join(root, rel));
+        if (st.isFile() || st.isSymbolicLink()) out.push(rel);
+      } catch { /* Missing files and non-directory ancestors are not candidates. */ }
+    }
+    return out;
+  }
   const rec = (dir: string) => {
     let entries;
     try {
@@ -48,8 +69,8 @@ function walkFiles(root: string): string[] {
 }
 
 /** Repo-relative POSIX paths of every candidate source file (git-aware; honours .gitignore and config globs). */
-export function discoverFiles(root: string, config: GroundworkConfig): string[] {
-  const all = gitFiles(root) ?? walkFiles(root);
+export function discoverFiles(root: string, config: GroundworkConfig, paths?: string[]): string[] {
+  const all = gitFiles(root, paths) ?? walkFiles(root, paths);
   const include = config.index.include.length ? picomatch(config.index.include, { dot: true }) : null;
   const exclude = config.index.exclude.length ? picomatch(config.index.exclude, { dot: true }) : null;
   const exts = new Set(INDEXED_EXTENSIONS);

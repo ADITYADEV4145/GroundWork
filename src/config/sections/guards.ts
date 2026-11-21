@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 // Phase 5 (waste guards). Owner: waste-guards stream.
 export const guardsConfigSchema = z

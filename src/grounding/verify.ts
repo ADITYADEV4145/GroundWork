@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import picomatch from 'picomatch';
+import ignore from 'ignore';
 import type { GroundworkConfig } from '../config/schema.js';
 import {
   callFacts,
@@ -27,6 +28,7 @@ export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member'
 export interface Finding {
   file: string;
   line: number;
+  column?: number;
   kind: FindingKind;
   name: string;
   message: string;
@@ -347,7 +349,7 @@ export class Grounder {
       if (!inRanges(call.line, opts.ranges)) continue;
       if (suppressed(lines, call.line)) continue;
       const finding = this.checkCall(f, call, text);
-      if (finding) res.findings.push(finding);
+      if (finding) res.findings.push({ ...finding, column: call.column });
     }
     res.findings.sort((a, b) => a.line - b.line);
     return res;
@@ -355,6 +357,7 @@ export class Grounder {
 
   private checkImport(f: FileFacts, imp: ImportFact, lines: string[]): Finding | null {
     if (imp.unresolvedReason === 'not-found') {
+      if (isPy(f) && optionalPythonImport(lines, imp.line)) return null;
       if (!imp.module.startsWith('.') || existsOnDisk(this.root, f.path, imp.module, isPy(f))) return null;
       return {
         file: f.path,
@@ -587,6 +590,16 @@ function existsOnDisk(root: string, fromFile: string, spec: string, py: boolean)
     target = path.join(baseDir, ...Array<string>(dots - 1).fill('..'), ...spec.slice(dots).split('.').filter(Boolean));
   } else target = path.join(baseDir, spec);
   if (existsSync(target)) return true;
+  // Missing ignored paths can be build products that do not exist in a source checkout.
+  const rel = path.relative(root, target).split(path.sep).join('/');
+  if (rel && !rel.startsWith('../')) {
+    const parts = rel.split('/');
+    for (let i = 0; i < parts.length; i++) {
+      const rules = path.join(root, ...parts.slice(0, i), '.gitignore');
+      if (!existsSync(rules)) continue;
+      if (ignore().add(readFileSync(rules, 'utf8')).ignores(parts.slice(i).join('/'))) return true;
+    }
+  }
   const dir = path.dirname(target);
   const base = path.basename(target).replace(/\.(m?js|cjs|jsx)$/, '');
   try {
@@ -594,6 +607,24 @@ function existsOnDisk(root: string, fromFile: string, spec: string, py: boolean)
   } catch {
     return false;
   }
+}
+
+function optionalPythonImport(lines: string[], line: number): boolean {
+  const indent = (s: string) => /^\s*/.exec(s)![0].length;
+  const level = indent(lines[line - 1] ?? '');
+  for (let i = line - 2; i >= 0; i--) {
+    const text = lines[i]!;
+    if (!text.trim() || indent(text) >= level) continue;
+    if (!/^\s*try\s*:/.test(text)) continue;
+    const depth = indent(text);
+    for (let j = i + 1; j < lines.length; j++) {
+      const next = lines[j]!;
+      if (!next.trim() || indent(next) > depth) continue;
+      if (j < line - 1 || indent(next) < depth || !/^\s*except\b/.test(next)) break;
+      if (/\b(ImportError|ModuleNotFoundError)\b/.test(next)) return true;
+    }
+  }
+  return false;
 }
 
 export function verifyFile(db: Db, root: string, rel: string, opts: VerifyOptions = {}): VerifyResult {

@@ -1,7 +1,7 @@
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import { runBenchmark } from '../src/bench/runner.js';
+import { benchmarkSuites, loadSuite, runBenchmark } from '../src/bench/runner.js';
 import { tempDir } from '../src/selftest/fixtures.js';
 
 vi.mock('node:fs', async (importOriginal) => {
@@ -19,6 +19,23 @@ async function recordedSuites(names: string[]) {
 }
 
 describe('offline all-suite replay', () => {
+  it('discovers graded suites, excludes standalone manifests, and retains broken recorded suites for validation', async () => {
+    await recordedSuites(['broken']);
+    const root = tempDir('gw-bench-discovery-');
+    try {
+      for (const name of ['standalone', 'graded', 'broken']) {
+        mkdirSync(path.join(root, name));
+        writeFileSync(path.join(root, name, 'tasks.json'), '{}');
+      }
+      writeFileSync(path.join(root, 'graded/grade.mjs'), 'export function grade() {}');
+      writeFileSync(path.join(root, 'broken/evidence.json'), '{}');
+      expect(benchmarkSuites(root)).toEqual(['broken', 'graded']);
+      expect(benchmarkSuites(root, true)).toEqual(['broken']);
+      expect(() => loadSuite('broken', root)).toThrow();
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
   it('writes available reports without requiring evidence for every installed suite', async () => {
     await recordedSuites(['nav']);
     const root = tempDir('gw-bench-replay-');

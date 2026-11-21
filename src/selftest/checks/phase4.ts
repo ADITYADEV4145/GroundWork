@@ -1,6 +1,6 @@
 import { cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { loadConfig } from '../../config/load.js';
+import { defaultConfig, loadConfig } from '../../config/load.js';
 import { Grounder, type Finding } from '../../grounding/index.js';
 import { dispatch } from '../../hooks/run.js';
 import type { HookEvent } from '../../hooks/types.js';
@@ -9,7 +9,9 @@ import { indexDbPath } from '../../index/store.js';
 import { initSqlBackend, openDb, type Db } from '../../store/db.js';
 import { FIXTURES, FIXTURES_DIR, tempDir, withIndexedFixture } from '../fixtures.js';
 import type { Check } from '../registry.js';
-import { prng, synthRepo } from '../synth.js';
+import { GroundingReposMissing, prepareGroundingRepos } from '../grounding-repos.js';
+import { groundingHookLatency } from '../grounding-latency.js';
+import { validateStoredResults } from '../../bench/grounding/report.js';
 
 // Phase 4 gate: grounding catches every planted error, stays silent on valid dynamic code and clean repos,
 // and the PostToolUse path is fast enough to run on every edit.
@@ -87,13 +89,16 @@ const didYouMean: Check = {
   },
 };
 
-async function groundCopy(src: string): Promise<{ files: number; findings: Finding[] }> {
+async function groundCopy(src: string, own = false, pinned = false): Promise<{ files: number; findings: Finding[] }> {
   const dir = tempDir('gw-ground-');
   try {
-    const skip = /(^|[\\/])(node_modules|\.git|\.groundwork|dist)$/;
+    const skip = pinned ? /(^|[\\/])\.groundwork$/ : /(^|[\\/])(node_modules|\.git|\.groundwork|dist)$/;
     // Groundwork's own fixtures plant errors on purpose; the rest of a repo must be clean.
-    cpSync(src, dir, { recursive: true, filter: (p) => !skip.test(p) && path.relative(src, p) !== 'fixtures' });
-    await refreshIndex(dir);
+    cpSync(src, dir, { recursive: true, filter: (p) => !skip.test(p) && !(own && path.relative(src, p) === 'fixtures') });
+    const config = defaultConfig();
+    config.index.skipGenerated = false;
+    config.index.maxFileBytes = Number.MAX_SAFE_INTEGER;
+    await refreshIndex(dir, { config });
     const db = openDb(indexDbPath(dir), { readonly: true });
     try {
       const files = Number(db.prepare('SELECT COUNT(*) AS n FROM files').get()!.n);
@@ -109,19 +114,27 @@ async function groundCopy(src: string): Promise<{ files: number; findings: Findi
 const cleanRepos: Check = {
   phase: 4,
   name: 'grounding: clean repos produce zero findings',
-  async run() {
+  async run(options) {
     await initSqlBackend();
     const self = path.resolve(FIXTURES_DIR, '..');
     const repos = [...FIXTURES.map((f) => path.join(FIXTURES_DIR, f)), ...(existsSync(path.join(self, 'src')) ? [self] : [])];
+    if (options.quick) return { ok: true, skipped: true, detail: 'skipped (--quick): pinned real-repo grounding requires a full run' };
+    let pinned: string[];
+    try { pinned = prepareGroundingRepos(self); }
+    catch (e) {
+      if (e instanceof GroundingReposMissing) return { ok: false, detail: e.message };
+      throw e;
+    }
+    repos.push(...pinned);
     // Extra real repositories at clean commits: GW_GROUNDING_REPOS=/path/a:/path/b
     repos.push(...(process.env.GW_GROUNDING_REPOS ?? '').split(path.delimiter).filter(Boolean));
     const notes: string[] = [];
     let flagged = 0;
     for (const r of repos) {
-      const { files, findings } = await groundCopy(r);
+      const { files, findings } = await groundCopy(r, r === self, pinned.includes(r));
       flagged += findings.length;
-      notes.push(`${path.basename(r)} ${files} files/${findings.length}`);
-      for (const f of findings.slice(0, 3)) notes.push(`  ${f.file}:${f.line} ${f.kind} ${f.name}`);
+      notes.push(`${pinned.includes(r) ? path.basename(path.dirname(r)) + '@' + path.basename(r) : path.basename(r)} ${files} files/${findings.length}`);
+      for (const f of findings.slice(0, 5)) notes.push(`  ${f.file}:${f.line} ${f.kind} ${f.message}`);
     }
     return { ok: flagged === 0, detail: notes.join(', '), metrics: { repos: repos.length, findings: flagged } };
   },
@@ -158,33 +171,17 @@ const hookBehaviour: Check = {
 const hookLatency: Check = {
   phase: 4,
   slow: true,
-  name: 'grounding hook p95 < 200 ms on a 100k-line repo',
-  async run() {
-    await initSqlBackend();
-    const dir = tempDir('gw-ground-perf-');
-    try {
-      synthRepo(dir, 100_000, 4);
-      await refreshIndex(dir);
-      const rnd = prng(11);
-      const files = readdirSync(path.join(dir, 'src')).filter((f) => f.endsWith('.ts'));
-      const total: number[] = [];
-      for (let i = 0; i < 20; i++) {
-        const file = `src/${files[Math.floor(rnd() * files.length)]!}`;
-        const fn = /export function (\w+)\(/.exec(readFileSync(path.join(dir, file), 'utf8'))![1]!;
-        const text = `\nexport function gwEdit${i}(): string {\n  return ${fn}('a', ${i % 2 ? 'x, y' : '1'});\n}\n`;
-        writeFileSync(path.join(dir, file), readFileSync(path.join(dir, file), 'utf8') + text);
-        const t0 = performance.now();
-        const r = await dispatch(editEvent(dir, file, text), dir);
-        total.push(performance.now() - t0);
-        if (i % 2 && r.action !== 'context') return { ok: false, detail: `edit ${i}: planted arity error not reported` };
-      }
-      total.sort((a, b) => a - b);
-      const p95 = total[Math.ceil(total.length * 0.95) - 1]!;
-      return { ok: p95 < 200, detail: `refresh + grounding p95 ${p95.toFixed(0)} ms, median ${total[10]!.toFixed(0)} ms over 20 edits`, metrics: { p95Ms: p95, medianMs: total[10]! } };
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
+  name: 'grounding hook median batch p95 < 200 ms on a 100k-line repo',
+  run: groundingHookLatency,
+};
+
+const benchmarkV3: Check = {
+  phase: 4,
+  name: 'Benchmark v3: paired grounding results with intervals and no success drop',
+  async run(opts) {
+    if (opts.quick) return { ok: true, skipped: true, detail: 'Benchmark v3 evidence validation skipped (--quick); full runs require both 15-task agent arms' };
+    return validateStoredResults();
   },
 };
 
-export const PHASE4_CHECKS: Check[] = [planted, didYouMean, cleanRepos, hookBehaviour, hookLatency];
+export const PHASE4_CHECKS: Check[] = [planted, didYouMean, cleanRepos, hookBehaviour, hookLatency, benchmarkV3];

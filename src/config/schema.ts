@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { indexConfigSchema } from './sections/index.js';
 import { navigationConfigSchema } from './sections/navigation.js';
 import { reuseConfigSchema } from './sections/reuse.js';

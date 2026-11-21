@@ -31,30 +31,25 @@ export interface TokenStream {
 export function normalizedTokens(node: Node): TokenStream {
   const norm: string[] = [];
   const identifiers: string[] = [];
-  const walk = (n: Node) => {
-    if (SKIP_TYPES.has(n.type)) return;
-    if (STRING_TYPES.has(n.type)) {
-      norm.push('STR');
-      return;
+  const cursor = node.walk();
+  try {
+    for (;;) {
+      const type = cursor.nodeType;
+      if (SKIP_TYPES.has(type)) {
+        // Skip the subtree.
+      } else if (STRING_TYPES.has(type)) norm.push('STR');
+      else if (NUMBER_TYPES.has(type)) norm.push('NUM');
+      else if (IDENT_TYPES.has(type)) {
+        norm.push('ID');
+        identifiers.push(cursor.nodeText);
+      } else if (cursor.gotoFirstChild()) continue;
+      else {
+        const t = cursor.nodeText.trim();
+        if (t) norm.push(t);
+      }
+      while (!cursor.gotoNextSibling()) if (!cursor.gotoParent()) return { norm, identifiers };
     }
-    if (NUMBER_TYPES.has(n.type)) {
-      norm.push('NUM');
-      return;
-    }
-    if (IDENT_TYPES.has(n.type)) {
-      norm.push('ID');
-      identifiers.push(n.text);
-      return;
-    }
-    if (n.childCount === 0) {
-      const t = n.text.trim();
-      if (t) norm.push(t);
-      return;
-    }
-    for (const c of n.children) if (c) walk(c);
-  };
-  walk(node);
-  return { norm, identifiers };
+  } finally { cursor.delete(); }
 }
 
 function mix32(h: number): number {
@@ -67,8 +62,12 @@ function mix32(h: number): number {
 }
 
 const SEEDS = Array.from({ length: MINHASH_PERMS }, (_, i) => mix32((i + 1) * 0x9e3779b1));
+const minhashCache = new Map<string, Uint32Array>();
 
 export function minhash(tokens: string[], k = SHINGLE_K): Uint32Array {
+  const key = JSON.stringify([k, tokens]);
+  const cached = minhashCache.get(key);
+  if (cached) return cached.slice();
   const sig = new Uint32Array(MINHASH_PERMS).fill(0xffffffff);
   const n = Math.max(1, tokens.length - k + 1);
   for (let i = 0; i < n; i++) {
@@ -78,6 +77,8 @@ export function minhash(tokens: string[], k = SHINGLE_K): Uint32Array {
       if (v < sig[p]!) sig[p] = v;
     }
   }
+  if (minhashCache.size >= 256) minhashCache.delete(minhashCache.keys().next().value!);
+  minhashCache.set(key, sig.slice());
   return sig;
 }
 

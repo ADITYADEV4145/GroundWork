@@ -1,0 +1,25 @@
+from .models import Customer, Order
+from .warehouse import StockLedger
+from .orders import list_orders, get_order
+from .pricing import total_due
+from .delivery import quote_delivery
+from .contacts import get_primary_email
+from .receipts import render_receipt
+
+def customer_balance(orders: list[Order], customer_id: str, tax_rate: float) -> int:
+    return sum(total_due(o, tax_rate=tax_rate) for o in list_orders(orders, customer_id))
+
+def delivery_offer(orders: list[Order], reference: str, region: str, express: bool) -> int | None:
+    order = get_order(orders, reference)
+    return quote_delivery(order.weight, region=region, express=express) if order and not order.cancelled else None
+
+def hold_order(orders: list[Order], reference: str, ledger: StockLedger) -> int:
+    order = get_order(orders, reference)
+    return ledger.hold(order.sku, order.quantity, allow_partial=False) if order and not order.cancelled else 0
+
+def customer_receipt(orders: list[Order], customer: Customer, tax_rate: float) -> str:
+    total = sum(total_due(o, tax_rate=tax_rate) for o in list_orders(orders, customer.id))
+    return render_receipt(get_primary_email(customer), total)
+
+def cancelled_references(orders: list[Order], customer_id: str) -> list[str]:
+    return sorted(o.reference for o in list_orders(orders, customer_id, include_cancelled=True) if o.cancelled)

@@ -1,4 +1,3 @@
-import { splitWords } from '../extract/fingerprint.js';
 import type { Db, Row } from '../store/db.js';
 import type { SymbolKind } from '../types.js';
 
@@ -16,6 +15,13 @@ const SYMBOL = 's.id, s.qualified_name, s.kind, f.path, s.start_line, s.end_line
 const FROM = 'FROM symbols s JOIN files f ON f.id = s.file_id';
 const CALLERS = '(SELECT COUNT(*) FROM calls c WHERE c.callee_id = s.id)';
 
+function searchWords(value: string): string[] {
+  return value
+    .replace(/([\p{Ll}\p{N}])(\p{Lu})/gu, '$1 $2')
+    .replace(/(\p{Lu}+)(\p{Lu}\p{Ll})/gu, '$1 $2')
+    .match(/[\p{L}\p{N}\p{M}]+/gu) ?? [];
+}
+
 function toSymbol(r: Row): NavigationSymbol {
   return {
     id: String(r.id),
@@ -30,7 +36,8 @@ function toSymbol(r: Row): NavigationSymbol {
 
 export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string): (NavigationSymbol & { doc: string; score: number })[] {
   const q = query.toLowerCase();
-  const words = [...new Set(splitWords(query))].slice(0, 24);
+  const termsByCase = searchWords(query).slice(0, 24);
+  const words = [...new Set(termsByCase.map((w) => w.toLowerCase()))];
   const select = `SELECT ${SYMBOL}, s.name, s.docstring, s.exported, f.is_test, ${CALLERS} caller_count`;
   const filter = (kind ? ' AND s.kind = ?' : '') + (file ? ' AND f.path = ?' : '');
   const filterArgs = [...(kind ? [kind] : []), ...(file ? [file] : [])];
@@ -43,8 +50,9 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
     // A sql.js-created FTS4 table can survive a switch to native SQLite even when refresh labels it FTS5.
     const schema = db.prepare("SELECT sql FROM sqlite_master WHERE name = 'symbols_fts' AND type = 'table'").get();
     const fts5 = /\bUSING\s+fts5\s*\(/i.test(String(schema?.sql ?? ''));
-    // splitWords emits alphanumerics only; FTS4 expects the wildcard inside the quoted token.
-    const terms = words.map((w) => fts5 ? `"${w}"*` : `"${w}*"`).join(' OR ');
+    // FTS4's simple tokenizer preserves the case of non-ASCII characters.
+    const tokens = fts5 ? words : [...new Set([...words, ...termsByCase.filter((w) => /[^\x00-\x7f]/u.test(w))])];
+    const terms = tokens.map((w) => fts5 ? `"${w}"*` : `"${w}*"`).join(' OR ');
     const rows = db.prepare(`${select}, ${fts5 ? 'bm25(symbols_fts, 0, 5, 2, 2, 1)' : '0'} rank
       ${FROM} JOIN symbols_fts ON symbols_fts.rowid = s.rowid WHERE symbols_fts MATCH ?${filter}`).all(terms, ...filterArgs);
     for (const r of rows) candidates.set(String(r.id), r);
@@ -53,7 +61,7 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
     const s = toSymbol(r);
     const doc = String(r.docstring ?? '').trim();
     const overlap = (value: string) => {
-      const tokens = splitWords(value);
+      const tokens = searchWords(value).map((w) => w.toLowerCase());
       return words.filter((w) => tokens.some((token) => token.startsWith(w))).length / Math.max(1, words.length);
     };
     const name = String(r.name).toLowerCase();

@@ -124,4 +124,21 @@ describe('MCP navigation', () => {
       rmSync(root, { recursive: true, force: true });
     }
   });
+
+  it('finds a symbol from documentation words written entirely in non-Latin scripts', async () => {
+    const root = tempDir('gw-nav-unicode-');
+    try {
+      writeFileSync(path.join(root, 'app.py'), 'def pay():\n    """送金 処理"""\n    pass\n');
+      await initSqlBackend();
+      await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        expect(await runNavigationTool('find_code', { query: '送金' }, { root, db, config })).toContain('pay (function)');
+      } finally {
+        db.close();
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
 });

@@ -45,6 +45,8 @@ describe('gw setup', () => {
     expect(readFileSync(path.join(root, '.codex', 'config.toml'), 'utf8')).toContain('[mcp_servers.groundwork]');
     expect(readFileSync(path.join(home, '.codex', 'config.toml'), 'utf8')).toBe('model = "o4"\n');
     expect(JSON.parse(readFileSync(path.join(root, '.cursor', 'hooks.json'), 'utf8')).hooks.preToolUse[0].command).toBe('gw hook cursor pre_tool');
+    expect(readFileSync(path.join(root, '.agents/skills/groundwork/SKILL.md'), 'utf8')).toContain('name: groundwork');
+    expect(readFileSync(path.join(root, '.agents/skills/groundwork/references/navigation.md'), 'utf8')).toContain('repo_map');
     expect(planSetup(root, targets, 'add').every((c) => c.action === 'unchanged')).toBe(true);
 
     applySetup(root, planSetup(root, targets, 'remove'), 'remove');
@@ -53,7 +55,65 @@ describe('gw setup', () => {
   });
 });
 
+describe('Codex skill ownership', () => {
+  it('preserves pre-existing skills and user edits to installed references on removal', () => {
+    const root = tempDir('gw-skill-root-'); dirs.push(root);
+    const skill = path.join(root, '.agents/skills/groundwork');
+    mkdirSync(skill, { recursive: true });
+    writeFileSync(path.join(skill, 'SKILL.md'), '# My Groundwork skill\n');
+    const targets = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === 'codex');
+    applySetup(root, planSetup(root, targets, 'add'), 'add');
+    expect(readFileSync(path.join(skill, 'SKILL.md'), 'utf8')).toBe('# My Groundwork skill\n');
+    const reference = path.join(skill, 'references/navigation.md');
+    writeFileSync(reference, '# My edited navigation\n');
+    applySetup(root, planSetup(root, targets, 'remove'), 'remove');
+    expect(readFileSync(path.join(skill, 'SKILL.md'), 'utf8')).toBe('# My Groundwork skill\n');
+    expect(readFileSync(reference, 'utf8')).toBe('# My edited navigation\n');
+  });
+});
+
 describe('gw setup edge cases', () => {
+  it.each(['claude', 'codex', 'cursor'] as const)('restores pre-existing matching %s hooks alongside later user edits', (agent) => {
+    const root = tempDir('gw-setup-matching-'); dirs.push(root);
+    const file = path.join(root, agent === 'claude' ? '.claude/settings.json' : `.${agent}/hooks.json`);
+    mkdirSync(path.dirname(file));
+    const event = agent === 'cursor' ? 'stop' : 'Stop';
+    const hook = (command: string) => agent === 'cursor' ? { command } : { hooks: [{ type: 'command', command }] };
+    const matching = hook(`gw hook ${agent} stop`);
+    const removed = hook('echo remove me');
+    const added = hook('echo added later');
+    const retainedFirst = hook('echo first');
+    const retainedLast = hook('echo last');
+    writeFileSync(file, JSON.stringify({ model: 'initial', hooks: { [event]: [matching, removed, retainedFirst, retainedLast] } }, null, 2) + '\n');
+    const first = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === agent);
+    applySetup(root, planSetup(root, first, 'add'), 'add');
+    const settings = JSON.parse(readFileSync(file, 'utf8'));
+    settings.model = 'later';
+    settings.hooks[event] = settings.hooks[event].filter((entry: unknown) => JSON.stringify(entry) !== JSON.stringify(removed));
+    settings.hooks[event].reverse();
+    settings.hooks[event].push(added);
+    writeFileSync(file, JSON.stringify(settings, null, 2) + '\n');
+    const second = targetsFor({ root, gw: 'npx groundwork-agent' }).filter((t) => t.agent === agent);
+    applySetup(root, planSetup(root, second, 'add'), 'add');
+    applySetup(root, planSetup(root, second, 'remove'), 'remove');
+    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ model: 'later', hooks: { [event]: [matching, retainedLast, retainedFirst, added] } });
+  });
+
+  it('keeps user edits made between setup runs with different commands', () => {
+    const root = tempDir('gw-setup-edits-'); dirs.push(root);
+    const first = targetsFor({ root, gw: 'gw' });
+    applySetup(root, planSetup(root, first, 'add'), 'add');
+    const file = path.join(root, '.claude/settings.json');
+    const settings = JSON.parse(readFileSync(file, 'utf8'));
+    settings.model = 'user-chosen-model';
+    settings.hooks.Stop.push({ hooks: [{ type: 'command', command: 'echo user hook' }] });
+    writeFileSync(file, JSON.stringify(settings, null, 2) + '\n');
+    const second = targetsFor({ root, gw: 'npx groundwork-agent' });
+    applySetup(root, planSetup(root, second, 'add'), 'add');
+    applySetup(root, planSetup(root, second, 'remove'), 'remove');
+    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ model: 'user-chosen-model', hooks: { Stop: [{ hooks: [{ type: 'command', command: 'echo user hook' }] }] } });
+  });
+
   function fresh() {
     const root = tempDir('gw-setup-root-');
     const home = tempDir('gw-setup-home-');

@@ -4,6 +4,7 @@
   "description": "A live, local map of your codebase for coding agents: navigation, reuse-first duplicate gate, grounding checks and waste guards.",
   "type": "module",
   "license": "MIT",
+  "publishConfig": { "provenance": true, "access": "public" },
   "author": "Aditya",
   "repository": {
     "type": "git",
@@ -38,7 +39,7 @@
     "typecheck": "tsc -p tsconfig.scripts.json",
     "test": "vitest run",
     "gw": "node --import tsx src/cli/main.ts",
-    "selftest": "node --import tsx src/cli/main.ts selftest",
+    "selftest": "node --import tsx src/cli/main.ts selftest --install-check",
     "golden": "node --import tsx scripts/update-golden.ts",
     "calibrate": "node --import tsx scripts/calibrate.ts",
     "prepublishOnly": "npm run build && npm test"

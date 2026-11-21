@@ -1,6 +1,6 @@
 ---
 name: groundwork
-description: Use for any coding task in a repository: to find code, read only what's needed, check for existing code before writing new code, and verify calls exist.
+description: "Use for any coding task in a repository: to find code, read only what's needed, check for existing code before writing new code, and verify calls exist."
 ---
 
 # Groundwork

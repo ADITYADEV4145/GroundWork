@@ -27,10 +27,12 @@ The test script copies `public/` to `dist/` and checks static-host paths and ser
 
 ## Netlify
 
+Live site: <https://groundwork-by-aditya.netlify.app/>. Netlify project: `groundwork-by-aditya` (ID `f732da6f-e1ab-4d6a-be2a-aca339faec70`). Production visibility is public; no team sign-in is required.
+
 `netlify.toml` at the repository root publishes `website/public` with no build command or server. `public/_headers` supplies security headers for the static deployment. Connect the repository to Netlify, or deploy that folder with an authenticated Netlify connection/CLI:
 
 ```sh
-netlify deploy --dir=website/public --prod
+netlify deploy --dir=website/public --prod --site=f732da6f-e1ab-4d6a-be2a-aca339faec70 --no-build
 ```
 
 Use the same linked Netlify site for updates. Do not commit access tokens or `.netlify/` account state. Verify the final public URL in a signed-out browser. The Devin preview is organization-only and is not the public deployment.

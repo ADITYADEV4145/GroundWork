@@ -76,14 +76,14 @@ To uninstall the integrations, run `gw setup --remove`. To remove the local inde
 </details>
 
 <details>
-<summary><strong>Plugin and npx installation: not available yet</strong></summary>
+<summary><strong>Claude Code plugin and other MCP clients</strong></summary>
 
-The repository includes plugin and MCP metadata, but those entry points use the unpublished `groundwork-agent` package. Use the source installation above today.
-
-**After the package is published**, these additional options will work:
+After installing from source, these integrations use the `gw` already on your PATH; npm publication is not required:
 
 - **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
-- **Any MCP client:** `npx -y groundwork-agent mcp`.
+- **Any MCP client:** run `gw mcp` as a stdio server from the repository root.
+
+The npm package itself is still unpublished, so do not use `npx groundwork-agent` or `npm install -g groundwork-agent` yet.
 
 </details>
 

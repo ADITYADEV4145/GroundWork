@@ -16,4 +16,14 @@ describe('Claude Code plugin', () => {
     expect(plugin.version).toBe(json('package.json').version);
     expect(json('.mcp.json').mcpServers.groundwork.args).toContain('mcp');
   });
+
+  it('launches the gw on PATH, so it works from a source install before npm publish', () => {
+    expect(json('.mcp.json').mcpServers.groundwork.command).toBe('gw');
+    expect(JSON.stringify(json('hooks/hooks.json'))).not.toContain('npx');
+  });
+
+  it('ships the plugin, skill and references in the npm package', () => {
+    const files: string[] = json('package.json').files;
+    for (const f of ['dist', 'SKILL.md', 'references', 'hooks', '.claude-plugin', '.mcp.json']) expect(files).toContain(f);
+  });
 });

@@ -1,10 +1,14 @@
 import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
+import { loadEvidence, loadSuite, withPinnedWorkspace } from '../../bench/runner.js';
 import { defaultConfig } from '../../config/load.js';
 import { dispatch, normalise } from '../../hooks/run.js';
 import { NAVIGATION_BUDGETS, NAVIGATION_TOOLS } from '../../mcp/tools/navigation.js';
 import type { ToolContext } from '../../mcp/registry.js';
+import { refreshIndex } from '../../index/refresh.js';
+import { indexDbPath } from '../../index/store.js';
+import { initSqlBackend, openDb } from '../../store/db.js';
 import { estimateTokens } from '../../util/tokens.js';
 import { tempDir, withIndexedFixture } from '../fixtures.js';
 import type { Check } from '../registry.js';
@@ -75,6 +79,59 @@ export const PHASE2_CHECKS: Check[] = [
       } finally {
         rmSync(root, { recursive: true, force: true });
       }
+    },
+  },
+  {
+    phase: 2,
+    name: 'navigation: token budgets on the pinned Groundwork repository',
+    async run() {
+      return withPinnedWorkspace(loadSuite('nav').suite.revision, 'groundwork', async (root) => {
+        await initSqlBackend();
+        await refreshIndex(root);
+        const db = openDb(indexDbPath(root), { readonly: true });
+        try {
+          const ctx = { root, db, config: defaultConfig() };
+          for (const [name, args, signature] of [
+            ['find_code', { query: 'index', limit: 100 }, 'Next: find_code'],
+            ['outline', { file: 'src/lang/typescript.ts' }, 'typescriptAdapter'],
+            ['read_symbol', { symbol: 'refreshIndex' }, 'function refreshIndex'],
+            ['callers', { symbol: 'refreshIndex' }, '[import-resolved]'],
+            ['callees', { symbol: 'refreshIndex' }, 'indexed callees'],
+            ['where_used', { name: 'refreshIndex' }, 'indexed references'],
+            ['repo_map', { depth: 8 }, 'Next: repo_map'],
+          ] as const) {
+            const result = await runNavigationTool(name, args, ctx);
+            if (!result.includes(signature)) return { ok: false, detail: `${name} missing ${signature}` };
+          }
+          return { ok: true, detail: 'All seven navigation MCP responses stayed within budget on the pinned real repository' };
+        } finally {
+          db.close();
+        }
+      });
+    },
+  },
+  {
+    phase: 2,
+    name: 'navigation benchmark: estimated tool-output reduction without a success drop',
+    async run() {
+      let summary;
+      try {
+        ({ summary } = loadEvidence('nav', 3));
+      } catch (err) {
+        return { ok: false, detail: (err as Error).message };
+      }
+      const { baseline: b, groundwork: g, estimatedToolOutputReductionPct: result } = summary;
+      if (!result || summary.toolOutputReductionCoverage !== summary.tasks.length || summary.tasks.length !== 30) {
+        return { ok: false, detail: 'Need valid paired measurements across all 30 tasks' };
+      }
+      const pct = (n: number) => n.toFixed(1) + '%';
+      const drop = summary.categories.filter((c) => c.groundwork.success < c.baseline.success).map((c) => c.category);
+      return {
+        ok: result.median > 0 && summary.noSuccessDrop,
+        detail: `Estimated tool-output tokens (UTF-8 bytes / 4): median reduction ${pct(result.median)} (95% interval ${pct(result.low)} to ${pct(result.high)}); success ${b.success}/${b.attempts} baseline vs ${g.success}/${g.attempts} Groundwork${drop.length ? `; declined in ${drop.join(', ')}` : ''}. Not provider input usage.`,
+        metrics: { medianEstimatedReductionPct: result.median, ciLowPct: result.low, ciHighPct: result.high,
+          baselineSuccessRate: b.success / b.attempts, groundworkSuccessRate: g.success / g.attempts },
+      };
     },
   },
 ];

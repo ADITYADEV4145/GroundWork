@@ -1,9 +1,10 @@
-import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { applyPatch, git, unpackWorkspace } from './workspace.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const source = path.resolve(here, '..');
@@ -13,27 +14,12 @@ if (!/^[a-z][a-z0-9-]*$/.test(suite)) throw new Error('Invalid suite name');
 const { revision, tasks, mcpTools = ['find_code', 'outline', 'read_symbol', 'callers', 'callees', 'where_used', 'repo_map'] } =
   JSON.parse(readFileSync(path.join(here, suite, 'tasks.json'), 'utf8'));
 const MAX_RESPONSE_BYTES = 8_000;
-const git = (cwd, ...args) => execFileSync('git', ['-c', 'core.hooksPath=/dev/null', ...args],
-  { cwd, encoding: 'utf8', timeout: 30_000, maxBuffer: 16 * 1024 * 1024 });
-const commit = (root, message) => git(root, '-c', 'user.name=Groundwork benchmark',
-  '-c', 'user.email=benchmark@example.invalid', 'commit', '-qm', message);
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 const saveJson = (file, value) => writeFileSync(file, JSON.stringify(value) + '\n');
 const positiveInt = (str) => {
   if (!/^[1-9]\d*$/.test(str ?? '') || !Number.isSafeInteger(Number(str))) throw new Error('Expected a positive integer');
   return Number(str);
 };
-
-function startWorkspace(task, root) {
-  mkdirSync(root);
-  const ref = task.repo === 'groundwork' ? revision : `${revision}:fixtures/${task.repo}`;
-  const archive = execFileSync('git', ['archive', ref], { cwd: source, maxBuffer: 16 * 1024 * 1024, timeout: 30_000 });
-  execFileSync('tar', ['-xf', '-'], { cwd: root, input: archive, timeout: 30_000 });
-  rmSync(path.join(root, 'expected.json'), { force: true });
-  git(root, 'init', '-q', '--template=');
-  git(root, 'add', '-A');
-  commit(root, 'Pinned task workspace');
-}
 
 function restoreSequence(task, dir, root) {
   if (!task.sequence) return;
@@ -44,9 +30,7 @@ function restoreSequence(task, dir, root) {
   for (const prior of priorTasks) {
     const previous = readJson(path.join(dir, prior.id + '.json'));
     if (previous.wallMs === undefined) throw new Error('Finish ' + prior.id + ' before beginning ' + task.id);
-    if (!previous.patch) continue;
-    execFileSync('git', ['apply', '--index', '-'], { cwd: root, input: previous.patch, timeout: 15_000 });
-    commit(root, 'Benchmark step ' + prior.id);
+    applyPatch(root, previous.patch, prior.id);
   }
 }
 
@@ -143,7 +127,7 @@ async function main([action, ...argv]) {
   const root = path.join(dir, task.id);
   const record = path.join(dir, task.id + '.json');
   if (action === 'begin') {
-    startWorkspace(task, root);
+    unpackWorkspace(source, revision, task.repo, root);
     restoreSequence(task, dir, root);
     saveJson(record, { task: task.id, startedAt: Date.now(), tools: [] });
     return;

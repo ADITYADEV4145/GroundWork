@@ -44,14 +44,3 @@ export class Patched {
 import urlDefault from './lib/url-default';
 
 export const site = urlDefault;
-
-export class Templated {
-  run(a: number): number {
-    return a;
-  }
-  use(): number {
-    return this.run();
-  }
-}
-const prefix = 'r';
-Object.defineProperty(Templated.prototype, `${prefix}un`, { value: () => 0 });

@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { loadEvidence, renderReport } from '../../dist/bench/runner.js';
-import { captureSchema, evidenceSchema } from '../../dist/bench/schema.js';
 import { evaluatorFingerprint } from './evaluator-fingerprint.mjs';
+
+const { loadEvidence, renderReport } = await import(new URL('../../dist/bench/runner.js', import.meta.url));
+const { captureSchema, evidenceSchema } = await import(new URL('../../dist/bench/schema.js', import.meta.url));
 
 const read = (file) => readFileSync(new URL(file, import.meta.url), 'utf8');
 const archive = './results/pre-19/long-horizon/';

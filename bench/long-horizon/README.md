@@ -63,34 +63,39 @@ The six [raw observations](observations/) retain original run labels 1–3 for
 both arms; none of the provisional two-pair relabeling is used. Each pins source
 `e366bbcd1944f81d118c486db4d1d8e6feeda705` and collector revision
 `34ea4c11efc47ffe7781308b31bdbf903e45f166`. The complete
-[report](results/2026-11-21T20-56-14-672Z-long-horizon.md),
-[JSON](results/2026-11-21T20-56-14-672Z-long-horizon.json) and dated graded evidence
-are committed under `results/`. [evidence.json](evidence.json) is the same graded
-evidence at the fixed path expected by the shared reporter. Its task/verifier
+[report](results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.md),
+[JSON](results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.json), dated graded evidence,
+original `tasks.json` and original `grade.mjs` are archived under
+`results/pre-19/long-horizon/`. Its [evidence.json](results/pre-19/long-horizon/evidence.json)
+is the same graded evidence at the fixed path within that historical suite. Its task/verifier
 digest is checked on replay. The evidence and results additionally record an
 `evaluator` SHA-256 fingerprint: every suite `.mjs` file (including acceptance,
 metrics, validation and verification helpers), the task manifest and every
-fixture file. `verify-results.mjs` checks both the file list and each file's
-bytes, rejecting edits, additions or deletions. Run it alongside shared replay;
+fixture file, including both archived and active manifests. `verify-results.mjs`
+checks both the file list and each file's bytes, rejecting edits, additions or
+deletions. Run it alongside shared replay;
 the shared reporter alone checks only its manifest/grade digest. This local
 fingerprint does not hash Node or third-party packages; the original collector
 revision and dependency lockfile define that environment.
 
-After `npm ci && npm run build`, reproduce the report offline, without agents,
+After `npm ci && npm run build`, verify the historical report offline, without agents,
 network access or execution of captured patches:
 
 ```sh
-node dist/cli/main.js bench --suite long-horizon --runs 3 \
-  --output-dir /path/to/reproduced-results
 node bench/long-horizon/verify-results.mjs
 ```
 
-To regrade all trusted patches instead of replaying graded evidence:
+Verification invokes the shared `loadEvidence` reporter against the archived
+suite directory, not the active collection manifest. No historical observations,
+scores or reported numbers have been relabeled or recomputed.
 
-```sh
-node dist/cli/main.js bench --suite long-horizon --runs 3 \
-  --observations bench/long-horizon/observations --output-dir /path/to/regraded-results
-```
+After rebasing onto merged Phase 2, the active manifest pins fixture commit
+`f2d5514fd96dac166b8e57c1790949fe67e65b05`, which is reachable in fresh clones.
+Its fixture tree is identical to the historical pin:
+`db8cdd31ecc3d901b1752acfc8145482c70bfa3d`. Only the pin changed; all ten tasks
+are unchanged. New sessions must use the active manifest. No evidence is
+installed at the active suite's fixed path until new sessions are graded, so
+the shared CLI cannot accidentally present these historical results as a new run.
 
 ## Run
 

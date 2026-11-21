@@ -1,21 +1,27 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { loadEvidence, renderReport } from '../../dist/bench/runner.js';
 import { captureSchema, evidenceSchema } from '../../dist/bench/schema.js';
 import { evaluatorFingerprint } from './evaluator-fingerprint.mjs';
 
 const read = (file) => readFileSync(new URL(file, import.meta.url), 'utf8');
-const stem = './results/2026-11-21T20-56-14-672Z-long-horizon';
+const archive = './results/pre-19/long-horizon/';
+const stem = archive + '2026-11-21T20-56-14-672Z-long-horizon';
 const records = JSON.parse(read(stem + '.json'));
 assert.equal(records.length, 1);
 const recorded = records[0];
-const rawEvidence = JSON.parse(read('./evidence.json'));
+const rawEvidence = JSON.parse(read(archive + 'evidence.json'));
+const historicalTasks = JSON.parse(read(archive + 'tasks.json'));
+const currentTasks = JSON.parse(read('./tasks.json'));
+assert.deepEqual({ ...currentTasks, revision: historicalTasks.revision }, historicalTasks, 'only the active fixture pin may differ from historical tasks');
+assert.equal(read('./grade.mjs'), read(archive + 'grade.mjs'), 'historical grader must be unchanged');
 assert.deepEqual(rawEvidence.evaluator, evaluatorFingerprint(), 'Recorded evaluator is stale: evaluator or fixture files changed');
 assert.deepEqual(recorded.evidence.evaluator, rawEvidence.evaluator, 'results must record the same evaluator fingerprint');
 console.log(`PASS evaluator and fixture file fingerprint (${Object.keys(rawEvidence.evaluator.files).length} files)`);
-const replay = loadEvidence('long-horizon', 3);
+const replay = loadEvidence('long-horizon', 3, fileURLToPath(new URL('./results/pre-19/', import.meta.url)));
 assert.deepEqual(replay, { ...recorded, evidence: evidenceSchema.parse(recorded.evidence) }, 'offline evidence must reproduce the saved JSON');
-assert.equal(read('./evidence.json'), read(stem + '.long-horizon.evidence.json'));
+assert.equal(read(archive + 'evidence.json'), read(stem + '.long-horizon.evidence.json'));
 const markdown = renderReport(replay.summary);
 assert.equal(markdown, read(stem + '.md'), 'saved Markdown must match the reporter');
 
@@ -43,7 +49,7 @@ for (const capture of replay.evidence.captures) {
   }
 }
 console.log('PASS six raw captures retain original labels and match all recorded timing/tool measurements');
-console.log('PASS offline evidence digest, JSON summary and Markdown reproduce exactly');
+console.log('PASS historical manifest, offline evidence digest, JSON summary and Markdown reproduce exactly');
 
 const headline = markdown.slice(markdown.indexOf('| Measure |'), markdown.indexOf('| Task category |')).trimEnd()
   + '\n\n' + markdown.slice(markdown.indexOf('| Suite metric |'), markdown.indexOf('Tool-output counts')).trimEnd();

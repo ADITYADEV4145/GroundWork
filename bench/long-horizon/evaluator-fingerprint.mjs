@@ -17,7 +17,7 @@ export function evaluatorFingerprint() {
       else if (!entry.isFile()) throw new Error(`Unexpected evaluator file type: ${file}`);
     }
   }
-  walk('bench/long-horizon', (file) => file.endsWith('.mjs') || file === 'bench/long-horizon/tasks.json');
+  walk('bench/long-horizon', (file) => file.endsWith('.mjs') || file.endsWith('/tasks.json'));
   walk('fixtures/long-horizon-events', () => true);
   const hashes = Object.fromEntries(files.sort().map((file) => [file, sha256(readFileSync(path.join(root, file)))]));
   return { algorithm: 'sha256', files: hashes, digest: sha256(JSON.stringify(hashes)) };

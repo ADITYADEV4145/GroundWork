@@ -292,7 +292,7 @@ capture JSON does not retain shell-command text or error status, so staging
 costs outside the wrappers or task timers cannot be verified. No retries were
 removed from the supplied captures.
 
-See the [full report](bench/long-horizon/results/2026-11-21T20-56-14-672Z-long-horizon.md),
+See the [historical full report](bench/long-horizon/results/pre-19/long-horizon/2026-11-21T20-56-14-672Z-long-horizon.md),
 [raw observations](bench/long-horizon/observations/) and
 [methodology and offline reproduction](bench/long-horizon/README.md).
 

@@ -28,7 +28,39 @@ Supported languages are TypeScript, JavaScript (including JSX and CommonJS) and 
 
 ## Install
 
-Requires Node.js 22 or later. Groundwork is not on npm yet, so install it from source:
+Requires Node.js 22 or later. Choose an install method:
+
+**Homebrew** (installs Node.js too):
+
+```sh
+brew install ADITYADEV4145/groundwork/groundwork
+```
+
+**npm, pnpm or Bun:**
+
+```sh
+npm install -g groundwork-agent
+# or
+pnpm add -g groundwork-agent
+# or
+bun add -g groundwork-agent
+```
+
+**Install script:**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/ADITYADEV4145/GroundWork/main/scripts/install.sh | sh
+```
+
+**One-off, without installing globally:**
+
+```sh
+npx groundwork-agent doctor
+# or
+bunx groundwork-agent doctor
+```
+
+**From source:**
 
 ```sh
 git clone https://github.com/ADITYADEV4145/GroundWork.git
@@ -55,7 +87,7 @@ Restart your agent after setup. Codex asks you to trust the new hooks once, unde
 
 Setup only writes project-level files: `.claude/settings.json`, `.mcp.json`, `.codex/hooks.json`, `.codex/config.toml`, `.cursor/hooks.json` and `.cursor/mcp.json`. It keeps your existing settings, and `gw setup --remove` returns each file to exactly how it was before setup.
 
-Two more options launch the `gw` on your PATH, so they work once the source install above is done:
+Two more options launch the `gw` on your PATH from any of the installs above (one-off runs do not put it on PATH):
 - **Claude Code plugin:** `/plugin marketplace add ADITYADEV4145/GroundWork`, then `/plugin install groundwork`.
 - **Any MCP client:** run `gw mcp` as a stdio server from the repository root.
 

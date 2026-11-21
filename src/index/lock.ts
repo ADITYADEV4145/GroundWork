@@ -60,7 +60,10 @@ function reclaim(file: string, stalePid: number): void {
 /** Single-writer lock for .groundwork/index.db. Readers never take it (SQLite WAL handles them). */
 export function withWriteLock<T>(root: string, fn: () => T, timeoutMs = 30_000): T {
   ensureGwDir(root);
-  const file = gwPath(root, 'index.lock');
+  return withFileLock(gwPath(root, 'index.lock'), fn, timeoutMs, 'another groundwork process is writing the index (.groundwork/index.lock)');
+}
+
+export function withFileLock<T>(file: string, fn: () => T, timeoutMs: number, busyMessage = `Another Groundwork process holds the lock: ${file}`): T {
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     try {
@@ -75,7 +78,7 @@ export function withWriteLock<T>(root: string, fn: () => T, timeoutMs = 30_000):
         reclaim(file, pid);
         continue;
       }
-      if (Date.now() > deadline) throw new Error('another groundwork process is writing the index (.groundwork/index.lock)');
+      if (Date.now() > deadline) throw new Error(busyMessage);
       sleep(25);
     }
   }

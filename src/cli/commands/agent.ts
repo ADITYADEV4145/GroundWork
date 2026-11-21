@@ -5,7 +5,7 @@ import { startMcpServer } from '../../mcp/server.js';
 import { globalOpts, repoRoot } from '../context.js';
 
 const AGENTS = ['claude', 'codex', 'cursor'];
-const EVENTS = ['pre_tool', 'post_tool', 'session_start', 'prompt', 'stop'];
+const EVENTS = ['pre_tool', 'post_tool', 'session_start', 'prompt', 'stop', 'pre_compact'];
 
 export function register(program: Command): void {
   program

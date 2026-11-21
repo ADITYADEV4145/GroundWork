@@ -51,6 +51,10 @@ export function sqliteBackendAvailable(): 'node:sqlite' | 'sql.js' {
 
 let txDepth = new WeakMap<object, number>();
 
+function unicodeLower(value: unknown): string | null {
+  return typeof value === 'string' ? value.toLowerCase() : null;
+}
+
 function wrapTransaction<T>(owner: object, exec: (sql: string) => void, fn: () => T): T {
   const depth = txDepth.get(owner) ?? 0;
   if (depth > 0) {
@@ -77,6 +81,7 @@ function wrapTransaction<T>(owner: object, exec: (sql: string) => void, fn: () =
 
 function openNode(mod: NodeSqlite, file: string, readonly: boolean): Db {
   const db = new mod.DatabaseSync(file, readonly ? { readOnly: true } : {});
+  db.function('gw_unicode_lower', { deterministic: true }, unicodeLower);
   if (!readonly) {
     db.exec('PRAGMA journal_mode = WAL');
     db.exec('PRAGMA synchronous = NORMAL');
@@ -118,15 +123,19 @@ function openSqlJs(file: string, readonly: boolean): Db {
   if (!sqlJs) throw new Error('sql.js backend not initialized; call initSqlBackend() first');
   const data = file !== ':memory:' && existsSync(file) ? readFileSync(file) : undefined;
   const db = new sqlJs.Database(data);
-  // Deletes rely on ON DELETE CASCADE, which SQLite only enforces with this pragma.
-  db.exec('PRAGMA foreign_keys = ON');
+  const configure = () => {
+    // Deletes rely on ON DELETE CASCADE, which SQLite only enforces with this pragma.
+    db.exec('PRAGMA foreign_keys = ON');
+    db.create_function('gw_unicode_lower', unicodeLower);
+  };
+  configure();
   let dirty = false;
   const persist = () => {
     if (readonly || file === ':memory:' || !dirty) return;
     const tmp = `${file}.tmp-${process.pid}`;
     writeFileSync(tmp, db.export());
-    // export() reopens the database, which resets connection pragmas.
-    db.exec('PRAGMA foreign_keys = ON');
+    // export() reopens the database, resetting connection settings.
+    configure();
     renameSync(tmp, file);
     dirty = false;
   };

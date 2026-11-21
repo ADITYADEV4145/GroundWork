@@ -1,0 +1,52 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MCP navigation > matches the fixture goldens 1`] = `
+{
+  "callees": "[8e008562f088c62b] ApiClient.request (method) — src/services/api.ts:21 — 3 indexed callees
+src/services/api.ts:23 fetch(url,{method,headers:{key,cfg:CONFIG_KEY}}).then [unresolved]
+src/services/api.ts:23 fetch [unresolved]
+src/services/api.ts:23 r.text [unresolved]",
+  "callers": "[98585e3ca1e85bdc] formatDate (function) — src/utils/date.ts:4 — 2 indexed callers
+src/main.ts:10 main [import-resolved]
+src/services/api.ts:17 ApiClient.get [import-resolved]",
+  "find_code": "Code matches (4):
+[98585e3ca1e85bdc] formatDate (function) — src/utils/date.ts:4 · <score>
+  formatDate(d: Date, withTime = false): string
+[6a25df001251a1fc] pad (function) — src/utils/date.ts:14 · <score>
+  pad(n: number, width = 2): string
+[c83a63744c278604] sleep (function) — src/utils/date.ts:8 · <score>
+  async sleep(ms: number): Promise<void>
+[e8d056135661b35f] joinParts (function) — src/utils/date.ts:18 · <score>
+  joinParts(sep: string, ...parts: string[]): string",
+  "outline": "src/utils/date.ts (23 lines; 5 symbols)
+[98585e3ca1e85bdc] 4-6 formatDate (function): formatDate(d: Date, withTime = false): string
+[c83a63744c278604] 8-10 sleep (function): async sleep(ms: number): Promise<void>
+[d2d4d5fde36dda38] 12-12 DAY_MS (constant): constant DAY_MS
+[6a25df001251a1fc] 14-16 pad (function): pad(n: number, width = 2): string
+[e8d056135661b35f] 18-20 joinParts (function): joinParts(sep: string, ...parts: string[]): string",
+  "read_symbol": "[809b4fda660bc8d5] ApiClient.get (method) — src/services/api.ts:16 (definition lines 16-19; source offset 0)
+async get(path: string): Promise<string> {
+    const stamp = formatDate(new Date(Date.now() - DAY_MS));
+    return this.request('GET', \`\${this.base}\${path}?d=\${stamp}\`);
+  }",
+  "repo_map": "Map: src/services (1 indexed files, depth 2). Narrow with repo_map({"path":"folder"}).
+src/services/api.ts — ApiClient, API_URL, CONFIG_KEY",
+  "where_used": "4 indexed references:
+src/main.ts
+  :2 import formatDate from @/utils
+  :10 call formatDate [import-resolved]
+src/services/api.ts
+  :1 import formatDate from @/utils/date
+  :17 call formatDate [import-resolved]",
+}
+`;
+
+exports[`MCP navigation > matches the fixture goldens 2`] = `
+"[ac4f028de8ae2e98] charge (function) — app/services/billing.py:8 (definition lines 8-13; source offset 0)
+def charge(invoice: Invoice, region: str = "eu") -> float:
+    """Charge an invoice including tax."""
+    subtotal = invoice.total()
+    total = subtotal * (1 + tax.rate(region))
+    log.info("charged %s", total)
+    return total"
+`;

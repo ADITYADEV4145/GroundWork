@@ -15,7 +15,13 @@ const types = new Map([
 ]);
 const port = Number(process.env.PORT || 4173);
 createServer(async (request, response) => {
-  const path = new URL(request.url, 'http://localhost').pathname;
+  let path;
+  try {
+    path = new URL(request.url, 'http://localhost').pathname;
+  } catch {
+    response.writeHead(400);
+    return response.end('Bad request');
+  }
   const file = types.get(path);
   if (!['GET', 'HEAD'].includes(request.method)) {
     response.writeHead(405, { Allow: 'GET, HEAD' });

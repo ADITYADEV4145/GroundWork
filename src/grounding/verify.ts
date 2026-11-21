@@ -497,7 +497,7 @@ export class Grounder {
   private patched(target: SymbolFact, where: FileFacts): boolean {
     const text = this.text(where.path) ?? '';
     // Object.assign onto an instance/class, or defineProperty with a computed key, may replace any member.
-    if (/\bsetattr\s*\(|Object\.assign\s*\(\s*(this|self|[A-Z][\w$]*(\.prototype)?)\s*,|defineProperty\s*\([^,]*,\s*(?!['"`])/.test(text)) return true;
+    if (/\bsetattr\s*\(|Object\.assign\s*\(\s*(this|self|[A-Z][\w$]*(\.prototype)?)\s*,|defineProperty\s*\([^,]*,\s*(?![\s'"`])/.test(text)) return true;
     const n = escapeRe(target.name);
     return new RegExp(`\\.${n}\\s*=(?!=)|defineProperty\\s*\\([^)]*['"\`]${n}['"\`]`).test(text);
   }

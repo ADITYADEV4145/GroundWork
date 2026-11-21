@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, rmdirSync, rmSync, writeFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 import { BLOCK_END, BLOCK_START, type AgentTarget, type Edit } from './targets.js';
 import { gwPath } from '../util/paths.js';
 
@@ -81,6 +82,10 @@ function transform(edit: Edit, before: string | null, mode: 'add' | 'remove', kn
   else edit.remove(doc, known);
   if (mode === 'remove' && before === null) return null;
   if (before !== null && JSON.stringify(doc) === original) return before;
+  return formatJson(doc, before);
+}
+
+function formatJson(doc: unknown, before: string | null): string {
   // Keep the file's own indentation and trailing newline so add + remove round-trips byte for byte.
   const indent = before ? (/\n([ \t]+)\S/.exec(before)?.[1] ?? 2) : 2;
   const eol = before === null || before.endsWith('\n') ? '\n' : '';
@@ -96,6 +101,41 @@ function parseOrEmpty(text: string | null): Record<string, unknown> {
   }
 }
 
+function mergeEdits(original: unknown, previous: unknown, current: unknown): unknown {
+  if (isDeepStrictEqual(previous, current)) return original;
+  if (Array.isArray(current) && (previous === undefined || Array.isArray(previous)) && (original === undefined || Array.isArray(original))) {
+    const prior: unknown[] = previous ?? [];
+    const kept: unknown[] = [...(original ?? [])];
+    const remaining = [...current];
+    for (const item of prior) {
+      const present = remaining.findIndex((value) => isDeepStrictEqual(value, item));
+      if (present >= 0) remaining.splice(present, 1);
+      else {
+        const removed = kept.findIndex((value) => isDeepStrictEqual(value, item));
+        if (removed >= 0) kept.splice(removed, 1);
+      }
+    }
+    return [...kept, ...remaining];
+  }
+  const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
+  if (object(current) && (previous === undefined || object(previous)) && (original === undefined || object(original))) {
+    const base = original ?? {}, prior = previous ?? {};
+    return Object.fromEntries([...new Set([...Object.keys(base), ...Object.keys(prior), ...Object.keys(current)])].flatMap((key) => {
+      const value = mergeEdits(base[key], prior[key], current[key]);
+      return value === undefined ? [] : [[key, value]];
+    }));
+  }
+  return current;
+}
+
+function restoration(edit: Edit, before: string | null, original: { before: string | null; after: string | null }, installed: Set<string>): string | null {
+  if (before === original.after) return original.before;
+  const current = transform(edit, before, 'remove', installed);
+  if (edit.kind !== 'json') return current;
+  const previous = transform(edit, original.after, 'remove', installed);
+  return formatJson(mergeEdits(parseOrEmpty(original.before), parseOrEmpty(previous), parseOrEmpty(current)), before);
+}
+
 export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'remove'): PlannedChange[] {
   const manifest = readManifest(root);
   const out: PlannedChange[] = [];
@@ -107,10 +147,8 @@ export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'r
       const known = new Set([...installed, ...owned]);
       let after = transform(edit, before, mode, known);
       const original = manifest.originals?.[edit.file];
-      const restoreBefore = original
-        ? before === original.after ? original.before : transform(edit, before, 'remove', installed)
-        : before;
-      if (mode === 'remove' && original && before === original.after) after = original.before;
+      const restoreBefore = original ? restoration(edit, before, original, installed) : before;
+      if (mode === 'remove' && original) after = restoreBefore;
       let action: PlannedChange['action'];
       if (mode === 'add') action = before === null ? 'create' : after === before ? 'unchanged' : 'update';
       else {

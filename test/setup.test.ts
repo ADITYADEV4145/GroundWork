@@ -73,6 +73,29 @@ describe('Codex skill ownership', () => {
 });
 
 describe('gw setup edge cases', () => {
+  it.each(['claude', 'codex', 'cursor'] as const)('restores pre-existing matching %s hooks alongside later user edits', (agent) => {
+    const root = tempDir('gw-setup-matching-'); dirs.push(root);
+    const file = path.join(root, agent === 'claude' ? '.claude/settings.json' : `.${agent}/hooks.json`);
+    mkdirSync(path.dirname(file));
+    const event = agent === 'cursor' ? 'stop' : 'Stop';
+    const hook = (command: string) => agent === 'cursor' ? { command } : { hooks: [{ type: 'command', command }] };
+    const matching = hook(`gw hook ${agent} stop`);
+    const removed = hook('echo remove me');
+    const added = hook('echo added later');
+    writeFileSync(file, JSON.stringify({ model: 'initial', hooks: { [event]: [matching, removed] } }, null, 2) + '\n');
+    const first = targetsFor({ root, gw: 'gw' }).filter((t) => t.agent === agent);
+    applySetup(root, planSetup(root, first, 'add'), 'add');
+    const settings = JSON.parse(readFileSync(file, 'utf8'));
+    settings.model = 'later';
+    settings.hooks[event] = settings.hooks[event].filter((entry: unknown) => JSON.stringify(entry) !== JSON.stringify(removed));
+    settings.hooks[event].push(added);
+    writeFileSync(file, JSON.stringify(settings, null, 2) + '\n');
+    const second = targetsFor({ root, gw: 'npx groundwork-agent' }).filter((t) => t.agent === agent);
+    applySetup(root, planSetup(root, second, 'add'), 'add');
+    applySetup(root, planSetup(root, second, 'remove'), 'remove');
+    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ model: 'later', hooks: { [event]: [matching, added] } });
+  });
+
   it('keeps user edits made between setup runs with different commands', () => {
     const root = tempDir('gw-setup-edits-'); dirs.push(root);
     const first = targetsFor({ root, gw: 'gw' });

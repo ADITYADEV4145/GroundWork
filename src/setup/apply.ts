@@ -81,14 +81,24 @@ function transform(edit: Edit, before: string | null, mode: 'add' | 'remove', kn
   return JSON.stringify(doc, null, indent) + eol;
 }
 
+function parseOrEmpty(text: string | null): Record<string, unknown> {
+  try {
+    const v: unknown = text?.trim() ? JSON.parse(text) : {};
+    return typeof v === 'object' && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}
+
 export function planSetup(root: string, targets: AgentTarget[], mode: 'add' | 'remove'): PlannedChange[] {
   const manifest = readManifest(root);
   const out: PlannedChange[] = [];
   for (const t of targets)
     for (const edit of t.edits) {
       const before = read(edit.file);
-      const owned = edit.kind === 'json' ? edit.owned : [];
-      const known = new Set([...installedIn(manifest, edit.file), ...owned]);
+      const installed = new Set(installedIn(manifest, edit.file));
+      const owned = edit.kind !== 'json' ? [] : typeof edit.owned === 'function' ? edit.owned(parseOrEmpty(before), installed) : edit.owned;
+      const known = new Set([...installed, ...owned]);
       let after = transform(edit, before, mode, known);
       let action: PlannedChange['action'];
       if (mode === 'add') action = before === null ? 'create' : after === before ? 'unchanged' : 'update';

@@ -10,8 +10,8 @@ import type { AgentName } from '../hooks/types.js';
 export interface JsonEdit {
   kind: 'json';
   file: string;
-  /** Keys of the entries this edit writes (hook commands, `mcp:<json>`), recorded in the setup manifest. */
-  owned: string[];
+  /** Keys of the entries this edit writes (hook commands, `mcp:<json>`), recorded in the setup manifest. A function gets the file as it is now and the keys setup recorded there. */
+  owned: string[] | ((doc: Record<string, unknown>, installed: Set<string>) => string[]);
   /** Adds our entries to the parsed file; must be idempotent. `known` holds every entry key setup ever wrote here. */
   add(doc: Record<string, unknown>, known: Set<string>): void;
   /** Removes only entries in `known`. */
@@ -231,7 +231,7 @@ export function detectAgents(home = os.homedir()): AgentName[] {
 
 export const PROFILES = ['minimal', 'standard', 'strict'] as const;
 
-/** Sets `profile` in .groundwork/config.json, unless the user already chose one there. */
+/** Sets `profile` in .groundwork/config.json, unless the user already chose one there; a profile setup did not write is never claimed. */
 export function profileTarget(root: string, profile?: (typeof PROFILES)[number]): AgentTarget {
   const key = (p: unknown) => `profile:${String(p)}`;
   return {
@@ -240,9 +240,9 @@ export function profileTarget(root: string, profile?: (typeof PROFILES)[number])
     edits: [{
       kind: 'json',
       file: path.join(root, '.groundwork', 'config.json'),
-      owned: profile ? [key(profile)] : [],
+      owned: (doc, installed) => (profile && (!('profile' in doc) || installed.has(key(doc.profile))) ? [key(profile)] : []),
       add(doc, known) {
-        if (!profile || ('profile' in doc && !known.has(key(doc.profile)))) return;
+        if (!profile || !known.has(key(profile)) || ('profile' in doc && !known.has(key(doc.profile)))) return;
         doc.profile = profile;
       },
       remove(doc, known) {

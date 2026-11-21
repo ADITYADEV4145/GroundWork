@@ -157,6 +157,24 @@ describe('gw setup --profile', () => {
     expect(readFileSync(path.join(root, '.groundwork', 'config.json'), 'utf8')).toBe('{ "profile": "minimal" }\n');
   });
 
+  it('a profile the user already set is never claimed, and switching a setup-written one works', () => {
+    const root = tempDir('gw-setup-root-');
+    dirs.push(root);
+    const cfg = path.join(root, '.groundwork', 'config.json');
+    mkdirSync(path.join(root, '.groundwork'));
+    writeFileSync(cfg, '{ "profile": "strict" }\n');
+    applySetup(root, planSetup(root, [profileTarget(root, 'strict')], 'add'), 'add');
+    applySetup(root, planSetup(root, [profileTarget(root)], 'remove'), 'remove');
+    expect(readFileSync(cfg, 'utf8')).toBe('{ "profile": "strict" }\n');
+
+    writeFileSync(cfg, '{}\n');
+    applySetup(root, planSetup(root, [profileTarget(root, 'minimal')], 'add'), 'add');
+    applySetup(root, planSetup(root, [profileTarget(root, 'strict')], 'add'), 'add');
+    expect(loadConfig(root).profile).toBe('strict');
+    applySetup(root, planSetup(root, [profileTarget(root)], 'remove'), 'remove');
+    expect(readFileSync(cfg, 'utf8')).toBe('{}\n');
+  });
+
   it('minimal turns off reuse, grounding and waste guards unless set explicitly', () => {
     const root = tempDir('gw-setup-root-');
     dirs.push(root);

@@ -67,7 +67,14 @@ both arms; none of the provisional two-pair relabeling is used. Each pins source
 [JSON](results/2026-11-21T20-56-14-672Z-long-horizon.json) and dated graded evidence
 are committed under `results/`. [evidence.json](evidence.json) is the same graded
 evidence at the fixed path expected by the shared reporter. Its task/verifier
-digest is checked on replay.
+digest is checked on replay. The evidence and results additionally record an
+`evaluator` SHA-256 fingerprint: every suite `.mjs` file (including acceptance,
+metrics, validation and verification helpers), the task manifest and every
+fixture file. `verify-results.mjs` checks both the file list and each file's
+bytes, rejecting edits, additions or deletions. Run it alongside shared replay;
+the shared reporter alone checks only its manifest/grade digest. This local
+fingerprint does not hash Node or third-party packages; the original collector
+revision and dependency lockfile define that environment.
 
 After `npm ci && npm run build`, reproduce the report offline, without agents,
 network access or execution of captured patches:

@@ -1,15 +1,20 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { loadEvidence, renderReport } from '../../dist/bench/runner.js';
-import { captureSchema } from '../../dist/bench/schema.js';
+import { captureSchema, evidenceSchema } from '../../dist/bench/schema.js';
+import { evaluatorFingerprint } from './evaluator-fingerprint.mjs';
 
 const read = (file) => readFileSync(new URL(file, import.meta.url), 'utf8');
 const stem = './results/2026-11-21T20-56-14-672Z-long-horizon';
 const records = JSON.parse(read(stem + '.json'));
 assert.equal(records.length, 1);
 const recorded = records[0];
+const rawEvidence = JSON.parse(read('./evidence.json'));
+assert.deepEqual(rawEvidence.evaluator, evaluatorFingerprint(), 'Recorded evaluator is stale: evaluator or fixture files changed');
+assert.deepEqual(recorded.evidence.evaluator, rawEvidence.evaluator, 'results must record the same evaluator fingerprint');
+console.log(`PASS evaluator and fixture file fingerprint (${Object.keys(rawEvidence.evaluator.files).length} files)`);
 const replay = loadEvidence('long-horizon', 3);
-assert.deepEqual(replay, recorded, 'offline evidence must reproduce the saved JSON');
+assert.deepEqual(replay, { ...recorded, evidence: evidenceSchema.parse(recorded.evidence) }, 'offline evidence must reproduce the saved JSON');
 assert.equal(read('./evidence.json'), read(stem + '.long-horizon.evidence.json'));
 const markdown = renderReport(replay.summary);
 assert.equal(markdown, read(stem + '.md'), 'saved Markdown must match the reporter');

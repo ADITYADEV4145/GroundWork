@@ -161,6 +161,8 @@ describe('MCP navigation', () => {
         'def different_version():\n    """Support HTTP/20, HTTP20, HTTP20Server and HTTP/20Server."""\n    pass\n',
         'def retry():\n    """Retry HTTP 3 times."""\n    pass\n',
         'def retry_twice():\n    """Retry HTTP 2x on timeout."""\n    pass\n',
+        'def decode():\n    """Decode MP3s."""\n    pass\n',
+        'def verify():\n    """Verify 2-factor authentication."""\n    pass\n',
       ].join('\n'));
       await initSqlBackend();
       await refreshIndex(root);
@@ -174,6 +176,8 @@ describe('MCP navigation', () => {
         expect(result).not.toContain('different_version (function)');
         expect(result).not.toContain('retry (function)');
         expect(result).not.toContain('retry_twice (function)');
+        expect(await runNavigationTool('find_code', { query: 'MP3' }, { root, db, config })).toContain('decode (function)');
+        expect(await runNavigationTool('find_code', { query: '2fa' }, { root, db, config })).toContain('verify (function)');
       } finally {
         db.close();
       }

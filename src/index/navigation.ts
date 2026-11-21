@@ -24,8 +24,9 @@ function searchWords(value: string): string[] {
     .match(/[\p{L}\p{N}\p{M}]+/gu) ?? [];
 }
 
-function separateLetterNumber(value: string): string {
-  return value.replace(/(?<=[\p{L}\p{M}])(?=\p{N})/gu, ' ');
+function separateLetterNumber(value: string, keepLeadingNumericWord = false): string {
+  const numberToLetter = keepLeadingNumericWord ? /([\p{L}\p{M}]\p{N}+)(?=\p{L})/gu : /(\p{N})(?=\p{L})/gu;
+  return value.replace(numberToLetter, '$1 ').replace(/(?<=[\p{L}\p{M}])(?=\p{N})/gu, ' ');
 }
 
 function isPrefixTerm(value: string): boolean {
@@ -33,7 +34,8 @@ function isPrefixTerm(value: string): boolean {
 }
 
 function rankingTokens(value: string): string[] {
-  return searchWords(value).flatMap((w) => separateLetterNumber(w.toLowerCase()).split(' '));
+  // Keep standalone quantities like 2x intact, but recognize 3 as part of MP3s.
+  return searchWords(value).flatMap((w) => separateLetterNumber(w.toLowerCase(), true).split(' '));
 }
 
 function matchesTerm(tokens: string[], parts: string[]): boolean {
@@ -57,7 +59,7 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
   const q = query.toLowerCase();
   const termsByCase = searchWords(query).slice(0, 24);
   const words = [...new Set(termsByCase.map((w) => w.toLowerCase()))];
-  const scoringWords = words.map(rankingTokens);
+  const scoringWords = words.map((w) => separateLetterNumber(w).split(' '));
   const select = `SELECT ${SYMBOL}, s.name, s.docstring, s.exported, f.is_test, ${CALLERS} caller_count`;
   const filter = (kind ? ' AND s.kind = ?' : '') + (file ? ' AND f.path = ?' : '');
   const filterArgs = [...(kind ? [kind] : []), ...(file ? [file] : [])];
@@ -82,7 +84,7 @@ export function findCode(db: Db, query: string, kind?: SymbolKind, file?: string
     const numbered = (w: string) => !isPrefixTerm(w) && /\p{L}/u.test(w);
     const expanded = variants(tokens.filter(numbered)).map(prefix).join(' OR ');
     if (expanded) {
-      const required = words.filter(numbered).map(rankingTokens);
+      const required = words.filter(numbered).map((w) => separateLetterNumber(w).split(' '));
       for (const r of search.all(expanded, ...filterArgs)) {
         const id = String(r.id);
         if (candidates.has(id)) continue;

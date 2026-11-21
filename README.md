@@ -286,6 +286,6 @@ To work on Groundwork itself: `npm test`, `npm run typecheck`, `npm run build`, 
 
 <p align="center">
   <strong>Give your agent solid ground.</strong><br>
-  Built by <a href="https://github.com/ADITYADEV4145">Aditya Punjani</a> · <a href="LICENSE">MIT licensed</a><br>
+  Built by <a href="https://github.com/ADITYADEV4145">Aditya</a> · <a href="LICENSE">MIT licensed</a><br>
   <sub>The generated illustrations are conceptual artwork, not product screenshots.</sub>
 </p>

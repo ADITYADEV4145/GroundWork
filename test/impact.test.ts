@@ -39,6 +39,15 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('does not claim file-level test coverage for runner name or marker filters', () => {
+    const root = fixture();
+    for (const filter of ['-k smoke', '-m slow', '-t case', '--testNamePattern=case', '--grep case']) {
+      const runner = filter.startsWith('-k') || filter.startsWith('-m') ? 'pytest' : 'vitest run';
+      const session = filter.replace(/[^A-Za-z0-9_-]/g, '_');
+      recordImpactEvidence(root, { ...stopEvent(root, false, session), event: 'post_tool', tool: 'Bash', input: { command: `${runner} ${filter} test` }, response: 'passed' });
+      expect(sessionEvidence(root, session).ran('test/api.test.ts')).toBe(false);
+    }
+  });
   it('restricts observed test discovery to runner directory and root options', () => {
     const root = fixture();
     for (const option of ['--dir', '--root', '--rootdir']) {
@@ -58,7 +67,7 @@ describe('change impact', () => {
     record('ignored', 'pytest --ignore tests/unit tests/integration');
     expect(sessionEvidence(root, 'ignored').ran('tests/unit/test_api.py')).toBe(false);
     expect(sessionEvidence(root, 'ignored').ran('tests/integration/test_api.py')).toBe(true);
-    record('deselected', 'pytest --deselect=tests/unit/test_api.py -k smoke --config pytest.ini tests');
+    record('deselected', 'pytest --deselect=tests/unit/test_api.py --config pytest.ini tests');
     expect(sessionEvidence(root, 'deselected').ran('tests/unit/test_api.py')).toBe(false);
     expect(sessionEvidence(root, 'deselected').ran('tests/integration/test_api.py')).toBe(true);
     record('config', 'vitest run --config test/api.test.ts --project integration test/other.test.ts');

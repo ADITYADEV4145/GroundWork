@@ -89,6 +89,7 @@ export function sessionEvidence(root: string, sessionId?: string) {
     } else return false;
     const selectors: string[] = [], exclusions: string[] = [], discovery: string[] = [];
     const discoveryOptions = new Set(['--dir', '--root', '--rootdir']);
+    const nameFilters = new Set(['-k', '-m', '-t', '--testNamePattern', '--grep']);
     const flags = new Set(['--coverage', '--run', '--watch', '--silent', '--verbose', '--no-coverage', '--no-watch', '--passWithNoTests', '--ci', '--runInBand', '--watchAll', '--disable-warnings', '--no-header', '--no-summary', '-s', '-q', '-v', '-x']);
     const values = new Set([...discoveryOptions, '--ignore', '--deselect', '-k', '-m', '-t', '-c', '--config', '--project', '--selectProjects', '--workspace', '--testNamePattern', '--reporter', '--outputFile', '--coverageDirectory', '--maxWorkers', '--minWorkers', '--pool', '--junitxml', '--maxfail', '-o', '--override-ini']);
     for (let i = 0; i < args.length; i++) {
@@ -96,6 +97,7 @@ export function sessionEvidence(root: string, sessionId?: string) {
       if (arg === '--') continue;
       if (!arg.startsWith('-')) { selectors.push(arg); continue; }
       const equals = arg.indexOf('='), flag = equals < 0 ? arg : arg.slice(0, equals);
+      if (nameFilters.has(flag)) return false;
       if (flags.has(flag)) continue;
       if (!values.has(flag)) return false;
       const value = equals < 0 ? args[++i] : arg.slice(equals + 1);

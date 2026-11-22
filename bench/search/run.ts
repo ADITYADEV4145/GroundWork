@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,7 +10,7 @@ import { searchDocuments } from '../../src/index/query.js';
 import { refreshIndex } from '../../src/index/refresh.js';
 import { indexDbPath } from '../../src/index/store.js';
 import { searchCode } from '../../src/search/index.js';
-import { DEFAULT_EMBEDDING_MODEL, hasLocalEmbeddings } from '../../src/reuse/embeddings.js';
+import { DEFAULT_EMBEDDING_MODEL, embeddingCacheDir, hasLocalEmbeddings } from '../../src/reuse/embeddings.js';
 import { openDb } from '../../src/store/db.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -60,11 +60,32 @@ export function benchmarkOutput(args: string[], version: number): string {
   return resolved;
 }
 
+export function benchmarkModels(args: string[]): string {
+  const at = args.indexOf('--models');
+  if (at < 0) return embeddingCacheDir(REPO);
+  const directory = args[at + 1];
+  if (!directory || directory.startsWith('--')) throw new Error('--models requires an installed model directory');
+  return path.resolve(directory);
+}
+
+export function reuseBenchmarkModels(roots: string[], models: string): void {
+  const source = path.resolve(models);
+  if (!existsSync(source)) return;
+  for (const root of roots) {
+    const destination = embeddingCacheDir(root);
+    if (existsSync(destination)) continue;
+    mkdirSync(path.dirname(destination), { recursive: true });
+    symlinkSync(source, destination, 'dir');
+    if (!hasLocalEmbeddings(root, DEFAULT_EMBEDDING_MODEL)) unlinkSync(destination);
+  }
+}
+
 async function run() {
   const version = process.argv.includes('--v2') ? 2 : 1;
   const manifestSha = version === 2 ? V2_MANIFEST_SHA : MANIFEST_SHA;
   const frozen = manifest(version);
   const results = process.argv.includes('--validate-only') ? '' : benchmarkOutput(process.argv.slice(2), version);
+  const models = benchmarkModels(process.argv.slice(2));
   execFileSync('git', ['merge-base', '--is-ancestor', frozen.anchor, 'HEAD'], { cwd: REPO });
   const workspace = mkdtempSync(path.join(os.homedir(), `groundwork-search-${process.argv.includes('--validate-only') ? 'validation' : 'evaluation'}-v${version}-`));
   const archive = execFileSync('git', ['archive', frozen.anchor, 'src', 'fixtures/py-app/app'], { cwd: REPO, maxBuffer: 50 * 1024 * 1024 });
@@ -84,7 +105,10 @@ async function run() {
       if (!task.expected.every((id) => ids.has(id))) throw new Error(`Missing frozen target: ${task.id} ${task.expected.join(',')}`);
     }
     if (process.argv.includes('--validate-only')) { console.log('All 50 frozen target IDs validated. No rankings evaluated.'); return; }
-    ({ semanticStatus, semanticReason } = prepareBenchmarkEmbeddings(Object.values(roots), process.argv.includes('--embeddings')));
+    try {
+      reuseBenchmarkModels(Object.values(roots), models);
+      ({ semanticStatus, semanticReason } = prepareBenchmarkEmbeddings(Object.values(roots), process.argv.includes('--embeddings')));
+    } catch (error) { semanticReason = (error as Error).message; }
     for (const task of frozen.tasks) for (const arm of ['baseline', 'lexical', ...(semanticStatus === 'RUN' ? ['hybrid'] : [])] as ('baseline' | 'lexical' | 'hybrid')[]) {
       rows.push(await evaluateTask(dbs[task.corpus]!, task, arm, roots[task.corpus as keyof typeof roots]));
     }

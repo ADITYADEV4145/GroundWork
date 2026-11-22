@@ -1,9 +1,9 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { rmSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { benchmarkOutput, evaluateTask, manifest, metrics, prepareBenchmarkEmbeddings } from '../bench/search/run.js';
+import { benchmarkModels, benchmarkOutput, evaluateTask, manifest, metrics, prepareBenchmarkEmbeddings, reuseBenchmarkModels } from '../bench/search/run.js';
 import { defaultConfig } from '../src/config/load.js';
 import { findCode } from '../src/index/navigation.js';
 import { searchDocuments } from '../src/index/query.js';
@@ -15,8 +15,36 @@ import { searchCode } from '../src/search/index.js';
 import { alternatives, reciprocalRankFusion, stemTerm, terms } from '../src/search/terms.js';
 import { tempDir, withIndexedFixture } from '../src/selftest/fixtures.js';
 import { estimateTokens } from '../src/util/tokens.js';
+import { sha1 } from '../src/util/hash.js';
 
 describe('plain-English search', () => {
+  it('reuses an installed model directory without downloading and ignores missing or invalid stores', () => {
+    const root = tempDir('gw-search-model-reuse-');
+    const models = path.join(root, 'installed-models');
+    const workspace = path.join(root, 'corpus');
+    try {
+      expect(benchmarkModels([])).toBe(embeddings.embeddingCacheDir(path.resolve('.')));
+      expect(benchmarkModels(['--models', models])).toBe(models);
+      expect(() => benchmarkModels(['--models'])).toThrow('--models requires');
+      expect(() => benchmarkModels(['--models', '--v2'])).toThrow('--models requires');
+      reuseBenchmarkModels([workspace], models);
+      expect(existsSync(embeddings.embeddingCacheDir(workspace))).toBe(false);
+      mkdirSync(models);
+      reuseBenchmarkModels([workspace], models);
+      expect(existsSync(embeddings.embeddingCacheDir(workspace))).toBe(false);
+      writeFileSync(path.join(models, 'weights.bin'), 'unit fixture only');
+      writeFileSync(path.join(models, `${sha1(embeddings.DEFAULT_EMBEDDING_MODEL)}.json`), JSON.stringify({
+        model: embeddings.DEFAULT_EMBEDDING_MODEL, format: embeddings.EMBEDDING_FORMAT, files: ['weights.bin'],
+      }));
+      reuseBenchmarkModels([workspace], models);
+      expect(embeddings.hasLocalEmbeddings(workspace, embeddings.DEFAULT_EMBEDDING_MODEL)).toBe(true);
+      const download = vi.fn();
+      expect(prepareBenchmarkEmbeddings([workspace], false, undefined, download).semanticStatus).toBe('RUN');
+      expect(download).not.toHaveBeenCalled();
+      reuseBenchmarkModels([workspace], path.join(root, 'missing'));
+      expect(existsSync(path.join(models, 'weights.bin'))).toBe(true);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
   it('refuses published or existing benchmark output and accepts only a new explicit directory', () => {
     const root = tempDir('gw-search-output-');
     try {

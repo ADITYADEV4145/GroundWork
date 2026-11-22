@@ -6,6 +6,12 @@ otherwise it is recorded NOT RUN. Explicit `--embeddings` permits benchmark
 setup to download missing models, equivalent to consenting to `gw init --embeddings`.
 Runtime search never downloads. Workspaces are persistent and never reused.
 
+Before optional setup, corpus workspaces reuse a valid installed model from this
+source checkout's `.groundwork/models`. To use another installation offline,
+pass `--models /path/to/.groundwork/models`; this directory must include the
+model manifest and its local files. Valid stores are linked, not downloaded or
+copied. Missing/invalid stores remain NOT RUN without explicit `--embeddings`.
+
 Published output directories are immutable: the runner refuses to evaluate into
 an existing results directory. An intentional independent rerun must specify
 `--out <new directory>`; existing explicit output directories are also refused.

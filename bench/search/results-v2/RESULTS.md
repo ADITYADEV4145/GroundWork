@@ -37,3 +37,9 @@ The runner now refuses existing results directories before evaluation; an
 intentional independent rerun must select `--out <new directory>`. This protects
 the published results from overwrite or accidental loss of the hybrid arm.
 This harness correction is not re-measured on v2.
+
+The runner can now reuse an installed model from the source checkout or explicit
+`--models <directory>` without downloading into fresh corpus workspaces. Missing
+or invalid model stores still require explicit `--embeddings` setup consent.
+This harness correction is also not re-measured; the recorded v2 hybrid arm used
+the explicitly consented installation at evaluation time.

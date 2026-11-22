@@ -14,6 +14,7 @@ import { CandidateIndex } from '../src/reuse/candidates.js';
 import { inspectSource } from '../src/reuse/inspection.js';
 import { thresholds } from '../src/reuse/model.js';
 import { assertCheckScenario, assertStopScenario, CHECK_SCENARIOS, scenarioGit, stopEvent, withCheckScenario, writeScenarioFile } from '../src/reuse/scenarios.js';
+import { tempDir } from '../src/selftest/fixtures.js';
 import { openDb } from '../src/store/db.js';
 import { estimateTokens } from '../src/util/tokens.js';
 
@@ -492,14 +493,20 @@ describe('check command and Stop gate', () => {
   });
 
   it('allows Cursor permission hooks even when loading the hook runner fails', async () => {
-    const loader = `export async function resolve(s, c, next) { if (s.includes('/hooks/run.')) { process.stderr.write('unavailable runner\\n'); throw new Error('unavailable runner'); } return next(s, c); }`;
-    const preload = `import { register } from 'node:module'; register(${JSON.stringify('data:text/javascript,' + encodeURIComponent(loader))}, import.meta.url);`;
-    const result = spawnSync(process.execPath, ['--import', TSX, '--import', 'data:text/javascript,' + encodeURIComponent(preload), MAIN, 'hook', 'cursor', 'pre_tool'], {
-      encoding: 'utf8', input: '{}',
-    });
-    expect(result.status).toBe(0);
-    expect(JSON.parse(result.stdout)).toEqual({ permission: 'allow' });
-    expect(result.stderr).toContain('unavailable runner');
+    const root = tempDir('gw-hook-unavailable-');
+    try {
+      for (const entry of ['client', 'run']) {
+        const marker = path.join(root, entry);
+        const loader = `import { writeFileSync } from 'node:fs'; export async function resolve(s, c, next) { if (s.includes('/hooks/${entry}.')) { writeFileSync(${JSON.stringify(marker)}, 'unavailable'); throw new Error('unavailable runner'); } return next(s, c); }`;
+        const preload = `import { register } from 'node:module'; register(${JSON.stringify('data:text/javascript,' + encodeURIComponent(loader))}, import.meta.url);`;
+        const result = spawnSync(process.execPath, ['--import', TSX, '--import', 'data:text/javascript,' + encodeURIComponent(preload), MAIN, 'hook', 'cursor', 'pre_tool'], {
+          encoding: 'utf8', input: '{}',
+        });
+        expect(result.status).toBe(0);
+        expect(JSON.parse(result.stdout)).toEqual({ permission: 'allow' });
+        expect(readFileSync(marker, 'utf8')).toBe('unavailable');
+      }
+    } finally { rmSync(root, { recursive: true, force: true }); }
   });
 
   it('prioritizes Stop denial while preserving opt-in nonblocking waste summaries', async () => {

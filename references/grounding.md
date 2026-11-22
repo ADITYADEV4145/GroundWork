@@ -20,7 +20,7 @@ Fix the call, or add the definition if you meant to create it. The note is conte
 
 ## On demand: `verify_calls`
 
-Use only for new cross-file calls to symbols not already read/confirmed in this task. Batch remaining calls once with `files:[{file,lines?}]`; skip the explicit call if none remain. Recheck if the relevant definitions change. Automatic grounding and duplicate-gate checks remain active.
+Never re-read a file only to satisfy the verify rule. `verify_calls` is the cheap check: use one batched call instead of rereads for new cross-file calls whose targets are not confirmed by unchanged evidence already in your context. Batch remaining calls once with `files:[{file,lines?}]`; skip the explicit call if none remain. Evidence can carry across continuing steps and sessions only when available in your current context and the relevant definitions are unchanged; recheck affected calls after changes. Another agent's reads are not your evidence. Read bodies only to understand or change behavior; use `read_symbol`, batched with `symbols:[...]` for several helpers. Automatic grounding and duplicate-gate checks remain active.
 
 ```json
 verify_calls({ "file": "src/api/orders.ts", "lines": "30-60" })

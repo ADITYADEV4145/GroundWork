@@ -108,7 +108,7 @@ function readSource(args: { symbol: string; context_lines: number; offset: numbe
 
 const findCodeTool = defineTool({
   name: 'find_code',
-  description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands to related results. Set locations_only: false for signatures/docs. Prefer rg for trivial literal text.',
+  description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands results. Set include_body: true for source with exactly one exact match, otherwise locations stay the default. Set locations_only: false for signatures/docs. Prefer rg for trivial literals. Reuse unchanged evidence carried across continuing steps/sessions.',
   inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(false), offset },
   handler(args, ctx) {
     const { db } = ctx;
@@ -131,7 +131,7 @@ const findCodeTool = defineTool({
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List a file’s symbols and line ranges without reading bodies. Set locations_only: false for signatures. If the symbol is known, go straight to read_symbol.',
+  description: 'List a file’s symbols and line ranges without bodies. Set locations_only: false for signatures. For a known helper use read_symbol, batched for several, instead of whole-file Read. For traces chain callees/read_symbol, not outline+Read.',
   inputSchema: { file: pathInput, locations_only: locationsOnly, offset },
   handler(args, { root, db }) {
     const file = repoRelative(root, args.file);
@@ -148,7 +148,7 @@ const outlineTool = defineTool({
 
 const readSymbolTool = defineTool({
   name: 'read_symbol',
-  description: 'Read exactly one symbol’s source (optional surrounding lines). If ambiguous, pick an ID from the returned candidates.',
+  description: 'Read known helpers instead of whole-file Read. Pass symbol for one or symbols for a budgeted batch (not both); optional context_lines. If ambiguous, pick an ID. Follow source/batch Next calls only if needed. Reuse unchanged evidence carried across continuing steps/sessions.',
   inputSchema: {
     symbol: symbol.optional(),
     symbols: z.array(symbol).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter selectors or IDs for a batch.').optional(),
@@ -171,7 +171,7 @@ const readSymbolTool = defineTool({
 function callsTool(direction: 'callers' | 'callees') {
   return defineTool({
     name: direction,
-    description: direction === 'callers' ? 'List the indexed calls to a symbol, ordered by resolution confidence.' : 'List a symbol’s outgoing calls with resolution confidence, including unresolved calls.',
+    description: direction === 'callers' ? 'List indexed calls to a symbol, ordered by resolution confidence.' : 'List outgoing calls with resolution confidence, including unresolved calls. For traces chain callees/read_symbol (batch bodies), not outline+Read.',
     inputSchema: { symbol, limit: limit(8), offset },
     handler(args, ctx) {
       const s = oneSymbol(direction, args, ctx);

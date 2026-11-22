@@ -2,7 +2,8 @@ import path from 'node:path';
 import ts from 'typescript';
 import { spawnSync } from 'node:child_process';
 import type { CheckFinding } from '../src/reuse/check.js';
-import { summarizeBlockReview } from '../src/selftest/real-repo-review.js';
+import { BLOCK_REVIEW_POLICY, resolutionDetail, summarizeBlockReview } from '../src/selftest/real-repo-review.js';
+import type { ReviewScoring } from '../src/selftest/real-repo-review.js';
 import { shellQuote } from '../src/guards/trimmer.js';
 
 export type Arm = 'baseline' | 'groundwork';
@@ -11,6 +12,9 @@ export type Suite = 'reuse-v2' | 'block-v2';
 export interface BlockTask {
   id: string; repo: string; url: string; commit: string; prompt: string;
   kind: 'clone-prone' | 'hard-negative'; reference_symbol: { file: string; name: string }; why: string;
+  wave?: 3 | 4 | 5 | 6;
+  copy_inviting?: true;
+  vendoring?: boolean;
 }
 export interface Task {
   id: string; repo: string; url: string; commit: string; prompt: string;
@@ -181,13 +185,14 @@ export interface ReviewRow {
   task_id: string; arm: Arm; added: CheckFinding['added']; existing: CheckFinding['existing'];
   probability?: number; signals: CheckFinding['signals']; verdict: 'agree' | 'disagree' | null;
   reviewer: string | null; reasoning: string | null;
+  resolved_by?: { commit: string; note: string };
 }
 const reviewIdentity = (row: Pick<ReviewRow, 'suite' | 'task_id' | 'arm' | 'added' | 'existing'>) => JSON.stringify([row.suite ?? 'reuse-v2', row.task_id, row.arm, row.added, row.existing]);
 export const reviewKey = (row: Pick<ReviewRow, 'suite' | 'kind' | 'task_id' | 'arm' | 'added' | 'existing'>) => JSON.stringify([reviewIdentity(row), row.kind ?? 'duplicate']);
-export function aggregateReview(results: Result[], previous: ReviewRow[], suite: Suite = 'reuse-v2'): ReviewRow[] {
+export function aggregateReview(results: Result[], previous: ReviewRow[], suite: Suite = 'reuse-v2', taskIds?: ReadonlySet<string>): ReviewRow[] {
   const old = new Map(previous.map(row => [reviewKey(row), row]));
   const legacy = new Map(previous.filter(row => !row.kind).map(row => [reviewIdentity(row), row]));
-  const rows = new Map(previous.filter(row => (row.suite ?? 'reuse-v2') !== suite).map(row => [reviewKey(row), row]));
+  const rows = new Map(previous.filter(row => row.resolved_by || (row.suite ?? 'reuse-v2') !== suite || (taskIds && !taskIds.has(row.task_id))).map(row => [reviewKey(row), row]));
   for (const result of results) for (const finding of result.check.findings) {
     if (result.check.status === 'UNAVAILABLE' || finding.severity !== 'BLOCK' || (suite === 'reuse-v2' && !['duplicate', 'duplicate-constant', 'duplicate-file'].includes(finding.kind))) continue;
     const row: ReviewRow = { suite, kind: finding.kind, task_id: result.task_id, arm: result.arm, added: finding.added, existing: finding.existing,
@@ -196,6 +201,7 @@ export function aggregateReview(results: Result[], previous: ReviewRow[], suite:
     if (prior && prior.probability === row.probability && JSON.stringify(prior.signals) === JSON.stringify(row.signals)) {
       row.verdict = prior.verdict; row.reviewer = prior.reviewer; row.reasoning = prior.reasoning;
     }
+    if (prior?.resolved_by) row.resolved_by = prior.resolved_by;
     rows.set(key, row);
   }
   return [...rows.values()];
@@ -245,14 +251,18 @@ export function renderReport(report: Summary): string {
   return lines.join('\n');
 }
 
-export function renderReview(rows: ReviewRow[]): string {
-  const summary = summarizeBlockReview(rows);
+export function renderReview(rows: ReviewRow[], scoring: ReviewScoring[] = []): string {
+  const summary = summarizeBlockReview(rows, scoring);
   const escape = (s: unknown) => String(s ?? '').replace(/\|/g, '\\|').replace(/[\r\n]/g, ' ');
-  return ['# BLOCK review', '', `${summary.agree}/${summary.reviewed} distinct reviewed BLOCK pairs agree (${percent(summary.reviewed ? summary.agreement : null)}); ${summary.pending} pending distinct pairs. Agreement requires a verdict, reviewer and reasoning.`, '',
+  return ['# BLOCK review', '', `${summary.agree}/${summary.reviewed} independent reviewed BLOCK pairs agree (${percent(summary.reviewed ? summary.agreement : null)}); ${summary.pending} pending independent pairs. Agreement requires a verdict, reviewer and reasoning.`, '',
+    BLOCK_REVIEW_POLICY, '', 'Waves 5–6 are copy-inviting by design: their BLOCKs measure precision on agent-made copies, not natural duplicate incidence or task success. Wave 6 keeps vendored bodies unchanged and puts behavior changes in separate wrappers; hard negatives request behaviorally different code without vendoring. The eligible unused got production target pool is exhausted; the approved wave-6 split is 12 Click and 12 pytest clones, with one hard negative per repository and a short got reference exception.', '', resolutionDetail(rows, scoring), '',
+    `Recorded reviewers: ${[...new Set(rows.map(row => row.reviewer?.trim()).filter(Boolean))].sort().join('; ') || 'none'}.`, '',
+    `${summary.symbolAgree}/${summary.symbolReviewed} distinct reviewed BLOCK pairs agree (${percent(summary.symbolReviewed ? summary.symbolAgreement : null)}); ${summary.symbolPending} pending symbol pairs before excluding covered nested functions.`, '',
     `${summary.rawReviewed}/${summary.rawRows} raw rows reviewed; ${summary.rawRows - summary.rawReviewed} raw rows pending. ${summary.coveredFileRows} duplicate-file rows covered by reviewed symbol-level BLOCKs are excluded from distinct counts. File-qualified symbol pairs count once across tasks, arms and line numbers; conflicting attributed verdicts count as disagree.`, '',
-    `Gate: ${summary.reviewed >= 10 && summary.agreement >= 0.9 ? 'PASS' : 'FAIL'}; requires >=10 distinct reviewed pairs and >=90% agreement.`, '',
-    '| Suite | Task | Arm | Kind | Added | Existing | Probability | Signals | Verdict | Reviewer | Reasoning |', '| --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- | --- |',
-    ...rows.map(r => `| ${[r.suite ?? 'reuse-v2', r.task_id, r.arm, r.kind ?? '', `${r.added.file}:${r.added.line} ${r.added.symbol}`, r.existing ? `${r.existing.file}:${r.existing.line} ${r.existing.symbol}` : '', r.probability ?? '', JSON.stringify(r.signals), r.verdict, r.reviewer, r.reasoning].map(escape).join(' | ')} |`), ''].join('\n');
+    `${summary.coveredNestedRows} nested-function rows covered by reviewed enclosing-symbol pairs are excluded from independent counts. Coverage requires matching added and existing file pairs and dotted symbol ancestry on both sides.`, '',
+    `Gate: ${summary.reviewed >= 10 && summary.agreement >= 0.9 ? 'PASS' : 'FAIL'}; requires >=10 independent reviewed pairs and >=90% agreement.`, '',
+    '| Suite | Task | Arm | Kind | Added | Existing | Probability | Signals | Verdict | Reviewer | Reasoning | Resolution |', '| --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- | --- | --- |',
+    ...rows.map(r => `| ${[r.suite ?? 'reuse-v2', r.task_id, r.arm, r.kind ?? '', `${r.added.file}:${r.added.line} ${r.added.symbol}`, r.existing ? `${r.existing.file}:${r.existing.line} ${r.existing.symbol}` : '', r.probability ?? '', JSON.stringify(r.signals), r.verdict, r.reviewer, r.reasoning, r.resolved_by ? `${r.resolved_by.commit}: ${r.resolved_by.note}` : ''].map(escape).join(' | ')} |`), ''].join('\n');
 }
 
 export function renderBlockReport(results: Result[], expectedTasks: number): string {

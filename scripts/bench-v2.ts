@@ -7,6 +7,7 @@ import { Command } from 'commander';
 import { z } from 'zod';
 import { addedLines, aggregateReview, applyOverride, labelReuse, pythonAcceptanceCommand, renderBlockReport, renderReport, renderReview, summarize } from './bench-v2-lib.js';
 import type { Arm, BlockTask, Override, Result, ReviewRow, Run, Suite, Task } from './bench-v2-lib.js';
+import { readReviewScoring } from '../src/selftest/real-repo-review.js';
 
 const project = path.resolve(fileURLToPath(new URL('../', import.meta.url)));
 const defaults = path.join(project, 'bench/reuse-v2');
@@ -14,7 +15,7 @@ const options = new Command().description('Score Benchmark v2 patches; executes 
   .option('--suite <suite>', 'reuse (acceptance + check) or block (check only)', 'reuse')
   .option('--runs <directory>', 'run inputs (default: runs/ or block-runs/ for the suite)')
   .option('--out <directory>', 'results/report/review directory', defaults)
-  .option('--tasks <file>', 'task suite (default: tasks.json or block-tasks.json)')
+  .option('--tasks <file>', 'task suite, including block-tasks-wave3.json through block-tasks-wave6.json with --suite block (default: tasks.json or block-tasks.json)')
   .option('--labels <file>', 'human JSONL overrides (default: output directory/labels.jsonl)')
   .option('--cache <directory>', 'external clones and worktrees', path.join(os.homedir(), 'work/gw-bench-v2'))
   .option('--python <executable>', 'Python for acceptance tests (default: cache/venv/bin/python)')
@@ -40,12 +41,17 @@ const taskSchema = z.object({ id: slug, repo: z.enum(['got', 'click', 'pytest'])
   acceptance: z.object({ path: z.string(), contents: z.string(), command: z.string() }), reference_patch: z.string() }).passthrough();
 const blockTaskSchema = taskSchema.pick({ id: true, repo: true, url: true, commit: true, prompt: true }).extend({
   kind: z.enum(['clone-prone', 'hard-negative']), reference_symbol: z.object({ file: z.string().min(1), name: z.string().min(1) }), why: z.string().min(1),
-}).strict();
+  wave: z.union([z.literal(3), z.literal(4), z.literal(5), z.literal(6)]).optional(), copy_inviting: z.literal(true).optional(),
+  vendoring: z.boolean().optional(),
+}).strict().refine(task => (task.wave !== 5 && task.wave !== 6) || task.copy_inviting === true, 'Waves 5–6 tasks must be copy-inviting')
+  .refine(task => task.wave !== 6 || task.vendoring === (task.kind === 'clone-prone'), 'Wave 6 requires vendoring only for clone-prone tasks');
 const tasks: (Task | BlockTask)[] = checkOnly
   ? z.array(blockTaskSchema).parse(JSON.parse(readFileSync(tasksFile, 'utf8')))
   : z.array(taskSchema).parse(JSON.parse(readFileSync(tasksFile, 'utf8')));
 if (new Set(tasks.map(t => t.id)).size !== tasks.length) throw new Error('Duplicate task IDs');
-const otherTaskIds = new Set((JSON.parse(readFileSync(path.join(defaults, checkOnly ? 'tasks.json' : 'block-tasks.json'), 'utf8')) as { id: string }[]).map(t => t.id));
+const otherTaskIds = new Set(['tasks.json', 'block-tasks.json', 'block-tasks-wave3.json', 'block-tasks-wave4.json', 'block-tasks-wave5.json', 'block-tasks-wave6.json']
+  .map(file => path.join(defaults, file)).filter(file => path.resolve(file) !== path.resolve(tasksFile))
+  .flatMap(file => (JSON.parse(readFileSync(file, 'utf8')) as { id: string }[]).map(t => t.id)));
 if (tasks.some(t => otherTaskIds.has(t.id))) throw new Error('Task IDs must be distinct between suites');
 const pins = JSON.parse(readFileSync(path.join(project, 'bench/real-repos/repos.json'), 'utf8')).repositories as { id: string; url: string; end: string }[];
 for (const task of tasks) {
@@ -187,7 +193,7 @@ for (const run of runs) {
   console.log(`${key(run)}: ${result.status}, success=${result.success ?? 'not evaluated'}, ${result.reuse.label}, gw=${result.check.status}${result.error ? ` (${result.error})` : ''}`);
 }
 const reviewFile = path.join(output, 'block-review.json');
-const review = aggregateReview(results, existsSync(reviewFile) ? readJson<ReviewRow[]>(reviewFile) : [], suite);
+const review = aggregateReview(results, existsSync(reviewFile) ? readJson<ReviewRow[]>(reviewFile) : [], suite, new Set(tasks.map(t => t.id)));
 let markdown: string;
 if (checkOnly) {
   writeFileSync(path.join(output, 'block-report.json'), JSON.stringify({ schemaVersion: 1, suite, mode: 'check-only', expectedTasks: tasks.length, runs: results }, null, 2) + '\n');
@@ -202,5 +208,5 @@ if (checkOnly) {
   writeFileSync(path.join(output, 'report.md'), markdown);
 }
 writeFileSync(reviewFile, JSON.stringify(review, null, 2) + '\n');
-writeFileSync(path.join(output, 'block-review.md'), renderReview(review));
+writeFileSync(path.join(output, 'block-review.md'), renderReview(review, readReviewScoring(output, review)));
 console.log(markdown);

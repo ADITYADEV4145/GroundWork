@@ -1,0 +1,898 @@
+[
+  {
+    "id": "block4-click-missing-callback-lookup",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add MissingCallbackLookup, a new subclass of Context from click.core, in src/click/missing_callback_lookup.py. Its invoke method must work exactly like Context.invoke except it must raise LookupError rather than TypeError when the supplied Command has no callback. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Context.invoke"
+    },
+    "why": "Single behavioral change: raise LookupError rather than TypeError when the supplied Command has no callback. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-parameter-warning-stack",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ParameterWarningStack, a new subclass of Command from click.core, in src/click/parameter_warning_stack.py. Its get_params method must work exactly like Command.get_params except it must use stacklevel=4 rather than 3 for duplicate-option warnings so a plugin wrapper is skipped. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command.get_params"
+    },
+    "why": "Single behavioral change: use stacklevel=4 rather than 3 for duplicate-option warnings so a plugin wrapper is skipped. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-probe-without-help",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ProbeWithoutHelp, a new subclass of Command from click.core, in src/click/probe_without_help.py. Its get_help_option method must work exactly like Command.get_help_option except it must return None immediately when ctx.resilient_parsing is true, before creating or returning the cached help option. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command.get_help_option"
+    },
+    "why": "Single behavioral change: return None immediately when ctx.resilient_parsing is true, before creating or returning the cached help option. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-legacy-short-help",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add LegacyShortHelp, a new subclass of Command from click.core, in src/click/legacy_short_help.py. Its get_short_help_str method must work exactly like Command.get_short_help_str except it must use LEGACY instead of DEPRECATED in the appended deprecation label, including when a custom deprecation message exists. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command.get_short_help_str"
+    },
+    "why": "Single behavioral change: use LEGACY instead of DEPRECATED in the appended deprecation label, including when a custom deprecation message exists. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-vertical-tab-help",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add VerticalTabHelp, a new subclass of Command from click.core, in src/click/vertical_tab_help.py. Its format_help_text method must work exactly like Command.format_help_text except it must truncate the help text at the first vertical tab instead of the first form feed. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command.format_help_text"
+    },
+    "why": "Single behavioral change: truncate the help text at the first vertical tab instead of the first form feed. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-comma-extra-arguments",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add CommaExtraArguments, a new subclass of Command from click.core, in src/click/comma_extra_arguments.py. Its parse_args method must work exactly like Command.parse_args except it must join unexpected extra argument names with a comma and space rather than a space in the failure message. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command.parse_args"
+    },
+    "why": "Single behavioral change: join unexpected extra argument names with a comma and space rather than a space in the failure message. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-yellow-deprecation",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add YellowDeprecation, a new subclass of Command from click.core, in src/click/yellow_deprecation.py. Its invoke method must work exactly like Command.invoke except it must render the deprecation warning in yellow instead of red. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command.invoke"
+    },
+    "why": "Single behavioral change: render the deprecation warning in yellow instead of red. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-hidden-option-suggestions",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add HiddenOptionSuggestions, a new subclass of Command from click.core, in src/click/hidden_option_suggestions.py. Its shell_complete method must work exactly like Command.shell_complete except it must include hidden options in the option-name completion branch; retain all other eligibility checks and chained-command behavior. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command.shell_complete"
+    },
+    "why": "Single behavioral change: include hidden options in the option-name completion branch; retain all other eligibility checks and chained-command behavior. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-suggest-environment",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add SuggestEnvironment, a new subclass of Command from click.core, in src/click/suggest_environment.py. Its _main_shell_completion method must work exactly like Command._main_shell_completion except it must generate the default completion environment variable with the suffix _SUGGEST instead of _COMPLETE; explicitly supplied complete_var values are unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Command._main_shell_completion"
+    },
+    "why": "Single behavioral change: generate the default completion environment variable with the suffix _SUGGEST instead of _COMPLETE; explicitly supplied complete_var values are unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-cleanup-documentation-context",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add CleanupDocumentationContext, a new subclass of Group from click.core, in src/click/cleanup_documentation_context.py. Its to_info_dict method must work exactly like Group.to_info_dict except it must enter each subcommand context with cleanup=True instead of cleanup=False while gathering its information. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Group.to_info_dict"
+    },
+    "why": "Single behavioral change: enter each subcommand context with cleanup=True instead of cleanup=False while gathering its information. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-command-decorator-type-error",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add CommandDecoratorTypeError, a new subclass of Group from click.core, in src/click/command_decorator_type_error.py. Its command method must work exactly like Group.command except it must raise TypeError instead of AssertionError for the invalid bare-callable invocation form; keep the same validation condition and message. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Group.command"
+    },
+    "why": "Single behavioral change: raise TypeError instead of AssertionError for the invalid bare-callable invocation form; keep the same validation condition and message. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-plain-child-group",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add PlainChildGroup, a new subclass of Group from click.core, in src/click/plain_child_group.py. Its group method must work exactly like Group.group except it must when self.group_class is type, choose Group itself rather than type(self) as the implicit child class. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Group.group"
+    },
+    "why": "Single behavioral change: when self.group_class is type, choose Group itself rather than type(self) as the implicit child class. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-replace-result-default",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ReplaceResultDefault, a new subclass of Group from click.core, in src/click/replace_result_default.py. Its result_callback method must work exactly like Group.result_callback except it must default the replace parameter to True rather than False; explicit replace values must still be honored. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Group.result_callback"
+    },
+    "why": "Single behavioral change: default the replace parameter to True rather than False; explicit replace values must still be honored. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-subcommands-heading",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add SubcommandsHeading, a new subclass of Group from click.core, in src/click/subcommands_heading.py. Its format_commands method must work exactly like Group.format_commands except it must label the help section Subcommands instead of Commands. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Group.format_commands"
+    },
+    "why": "Single behavioral change: label the help section Subcommands instead of Commands. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-chain-argument-preview",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ChainArgumentPreview, a new subclass of Group from click.core, in src/click/chain_argument_preview.py. Its parse_args method must work exactly like Group.parse_args except it must in the chain branch assign rest to ctx.args instead of an empty list, while still assigning rest to ctx._protected_args. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Group.parse_args"
+    },
+    "why": "Single behavioral change: in the chain branch assign rest to ctx.args instead of an empty list, while still assigning rest to ctx._protected_args. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-unknown-command-message",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add UnknownCommandMessage, a new subclass of Group from click.core, in src/click/unknown_command_message.py. Its resolve_command method must work exactly like Group.resolve_command except it must say Unknown command rather than No such command in the final missing-command failure. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Group.resolve_command"
+    },
+    "why": "Single behavioral change: say Unknown command rather than No such command in the final missing-command failure. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-reverse-source-priority",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ReverseSourcePriority, a new subclass of CommandCollection from click.core, in src/click/reverse_source_priority.py. Its get_command method must work exactly like CommandCollection.get_command except it must search self.sources in reverse order; commands registered directly on the collection must retain first priority. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "CommandCollection.get_command"
+    },
+    "why": "Single behavioral change: search self.sources in reverse order; commands registered directly on the collection must retain first priority. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-parameter-kind-key",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ParameterKindKey, a new subclass of Parameter from click.core, in src/click/parameter_kind_key.py. Its to_info_dict method must work exactly like Parameter.to_info_dict except it must emit the key kind instead of param_type_name for self.param_type_name. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Parameter.to_info_dict"
+    },
+    "why": "Single behavioral change: emit the key kind instead of param_type_name for self.param_type_name. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-unicode-metavar-ellipsis",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add UnicodeMetavarEllipsis, a new subclass of Parameter from click.core, in src/click/unicode_metavar_ellipsis.py. Its make_metavar method must work exactly like Parameter.make_metavar except it must append the Unicode ellipsis character rather than three ASCII periods when nargs is not 1. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Parameter.make_metavar"
+    },
+    "why": "Single behavioral change: append the Unicode ellipsis character rather than three ASCII periods when nargs is not 1. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-explicit-null-option",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ExplicitNullOption, a new subclass of Parameter from click.core, in src/click/explicit_null_option.py. Its consume_value method must work exactly like Parameter.consume_value except it must treat the presence of self.name in opts with a None value as an explicit COMMANDLINE value and return it without falling through to other sources. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Parameter.consume_value"
+    },
+    "why": "Single behavioral change: treat the presence of self.name in opts with a None value as an explicit COMMANDLINE value and return it without falling through to other sources. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-trim-environment-result",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add TrimEnvironmentResult, a new subclass of Parameter from click.core, in src/click/trim_environment_result.py. Its resolve_envvar_value method must work exactly like Parameter.resolve_envvar_value except it must strip leading and trailing whitespace from a selected environment value before returning it; keep the original truthiness-based selection order. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Parameter.resolve_envvar_value"
+    },
+    "why": "Single behavioral change: strip leading and trailing whitespace from a selected environment value before returning it; keep the original truthiness-based selection order. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-yellow-parameter-warning",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add YellowParameterWarning, a new subclass of Parameter from click.core, in src/click/yellow_parameter_warning.py. Its handle_parse_result method must work exactly like Parameter.handle_parse_result except it must render the parameter deprecation warning in yellow rather than red. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Parameter.handle_parse_result"
+    },
+    "why": "Single behavioral change: render the parameter deprecation warning in yellow rather than red. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-plain-custom-completion",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add PlainCustomCompletion, a new subclass of Parameter from click.core, in src/click/plain_custom_completion.py. Its shell_complete method must work exactly like Parameter.shell_complete except it must construct CompletionItem(c, type=\"plain\") instead of CompletionItem(c) when custom completions return strings. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Parameter.shell_complete"
+    },
+    "why": "Single behavioral change: construct CompletionItem(c, type=\"plain\") instead of CompletionItem(c) when custom completions return strings. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-option-hidden-key",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add OptionHiddenKey, a new subclass of Option from click.core, in src/click/option_hidden_key.py. Its to_info_dict method must work exactly like Option.to_info_dict except it must emit the key is_hidden instead of hidden for self.hidden. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Option.to_info_dict"
+    },
+    "why": "Single behavioral change: emit the key is_hidden instead of hidden for self.hidden. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-nullable-secondary-flag",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add NullableSecondaryFlag, a new subclass of Option from click.core, in src/click/nullable_secondary_flag.py. Its add_to_parser method must work exactly like Option.add_to_parser except it must register the secondary boolean flag spelling with const=None instead of const=False; primary boolean flag spellings still use True. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Option.add_to_parser"
+    },
+    "why": "Single behavioral change: register the secondary boolean flag spelling with const=None instead of const=False; primary boolean flag spellings still use True. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-prompt-without-choices",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add PromptWithoutChoices, a new subclass of Option from click.core, in src/click/prompt_without_choices.py. Its prompt_for_value method must work exactly like Option.prompt_for_value except it must pass show_choices=False for the non-boolean prompt regardless of self.show_choices; boolean confirmation prompting is unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Option.prompt_for_value"
+    },
+    "why": "Single behavioral change: pass show_choices=False for the non-boolean prompt regardless of self.show_choices; boolean confirmation prompting is unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-double-underscore-autoenv",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add DoubleUnderscoreAutoenv, a new subclass of Option from click.core, in src/click/double_underscore_autoenv.py. Its resolve_envvar_value method must work exactly like Option.resolve_envvar_value except it must join ctx.auto_envvar_prefix and the uppercased option name with two underscores rather than one for automatic environment lookup. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Option.resolve_envvar_value"
+    },
+    "why": "Single behavioral change: join ctx.auto_envvar_prefix and the uppercased option name with two underscores rather than one for automatic environment lookup. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-immutable-environment-values",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ImmutableEnvironmentValues, a new subclass of Option from click.core, in src/click/immutable_environment_values.py. Its value_from_envvar method must work exactly like Option.value_from_envvar except it must return a tuple instead of the outer list in the value_depth > 0 branch, including batched multiple/nargs values. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Option.value_from_envvar"
+    },
+    "why": "Single behavioral change: return a tuple instead of the outer list in the value_depth > 0 branch, including batched multiple/nargs values. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-angle-optional-argument",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add AngleOptionalArgument, a new subclass of Argument from click.core, in src/click/angle_optional_argument.py. Its make_metavar method must work exactly like Argument.make_metavar except it must surround an optional argument metavar with angle brackets instead of square brackets. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Argument.make_metavar"
+    },
+    "why": "Single behavioral change: surround an optional argument metavar with angle brackets instead of square brackets. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-casefold-argument-name",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add CasefoldArgumentName, a new subclass of Argument from click.core, in src/click/casefold_argument_name.py. Its _parse_decls method must work exactly like Argument._parse_decls except it must casefold the normalized internal argument name instead of lowercasing it; keep the external declaration unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "Argument._parse_decls"
+    },
+    "why": "Single behavioral change: casefold the normalized internal argument name instead of lowercasing it; keep the external declaration unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-synopsis-usage-prefix",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add SynopsisUsagePrefix, a new subclass of HelpFormatter from click.formatting, in src/click/synopsis_usage_prefix.py. Its write_usage method must work exactly like HelpFormatter.write_usage except it must use Synopsis: rather than Usage: as the default prefix; an explicitly supplied prefix is unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/formatting.py",
+      "name": "HelpFormatter.write_usage"
+    },
+    "why": "Single behavioral change: use Synopsis: rather than Usage: as the default prefix; an explicitly supplied prefix is unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-flow-help-paragraphs",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add FlowHelpParagraphs, a new subclass of HelpFormatter from click.formatting, in src/click/flow_help_paragraphs.py. Its write_text method must work exactly like HelpFormatter.write_text except it must pass preserve_paragraphs=False rather than True to wrap_text. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/formatting.py",
+      "name": "HelpFormatter.write_text"
+    },
+    "why": "Single behavioral change: pass preserve_paragraphs=False rather than True to wrap_text. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-wider-definition-minimum",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add WiderDefinitionMinimum, a new subclass of HelpFormatter from click.formatting, in src/click/wider_definition_minimum.py. Its write_dl method must work exactly like HelpFormatter.write_dl except it must use 20 rather than 10 as the minimum description text width. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/formatting.py",
+      "name": "HelpFormatter.write_dl"
+    },
+    "why": "Single behavioral change: use 20 rather than 10 as the minimum description text width. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-double-count-action",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add DoubleCountAction, a new subclass of _Option from click.parser, in src/click/double_count_action.py. Its process method must work exactly like _Option.process except it must increment the count action by 2 instead of 1; every other action is unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_Option.process"
+    },
+    "why": "Single behavioral change: increment the count action by 2 instead of 1; every other action is unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-partial-argument-value-error",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add PartialArgumentValueError, a new subclass of _Argument from click.parser, in src/click/partial_argument_value_error.py. Its process method must work exactly like _Argument.process except it must raise ValueError rather than BadArgumentUsage for a partially missing multi-value argument, preserving its message. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_Argument.process"
+    },
+    "why": "Single behavioral change: raise ValueError rather than BadArgumentUsage for a partially missing multi-value argument, preserving its message. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-colon-argument-terminator",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ColonArgumentTerminator, a new subclass of _OptionParser from click.parser, in src/click/colon_argument_terminator.py. Its _process_args_for_options method must work exactly like _OptionParser._process_args_for_options except it must recognize :: rather than -- as the unconditional end-of-options marker; -- must follow normal option processing. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_OptionParser._process_args_for_options"
+    },
+    "why": "Single behavioral change: recognize :: rather than -- as the unconditional end-of-options marker; -- must follow normal option processing. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-five-option-suggestions",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add FiveOptionSuggestions, a new subclass of _OptionParser from click.parser, in src/click/five_option_suggestions.py. Its _match_long_opt method must work exactly like _OptionParser._match_long_opt except it must request at most five close matches rather than the default three when constructing an unknown-option error. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_OptionParser._match_long_opt"
+    },
+    "why": "Single behavioral change: request at most five close matches rather than the default three when constructing an unknown-option error. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-sorted-unknown-short-options",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add SortedUnknownShortOptions, a new subclass of _OptionParser from click.parser, in src/click/sorted_unknown_short_options.py. Its _match_short_opt method must work exactly like _OptionParser._match_short_opt except it must sort unknown short-option letters when reconstructing the final ignored-option token; known option processing and order are unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_OptionParser._match_short_opt"
+    },
+    "why": "Single behavioral change: sort unknown short-option letters when reconstructing the final ignored-option token; known option processing and order are unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-list-option-values",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ListOptionValues, a new subclass of _OptionParser from click.parser, in src/click/list_option_values.py. Its _get_value_from_state method must work exactly like _OptionParser._get_value_from_state except it must produce a list instead of a tuple when consuming a fixed nargs greater than one. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_OptionParser._get_value_from_state"
+    },
+    "why": "Single behavioral change: produce a list instead of a tuple when consuming a fixed nargs greater than one. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-colon-option-assignment",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ColonOptionAssignment, a new subclass of _OptionParser from click.parser, in src/click/colon_option_assignment.py. Its _process_opts method must work exactly like _OptionParser._process_opts except it must split attached long-option values on the first colon rather than the first equals sign; keep the long/short dispatch and unknown-option handling. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_OptionParser._process_opts"
+    },
+    "why": "Single behavioral change: split attached long-option values on the first colon rather than the first equals sign; keep the long/short dispatch and unknown-option handling. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-type-class-key",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add TypeClassKey, a new subclass of ParamType from click.types, in src/click/type_class_key.py. Its to_info_dict method must work exactly like ParamType.to_info_dict except it must emit type_class instead of param_type as the dictionary key for the derived class label. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "ParamType.to_info_dict"
+    },
+    "why": "Single behavioral change: emit type_class instead of param_type as the dictionary key for the derived class label. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-ignore-invalid-utf8",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add IgnoreInvalidUtf8, a new subclass of StringParamType from click.types, in src/click/ignore_invalid_utf8.py. Its convert method must work exactly like StringParamType.convert except it must use errors=\"ignore\" instead of errors=\"replace\" in both last-resort UTF-8 decoding branches; earlier decoding attempts are unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "StringParamType.convert"
+    },
+    "why": "Single behavioral change: use errors=\"ignore\" instead of errors=\"replace\" in both last-resort UTF-8 decoding branches; earlier decoding attempts are unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-comma-choice-metavar",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add CommaChoiceMetavar, a new subclass of Choice from click.types, in src/click/comma_choice_metavar.py. Its get_metavar method must work exactly like Choice.get_metavar except it must join alternatives with commas instead of vertical bars in both metavar branches. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "Choice.get_metavar"
+    },
+    "why": "Single behavioral change: join alternatives with commas instead of vertical bars in both metavar branches. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-normalized-choice-value",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add NormalizedChoiceValue, a new subclass of Choice from click.types, in src/click/normalized_choice_value.py. Its convert method must work exactly like Choice.convert except it must return the matched normalized value rather than the original choice object. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "Choice.convert"
+    },
+    "why": "Single behavioral change: return the matched normalized value rather than the original choice object. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-typed-choice-completion",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add TypedChoiceCompletion, a new subclass of Choice from click.types, in src/click/typed_choice_completion.py. Its shell_complete method must work exactly like Choice.shell_complete except it must construct completion items with type=\"choice\" rather than the default type. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "Choice.shell_complete"
+    },
+    "why": "Single behavioral change: construct completion items with type=\"choice\" rather than the default type. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-last-date-format-first",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add LastDateFormatFirst, a new subclass of DateTime from click.types, in src/click/last_date_format_first.py. Its convert method must work exactly like DateTime.convert except it must try self.formats in reverse order so the last configured format wins when several formats accept the input. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "DateTime.convert"
+    },
+    "why": "Single behavioral change: try self.formats in reverse order so the last configured format wins when several formats accept the input. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-numeric-type-error",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add NumericTypeError, a new subclass of _NumberParamTypeBase from click.types, in src/click/numeric_type_error.py. Its convert method must work exactly like _NumberParamTypeBase.convert except it must handle TypeError using the same self.fail path as ValueError, while keeping the existing error text. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "_NumberParamTypeBase.convert"
+    },
+    "why": "Single behavioral change: handle TypeError using the same self.fail path as ValueError, while keeping the existing error text. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-closed-upper-numeric-bound",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ClosedUpperNumericBound, a new subclass of _NumberRangeBase from click.types, in src/click/closed_upper_numeric_bound.py. Its convert method must work exactly like _NumberRangeBase.convert except it must treat the upper bound as closed even when self.max_open is True, using operator.gt for that comparison; lower-bound and clamp behavior are otherwise unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "_NumberRangeBase.convert"
+    },
+    "why": "Single behavioral change: treat the upper bound as closed even when self.max_open is True, using operator.gt for that comparison; lower-bound and clamp behavior are otherwise unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-named-range-variable",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add NamedRangeVariable, a new subclass of _NumberRangeBase from click.types, in src/click/named_range_variable.py. Its _describe_range method must work exactly like _NumberRangeBase._describe_range except it must display value rather than x as the variable in all range-description strings. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "_NumberRangeBase._describe_range"
+    },
+    "why": "Single behavioral change: display value rather than x as the variable in all range-description strings. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-semicolon-boolean-states",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add SemicolonBooleanStates, a new subclass of BoolParamType from click.types, in src/click/semicolon_boolean_states.py. Its convert method must work exactly like BoolParamType.convert except it must separate recognized boolean state names with a semicolon and space instead of a comma and space in the error message. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "BoolParamType.convert"
+    },
+    "why": "Single behavioral change: separate recognized boolean state names with a semicolon and space instead of a comma and space in the error message. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-strict-trailing-uuid-space",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add StrictTrailingUuidSpace, a new subclass of UUIDParameterType from click.types, in src/click/strict_trailing_uuid_space.py. Its convert method must work exactly like UUIDParameterType.convert except it must strip only leading whitespace before parsing, leaving trailing whitespace for UUID validation to reject. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "UUIDParameterType.convert"
+    },
+    "why": "Single behavioral change: strip only leading whitespace before parsing, leaving trailing whitespace for UUID validation to reject. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-file-open-error-prefix",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add FileOpenErrorPrefix, a new subclass of File from click.types, in src/click/file_open_error_prefix.py. Its convert method must work exactly like File.convert except it must prefix the existing OSError failure message with Cannot open followed by a space. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "File.convert"
+    },
+    "why": "Single behavioral change: prefix the existing OSError failure message with Cannot open followed by a space. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-executable-path-metadata",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ExecutablePathMetadata, a new subclass of Path from click.types, in src/click/executable_path_metadata.py. Its to_info_dict method must work exactly like Path.to_info_dict except it must include an additional executable key with the value self.executable in the information dictionary. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "Path.to_info_dict"
+    },
+    "why": "Single behavioral change: include an additional executable key with the value self.executable in the information dictionary. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-list-composite-values",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add ListCompositeValues, a new subclass of Tuple from click.types, in src/click/list_composite_values.py. Its convert method must work exactly like Tuple.convert except it must return the converted elements as a list rather than a tuple; arity validation is unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/types.py",
+      "name": "Tuple.convert"
+    },
+    "why": "Single behavioral change: return the converted elements as a list rather than a tuple; arity validation is unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-first-line-extra-indent",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add FirstLineExtraIndent, a new subclass of TextWrapper from click._textwrap, in src/click/first_line_extra_indent.py. Its extra_indent method must work exactly like TextWrapper.extra_indent except it must add the temporary indent only to initial_indent, not subsequent_indent; save and restore both original fields as before. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/_textwrap.py",
+      "name": "TextWrapper.extra_indent"
+    },
+    "why": "Single behavioral change: add the temporary indent only to initial_indent, not subsequent_indent; save and restore both original fields as before. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-crlf-indented-text",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add CrlfIndentedText, a new subclass of TextWrapper from click._textwrap, in src/click/crlf_indented_text.py. Its indent_only method must work exactly like TextWrapper.indent_only except it must join the indented lines with CRLF instead of LF. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/_textwrap.py",
+      "name": "TextWrapper.indent_only"
+    },
+    "why": "Single behavioral change: join the indented lines with CRLF instead of LF. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-quiet-eta-progressbar",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add quiet_eta_progressbar in src/click/quiet_eta_progressbar.py. It must work exactly like progressbar from src/click/termui.py except it must always forward show_eta=False to ProgressBar regardless of the supplied show_eta argument; preserve every other forwarded argument and color resolution. Keep the signature and all other behavior unchanged; do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "progressbar"
+    },
+    "why": "Single behavioral change: always forward show_eta=False to ProgressBar regardless of the supplied show_eta argument; preserve every other forwarded argument and color resolution. The sibling factory retains the full argument-forwarding structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-alternate-zsh-word-variable",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add AlternateZshWordVariable, a new subclass of ZshComplete from click.shell_completion, in src/click/alternate_zsh_word_variable.py. Its get_completion_args method must work exactly like ZshComplete.get_completion_args except it must read the word list from SUGGEST_WORDS rather than COMP_WORDS; still read the index from COMP_CWORD. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/shell_completion.py",
+      "name": "ZshComplete.get_completion_args"
+    },
+    "why": "Single behavioral change: read the word list from SUGGEST_WORDS rather than COMP_WORDS; still read the index from COMP_CWORD. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-tab-zsh-record",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add TabZshRecord, a new subclass of ZshComplete from click.shell_completion, in src/click/tab_zsh_record.py. Its format_completion method must work exactly like ZshComplete.format_completion except it must separate the three output fields with tabs rather than newlines, leaving value escaping and the help sentinel unchanged. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/shell_completion.py",
+      "name": "ZshComplete.format_completion"
+    },
+    "why": "Single behavioral change: separate the three output fields with tabs rather than newlines, leaving value escaping and the help sentinel unchanged. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-click-empty-fish-partial",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add EmptyFishPartial, a new subclass of FishComplete from click.shell_completion, in src/click/empty_fish_partial.py. Its get_completion_args method must work exactly like FishComplete.get_completion_args except it must remove the trailing argument when it equals incomplete even if incomplete is empty; keep all other slicing and return behavior. Keep the signature and all other behavior unchanged, retaining the base class context and any method decorators. Preserve the original parent-call targets when the reference uses super(); do not edit existing modules.",
+    "reference_symbol": {
+      "file": "src/click/shell_completion.py",
+      "name": "FishComplete.get_completion_args"
+    },
+    "why": "Single behavioral change: remove the trailing argument when it equals incomplete even if incomplete is empty; keep all other slicing and return behavior. The new subclass retains the receiver context and the existing builder/dispatch structure.",
+    "wave": 4
+  },
+  {
+    "id": "block4-pytest-manifest-suffix-counts",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add manifest_suffix_counts(names) in src/_pytest/manifest_suffix_counts.py. Given manifest path strings, return a sorted dictionary counting lowercased final suffixes, using <none> for names without a suffix. A trailing slash identifies a directory and must be ignored. Unlike FastFilesCompleter.__call__, this summarizes supplied manifest strings: never glob, inspect the filesystem, or emit shell completions.",
+    "reference_symbol": {
+      "file": "src/_pytest/_argcomplete.py",
+      "name": "FastFilesCompleter.__call__"
+    },
+    "why": "Filename iteration and suffix handling resemble a completer, but aggregation of supplied manifest names has different semantics from filesystem completion.",
+    "wave": 4
+  },
+  {
+    "id": "block4-pytest-manifest-origin-label",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add manifest_origin_label(value) in src/_pytest/manifest_origin_label.py. Convert a manifest location to text and return remote for an http:// or https:// prefix, absolute for a POSIX-rooted path, otherwise relative; if conversion to text raises, return invalid. Unlike Code.path, this is lexical classification: do not test existence, resolve paths, or return a Path object.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/code.py",
+      "name": "Code.path"
+    },
+    "why": "Guard/fallback path classification can look like Code.path but must never perform its filesystem-resolution behavior.",
+    "wave": 4
+  },
+  {
+    "id": "block4-pytest-event-window-filter",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add event_window_filter(events, start, stop) in src/_pytest/event_window_filter.py. From dictionaries with an integer tick, keep those with start <= tick < stop, excluding records whose hidden value is true; preserve input order and do not mutate the records. Unlike Traceback.cut, this filters timestamped event dictionaries, not frames, file paths, or source line numbers.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/code.py",
+      "name": "Traceback.cut"
+    },
+    "why": "Ordered filtering and an early eligibility check resemble traceback cutting, but the units, record types and exclusion rules differ.",
+    "wave": 4
+  },
+  {
+    "id": "block4-pytest-mapping-value-kind-counts",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add mapping_value_kind_counts(mapping) in src/_pytest/mapping_value_kind_counts.py. Iterate mapping items and return counts for null, bool, number, text, and other based on each value, checking bool before number. Return all five keys, including zero counts. Unlike PrettyPrinter._format_dict_items, do not render keys or values, write to a stream, or apply width and indentation rules.",
+    "reference_symbol": {
+      "file": "src/_pytest/_io/pprint.py",
+      "name": "PrettyPrinter._format_dict_items"
+    },
+    "why": "A mapping-item loop shares a common structural shape with formatting, but categorical counting is not pretty-printing.",
+    "wave": 4
+  }
+]

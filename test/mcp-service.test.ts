@@ -102,6 +102,18 @@ describe.skipIf(process.platform === 'win32')('persistent MCP service', () => {
     expect(await call(await client(), 'read_symbol', { symbol: 'normalize' })).toContain('value.trim');
   }, 20000);
 
+  it('gates explore-first descriptions per root without removing the tool', async () => {
+    const other = tempDir('gw-service-default-');
+    peers.push(other);
+    mkdirSync(path.join(root, '.groundwork'));
+    writeFileSync(path.join(root, '.groundwork/config.json'), JSON.stringify({ navigation: { experimentalReadPaths: true } }));
+    const a = await client(), b = await client(other);
+    const description = async (value: Client) => (await value.listTools()).tools.find((tool) => tool.name === 'explore')!.description;
+    expect(await description(a)).toContain('Experimental read paths enabled: start trace');
+    expect(await description(b)).toContain('Optional trace context');
+    expect(await description(b)).not.toContain('start trace');
+  }, 20000);
+
   it('shares one service across concurrent clients, refreshes writes/config and expires idle', async () => {
     const [first, second] = await Promise.all([client(), client()]);
     const pid = (await greeting()).pid;

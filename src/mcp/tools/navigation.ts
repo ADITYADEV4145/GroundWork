@@ -186,7 +186,7 @@ const readSymbolTool = defineTool({
 
 const exploreTool = defineTool({
   name: 'explore',
-  description: 'Start trace/how-does-X-work questions here: ranked definitions with bodies, direct callers/callees with confidence, definition/call-site locations and involved files in one budgeted payload. Answer directly; follow source/edge Next calls only for missing details. Pass query or exact symbol/ID, not both. Not a complete runtime call graph.',
+  description: 'Optional trace context: ranked definitions with bodies, direct callers/callees with confidence, definition/call-site locations and involved files in one budgeted payload. Answer directly when sufficient; follow source/edge Next calls only for missing details. Pass query or exact symbol/ID, not both. Not a complete runtime call graph.',
   inputSchema: { query: text.optional(), symbol: symbol.optional(), limit: z.number().int().min(1).max(5).default(2), offset },
   handler(args, ctx) {
     if (Boolean(args.query) === Boolean(args.symbol)) return 'Provide exactly one of query or symbol.';

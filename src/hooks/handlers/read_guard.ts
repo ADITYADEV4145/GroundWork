@@ -1,5 +1,6 @@
 import { TextDecoder } from 'node:util';
 import * as z from 'zod';
+import { experimentalReadPathsEnabled } from '../../config/sections/navigation.js';
 import { sha1 } from '../../util/hash.js';
 import { log } from '../../util/log.js';
 import { readRepoFile, repoRelative } from '../../util/repo-file.js';
@@ -152,7 +153,7 @@ export const readGuard: HookHandler = {
     if (eventLog) log(root, 'info', eventLog.name, { sessionId: id, file, from, to, estimatedTokensSaved: eventLog.estimatedTokensSaved, method: TOKEN_ESTIMATE_METHOD });
     if (result) return result;
     if (forced) return null;
-    if (input.data.offset === undefined && input.data.limit === undefined && buf.length >= LARGE_READ_MIN_BYTES) {
+    if (experimentalReadPathsEnabled(config) && input.data.offset === undefined && input.data.limit === undefined && buf.length >= LARGE_READ_MIN_BYTES) {
       const { largeReadContext } = await import('../large-read.js');
       const message = await largeReadContext(root, file, buf, config, recentQuery);
       if (!message) return null;

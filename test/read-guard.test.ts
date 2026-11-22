@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
@@ -58,6 +58,8 @@ it('compacts a large indexed whole-file read with query-ranked bodies and an exa
     await initSqlBackend();
     await refreshIndex(root);
     const payload = { cwd: root, session_id: 'hint-test', tool_name: 'Read', tool_input: { file_path: file } };
+    expect(await dispatch(normalise('claude', 'pre_tool', payload), root)).toMatchObject({ action: 'context', message: expect.stringContaining('Large read allowed') });
+    writeFileSync(gwPath(root, 'config.json'), JSON.stringify({ navigation: { experimentalReadPaths: true } }));
     await dispatch(normalise('claude', 'post_tool', { ...payload, tool_name: 'mcp__plugin_groundwork_groundwork__find_code', tool_input: { query: 'wanted' } }), root);
     const compact = await dispatch(normalise('claude', 'pre_tool', payload), root);
     expect(compact).toMatchObject({ action: 'deny', message: expect.stringContaining('Repeat the exact Read to get the full file') });
@@ -77,6 +79,8 @@ it('compacts a large indexed whole-file read with query-ranked bodies and an exa
 it('does not add denials for ranged, small, unindexed, empty, changed, subagent or malformed reads', async () => {
   const root = tempDir('gw-read-compact-safety-');
   try {
+    mkdirSync(gwPath(root), { recursive: true });
+    writeFileSync(gwPath(root, 'config.json'), JSON.stringify({ navigation: { experimentalReadPaths: true } }));
     const file = path.join(root, 'sample.ts');
     const source = 'export function target() { return 1; }\n' + '// useful source context\n'.repeat(150);
     const payload = { cwd: root, session_id: 'compact-safety', tool_name: 'Read', tool_input: { file_path: file } };

@@ -31,6 +31,12 @@ describe('shipped task-aware guidance', () => {
     expect(verifyCallsTool.description).toContain('Never re-read');
     expect(verifyCallsTool.description).toContain('one batched call instead of rereads');
     expect(read('SKILL.md')).toContain('start with `explore(');
+    for (const file of ['SKILL.md', 'references/navigation.md']) {
+      expect(read(file)).toContain('Only with experimental read paths enabled');
+      expect(read(file)).toContain('Experimental read paths default off.');
+      expect(read(file)).toContain('GW_EXPERIMENTAL_READ_PATHS=1');
+    }
+    expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'explore')!.description).not.toContain('Start trace');
     expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'explore')!.description).toContain('Answer directly');
   });
 });

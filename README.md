@@ -250,6 +250,37 @@ Commit `config.json` to share your team's preferences. Everything else in `.grou
 
 Every command accepts `--json`.
 
+## Benchmark results
+
+Recorded Devin-agent runs show **less copied code, not demonstrated token or
+money savings**. Reuse v2 copied-code rate fell from **14/20 (70%) to 0/20 (0%)**.
+Task success was identical in each suite; grounding v3 had zero wrong calls in
+both arms. Estimated tool-output reductions were not statistically significant
+(all 95% intervals cross zero), and GroundWork was slower in the timed suites.
+These small task sets do not establish performance on other agents or projects.
+
+![Estimated tool-output reductions with 95% task-bootstrap intervals, all crossing zero](docs/assets/bench/token-reduction.svg)
+
+Positive reduction means less output; negative means more. Intervals bootstrap
+paired tasks after summing repeats, not independent sessions. Long-horizon
+tasks share conversation context. This is bytes/4, **not billed model tokens**;
+provider usage and dollar savings are unavailable.
+
+![Reuse v2 copied-code rates with 95% Wilson intervals](docs/assets/bench/copied-code.svg)
+
+Reviewed copied-code labels in reuse v2 are distinct from long-horizon raw
+`duplicatesAdded` scorer findings (25 baseline vs 24 GroundWork).
+
+![Task success counts for all four benchmarks, with both navigation versions shown separately](docs/assets/bench/success.svg)
+
+![Mean task wall time: GroundWork slower for compact navigation and long-horizon](docs/assets/bench/wall-time.svg)
+
+Sources: navigation [initial](bench/nav/evidence-initial.json) and
+[compact](bench/nav/evidence.json), [long-horizon](bench/long-horizon/results/2026-11-21T21-44-09-424Z-long-horizon.json),
+[reuse v2](bench/reuse-v2/report.json), and [grounding v3](bench/grounding/results/report.json).
+Regenerate the static charts with `npm run bench:charts` (no dependencies or network).
+Navigation versions are separate runs, not pooled. Detailed tables follow.
+
 ## Long-horizon benchmark
 
 **Devin-agent results (6 sessions: 3 baseline, 3 Groundwork; 10 sequential tasks each); tokens are estimated tool-output tokens (bytes/4), not model tokens**

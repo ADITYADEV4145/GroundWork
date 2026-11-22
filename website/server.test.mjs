@@ -72,6 +72,12 @@ test('static server contains malformed targets and never exposes repository file
   const home = await fetch(base);
   assert.equal(home.status, 200, 'server stays alive after invalid request');
   assert.match(await home.text(), /Big ideas/);
+  for (const name of ['token-reduction', 'copied-code', 'success', 'wall-time']) {
+    const chart = await fetch(`${base}/bench/${name}.svg`);
+    assert.equal(chart.status, 200);
+    assert.equal(chart.headers.get('content-type'), 'image/svg+xml');
+    assert.match(await chart.text(), /<svg/);
+  }
   for (const path of ['/package.json', '/server.mjs', '/.git/config', '/%2e%2e/package.json']) {
     assert.equal((await fetch(base + path)).status, 404, path);
   }

@@ -29,6 +29,23 @@ afterEach(() => { for (const root of directories.splice(0)) rmSync(root, { recur
 const config = () => { const c = defaultConfig(); c.types.timeoutMs = 20000; return c; };
 
 describe('optional project types', () => {
+  it('keeps informational type diagnostics out of Stop, including mixed reports', async () => {
+    const root = fixture();
+    writeFileSync(path.join(root, 'app.ts'), 'function identity(value) { return value; }\n');
+    const c = config(); c.reuse.duplicateGate = false;
+    const report = await checkRepository(root, { config: c });
+    expect(report.types?.findings).toEqual(expect.arrayContaining([expect.objectContaining({ code: 7006, blocking: false })]));
+    expect(renderTypes(report.types!, 1000)).toContain('7006');
+    for (const profile of ['standard', 'strict'] as const) {
+      c.profile = profile;
+      expect(await duplicateGate.run(stopEvent(root, false, profile), { root, config: c })).toMatchObject({ action: 'allow' });
+    }
+    writeFileSync(path.join(root, 'app.ts'), 'function identity(value) { return value; }\nfunction count(n: number) { return n; }\ncount("wrong");\n');
+    const mixed = await duplicateGate.run(stopEvent(root, false, 'mixed-types'), { root, config: c });
+    expect(mixed).toMatchObject({ action: 'deny' });
+    expect(mixed?.message).toContain('Argument of type');
+    expect(mixed?.message).not.toContain('implicitly');
+  }, 60000);
   it('includes new type errors in check and strict Stop, reports standard context, and respects stopGate', async () => {
     const root = fixture();
     writeFileSync(path.join(root, 'app.ts'), 'function count(n: number) { return n; }\ncount("wrong");\n');

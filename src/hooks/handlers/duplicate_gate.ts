@@ -15,7 +15,7 @@ export const duplicateGate: HookHandler = {
     try {
       const { checkRepository, formatFinding } = await import('../../reuse/check.js');
       const report = await checkRepository(root, { config, timeoutMs: 1500, stopHook: true });
-      const blocks = report.findings.filter((f) => (config.reuse.duplicateGate || f.grounding?.kind === 'type') && (f.severity === 'BLOCK' || f.grounding?.kind === 'type'));
+      const blocks = report.findings.filter((f) => (config.reuse.duplicateGate || f.grounding?.kind === 'type') && f.severity === 'BLOCK');
       if (!blocks.length) return { action: 'allow' };
       const findingSet = sha1(JSON.stringify(blocks.map((f) => f.id).sort()));
       const session = sha1(`${ev.agent}:${ev.sessionId ?? '<anonymous>'}`);

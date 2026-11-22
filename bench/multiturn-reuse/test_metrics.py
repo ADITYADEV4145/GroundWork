@@ -7,6 +7,27 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_comprehension_targets_do_not_rebind_outer_imports(self):
+        baseline={'src/pkg/helpers.py':'def canonical(x):\n    return x\n'}
+        expressions=['[helper for helper in xs]', '{helper for helper in xs}',
+                     '{helper: helper for helper in xs}', '(helper for helper in xs)',
+                     '[item for (helper, item) in xs]']
+        for prefix in ['from pkg.helpers import canonical as helper\ndef prepare(xs):\n',
+                       'def prepare(xs):\n    from pkg.helpers import canonical as helper\n']:
+            for expression in expressions:
+                with self.subTest(prefix=prefix,expression=expression):
+                    code=prefix+'    result = '+expression+'\n    return helper(xs)\n'
+                    self.assertIn(('src/pkg/helpers.py','canonical'),CodeGraph({**baseline,'src/feature.py':code}).reachable('src/feature.py','prepare'))
+        for expression in ['[helper(x) for helper in xs]',
+                           '[helper(x) for helper in xs for x in helper(xs)]',
+                           '[[helper(x) for x in xs] for helper in xs]']:
+            code='def prepare(xs):\n    from pkg.helpers import canonical as helper\n    return '+expression+'\n'
+            self.assertNotIn(('src/pkg/helpers.py','canonical'),CodeGraph({**baseline,'src/feature.py':code}).reachable('src/feature.py','prepare'))
+        code='def prepare(xs):\n    from pkg.helpers import canonical as helper\n    return [helper for helper in helper(xs)]\n'
+        self.assertIn(('src/pkg/helpers.py','canonical'),CodeGraph({**baseline,'src/feature.py':code}).reachable('src/feature.py','prepare'))
+        code='def prepare(xs):\n    from pkg.helpers import canonical as helper\n    result = [(helper := x) for x in xs]\n    return helper(xs)\n'
+        self.assertNotIn(('src/pkg/helpers.py','canonical'),CodeGraph({**baseline,'src/feature.py':code}).reachable('src/feature.py','prepare'))
+
     def test_same_name_conditional_redefinitions_preserve_both_clone_sources(self):
         first='\n'.join('    value = value + '+str(i) for i in range(30))+'\n    return value\n'
         second='\n'.join('    if value:\n        value = not value' for _ in range(30))+'\n    return value\n'

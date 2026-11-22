@@ -183,9 +183,11 @@ class CodeGraph:
             bindings[node.args.vararg.arg] = None
         if node.args.kwarg:
             bindings[node.args.kwarg.arg] = None
+        comprehension_targets = {id(target) for child in ast.walk(node) if isinstance(child, ast.comprehension)
+                                 for target in ast.walk(child.target)}
         # Python's lexical locals shadow module names even before assignment.
         for child in ast.walk(node):
-            if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Store):
+            if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Store) and id(child) not in comprehension_targets:
                 bindings[child.id] = None
             elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child is not node:
                 bindings[child.name] = None
@@ -201,6 +203,26 @@ class CodeGraph:
 
         def visit(statement):
             if isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+                return
+            if isinstance(statement, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+                visit(statement.generators[0].iter)
+                outer = dict(bindings)
+                for index, generator in enumerate(statement.generators):
+                    if index:
+                        visit(generator.iter)
+                    visit(generator.target)
+                    for condition in generator.ifs:
+                        visit(condition)
+                if isinstance(statement, ast.DictComp):
+                    visit(statement.key)
+                    visit(statement.value)
+                else:
+                    visit(statement.elt)
+                bindings.clear()
+                bindings.update(outer)
+                for child in ast.walk(statement):
+                    if isinstance(child, ast.NamedExpr) and isinstance(child.target, ast.Name):
+                        bindings[child.target.id] = None
                 return
             if isinstance(statement, (ast.Assign, ast.AnnAssign, ast.AugAssign, ast.NamedExpr)):
                 if statement.value is not None:

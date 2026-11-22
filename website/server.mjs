@@ -5,6 +5,8 @@ import { readFile } from 'node:fs/promises';
 const types = new Map([
   ['/', ['index.html', 'text/html; charset=utf-8']],
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
+  ['/benchmarks', ['benchmarks.html', 'text/html; charset=utf-8']],
+  ['/benchmarks.html', ['benchmarks.html', 'text/html; charset=utf-8']],
   ['/favicon.svg', ['favicon.svg', 'image/svg+xml']],
   ['/icon-192.png', ['icon-192.png', 'image/png']],
   ['/icon-512.png', ['icon-512.png', 'image/png']],

@@ -43,7 +43,7 @@ function request(payload: object, timeoutMs: number): Promise<unknown> {
 }
 
 export async function typeCheck(root: string, changed: ChangedFile[], config: GroundworkConfig, options: { timeoutMs?: number; base?: string } = {}): Promise<TypeCheckResult> {
-  const safe = changed.map((f) => ({ ...f, file: path.relative(root, path.resolve(root, f.file)) })).filter((f) => f.file && !f.file.startsWith(`..${path.sep}`) && f.file !== '..' && !path.isAbsolute(f.file) && (f.ranges === null || f.ranges.length));
+  const safe = changed.map((f) => ({ ...f, file: path.relative(root, path.resolve(root, f.file)) })).filter((f) => f.file && !f.file.split(path.sep).includes('.groundwork') && !f.file.startsWith(`..${path.sep}`) && f.file !== '..' && !path.isAbsolute(f.file) && (f.ranges === null || f.ranges.length));
   if (!config.types.enabled || !safe.length) return { available: { typescript: false, python: false }, findings: [], timedOut: false };
   try {
     const result = await request({ root, changed: safe, config, base: options.base }, options.timeoutMs ?? config.types.timeoutMs) as TypeCheckResult & { unavailable?: string };

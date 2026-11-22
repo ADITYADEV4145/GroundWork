@@ -123,6 +123,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
       const existing = groundingFindings.find((g) => g.file === f.file && g.line === f.line && name(g.name) === name(f.name));
       if (existing) {
         existing.typeConfirmed = true;
+        existing.typeBlocking ||= f.blocking;
         existing.blocking ||= f.blocking;
         const reported = findings.find((g) => g.grounding === existing);
         if (reported) reported.severity = existing.blocking ? 'BLOCK' : 'WARN';

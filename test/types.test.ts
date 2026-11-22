@@ -117,6 +117,14 @@ describe('optional project types', () => {
     expect(result?.message).toContain('unknownName');
   }, 60000);
 
+  it('keeps baseline-exempt grounding errors out of a types-only strict Stop', async () => {
+    const root = fixture(true, 'app.ts', 'function count(n: number) { return n; }\ncount();\n');
+    writeFileSync(path.join(root, 'app.ts'), 'function count(n: number) { return n; }\ncount(); // touched\n');
+    const c = config(); c.reuse.duplicateGate = false; c.profile = 'strict';
+    const r = await duplicateGate.run(stopEvent(root, false, 'baseline-types'), { root, config: c });
+    expect(r).toMatchObject({ action: 'allow' });
+  }, 60000);
+
   it('resolves explicit gw types check paths from the current directory', () => {
     const root = fixture(true, 'app.ts', 'export {};\n');
     mkdirSync(path.join(root, 'sub'));

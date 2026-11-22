@@ -36,6 +36,7 @@ export interface Finding {
   blocking: boolean;
   suggestions: Suggestion[];
   typeConfirmed?: boolean;
+  typeBlocking?: boolean;
 }
 
 export interface VerifyResult {

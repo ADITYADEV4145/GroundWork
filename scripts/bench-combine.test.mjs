@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { combine, options, planArchive, validateCaptures } from './bench-combine.mjs';
 import { options as experimentOptions } from './bench-combine-v2.mjs';
-import { ROUND3_REVISION, ROUND4_REVISION } from './bench-comparison.mjs';
+import { ROUND3_REVISION, ROUND4_REVISION, ROUND5_REVISION } from './bench-comparison.mjs';
 
 test('combine defaults to eight runs and accepts explicit inputs', () => {
   assert.equal(options([]).runs, 8);
@@ -88,7 +88,7 @@ test('higher runs are ignored without masking missing or duplicate selected runs
   }
 });
 
-for (const [experiment, revision, versions] of [['v4', ROUND3_REVISION, ['', 'v2', 'v3']], ['v5', ROUND4_REVISION, ['', 'v2', 'v3', 'v4']]]) test(`${experiment} isolates nav3/lh3 inputs and archives only after both graders succeed`, (t) => {
+for (const [experiment, revision, versions] of [['v4', ROUND3_REVISION, ['', 'v2', 'v3']], ['v5', ROUND4_REVISION, ['', 'v2', 'v3', 'v4']], ['v6', ROUND5_REVISION, ['', 'v2', 'v3', 'v4', 'v5']]]) test(`${experiment} isolates nav3/lh3 inputs and archives only after both graders succeed`, (t) => {
   const root = new URL('../', import.meta.url).pathname;
   const dir = mkdtempSync(path.join(os.homedir(), `bench-${experiment}-combine-test-`));
   const scratch = new Set();

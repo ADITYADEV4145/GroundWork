@@ -20,6 +20,8 @@ Fix the call, or add the definition if you meant to create it. The note is conte
 
 ## On demand: `verify_calls`
 
+Use only for new cross-file calls to symbols not already read/confirmed in this task. Batch remaining calls once with `files:[{file,lines?}]`; skip the explicit call if none remain. Recheck if the relevant definitions change. Automatic grounding and duplicate-gate checks remain active.
+
 ```json
 verify_calls({ "file": "src/api/orders.ts", "lines": "30-60" })
 ```

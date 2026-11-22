@@ -52,7 +52,8 @@ export async function findSimilar(index: CandidateIndex, input: SimilarInput): P
     return { symbol: s.qualifiedName, file: s.file, line: s.line, probability: p,
       verdict: p >= thresholds.block ? 'reuse as-is' : p >= thresholds.warn ? 'extend' : 'related',
       why: [...top.map(([key, value]) => `${key} ${Math.round(value * 100)}%`), ...(score.meaning ? [`meaning ${Math.round(signals.meaning! * 100)}%`] : [])].join(', ') };
-  }).sort((a, b) => b.probability - a.probability || a.file.localeCompare(b.file) || a.line - b.line).slice(0, 5);
+  }).sort((a, b) => b.probability - a.probability || a.file.localeCompare(b.file) || a.line - b.line)
+    .filter((m) => args.detail === 'full' || m.verdict !== 'related').slice(0, 5);
   const render = (m: SimilarMatch) => JSON.stringify(m);
   const safe = matches.filter((m) => estimateTokens(render(m)) < 400);
   const kept = fitToBudget(safe, render, 500, estimateTokens(JSON.stringify({ matches: [] })) + 10).items;

@@ -7,10 +7,10 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
 
-## 1. Navigate: index first, whole files last
+## 1. Navigate: use the cheapest sufficient evidence
 
-1. Start with the clue you have. If a symbol name or behavior is known, use `find_code({ "query": "what you need", "locations_only": true })` before grep. Use `kind` to narrow results. If you only need a definition's location, stop when you have it. Omit `locations_only` when signatures or docs are needed to choose a match.
-2. If you have a file but not a symbol, use `outline({ "file": "path/to/file.ts", "locations_only": true })` before reading the whole file. If you already know the symbol and need its body, go straight to `read_symbol({ "symbol": "exact name or ID" })`.
+1. Use `rg` for a trivial literal or filename lookup. Use the index for symbol, behavior and structure questions: `find_code({ "query": "what you need" })`. Exact names return exact matches; use `breadth: "all"` only when broader results are needed. Set `locations_only: false` for signatures or docs. Stop when the requested location is resolved.
+2. If you have a file but not a symbol, use `outline({ "file": "path/to/file.ts" })` instead of reading the whole file. If you already know the symbol and need its body, go straight to `read_symbol({ "symbol": "exact name or ID" })`; do not add an outline first. Outline defaults to locations/ranges; set `locations_only: false` for signatures.
 3. Use `repo_map({ "depth": 1 })` once if you need orientation in an unfamiliar repo. Skip the map for a targeted lookup; go deeper by narrowing `path`.
 4. Trace with `callers`, `callees`, or `where_used` when you know the anchor name. Treat `name-only` and unresolved edges as leads. Verify only missing details with a symbol or ranged read. Follow the exact `Next` call if you need more results.
 
@@ -18,7 +18,7 @@ Fall back to ordinary search and ranged reads for docs, logs, config, unsupporte
 
 ## 2. Reuse first: look before you write
 
-Before writing a new non-trivial helper/function (including a class, hook or component with new reusable logic), check for existing code. Skip `find_similar` for small edits, inline code and simple constants; reuse known symbols directly. Reuse earlier search evidence within the task while the relevant code is unchanged.
+Before writing a genuinely new non-trivial helper/function (including a class, hook or component with new reusable logic), check for existing code. Skip `find_similar` for small edits, inline code, simple constants and already-confirmed helpers; reuse known symbols directly. Reuse earlier search evidence within the task while the relevant code is unchanged. Default results are actionable reuse/extend matches; request `detail: "full"` only when related matches are useful.
 
 1. Call `find_similar({ "description": "what it does", "name": "planned name", "signature": "planned signature" })`. Pass `code` once you have a draft.
 2. State your decision in one line:
@@ -31,7 +31,7 @@ Reuse existing constants and config keys such as `API_URL`; do not define a seco
 
 ## 3. Respond to feedback
 
-**Grounding notes after an edit** ("these names/arguments do not match the code") list imports, calls, members or arguments in the lines you just changed that the index cannot find. Each note names the nearest real symbols with their signature and location. Fix the call to use one of them, or add the missing definition if you really meant to create it. Once per task, verify all new cross-file calls together: `verify_calls({ "files": [{ "file": "src/x.ts", "lines": "10-40" }, { "file": "src/y.ts" }] })`. Skip the explicit call when there are no new cross-file calls. Fix findings and recheck affected ranges if needed; automatic grounding checks still run after edits.
+**Grounding notes after an edit** ("these names/arguments do not match the code") list imports, calls, members or arguments in the lines you just changed that the index cannot find. Each note names the nearest real symbols with their signature and location. Fix the call to use one of them, or add the missing definition if you really meant to create it. Use `verify_calls` only for new cross-file calls to symbols not already read or confirmed in this task. Batch all remaining calls once: `verify_calls({ "files": [{ "file": "src/x.ts", "lines": "10-40" }, { "file": "src/y.ts" }] })`. Skip the explicit call if there are no such calls. Evidence is reusable only while the relevant definitions are unchanged; recheck if they change. Fix findings and recheck affected ranges if needed; automatic grounding and duplicate-gate checks remain active.
 
 **The Stop gate** runs `gw check` over your uncommitted changes when you finish. Findings look like this:
 

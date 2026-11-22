@@ -11,9 +11,10 @@ export function register(program: Command): void {
     .option('--signature <signature>', 'draft signature')
     .option('--code <code>', 'draft source code')
     .option('--language <language>', 'draft language (typescript, tsx, javascript, python)', 'typescript')
+    .option('--detail <detail>', 'compact actionable matches or full related matches', 'compact')
     .action(async (description: string, options: Record<string, string>, cmd: Command) => {
       const opts = globalOpts(cmd);
-      const input = similarInputSchema.parse({ description, name: options.name, signature: options.signature, code: options.code, language: options.language });
+      const input = similarInputSchema.parse({ description, name: options.name, signature: options.signature, code: options.code, language: options.language, detail: options.detail });
       await withIndex(opts, async ({ root, db, config }) => {
         const index = await cachedCandidates(db, root, config);
         await index.prepareMeaning(root, config);

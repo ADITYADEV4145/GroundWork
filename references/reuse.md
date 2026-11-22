@@ -4,7 +4,7 @@ Groundwork stops two kinds of duplication: writing code that already exists unde
 
 ## Before writing: `find_similar`
 
-Search before a new non-trivial helper/function. Skip small edits and inline code; reuse known helpers and unchanged search evidence within the task.
+Search only before a genuinely new non-trivial helper/function. Skip small edits, inline code, simple constants and already-confirmed helpers; reuse unchanged search evidence within the task. Default results contain only actionable reuse/extend matches; use `detail:"full"` for related matches.
 
 ```json
 find_similar({

@@ -61,7 +61,7 @@ describe('find_similar', () => {
   it('ranks date parsing above unrelated work and budgets both output formats', async () => {
     await withIndexedFixture('reuse-app', async (db, root) => {
       const index = new CandidateIndex(db);
-      const result = await findSimilar(index, { description });
+      const result = await findSimilar(index, { description, detail: 'full' });
       expect(['parseDateString', 'dateFromParts', 'parse_date_string', 'read_calendar']).toContain(result.matches[0]?.symbol);
       expect(result.matches.every((m) => m.symbol !== 'countValidOrders')).toBe(true);
       expect(renderSimilar(result)).not.toContain('State REUSE');
@@ -69,16 +69,19 @@ describe('find_similar', () => {
       expect(estimateTokens(JSON.stringify(result))).toBeLessThanOrEqual(500);
       const draft = 'function another(value: string): Date { const date = new Date(value); if (Number.isNaN(date.getTime())) throw new Error("Invalid"); return date; }';
       const code = await findSimilar(index, { description, code: draft });
+      expect(code.matches.every((m) => m.verdict !== 'related')).toBe(true);
+      const fullCode = await findSimilar(index, { description, code: draft, detail: 'full' });
+      expect(code.matches).toEqual(fullCode.matches.filter((m) => m.verdict !== 'related'));
       expect(['parseDateString', 'decodeTimestamp']).toContain(code.matches[0]?.symbol);
       expect(code.matches[0]?.why).toContain('structure');
-      const signature = await findSimilar(index, { description, signature: 'parse(value: string): Date' });
+      const signature = await findSimilar(index, { description, signature: 'parse(value: string): Date', detail: 'full' });
       expect(signature.matches.length).toBeGreaterThan(0);
-      const python = await findSimilar(index, { description, language: 'python', signature: 'parse(value: str) -> datetime:' });
+      const python = await findSimilar(index, { description, language: 'python', signature: 'parse(value: str) -> datetime:', detail: 'full' });
       expect(python.matches.length).toBeGreaterThan(0);
       expect(TOOLS.some((t) => t.name === 'find_similar')).toBe(true);
-      const text = await findSimilarTool.handler({ description, language: 'typescript' }, { root, db, config: configSchema.parse({}) });
+      const text = await findSimilarTool.handler({ description, language: 'typescript', detail: 'full' }, { root, db, config: configSchema.parse({}) });
       expect(text).toBe(renderSimilar(result));
-      const cli = JSON.parse(execFileSync(process.execPath, ['--import', TSX, MAIN, '--root', root, 'similar', description, '--json'], { encoding: 'utf8' }));
+      const cli = JSON.parse(execFileSync(process.execPath, ['--import', TSX, MAIN, '--root', root, 'similar', description, '--detail', 'full', '--json'], { encoding: 'utf8' }));
       expect(cli).toEqual(result);
       const bad = spawnSync(process.execPath, ['--import', TSX, MAIN, '--root', root, 'similar', ' ', '--json'], { encoding: 'utf8' });
       expect(bad.status).toBe(1);
@@ -92,6 +95,7 @@ describe('find_similar', () => {
       expect(none.matches).toEqual([]);
       expect(renderSimilar(none)).toBe('No matches.');
       await expect(findSimilar(index, { description: '' })).rejects.toThrow();
+      await expect(findSimilar(index, { description, detail: 'invalid' } as never)).rejects.toThrow();
       await expect(findSimilar(index, { description, code: 'function {' })).rejects.toThrow('Draft');
       await expect(findSimilar(index, { description, code: 'const x = 1;', language: 'python' })).rejects.toThrow('Draft');
       const long = await findSimilar(index, { description: 'date '.repeat(1900), name: 'x'.repeat(300) });

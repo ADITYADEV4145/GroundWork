@@ -4,8 +4,9 @@ Run `gw mcp` as a local stdio MCP server rooted in the repository (set its worki
 
 ### Find a definition and inspect its neighborhood
 
-- `find_code({"query":"format date","kind":"function","locations_only":true})` returns the top three matching locations and IDs. Omit `locations_only` to include signatures, first doc lines, and scores.
-- `outline({"file":"src/utils/date.ts","locations_only":true})` shows symbol names and ranges without signatures or bodies.
+- Use `rg` for trivial literal/filename lookups; use the index for symbol, behavior and structure questions. Stop once the requested location is resolved.
+- `find_code({"query":"formatDate","kind":"function"})` returns exact matches first. Use `breadth:"all"` to expand; without an exact hit, results are ranked broadly. Set `locations_only:false` to include signatures, docs and scores.
+- `outline({"file":"src/utils/date.ts"})` shows symbol names and ranges without signatures or bodies. Set `locations_only:false` for signatures. Skip outline when you already know which symbol to read.
 - `read_symbol({"symbol":"src/utils/date.ts:formatDate","context_lines":1})` reads the body. If multiple declarations match, pass a candidate ID instead. With zero context, only the indexed declaration is returned.
 - `repo_map({"depth":1})` gives an overview when you don't know where to start. Narrow with `path` to explore a folder; maps default to 12 rows per page.
 

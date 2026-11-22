@@ -177,7 +177,7 @@ Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): strin
 | Tool | What your agent gets |
 | --- | --- |
 | `repo_map` | A ranked directory tree with top symbols per file; narrow by path. |
-| `find_code` | Symbols matching a name or description, with signatures. |
+| `find_code` | Symbols matching a name or description, with source for the top matches; takes several queries in one call. |
 | `outline` | A file's symbols and signatures without their bodies. |
 | `read_symbol` | One symbol's source, not the whole file. |
 | `callers` / `callees` / `where_used` | Who calls a symbol, what it calls, and its references. |

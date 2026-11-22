@@ -10,6 +10,7 @@ import { refreshIndex } from '../src/index/refresh.js';
 import { indexDbPath } from '../src/index/store.js';
 import { FIXTURE_NAVIGATION, runNavigationTool } from '../src/selftest/checks/phase2.js';
 import { tempDir, withIndexedFixture } from '../src/selftest/fixtures.js';
+import { estimateTokens } from '../src/util/tokens.js';
 import { initSqlBackend, openDb, sqliteBackendAvailable } from '../src/store/db.js';
 
 const config = defaultConfig();
@@ -60,7 +61,7 @@ describe('MCP navigation', () => {
   it('matches the fixture goldens', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const output = Object.fromEntries(await Promise.all(FIXTURE_NAVIGATION.map(async ([name, args]) => {
-        const value = await runNavigationTool(name, name === 'find_code' || name === 'outline' ? { ...args, locations_only: false } : args, { root, db, config });
+        const value = await runNavigationTool(name, name === 'find_code' ? { ...args, locations_only: false, include_body: false } : name === 'outline' ? { ...args, locations_only: false } : args, { root, db, config });
         return [name, value.replace(/ · \d+(?:\.\d+)?/g, ' · <score>')];
       })));
       expect(output).toMatchSnapshot();
@@ -75,7 +76,7 @@ describe('MCP navigation', () => {
   it('keeps locator views short and pages without switching to signatures', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const ctx = { root, db, config };
-      const query = { query: 'format date', kind: 'function' };
+      const query = { query: 'format date', kind: 'function', include_body: false };
       const full = await runNavigationTool('find_code', { ...query, locations_only: false }, ctx);
       expect(full).toContain('formatDate(d: Date');
       const fullPage = await runNavigationTool('find_code', { ...query, locations_only: false, limit: 1 }, ctx);
@@ -98,10 +99,47 @@ describe('MCP navigation', () => {
     });
   });
 
+  it('answers in one call: top matches carry their source and several queries share one call', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const fuzzy = await runNavigationTool('find_code', { query: 'format date', kind: 'function' }, ctx);
+      expect(fuzzy).toContain('formatDate (function) — src/utils/date.ts:4');
+      expect(fuzzy).toContain('d.toISOString()');
+      expect(fuzzy.split('\n').filter((row) => row.includes('source offset 0'))).toHaveLength(3);
+      expect(estimateTokens(fuzzy)).toBeLessThanOrEqual(600);
+      const next = JSON.parse(fuzzy.split('Next: find_code(')[1]!.slice(0, -1));
+      expect(next).toMatchObject({ query: 'format date', offset: 3 });
+      expect(await runNavigationTool('find_code', next, ctx)).not.toContain('source offset');
+      const one = await runNavigationTool('find_code', { query: 'format date', kind: 'function', limit: 1 }, ctx);
+      expect(one.split('\n').filter((row) => row.includes('source offset 0'))).toHaveLength(1);
+
+      const batch = await runNavigationTool('find_code', { queries: ['formatDate', 'pad', 'formatDate', 'notarealsymbolzz'] }, ctx);
+      expect(batch.match(/^## /gm)).toHaveLength(3);
+      expect(batch).toContain('## formatDate\nExact (1)');
+      expect(batch).toContain('d.toISOString()');
+      expect(batch).toContain('function pad');
+      expect(batch).toContain('## notarealsymbolzz\nNo indexed matches');
+      const wide = await runNavigationTool('find_code', { queries: ['format date', 'pad number', 'join parts', 'api client', 'get', 'user', 'date', 'config'], breadth: 'all' }, ctx);
+      expect(wide.match(/^## /gm)).toHaveLength(8);
+      expect(estimateTokens(wide)).toBeLessThanOrEqual(1800);
+      expect(await runNavigationTool('find_code', { queries: ['formatDate'], include_body: false }, ctx)).not.toContain('d.toISOString()');
+
+      expect(await runNavigationTool('find_code', {}, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('find_code', { query: 'pad', queries: ['pad'] }, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('find_code', { queries: ['pad'], offset: 3 }, ctx)).toContain('no offset');
+      await expect(runNavigationTool('find_code', { queries: [] }, ctx)).rejects.toThrow();
+      await expect(runNavigationTool('find_code', { queries: Array(9).fill('pad') }, ctx)).rejects.toThrow();
+      writeFileSync(path.join(root, 'src/utils/date.ts'), 'export function changed() {}');
+      const stale = await runNavigationTool('find_code', { queries: ['formatDate'] }, ctx);
+      expect(stale).toContain('formatDate (function)');
+      expect(stale).not.toContain('d.toISOString()');
+    });
+  });
+
   it('defaults to exact locations, preserves broad opt-in, and rejects invalid breadth', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const ctx = { root, db, config };
-      const exact = await runNavigationTool('find_code', { query: 'formatDate' }, ctx);
+      const exact = await runNavigationTool('find_code', { query: 'formatDate', include_body: false }, ctx);
       expect(exact).toContain('Exact (1)');
       expect(exact).toContain('breadth="all"');
       expect(exact).not.toContain('pad (');
@@ -187,8 +225,9 @@ describe('MCP navigation', () => {
       const body = await runNavigationTool('find_code', { query: 'formatDate', include_body: true }, ctx);
       expect(body).toContain('function formatDate');
       expect(body).toContain('d.toISOString()');
-      expect(await runNavigationTool('find_code', { query: 'formatDate', breadth: 'all', include_body: true }, ctx)).toBe(body);
-      expect(await runNavigationTool('find_code', { query: 'formatDate' }, ctx)).not.toContain('d.toISOString()');
+      expect(await runNavigationTool('find_code', { query: 'formatDate', breadth: 'all', include_body: true }, ctx)).toContain('function pad');
+      expect(await runNavigationTool('find_code', { query: 'formatDate' }, ctx)).toBe(body);
+      expect(await runNavigationTool('find_code', { query: 'formatDate', include_body: false }, ctx)).not.toContain('d.toISOString()');
       const query = { query: 'format date', limit: 1 };
       const fuzzy = await runNavigationTool('find_code', query, ctx);
       expect(fuzzy).not.toContain('include_body');

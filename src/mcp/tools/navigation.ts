@@ -5,6 +5,7 @@ import { readRepoFile, repoRelative } from '../../util/repo-file.js';
 import { estimateTokens, fitToBudget } from '../../util/tokens.js';
 import { defineTool, type GwTool, type ToolContext } from '../registry.js';
 
+export const FIND_BATCH_BUDGET = 1800;
 export const NAVIGATION_BUDGETS = { find_code: 600, outline: 400, read_symbol: 1200, explore: 1800, callers: 600, callees: 600, where_used: 600, repo_map: 1200 } as const;
 
 const printable = (s: string) => !/[\u0000-\u001f\u007f]/u.test(s) && Buffer.from(s).toString('utf8') === s;
@@ -106,26 +107,48 @@ export function readSource(args: { symbol: string; context_lines: number; offset
   return title + part + next(part.length);
 }
 
+const FIND_BODIES = 3;
+const queryBatch = z.array(text).min(1).max(8).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter or fewer queries.');
+
+interface FindArgs { query: string; kind?: z.infer<typeof kinds>; limit?: number; locations_only: boolean; breadth: 'exact' | 'all'; include_body: boolean; offset: number }
+
+function findOne(args: FindArgs, ctx: ToolContext, budget: number, heading = ''): string {
+  const all = findCode(ctx.db, args.query, args.kind);
+  const query = args.query.toLowerCase();
+  const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
+  if (args.include_body && exact.length === 1 && args.breadth !== 'all' && args.offset === 0 && !heading)
+    return readSource({ symbol: exact[0]!.id, context_lines: 0, offset: 0 }, ctx, budget);
+  const narrowed = args.breadth !== 'all' && exact.length > 0;
+  const items = narrowed ? exact : all;
+  const count = args.limit ?? (args.locations_only ? 3 : 8);
+  const withBody = args.include_body && args.offset === 0 ? Math.min(FIND_BODIES, count, items.length) : 0;
+  // Bodies share the budget so one call can answer; each is cut at its share and keeps its own Next cursor.
+  const share = withBody ? Math.max(80, Math.floor((budget - 40) / withBody)) : 0;
+  const row = (s: (typeof items)[number]) => args.locations_only ? choice(s) :
+    `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`;
+  return page({
+    items, title: heading + (narrowed ? `Exact (${items.length})${all.length > exact.length ? '; more: breadth="all"' : ''}` : items.length ? `Code matches (${items.length}):` : 'No indexed matches. Try a different name or search plain text with your normal tools.'),
+    start: args.offset, count, budget,
+    render: (s) => {
+      if (items.indexOf(s) >= withBody) return row(s);
+      const body = readSource({ symbol: s.id, context_lines: 0, offset: 0 }, ctx, share);
+      return body.startsWith(`[${s.id}] `) ? body : row(s);
+    },
+    next: (offset) => call('find_code', { query: args.query, kind: args.kind, limit: args.limit, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, include_body: args.include_body ? undefined : false, offset }),
+  });
+}
+
 const findCodeTool = defineTool({
   name: 'find_code',
-  description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands results. Set include_body: true for source with exactly one exact match, otherwise locations stay the default. Set locations_only: false for signatures/docs. Prefer rg for trivial literals. Reuse unchanged evidence carried across continuing steps/sessions.',
-  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(false), offset },
+  description: 'Find symbols by name or behavior and answer in one call: the top matches come with their source inside the budget, so no follow-up read is needed for them. Pass query, or queries to send several independent lookups together (not both). Exact names return only exact matches; breadth: all expands results. Set include_body: false for locations only; locations_only: false adds signatures/docs. Prefer rg for trivial literals. Reuse unchanged evidence carried across continuing steps/sessions.',
+  inputSchema: { query: text.optional(), queries: queryBatch.optional(), kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(true), offset },
   handler(args, ctx) {
-    const { db } = ctx;
-    const all = findCode(db, args.query, args.kind);
-    const query = args.query.toLowerCase();
-    const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
-    if (args.include_body && exact.length === 1 && args.offset === 0)
-      return readSource({ symbol: exact[0]!.id, context_lines: 0, offset: 0 }, ctx, NAVIGATION_BUDGETS.find_code);
-    const narrowed = args.breadth !== 'all' && exact.length > 0;
-    const items = narrowed ? exact : all;
-    return page({
-      items, title: narrowed ? `Exact (${items.length})${all.length > exact.length ? '; more: breadth="all"' : ''}` : items.length ? `Code matches (${items.length}):` : 'No indexed matches. Try a different name or search plain text with your normal tools.',
-      start: args.offset, count: args.limit ?? (args.locations_only ? 3 : 8), budget: NAVIGATION_BUDGETS.find_code,
-      render: (s) => args.locations_only ? choice(s) :
-        `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
-      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, include_body: args.include_body ? true : undefined, offset }),
-    });
+    if (Boolean(args.query) === Boolean(args.queries)) return 'Provide exactly one of query or queries.';
+    if (args.query) return findOne({ ...args, query: args.query }, ctx, NAVIGATION_BUDGETS.find_code);
+    if (args.offset) return 'Follow the Next call of one query to page it; a batch has no offset.';
+    const queries = [...new Set(args.queries!)];
+    const budget = Math.floor(Math.min(NAVIGATION_BUDGETS.find_code * queries.length, FIND_BATCH_BUDGET) / queries.length);
+    return queries.map((query) => findOne({ ...args, query }, ctx, budget, `## ${compact(query, 80)}\n`)).join('\n');
   },
 });
 

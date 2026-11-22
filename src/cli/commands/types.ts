@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { Command } from 'commander';
 import { loadConfig } from '../../config/load.js';
 import { changedFromGit } from '../../grounding/ranges.js';
@@ -11,7 +12,7 @@ export function register(program: Command): void {
   types.command('check').argument('[files...]').option('--base <ref>', 'compare against this commit').option('--json', 'machine-readable output')
     .action(async (files: string[], options: { base?: string }, cmd: Command) => {
       const opts = globalOpts(cmd), root = repoRoot(opts), config = loadConfig(root);
-      const changed = files.length ? files.map((file) => ({ file, ranges: null })) : changedFromGit(root, options.base);
+      const changed = files.length ? files.map((file) => ({ file: path.relative(root, path.resolve(process.cwd(), file)), ranges: null })) : changedFromGit(root, options.base);
       const result = await typeCheck(root, changed, config, { base: options.base });
       emit(opts, result, () => renderTypes(result, config.types.budgetTokens) || 'ok');
       if (result.findings.some((f) => f.blocking)) process.exitCode = 1;

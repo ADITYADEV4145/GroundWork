@@ -38,9 +38,11 @@ export function projectService(root: string, file: string) {
   return { ts, ...cached };
 }
 
-export function tsDiagnostics(root: string, file: string, text?: string): TypeFinding[] {
+export function tsDiagnostics(root: string, file: string, text?: string, others: Map<string, string> = new Map()): TypeFinding[] {
   const absolute = path.resolve(root, file);
   const { ts, service, overlay } = projectService(root, absolute);
+  const overridden = [...others].map(([f, t]) => [path.resolve(root, f), t] as const).filter(([f]) => f !== absolute);
+  for (const [f, t] of overridden) overlay.set(f, t);
   if (text !== undefined) overlay.set(absolute, text);
   try {
     return [...service.getSyntacticDiagnostics(absolute), ...service.getSemanticDiagnostics(absolute)].flatMap((d) => {
@@ -51,7 +53,7 @@ export function tsDiagnostics(root: string, file: string, text?: string): TypeFi
         message: ts.flattenDiagnosticMessageText(d.messageText, ' '), language: 'typescript' as const,
         blocking: d.category === ts.DiagnosticCategory.Error && blockingCodes.has(d.code) }];
     });
-  } finally { overlay.delete(absolute); }
+  } finally { overlay.delete(absolute); for (const [f] of overridden) overlay.delete(f); }
 }
 
 export function navigate(root: string, target: string, operation: 'def' | 'impl' | 'refs') {

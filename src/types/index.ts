@@ -25,7 +25,7 @@ function request(payload: object, timeoutMs: number): Promise<unknown> {
       const compiled = new URL('../types/worker.js', import.meta.url);
       const source = new URL('../types/worker.ts', import.meta.url);
       const js = existsSync(fileURLToPath(compiled));
-      child = fork(fileURLToPath(js ? compiled : source), [], { execArgv: js ? [] : ['--import', 'tsx'], stdio: ['ignore', 'ignore', 'ignore', 'ipc'] });
+      child = fork(fileURLToPath(js ? compiled : source), [], { execArgv: js ? [] : ['--import', 'tsx'], ...(js ? {} : { cwd: fileURLToPath(new URL('../..', import.meta.url)) }), stdio: ['ignore', 'ignore', 'ignore', 'ipc'] });
       child.unref(); child.channel?.unref();
       const spawned = child;
       spawned.on('exit', () => { if (child === spawned) child = undefined; });

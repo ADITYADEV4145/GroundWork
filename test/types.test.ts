@@ -89,6 +89,43 @@ describe('optional project types', () => {
     expect(result.findings).toEqual(expect.arrayContaining([expect.objectContaining({ code: 2339, blocking: false, preExisting: true })]));
   }, 30000);
 
+  it('blocks a new occurrence of an error that already exists in the file', async () => {
+    const source = 'export const value: {name: string} = {name: "a"};\nvalue.missing();\n';
+    const root = fixture(true, 'app.ts', source);
+    writeFileSync(path.join(root, 'app.ts'), `${source}value.missing();\n`);
+    const result = await typeCheck(root, [{ file: 'app.ts', ranges: [[3, 3]] }], config());
+    expect(result.findings).toEqual([expect.objectContaining({ code: 2339, line: 3, blocking: true })]);
+  }, 30000);
+
+  it('baselines against base versions of changed dependencies', async () => {
+    const root = fixture(true, 'app.ts', 'import { f } from "./lib.js";\nf(1);\n');
+    writeFileSync(path.join(root, 'lib.ts'), 'export function f(a: number) { return a; }\n');
+    execFileSync('git', ['add', 'lib.ts'], { cwd: root });
+    execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'lib'], { cwd: root });
+    writeFileSync(path.join(root, 'lib.ts'), 'export function f(a: number, b: number) { return a + b; }\n');
+    writeFileSync(path.join(root, 'app.ts'), 'import { f } from "./lib.js";\nf(1);\nf(2);\n');
+    const result = await typeCheck(root, [{ file: 'lib.ts', ranges: null }, { file: 'app.ts', ranges: [[3, 3]] }], config());
+    expect(result.findings).toEqual(expect.arrayContaining([expect.objectContaining({ file: 'app.ts', code: 2554, line: 3, blocking: true })]));
+  }, 30000);
+
+  it('keeps type-confirmed grounding errors in a types-only strict Stop', async () => {
+    const root = fixture();
+    writeFileSync(path.join(root, 'app.ts'), 'unknownName();\n');
+    const c = config(); c.reuse.duplicateGate = false; c.profile = 'strict';
+    const result = await duplicateGate.run(stopEvent(root, false, 'confirmed-types'), { root, config: c });
+    expect(result).toMatchObject({ action: 'deny' });
+    expect(result?.message).toContain('unknownName');
+  }, 60000);
+
+  it('resolves explicit gw types check paths from the current directory', () => {
+    const root = fixture(true, 'app.ts', 'export {};\n');
+    mkdirSync(path.join(root, 'sub'));
+    writeFileSync(path.join(root, 'tsconfig.json'), JSON.stringify({ compilerOptions: { strict: true, target: 'ES2022', module: 'NodeNext', moduleResolution: 'NodeNext', skipLibCheck: true }, include: ['**/*.ts'] }));
+    writeFileSync(path.join(root, 'sub', 'app.ts'), 'const n: number = 1;\nn.missing();\n');
+    const run = spawnSync(process.execPath, ['--import', import.meta.resolve('tsx'), path.resolve('src/cli/main.ts'), 'types', 'check', 'app.ts', '--json'], { cwd: path.join(root, 'sub'), encoding: 'utf8' });
+    expect(JSON.parse(run.stdout).findings).toEqual(expect.arrayContaining([expect.objectContaining({ file: path.join('sub', 'app.ts'), code: 2339 })]));
+  }, 60000);
+
   it('leaves all missing modules to grounding and keeps other non-allowlisted diagnostics informational', async () => {
     const root = fixture();
     writeFileSync(path.join(root, 'app.ts'), 'import x from "not-installed";\nimport y from "./missing.js";\nconst n: number = "wrong";\n');

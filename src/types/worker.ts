@@ -17,7 +17,12 @@ process.on('message', (request: { root: string; changed: ChangedFile[]; config: 
       const language = /\.[cm]?tsx?$/.test(changed.file) ? 'typescript' : changed.file.endsWith('.py') ? 'python' : null;
       if (!language) continue;
       if (!request.config.types.enabled || request.config.types[language] === 'off') { result.available[language] = 'disabled'; continue; }
-      const check = (root: string, file: string, text?: string) => language === 'typescript' ? tsDiagnostics(root, file, text) : pythonDiagnostics(root, file, text, request.deadline);
+      // The baseline sees the base text of every changed TypeScript file, so changed dependencies don't leak into it.
+      const baseOthers = () => new Map(request.changed.filter((c) => c.file !== changed.file && /\.[cm]?tsx?$/.test(c.file)).flatMap((c) => {
+        try { return [[c.file, execFileSync('git', ['show', `${request.base ?? 'HEAD'}:${c.file}`], { cwd: request.root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })] as const]; }
+        catch { return []; }
+      }));
+      const check = (root: string, file: string, text?: string) => language === 'typescript' ? tsDiagnostics(root, file, text, text === undefined ? undefined : baseOthers()) : pythonDiagnostics(root, file, text, request.deadline);
       try {
         const findings = check(request.root, changed.file);
         result.available[language] = true;
@@ -37,7 +42,14 @@ process.on('message', (request: { root: string; changed: ChangedFile[]; config: 
             } catch { for (const f of relevant) f.blocking = false; }
           }
           if (baseText !== undefined) {
-            try { const prior = new Set(check(request.root, changed.file, baseText).map(signature)); for (const f of relevant) if (prior.has(signature(f))) { f.blocking = false; f.preExisting = true; } }
+            try {
+              // An error counts as pre-existing only while its occurrences do not outnumber the baseline's.
+              const prior = new Map<string, number>();
+              for (const f of check(request.root, changed.file, baseText)) prior.set(signature(f), (prior.get(signature(f)) ?? 0) + 1);
+              const current = new Map<string, number>();
+              for (const f of findings) current.set(signature(f), (current.get(signature(f)) ?? 0) + 1);
+              for (const f of relevant) if ((current.get(signature(f)) ?? 0) <= (prior.get(signature(f)) ?? 0)) { f.blocking = false; f.preExisting = true; }
+            }
             catch (e) {
               if ((e as NodeJS.ErrnoException).code === 'ETIMEDOUT' || (e as Error).message === 'timeout') throw e;
               for (const f of relevant) f.blocking = false;

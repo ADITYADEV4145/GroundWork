@@ -78,7 +78,7 @@ test('static server contains malformed targets and never exposes repository file
   const homeHtml = await (await fetch(base)).text();
   assert.doesNotMatch(homeHtml, /class="benchmarks"|bench\/.*\.svg/);
   assert.equal([...homeHtml.matchAll(/href="\.\/benchmarks"/g)].length, 2);
-  for (const name of ['token-reduction', 'copied-code', 'success', 'wall-time']) {
+  for (const name of ['token-reduction', 'copied-code', 'success', 'wall-time', 'before-after-output', 'before-after-wall', 'before-after-success']) {
     const chart = await fetch(`${base}/bench/${name}.svg`);
     assert.equal(chart.status, 200);
     assert.equal(chart.headers.get('content-type'), 'image/svg+xml');

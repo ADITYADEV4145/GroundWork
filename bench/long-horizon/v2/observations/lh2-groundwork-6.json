@@ -1,0 +1,292 @@
+{
+  "suite": "long-horizon",
+  "revision": "f2d5514fd96dac166b8e57c1790949fe67e65b05",
+  "condition": "groundwork",
+  "run": 6,
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "e605fe9559cae088a2060a4ed53a27c32daa4df9",
+  "observations": [
+    {
+      "task": "lh-01",
+      "startedAt": 1795311979654,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "repo_map",
+          "bytes": 96
+        },
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 124
+        },
+        {
+          "action": "shell",
+          "bytes": 169
+        },
+        {
+          "action": "mcp",
+          "name": "outline",
+          "bytes": 155
+        },
+        {
+          "action": "read",
+          "bytes": 205,
+          "file": "src/lib/date.js",
+          "readBytes": 204
+        },
+        {
+          "action": "read",
+          "bytes": 409,
+          "file": "src/lib/text.js",
+          "readBytes": 408
+        },
+        {
+          "action": "read",
+          "bytes": 381,
+          "file": "src/lib/validation.js",
+          "readBytes": 380
+        },
+        {
+          "action": "read",
+          "bytes": 190,
+          "file": "src/catalog.js",
+          "readBytes": 189
+        },
+        {
+          "action": "shell",
+          "bytes": 84
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 20473,
+      "patch": "diff --git a/src/features/event-card.js b/src/features/event-card.js\nnew file mode 100644\nindex 0000000..f949fa4\n--- /dev/null\n+++ b/src/features/event-card.js\n@@ -0,0 +1,13 @@\n+import { formatDate } from '../lib/date.js';\n+import { slugify } from '../lib/text.js';\n+\n+export function createEventCard(event) {\n+  const title = typeof event.title === 'string' ? event.title.trim() : '';\n+  if (!title) {\n+    throw new TypeError('Expected an event title');\n+  }\n+  if (event.startsAt == null) {\n+    throw new TypeError('Invalid event date');\n+  }\n+  return { id: slugify(title), title, dateLabel: formatDate(event.startsAt) };\n+}\n"
+    },
+    {
+      "task": "lh-02",
+      "startedAt": 1795312001293,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 200
+        },
+        {
+          "action": "shell",
+          "bytes": 97
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 9914,
+      "patch": "diff --git a/src/features/invitation.js b/src/features/invitation.js\nnew file mode 100644\nindex 0000000..d6efa50\n--- /dev/null\n+++ b/src/features/invitation.js\n@@ -0,0 +1,11 @@\n+import { normalizeEmail } from '../lib/validation.js';\n+import { createEventCard } from './event-card.js';\n+\n+export function buildInvitation(event, guest) {\n+  const card = createEventCard(event);\n+  return {\n+    to: normalizeEmail(guest.email),\n+    subject: 'Invitation: ' + card.title,\n+    url: '/events/' + card.id,\n+  };\n+}\n"
+    },
+    {
+      "task": "lh-03",
+      "startedAt": 1795312011370,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 356
+        },
+        {
+          "action": "read",
+          "bytes": 567,
+          "file": "src/lib/collections.js",
+          "readBytes": 566
+        },
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 225
+        },
+        {
+          "action": "shell",
+          "bytes": 106
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 10989,
+      "patch": "diff --git a/src/features/agenda.js b/src/features/agenda.js\nnew file mode 100644\nindex 0000000..60078b1\n--- /dev/null\n+++ b/src/features/agenda.js\n@@ -0,0 +1,13 @@\n+import { createEventCard } from './event-card.js';\n+\n+function buildAgendaEntries(events) {\n+  return events.map((event) => ({\n+    event,\n+    card: createEventCard(event),\n+    timestamp: new Date(event.startsAt).getTime(),\n+  })).sort((a, b) => a.timestamp - b.timestamp);\n+}\n+\n+export function buildAgenda(events) {\n+  return buildAgendaEntries(events).map(({ card }) => card);\n+}\n"
+    },
+    {
+      "task": "lh-04",
+      "startedAt": 1795312022521,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 311
+        },
+        {
+          "action": "read",
+          "bytes": 249,
+          "file": "src/lib/retry.js",
+          "readBytes": 248
+        },
+        {
+          "action": "shell",
+          "bytes": 83
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 11615,
+      "patch": "diff --git a/src/features/reminders.js b/src/features/reminders.js\nnew file mode 100644\nindex 0000000..ddbfcbd\n--- /dev/null\n+++ b/src/features/reminders.js\n@@ -0,0 +1,7 @@\n+import { retry } from '../lib/retry.js';\n+import { buildInvitation } from './invitation.js';\n+\n+export async function sendReminder(event, guest, deliver) {\n+  const invitation = buildInvitation(event, guest);\n+  return retry(() => deliver(invitation), 3);\n+}\n"
+    },
+    {
+      "task": "lh-05",
+      "startedAt": 1795312034320,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 348
+        },
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 118
+        },
+        {
+          "action": "shell",
+          "bytes": 96
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 10364,
+      "patch": "diff --git a/src/features/roster.js b/src/features/roster.js\nnew file mode 100644\nindex 0000000..bc93789\n--- /dev/null\n+++ b/src/features/roster.js\n@@ -0,0 +1,11 @@\n+import { uniqueBy } from '../lib/collections.js';\n+import { normalizeEmail } from '../lib/validation.js';\n+\n+export function buildRoster(signups) {\n+  const entries = signups.map((signup) => ({\n+    name: signup.name.trim(),\n+    email: normalizeEmail(signup.email),\n+  }));\n+  return uniqueBy(entries, ({ email }) => email).sort((a, b) =>\n+    a.name < b.name ? -1 : a.name > b.name ? 1 : 0);\n+}\n"
+    },
+    {
+      "task": "lh-06",
+      "startedAt": 1795312044855,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 355
+        },
+        {
+          "action": "shell",
+          "bytes": 100
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 8735,
+      "patch": "diff --git a/src/features/attendance.js b/src/features/attendance.js\nnew file mode 100644\nindex 0000000..b74ef3d\n--- /dev/null\n+++ b/src/features/attendance.js\n@@ -0,0 +1,12 @@\n+import { positiveInteger } from '../lib/validation.js';\n+import { buildRoster } from './roster.js';\n+\n+export function summarizeAttendance(event, signups) {\n+  const capacity = positiveInteger(event.capacity);\n+  const count = buildRoster(signups).length;\n+  return {\n+    confirmed: Math.min(count, capacity),\n+    remaining: Math.max(capacity - count, 0),\n+    waitlisted: Math.max(count - capacity, 0),\n+  };\n+}\n"
+    },
+    {
+      "task": "lh-07",
+      "startedAt": 1795312053769,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 360
+        },
+        {
+          "action": "shell",
+          "bytes": 104
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 9417,
+      "patch": "diff --git a/src/features/export.js b/src/features/export.js\nnew file mode 100644\nindex 0000000..1671335\n--- /dev/null\n+++ b/src/features/export.js\n@@ -0,0 +1,12 @@\n+import { csvCell } from '../lib/text.js';\n+import { createEventCard } from './event-card.js';\n+import { buildRoster } from './roster.js';\n+\n+export function exportRosterCsv(event, signups) {\n+  const { title, dateLabel } = createEventCard(event);\n+  const rows = ['event,date,name,email'];\n+  for (const { name, email } of buildRoster(signups)) {\n+    rows.push([title, dateLabel, name, email].map(csvCell).join(','));\n+  }\n+  return rows.join('\\n') + '\\n';\n+}\n"
+    },
+    {
+      "task": "lh-08",
+      "startedAt": 1795312063390,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 401
+        },
+        {
+          "action": "shell",
+          "bytes": 196
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 13039,
+      "patch": "diff --git a/src/features/agenda.js b/src/features/agenda.js\nindex 60078b1..6ce9721 100644\n--- a/src/features/agenda.js\n+++ b/src/features/agenda.js\n@@ -1,6 +1,6 @@\n import { createEventCard } from './event-card.js';\n \n-function buildAgendaEntries(events) {\n+export function buildAgendaEntries(events) {\n   return events.map((event) => ({\n     event,\n     card: createEventCard(event),\ndiff --git a/src/features/digest.js b/src/features/digest.js\nnew file mode 100644\nindex 0000000..c3b2925\n--- /dev/null\n+++ b/src/features/digest.js\n@@ -0,0 +1,9 @@\n+import { buildAgendaEntries } from './agenda.js';\n+import { summarizeAttendance } from './attendance.js';\n+\n+export function buildOrganizerDigest(events, signupsByEvent) {\n+  return buildAgendaEntries(events).map(({ event, card }) => {\n+    const signups = Object.hasOwn(signupsByEvent, card.id) ? signupsByEvent[card.id] : [];\n+    return { ...card, ...summarizeAttendance(event, signups) };\n+  });\n+}\n"
+    },
+    {
+      "task": "lh-09",
+      "startedAt": 1795312076625,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 356
+        },
+        {
+          "action": "shell",
+          "bytes": 116
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 12405,
+      "patch": "diff --git a/src/features/delivery.js b/src/features/delivery.js\nnew file mode 100644\nindex 0000000..0690fe9\n--- /dev/null\n+++ b/src/features/delivery.js\n@@ -0,0 +1,15 @@\n+import { retry } from '../lib/retry.js';\n+import { normalizeEmail } from '../lib/validation.js';\n+import { buildOrganizerDigest } from './digest.js';\n+\n+export async function deliverDigest(events, signupsByEvent, organizer, send) {\n+  const to = normalizeEmail(organizer.email);\n+  const digest = buildOrganizerDigest(events, signupsByEvent);\n+  const payload = {\n+    to,\n+    subject: 'Event digest',\n+    eventIds: digest.map(({ id }) => id),\n+    totalConfirmed: digest.reduce((total, { confirmed }) => total + confirmed, 0),\n+  };\n+  return retry(() => send(payload), 3);\n+}\n"
+    },
+    {
+      "task": "lh-10",
+      "startedAt": 1795312089289,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 361
+        },
+        {
+          "action": "shell",
+          "bytes": 98
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3
+        }
+      ],
+      "wallMs": 15122,
+      "patch": "diff --git a/src/features/dashboard.js b/src/features/dashboard.js\nnew file mode 100644\nindex 0000000..9aee908\n--- /dev/null\n+++ b/src/features/dashboard.js\n@@ -0,0 +1,9 @@\n+import { paginate } from '../lib/collections.js';\n+import { buildOrganizerDigest } from './digest.js';\n+\n+export function buildDashboard(events, signupsByEvent, query = {}) {\n+  const digest = buildOrganizerDigest(events, signupsByEvent);\n+  const search = query.search?.trim().toLowerCase() ?? '';\n+  const items = search ? digest.filter(({ title }) => title.toLowerCase().includes(search)) : digest;\n+  return paginate(items, query.page, query.pageSize);\n+}\n"
+    }
+  ]
+}

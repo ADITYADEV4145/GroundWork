@@ -100,7 +100,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
         if (c.calleeId === target.id) return true;
         const terminal = c.calleeText.split('.').at(-1);
         if ((!c.calleeId || c.confidence === 'name-only') && terminal === target.name) return true;
-        return deleted && target.id === s.id && state.imports.some((i) => i.file === c.file && i.target === s.file && i.name === s.name && (i.alias ?? i.name) === c.calleeText);
+        return deleted && target.id === s.id && state.imports.some((i) => i.file === c.file && i.target === s.file && (i.name === s.name || (s.isDefaultExport && i.name === 'default')) && (i.alias ?? i.name) === c.calleeText);
       });
       for (let depth = 1; depth <= options.config.impact.depth && frontier.length; depth++) {
         const next: typeof frontier = [];

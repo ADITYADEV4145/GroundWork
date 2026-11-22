@@ -37,6 +37,14 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('finds aliased default-import callers after deleting a default export', async () => {
+    const root = fixture();
+    writeFileSync(path.join(root, 'api.ts'), 'export default function parse(value: string): string { return value; }\n');
+    writeFileSync(path.join(root, 'caller.ts'), 'import renamed from "./api.js";\nexport function caller() { return renamed("a"); }\n');
+    git(root, 'add', 'api.ts', 'caller.ts'); git(root, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Default export');
+    writeFileSync(path.join(root, 'api.ts'), 'export {};\n');
+    expect((await run(root)).symbols).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'parse', deleted: true, risk: 'high', callers: expect.arrayContaining([expect.objectContaining({ file: 'caller.ts' })]) })]));
+  });
   it('selects a function after a deletion-only body edit', async () => {
     const root = fixture();
     writeFileSync(path.join(root, 'api.ts'), 'export function parse(value: string): string {\n  const unused = 1;\n  return value;\n}\n');

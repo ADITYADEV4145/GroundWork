@@ -2,6 +2,7 @@ import type { Command } from 'commander';
 import { checkRepository, formatCheck } from '../../reuse/check.js';
 import { globalOpts, repoRoot } from '../context.js';
 import { emit } from '../output.js';
+import { renderTypes } from '../../types/index.js';
 
 export function register(program: Command): void {
   program.command('check')
@@ -12,7 +13,7 @@ export function register(program: Command): void {
       const opts = globalOpts(cmd);
       try {
         const report = await checkRepository(repoRoot(opts), { base: options.base });
-        emit(opts, report, () => formatCheck(report));
+        emit(opts, report, () => [formatCheck(report), report.types ? renderTypes({ ...report.types, findings: [] }, 400) : ''].filter(Boolean).join('\n'));
         if (report.blocked) process.exitCode = 1;
       } catch (error) {
         const message = (error as Error).message;

@@ -72,4 +72,5 @@ Forces and allows are counted and logged. If you force often, you are fighting t
 - [Navigation examples](references/navigation.md)
 - [Reuse protocol and gate findings](references/reuse.md)
 - [Grounding checks](references/grounding.md)
+- Optional types: `check_types({files: [{file, lines?}]})` uses the project's compiler when available. `gw types check` and TypeScript-only `gw types def|impl|refs file:line:col` also support `--json`. Missing compilers leave grounding unchanged. Configure `types.enabled`, `stopGate`, `postToolHook` (default false), `timeoutMs`, `budgetTokens`, `typescript` and `python` (`auto`/`off`).
 - [Troubleshooting](references/troubleshooting.md)

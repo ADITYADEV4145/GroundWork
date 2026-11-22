@@ -37,6 +37,13 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('selects a function after a deletion-only body edit', async () => {
+    const root = fixture();
+    writeFileSync(path.join(root, 'api.ts'), 'export function parse(value: string): string {\n  const unused = 1;\n  return value;\n}\n');
+    git(root, 'add', 'api.ts'); git(root, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Multiline body');
+    writeFileSync(path.join(root, 'api.ts'), 'export function parse(value: string): string {\n  return value;\n}\n');
+    expect((await run(root)).symbols).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'parse', risk: 'medium' })]));
+  });
   it('ignores unrelated unresolved calls, imports, unparsed and dynamic files', async () => {
     const root = fixture();
     writeFileSync(path.join(root, 'unrelated.ts'), 'import { absent } from "./missing.js";\nexport function unrelated() { Object.assign({}, {}); return unknown.other(); }\n');

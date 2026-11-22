@@ -53,8 +53,10 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
       if (path.isAbsolute(file) || file.split(/[\\/]/).includes('..')) { reasons.add('unsafe changed path'); continue; }
       const language = languageForPath(file); if (!language) continue;
       let prior: ExtractedSymbol[] = [];
+      let priorText = '';
       try {
         const source = git('show', `${base}:${file}`);
+        priorText = source;
         if (Buffer.byteLength(source) > options.config.index.maxFileBytes) { reasons.add(`base file too large: ${file}`); continue; }
         const parsed = adapterFor(language).extract(source, language);
         prior = parsed.symbols; if (parsed.hasErrors) reasons.add(`unparsed base file: ${file}`);
@@ -62,12 +64,14 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
         if (git('ls-tree', '--name-only', base, '--', file).trim()) reasons.add(`base unavailable: ${file}`);
       }
       const now = state.symbols.filter((s) => s.file === file);
+      const currentText = existsSync(path.join(root, file)) ? readFileSync(path.join(root, file), 'utf8') : '';
       if (new Set(now.map(key)).size !== now.length || new Set(prior.map(key)).size !== prior.length) reasons.add(`ambiguous symbol declarations: ${file}`);
       const ranges = changed.find((c) => c.file === file)?.ranges ?? [];
       for (const s of now) {
         const old = prior.find((p) => key(p) === key(s));
         const signatureChanged = !!old && signature(s) !== signature(old);
-        if (signatureChanged || changed.some((c) => c.file === file && c.ranges === null) || ranges.some(([a, b]) => s.line <= b && s.endLine >= a)) selected.push({ symbol: s, deleted: false, signatureChanged });
+        const bodyChanged = !options.changed && old && priorText.slice(old.startByte, old.endByte) !== currentText.slice(s.startByte, s.endByte);
+        if (bodyChanged || signatureChanged || changed.some((c) => c.file === file && c.ranges === null) || ranges.some(([a, b]) => s.line <= b && s.endLine >= a)) selected.push({ symbol: s, deleted: false, signatureChanged });
       }
       for (const old of prior.filter((s) => !now.some((n) => key(n) === key(s)))) selected.push({
         symbol: { ...old, id: `base:${file}:${key(old)}`, file, fileId: -1, line: old.startLine, endLine: old.endLine, parentId: null }, deleted: true, signatureChanged: true,

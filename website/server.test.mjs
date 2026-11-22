@@ -47,6 +47,24 @@ test('built page includes all install commands and accessible package manager ta
   assert.equal([...html.matchAll(/id="install-picker"/g)].length, 1);
 });
 
+test('built benchmark page separates completed v7 from post-hoc and original historical results', async () => {
+  const html = await readFile(new URL('./dist/benchmarks.html', import.meta.url), 'utf8');
+  const section = html.match(/<!-- stable-protocol:start -->([\s\S]*?)<!-- stable-protocol:end -->/)[1];
+  assert.match(section, /Stable protocol \(v7\)/);
+  assert.ok(html.indexOf('<!-- stable-protocol:end -->') < html.indexOf('<h2>Pre-fix results</h2>'));
+  const primary = section.match(/aria-label="Stable protocol v7 primary results"[\s\S]*?<tbody>([\s\S]*?)<\/tbody>/)[1];
+  assert.equal([...primary.matchAll(/<tr>/g)].length, 6);
+  assert.doesNotMatch(primary, /Pending/);
+  assert.match(section, /no confirmatory latency win/);
+  const historical = section.match(/aria-label="Post-hoc historical session analysis, not v7"[\s\S]*?<tbody>([\s\S]*?)<\/tbody>/)[1];
+  assert.equal([...historical.matchAll(/<tr>/g)].length, 12);
+  assert.doesNotMatch(historical, /Pending/);
+  assert.match(section, /95% whole-session bootstrap/);
+  assert.match(section, /50%[\s\S]*11%/);
+  assert.match(section, /Historical tool-side time is unavailable/);
+  assert.match(html, /-153\.3% \[-209\.8, -66\.4\]/);
+});
+
 test('static server contains malformed targets and never exposes repository files', async t => {
   const port = 18000 + Math.floor(Math.random() * 10000);
   const server = spawn(process.execPath, ['server.mjs'], {

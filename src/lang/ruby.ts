@@ -1,4 +1,5 @@
 import type { Node } from 'web-tree-sitter';
+import { constantOwner, numberConstant } from './constant-literal.js';
 import type { Param, SymbolKind } from '../types.js';
 import { fingerprint } from '../extract/fingerprint.js';
 import { parse } from './parser.js';
@@ -88,10 +89,12 @@ export const rubyAdapter: LanguageAdapter = {
           hasSpread: args.some((n) => n && ['splat_argument', 'hash_splat_argument'].includes(n.type)), isNew: method === 'new' && !!receiver });
       } else if (node.type === 'string') {
         const value = stringValue(node);
-        const kind = value === null ? null : classifyStringLiteral(value);
-        if (value !== null && kind) r.literals.push({ symbol: scope, value, kind, line: node.startPosition.row + 1, constName: null });
+        const owner = constantOwner(node, r);
+        const kind = value === null ? null : (classifyStringLiteral(value) ?? (owner ? 'string' : null));
+        if (value !== null && kind) r.literals.push({ symbol: scope, constName: null, ...owner, value, kind, line: node.startPosition.row + 1 });
         return;
       }
+      numberConstant(node, r);
       for (const child of node.namedChildren) if (child) visit(child, parent, scope);
     };
     try {

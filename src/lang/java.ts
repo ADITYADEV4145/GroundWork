@@ -1,4 +1,5 @@
 import type { Node } from 'web-tree-sitter';
+import { constantOwner, numberConstant } from './constant-literal.js';
 import type { Param, SymbolKind } from '../types.js';
 import { fingerprint } from '../extract/fingerprint.js';
 import { parse } from './parser.js';
@@ -76,10 +77,12 @@ export const javaAdapter: LanguageAdapter = {
       } else if (node.type === 'string_literal') {
         let value: string;
         try { value = JSON.parse(node.text) as string; } catch { value = node.text.slice(1, -1); }
-        const kind = classifyStringLiteral(value);
-        if (kind) r.literals.push({ symbol: scope, value, kind, line: node.startPosition.row + 1, constName: null });
+        const owner = constantOwner(node, r);
+        const kind = (classifyStringLiteral(value) ?? (owner ? 'string' : null));
+        if (kind) r.literals.push({ symbol: scope, constName: null, ...owner, value, kind, line: node.startPosition.row + 1 });
         return;
       }
+      numberConstant(node, r);
       for (const child of node.namedChildren) if (child && child.type !== 'modifiers') visit(child, parent, scope);
     };
     try { visit(tree.rootNode, null, null); return r; } finally { tree.delete(); }

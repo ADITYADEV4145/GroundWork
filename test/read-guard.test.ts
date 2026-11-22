@@ -49,24 +49,58 @@ it('only denies verified covered reads in the same session, with a one-time forc
   }
 });
 
-it('hints on a large read and uses recent find_code queries to pick a relevant symbol', async () => {
+it('compacts a large indexed whole-file read with query-ranked bodies and an exact force retry', async () => {
   const root = tempDir('gw-read-hint-');
   try {
     const file = path.join(root, 'sample.ts');
-    writeFileSync(file, ['function earlier() {}', 'export function wanted() {}', ...Array(400).fill('// filler')].join('\n'));
+    const source = ['function earlier() {}', 'export function wanted() { return 42; }', ...Array(400).fill('// filler')].join('\n');
+    writeFileSync(file, source);
     await initSqlBackend();
     await refreshIndex(root);
     const payload = { cwd: root, session_id: 'hint-test', tool_name: 'Read', tool_input: { file_path: file } };
     await dispatch(normalise('claude', 'post_tool', { ...payload, tool_name: 'mcp__plugin_groundwork_groundwork__find_code', tool_input: { query: 'wanted' } }), root);
-    expect(await dispatch(normalise('claude', 'pre_tool', payload), root)).toMatchObject({
-      action: 'context', message: expect.stringMatching(/Large read allowed \(402 lines\).*outline.*Try read_symbol/s),
-    });
+    const compact = await dispatch(normalise('claude', 'pre_tool', payload), root);
+    expect(compact).toMatchObject({ action: 'deny', message: expect.stringContaining('Repeat the exact Read to get the full file') });
+    expect(compact.message).toContain('Outline (');
+    expect(compact.message).toContain('function wanted() { return 42; }');
+    expect(Buffer.byteLength(compact.message!)).toBeLessThanOrEqual(Buffer.byteLength(source) * 0.65);
+    expect((await dispatch(normalise('claude', 'pre_tool', payload), root)).action).toBe('allow');
+    expect((await dispatch(normalise('claude', 'pre_tool', payload), root)).action).toBe('deny');
     expect((await dispatch(normalise('claude', 'pre_tool', { ...payload, tool_input: { ...payload.tool_input, limit: 10 } }), root)).action).toBe('allow');
     writeFileSync(gwPath(root, 'config.json'), JSON.stringify({ navigation: { readGuard: { enabled: false } } }));
     expect((await dispatch(normalise('claude', 'pre_tool', payload), root)).action).toBe('allow');
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+it('does not add denials for ranged, small, unindexed, empty, changed, subagent or malformed reads', async () => {
+  const root = tempDir('gw-read-compact-safety-');
+  try {
+    const file = path.join(root, 'sample.ts');
+    const source = 'export function target() { return 1; }\n' + '// useful source context\n'.repeat(150);
+    const payload = { cwd: root, session_id: 'compact-safety', tool_name: 'Read', tool_input: { file_path: file } };
+    const run = (override = {}) => dispatch(normalise('claude', 'pre_tool', { ...payload, ...override }), root);
+    writeFileSync(file, source);
+    expect((await run()).action).toBe('allow');
+    await refreshIndex(root);
+    expect((await run({ agent_id: 'subagent' })).action).toBe('allow');
+    expect((await run({ session_id: '../bad' })).action).toBe('allow');
+    expect((await run({ tool_input: { file_path: file, offset: 1 } })).action).toBe('allow');
+    expect((await run({ tool_input: { file_path: file, limit: 2 } })).action).toBe('allow');
+    expect((await run()).action).toBe('deny');
+    expect((await run({ tool_input: { file_path: file, offset: 1, limit: 151 } })).action).toBe('allow');
+    expect((await run()).action).toBe('deny');
+    writeFileSync(file, source.replace('return 1', 'return 2'));
+    expect((await run()).action).toBe('allow');
+    writeFileSync(file, 'export function small() {}');
+    await refreshIndex(root);
+    expect((await run()).action).toBe('allow');
+    writeFileSync(file, ''); await refreshIndex(root);
+    expect((await run()).action).toBe('allow');
+    writeFileSync(file, '// no indexed symbols\n'.repeat(160)); await refreshIndex(root);
+    expect((await run()).action).toBe('allow');
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 it('wires the Claude subprocess hook and clears its history on PreCompact', () => {

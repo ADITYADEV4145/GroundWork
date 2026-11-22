@@ -22,6 +22,8 @@ The search and map rank the most useful results first. If output is truncated, u
 
 Batches accept up to 20 selectors with at most 900 UTF-8 bytes of JSON; use IDs or fewer symbols for long selectors. They share a 1,200-token budget and use compact headers. Follow individual source continuations for truncated bodies and the batch continuation for remaining symbols, only when needed. Neither continuation means an omitted body was fully read.
 
+The Claude Read guard can replace a whole-file Read of indexed source at least 2 KiB with a compact outline and one or two likely relevant symbol bodies. It uses the recent find_code query, otherwise index-ranked symbols. This is a denied Read carrying selected evidence, not a successful full-file Read. The payload is at most 900 estimated tokens and 65% of source bytes; otherwise it allows the Read. Repeat the exact Read to get the full file. This rule leaves small files and explicitly ranged Reads untouched; the existing unchanged-repeat guard still applies. Invalid sessions, subagents, missing/empty/partial/stale indexes and errors fail open. It never refreshes or waits for an index writer. The 2 KiB threshold targets only the upper tail of observed v2/v3 navigation Read sizes; all observed LH Reads were smaller.
+
 ### Claude Code read guard
 
 Wire the following commands into Claude Code hooks if not already installed by your setup:

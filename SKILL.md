@@ -49,6 +49,7 @@ Act on each finding by reusing or extending the existing symbol, deleting dead c
 **Waste guards**:
 - A repeated command with nothing changed returns the earlier result's summary instead of running again.
 - A repeated read of unchanged lines points you to `outline` and `read_symbol`.
+- A first whole-file Read of indexed source at least 2 KiB may return a compact outline and selected bodies instead of the file. These are ranked leads, not full-file evidence; follow missing source ranges only if needed, or repeat the exact Read to get the full file. Small files and explicitly ranged Reads are not intercepted by this large-Read rule.
 - Long outputs are trimmed, but failures are always kept.
 
 ## 4. Force, rarely and with a reason

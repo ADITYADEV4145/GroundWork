@@ -11,8 +11,13 @@ const source = path.resolve(here, '..');
 const cli = path.join(source, 'dist/cli/main.js');
 const suite = process.env.GW_BENCH_SUITE ?? 'nav';
 if (!/^[a-z][a-z0-9-]*$/.test(suite)) throw new Error('Invalid suite name');
-const { revision, tasks, mcpTools = ['find_code', 'outline', 'read_symbol', 'explore', 'callers', 'callees', 'where_used', 'repo_map'] } =
+const { revision, tasks: allTasks, mcpTools = ['find_code', 'outline', 'read_symbol', 'explore', 'callers', 'callees', 'where_used', 'repo_map'] } =
   JSON.parse(readFileSync(path.join(here, suite, 'tasks.json'), 'utf8'));
+const reuse = suite === 'multiturn-reuse';
+const chain = reuse ? process.env.GW_BENCH_CHAIN : undefined;
+const tasks = reuse ? allTasks.filter(t => t.sequence === chain) : allTasks;
+if (reuse && (tasks.length !== 5 || process.env.GW_BENCH_PROTOCOL !== 'stable-v1')) throw new Error('Reuse capture requires stable-v1 and a valid GW_BENCH_CHAIN');
+const taskRoot = (dir, task) => path.join(dir, reuse ? 'workspace' : task.id);
 const MAX_RESPONSE_BYTES = 8_000;
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 const saveJson = (file, value) => writeFileSync(file, JSON.stringify(value) + '\n');
@@ -98,7 +103,13 @@ async function main([action, ...argv]) {
     if (process.env.GW_BENCH_PROTOCOL === 'stable-v1') {
       if (!argv[0] || readJson(path.join(argv[0], 'metadata.json')).protocol !== 'stable-v1') throw new Error('Stable list requires initialized STATE');
     }
-    process.stdout.write(JSON.stringify(tasks) + '\n');
+    if (reuse) {
+      const dir = argv[0];
+      const meta = readJson(path.join(dir, 'metadata.json'));
+      if (meta.chain !== chain) throw new Error('Wrong chain');
+      const next = tasks.find(t => !existsSync(path.join(dir, t.id + '.json')) || readJson(path.join(dir, t.id + '.json')).wallMs === undefined);
+      process.stdout.write(JSON.stringify(next ? [next] : []) + '\n');
+    } else process.stdout.write(JSON.stringify(tasks) + '\n');
     return;
   }
   const [directory, id, ...args] = argv;
@@ -112,14 +123,14 @@ async function main([action, ...argv]) {
     mkdirSync(dir);
     const stable = process.env.GW_BENCH_PROTOCOL === 'stable-v1';
     if (stable && run > 16) throw new Error('Stable protocol requires runs 1–16');
-    if (stable) unpackWorkspace(source, revision, tasks[0].repo, path.join(dir, tasks[0].id));
+    if (stable) unpackWorkspace(source, revision, tasks[0].repo, taskRoot(dir, tasks[0]));
     saveJson(metadata, { suite, revision, condition: id, run, ...(stable ? { protocol: 'stable-v1', sessionStartedAt: Date.now(), sessionStartBasis: 'workspace-ready' } : {}), agent: process.env.GW_BENCH_AGENT ?? 'Devin normal',
       model: process.env.GW_BENCH_MODEL ?? null, node: process.version,
-      captureRevision: git(source, 'rev-parse', 'HEAD').trim() });
+      captureRevision: git(source, 'rev-parse', 'HEAD').trim(), ...(reuse ? { chain } : {}) });
     return;
   }
   const meta = readJson(metadata);
-  if (meta.suite !== suite || meta.revision !== revision) throw new Error('Capture state does not match this suite');
+  if (meta.suite !== suite || meta.revision !== revision || (reuse && meta.chain !== chain)) throw new Error('Capture state does not match this suite');
   if (action === 'export') {
     const observations = tasks.flatMap((task) => {
       const file = path.join(dir, task.id + '.json');
@@ -130,7 +141,7 @@ async function main([action, ...argv]) {
   }
   const task = tasks.find((t) => t.id === id);
   if (!task) throw new Error('Unknown task');
-  const root = path.join(dir, task.id);
+  const root = taskRoot(dir, task);
   const record = path.join(dir, task.id + '.json');
   if (action === 'begin') {
     if (existsSync(record)) throw new Error('Task already begun');
@@ -138,8 +149,10 @@ async function main([action, ...argv]) {
       const position = tasks.indexOf(task);
       if (position && readJson(path.join(dir, tasks[position - 1].id + '.json')).wallMs === undefined) throw new Error('Finish previous task first');
     }
-    if (!(meta.protocol === 'stable-v1' && task === tasks[0])) unpackWorkspace(source, revision, task.repo, root);
-    restoreSequence(task, dir, root);
+    if (!reuse) {
+      if (!(meta.protocol === 'stable-v1' && task === tasks[0])) unpackWorkspace(source, revision, task.repo, root);
+      restoreSequence(task, dir, root);
+    }
     saveJson(record, { task: task.id, startedAt: Date.now(), tools: [] });
     return;
   }
@@ -161,6 +174,10 @@ async function main([action, ...argv]) {
         ':(exclude).groundwork/**', ':(exclude)**/__pycache__/**');
     } else observation.answer = JSON.parse(args[0] ?? '[]');
     saveJson(record, observation);
+    if (reuse) {
+      git(root, 'add', '--', '.', ':(exclude).groundwork/**', ':(exclude)**/__pycache__/**');
+      git(root, '-c', 'user.name=Groundwork benchmark', '-c', 'user.email=benchmark@example.invalid', 'commit', '--allow-empty', '-qm', 'Benchmark turn ' + task.step);
+    }
     if (meta.protocol !== 'stable-v1' || task === tasks.at(-1)) {
       meta.sessionEndedAt = Date.now();
       saveJson(metadata, meta);

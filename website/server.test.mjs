@@ -65,6 +65,18 @@ test('built benchmark page separates completed v7 from post-hoc and original his
   assert.match(html, /-153\.3% \[-209\.8, -66\.4\]/);
 });
 
+test('built benchmark page places measured-not-shipped v8 above preserved v7', async () => {
+  const html = await readFile(new URL('./dist/benchmarks.html', import.meta.url), 'utf8');
+  assert.ok(html.indexOf('id="stable-protocol-v8"') < html.indexOf('id="stable-protocol-v7"'));
+  const primary = html.match(/aria-label="Stable protocol v8 primary results"[\s\S]*?<tbody>([\s\S]*?)<\/tbody>/)[1];
+  assert.equal([...primary.matchAll(/<tr>/g)].length, 6);
+  assert.match(html, /434 to 285ms/);
+  assert.match(html, /616 to 337ms/);
+  assert.match(html, /measured and not shipped on main/);
+  assert.match(html, /significantly slower in both suites/);
+  assert.doesNotMatch(primary, /Pending/);
+});
+
 test('static server contains malformed targets and never exposes repository files', async t => {
   const port = 18000 + Math.floor(Math.random() * 10000);
   const server = spawn(process.execPath, ['server.mjs'], {

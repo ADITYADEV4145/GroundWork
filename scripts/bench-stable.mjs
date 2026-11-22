@@ -25,8 +25,8 @@ export function historicalRows(report) {
   return rows;
 }
 
-export function loadV7(base = root) {
-  const files = ['nav', 'long-horizon'].map((s) => path.join(base, 'bench', s, 'v7/results/combined.json'));
+export function loadV7(base = root, round = 'v7', pin = '01b142647e338ce557ef85bb7ef6c15e0c4f9257') {
+  const files = ['nav', 'long-horizon'].map((s) => path.join(base, 'bench', s, `${round}/results/combined.json`));
   if (files.every((f) => !existsSync(f))) return null;
   if (files.some((f) => !existsSync(f))) throw new Error('Both v7 reports are required');
   return files.map((f, i) => {
@@ -36,7 +36,7 @@ export function loadV7(base = root) {
     if (reports.length !== 1 || summary.suite !== suite || summary.runs !== 16 || evidence.captures.length !== 32 || summary.sessionPrimary?.basis !== 'recorded-session') throw new Error('Invalid v7 report');
     for (const arm of ['baseline', 'groundwork']) {
       const cs = evidence.captures.filter((c) => c.condition === arm);
-      if (cs.length !== 16 || new Set(cs.map((c) => c.run)).size !== 16 || cs.some((c) => c.run < 1 || c.run > 16 || c.captureRevision !== '01b142647e338ce557ef85bb7ef6c15e0c4f9257' || c.protocol !== 'stable-v1' || c.samples.length !== (i ? 10 : 30))) throw new Error('Invalid v7 provenance');
+      if (cs.length !== 16 || new Set(cs.map((c) => c.run)).size !== 16 || cs.some((c) => c.run < 1 || c.run > 16 || c.captureRevision !== pin || c.protocol !== 'stable-v1' || c.samples.length !== (i ? 10 : 30))) throw new Error('Invalid v7 provenance');
     }
     for (const key of ['elapsedMsPerTask', 'emittedBytesPerSession', 'toolSideMsPerSession']) {
       const m = summary.sessionPrimary[key];
@@ -49,7 +49,7 @@ export function loadV7(base = root) {
   });
 }
 
-export function sections(report, results = null) {
+export function sections(report, results = null, v8 = null) {
   const rows = historicalRows(report);
   const title = 'Stable protocol (v7)';
   const status = 'Pending — v7 collection is in progress. No v7 results are published yet. There are 16 independent sessions per arm per suite (64 sessions total); the product under test is main at e0cad99, with collector 01b1426 and experimental read paths off.';
@@ -80,11 +80,23 @@ export function sections(report, results = null) {
     content.markdown = content.markdown.replace(status, completedStatus).replace(markdownTable(headings, pending), markdownTable(resultHeadings, resultRows) + '\n\n' + interpretation + '\n\n' + notes + '\n\n[Tool-side totals and deviation review](bench/V7-ANALYSIS.md).').replace('Each cost cell will show', 'Each metric row reports');
     content.html = content.html.replace(escape(status), escape(completedStatus)).replace(htmlTable('Stable protocol v7 pending results', headings, pending), htmlTable('Stable protocol v7 primary results', resultHeadings, resultRows) + `\n<p>${escape(interpretation)}</p>\n<p>${escape(notes)}</p>\n<p><a href="https://github.com/ADITYADEV4145/GroundWork/blob/main/bench/V7-ANALYSIS.md">Tool-side totals and deviation review</a>.</p>`).replace('Each cost cell will show', 'Each metric row reports');
   }
+  if (v8) {
+    const title = 'v8 (PR #39: fresh-root index cloning + bundled service, not shipped)';
+    const rows = v8.flatMap((s) => [['Session elapsed/task (ms)', 'elapsedMsPerTask'], ['Emitted bytes/session', 'emittedBytesPerSession'], ['Tool-side ms/session', 'toolSideMsPerSession']].map(([label, key]) => {
+      const m = s.sessionPrimary[key], c = m.reductionPct;
+      return [s.suite, label, m.baselineMean.toFixed(2), m.groundworkMean.toFixed(2), `${c.median.toFixed(1)}% [${c.low.toFixed(1)}, ${c.high.toFixed(1)}]`, `${s.noSuccessDrop ? 'met' : 'NOT MET'}: ${s.baseline.success}/${s.baseline.attempts} / ${s.groundwork.success}/${s.groundwork.attempts}`];
+    }));
+    const status = 'V8 publishes the completed v8b recollection: 16 sessions per arm per suite, product and unchanged stable-v1 collector/grader pinned to 243bb549e352ee4a63e968230055cda0c165bbe5. The earlier 3e804c9 run was killed and discarded; none of its captures are included.';
+    const note = 'Tool-level find_code fell from 434 to 285ms mean per call and LH repo_map from 616 to 337ms (descriptive cross-round), but end to end GroundWork was still significantly slower in both suites: navigation −18.2% [−27.1, −10.4], long-horizon −16.2% [−28.7, −4.7]. Output CIs cross zero in both suites; tool-side time is significantly higher in both. Navigation’s elapsed gap is about 29s per session versus about 7s of additional tool time: most of the loss is outside captured dispatch, in the agent-turn/inter-action portion of the envelope. This residual does not identify model thinking, provider latency or a causal product effect. These product changes were measured and not shipped on main.';
+    const confirm = 'Success guardrails are met (480/480 each navigation, 160/160 each LH). Neither suite meets the confirmatory latency-win rule: adjusted 97.5% per-suite lower bounds are −28.35% navigation and −30.45% LH. Positive reduction favors GW; all nominal 95% intervals use the frozen whole-session bootstrap. Equal success is not a correctness win. LH GW16’s 86.216s envelope is complete and valid under the timing rules; it is retained. Tool bytes are not billed tokens or dollar savings.';
+    content.markdown = `### ${title}\n\n${status}\n\n${markdownTable(resultHeadings, rows)}\n\n${note}\n\n${confirm}\n\n[Full v8 analysis and tool totals](bench/V8-ANALYSIS.md).\n\n` + content.markdown;
+    content.html = `<h2 id="stable-protocol-v8">${escape(title)}</h2>\n<p>${escape(status)}</p>\n${htmlTable('Stable protocol v8 primary results', resultHeadings, rows)}\n<p>${escape(note)}</p>\n<p>${escape(confirm)}</p>\n<p><a href="https://github.com/ADITYADEV4145/GroundWork/blob/main/bench/V8-ANALYSIS.md">Full v8 analysis and tool totals</a>.</p>\n` + content.html;
+  }
   return content;
 }
 
 export function generateStable(base = root) {
-  const content = sections(readFileSync(path.join(base, snapshot), 'utf8'), loadV7(base));
+  const content = sections(readFileSync(path.join(base, snapshot), 'utf8'), loadV7(base), loadV7(base, 'v8', '243bb549e352ee4a63e968230055cda0c165bbe5'));
   const pages = [['README.md', content.markdown], ['website/public/benchmarks.html', content.html]].map(([file, section]) => {
     const target = path.join(base, file), previous = readFileSync(target, 'utf8');
     const start = '<!-- stable-protocol:start -->', end = '<!-- stable-protocol:end -->';

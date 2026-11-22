@@ -1,0 +1,706 @@
+{
+  "version": 1,
+  "anchor": "10fc7493ed024d817b5cabf7cbf4aaa97533825c",
+  "tasks": [
+    {
+      "id": "p1",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "approximate prompt size using UTF8 bytes divided by four",
+      "target": {
+        "file": "src/util/tokens.ts",
+        "name": "estimateTokens",
+        "kind": "function"
+      },
+      "expected": [
+        "c8bad45069ee18cd"
+      ]
+    },
+    {
+      "id": "p2",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "keep ranked entries until the response allowance is exhausted",
+      "target": {
+        "file": "src/util/tokens.ts",
+        "name": "fitToBudget",
+        "kind": "function"
+      },
+      "expected": [
+        "eaae94344719969e"
+      ]
+    },
+    {
+      "id": "p3",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "produce a cryptographic hexadecimal digest",
+      "target": {
+        "file": "src/util/hash.ts",
+        "name": "sha1",
+        "kind": "function"
+      },
+      "expected": [
+        "d608ec300e304f04"
+      ]
+    },
+    {
+      "id": "p4",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "produce a fast noncryptographic integer digest",
+      "target": {
+        "file": "src/util/hash.ts",
+        "name": "fnv1a",
+        "kind": "function"
+      },
+      "expected": [
+        "c80eae278e24308f"
+      ]
+    },
+    {
+      "id": "p5",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "discover the git toplevel starting from a working directory",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "findRepoRoot",
+        "kind": "function"
+      },
+      "expected": [
+        "343152776de30679"
+      ]
+    },
+    {
+      "id": "p6",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "join a workspace directory with the hidden groundwork folder",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "gwPath",
+        "kind": "function"
+      },
+      "expected": [
+        "d3c5bbb34357f88e"
+      ]
+    },
+    {
+      "id": "p7",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "create the hidden state folder recursively",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "ensureGwDir",
+        "kind": "function"
+      },
+      "expected": [
+        "cdb6dd5f3d3ab79a"
+      ]
+    },
+    {
+      "id": "p8",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "convert platform separators into forward slashes",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "toPosix",
+        "kind": "function"
+      },
+      "expected": [
+        "731081f56167b03b"
+      ]
+    },
+    {
+      "id": "p9",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "reject a pathname escaping the workspace boundary",
+      "target": {
+        "file": "src/util/repo-file.ts",
+        "name": "repoRelative",
+        "kind": "function"
+      },
+      "expected": [
+        "ca6b33a1648ed7aa"
+      ]
+    },
+    {
+      "id": "p10",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "safely consume a bounded regular file without following outside symlinks",
+      "target": {
+        "file": "src/util/repo-file.ts",
+        "name": "readRepoFile",
+        "kind": "function"
+      },
+      "expected": [
+        "f4305408004643df"
+      ]
+    },
+    {
+      "id": "p11",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "obtain builtin settings when no user options exist",
+      "target": {
+        "file": "src/config/load.ts",
+        "name": "defaultConfig",
+        "kind": "function"
+      },
+      "expected": [
+        "7f5be05b63e16185"
+      ]
+    },
+    {
+      "id": "p12",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "read workspace settings and validate them",
+      "target": {
+        "file": "src/config/load.ts",
+        "name": "loadConfig",
+        "kind": "function"
+      },
+      "expected": [
+        "9559b6e41870bde8"
+      ]
+    },
+    {
+      "id": "p13",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "locate the sqlite database inside hidden workspace state",
+      "target": {
+        "file": "src/index/store.ts",
+        "name": "indexDbPath",
+        "kind": "function"
+      },
+      "expected": [
+        "111f5a1e4724b2fe"
+      ]
+    },
+    {
+      "id": "p14",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "fingerprint extraction settings to detect rebuild requirements",
+      "target": {
+        "file": "src/index/store.ts",
+        "name": "indexConfigHash",
+        "kind": "function"
+      },
+      "expected": [
+        "eb76a2f76ac8f0ce"
+      ]
+    },
+    {
+      "id": "p15",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "derive a stable declaration key from location and ordinal",
+      "target": {
+        "file": "src/index/store.ts",
+        "name": "symbolId",
+        "kind": "function"
+      },
+      "expected": [
+        "f88174bb7f9eef5d"
+      ]
+    },
+    {
+      "id": "p16",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "rank declarations matching a description or identifier",
+      "target": {
+        "file": "src/index/navigation.ts",
+        "name": "findCode",
+        "kind": "function"
+      },
+      "expected": [
+        "14f630c4655c40ef"
+      ]
+    },
+    {
+      "id": "p17",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "list declarations contained in a single source document",
+      "target": {
+        "file": "src/index/navigation.ts",
+        "name": "fileOutline",
+        "kind": "function"
+      },
+      "expected": [
+        "24a2765b19e57738"
+      ]
+    },
+    {
+      "id": "p18",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "locate references to an identifier throughout the workspace",
+      "target": {
+        "file": "src/index/navigation.ts",
+        "name": "whereUsed",
+        "kind": "function"
+      },
+      "expected": [
+        "0211354434c30601"
+      ]
+    },
+    {
+      "id": "p19",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "traverse incoming or outgoing invocation edges",
+      "target": {
+        "file": "src/index/navigation.ts",
+        "name": "symbolCalls",
+        "kind": "function"
+      },
+      "expected": [
+        "ce43e989fa900fc2"
+      ]
+    },
+    {
+      "id": "p20",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "obtain byte offsets and content digest for a declaration",
+      "target": {
+        "file": "src/index/navigation.ts",
+        "name": "sourceLocation",
+        "kind": "function"
+      },
+      "expected": [
+        "2c7abc8965dbbe9c"
+      ]
+    },
+    {
+      "id": "p21",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "count indexed files declarations and invocation edges",
+      "target": {
+        "file": "src/index/query.ts",
+        "name": "indexStats",
+        "kind": "function"
+      },
+      "expected": [
+        "a8c9c67d76be1e1a"
+      ]
+    },
+    {
+      "id": "p22",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "enumerate programming dialects present in the database",
+      "target": {
+        "file": "src/index/query.ts",
+        "name": "indexedLanguages",
+        "kind": "function"
+      },
+      "expected": [
+        "1e9f9a66c5616f1e"
+      ]
+    },
+    {
+      "id": "p23",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "retrieve a cached semantic vector by content digest",
+      "target": {
+        "file": "src/index/query.ts",
+        "name": "readEmbedding",
+        "kind": "function"
+      },
+      "expected": [
+        "75d24df4dfcc0d10"
+      ]
+    },
+    {
+      "id": "p24",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "expand a declaration with parameters members and incoming invocations",
+      "target": {
+        "file": "src/index/query.ts",
+        "name": "getSymbolDetail",
+        "kind": "function"
+      },
+      "expected": [
+        "b050d4b4de29bd82"
+      ]
+    },
+    {
+      "id": "p25",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "convert comma separated numeric intervals into pairs",
+      "target": {
+        "file": "src/grounding/ranges.ts",
+        "name": "parseLineSpec",
+        "kind": "function"
+      },
+      "expected": [
+        "9977a21dac1f1999"
+      ]
+    },
+    {
+      "id": "p26",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "discover inserted snippets positions in document text",
+      "target": {
+        "file": "src/grounding/ranges.ts",
+        "name": "locate",
+        "kind": "function"
+      },
+      "expected": [
+        "781623331f9a57eb"
+      ]
+    },
+    {
+      "id": "p27",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "derive edited file spans from agent edit arguments",
+      "target": {
+        "file": "src/grounding/ranges.ts",
+        "name": "changedFromToolInput",
+        "kind": "function"
+      },
+      "expected": [
+        "5d5ea65688170efa"
+      ]
+    },
+    {
+      "id": "p28",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "derive edited file spans from unified agent patch text",
+      "target": {
+        "file": "src/grounding/ranges.ts",
+        "name": "changedFromApplyPatch",
+        "kind": "function"
+      },
+      "expected": [
+        "42dd5368342ced99"
+      ]
+    },
+    {
+      "id": "p29",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "check whether a source span intersects requested intervals",
+      "target": {
+        "file": "src/grounding/verify.ts",
+        "name": "inRanges",
+        "kind": "function"
+      },
+      "expected": [
+        "f5dd0f1c40e06c7a"
+      ]
+    },
+    {
+      "id": "p30",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "measure spelling closeness between two identifiers",
+      "target": {
+        "file": "src/grounding/suggest.ts",
+        "name": "nameSimilarity",
+        "kind": "function"
+      },
+      "expected": [
+        "3a237822b68fd550"
+      ]
+    },
+    {
+      "id": "p31",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "allow the agent to continue when a hook crashes",
+      "target": {
+        "file": "src/hooks/run.ts",
+        "name": "failOpenOutput",
+        "kind": "function"
+      },
+      "expected": [
+        "53b5bd00961ddc9f"
+      ]
+    },
+    {
+      "id": "p32",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "consume agent event JSON from standard input",
+      "target": {
+        "file": "src/hooks/client.ts",
+        "name": "readHookInput",
+        "kind": "function"
+      },
+      "expected": [
+        "9a0d56a5af4f5c25"
+      ]
+    },
+    {
+      "id": "p33",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "check installed vector model manifest files exist on disk",
+      "target": {
+        "file": "src/reuse/embeddings.ts",
+        "name": "hasLocalEmbeddings",
+        "kind": "function"
+      },
+      "expected": [
+        "bb0b39489eefe00a"
+      ]
+    },
+    {
+      "id": "p34",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "download a consented vector model and persist its installation manifest",
+      "target": {
+        "file": "src/reuse/embeddings.ts",
+        "name": "initializeEmbeddings",
+        "kind": "function"
+      },
+      "expected": [
+        "8972c93aeee58a46"
+      ]
+    },
+    {
+      "id": "p35",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "compute semantic vectors while reusing content addressed cache entries",
+      "target": {
+        "file": "src/reuse/embeddings.ts",
+        "name": "embedSources",
+        "kind": "function"
+      },
+      "expected": [
+        "9f7ba01e4727e998"
+      ]
+    },
+    {
+      "id": "p36",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "prepare sqlite fallback when native support is unavailable",
+      "target": {
+        "file": "src/store/db.ts",
+        "name": "initSqlBackend",
+        "kind": "function"
+      },
+      "expected": [
+        "31ff06c59ed39e9b"
+      ]
+    },
+    {
+      "id": "p37",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "incrementally reextract dirty source files and relink references",
+      "target": {
+        "file": "src/index/refresh.ts",
+        "name": "refreshIndex",
+        "kind": "function"
+      },
+      "expected": [
+        "51cd2398cdf7f044"
+      ]
+    },
+    {
+      "id": "p38",
+      "set": "paraphrase",
+      "corpus": "python",
+      "query": "sum monetary line amounts",
+      "target": {
+        "file": "app/models.py",
+        "name": "Invoice.total",
+        "kind": "method"
+      },
+      "expected": [
+        "7206211994201767"
+      ]
+    },
+    {
+      "id": "p39",
+      "set": "paraphrase",
+      "corpus": "python",
+      "query": "calculate payable money including regional tax",
+      "target": {
+        "file": "app/services/billing.py",
+        "name": "charge",
+        "kind": "function"
+      },
+      "expected": [
+        "ac4f028de8ae2e98"
+      ]
+    },
+    {
+      "id": "p40",
+      "set": "paraphrase",
+      "corpus": "python",
+      "query": "titlecase the client label for presentation",
+      "target": {
+        "file": "app/models.py",
+        "name": "Customer.display",
+        "kind": "method"
+      },
+      "expected": [
+        "1bcafe0ff365341b"
+      ]
+    },
+    {
+      "id": "c1",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "estimateTokens",
+      "target": {
+        "file": "src/util/tokens.ts",
+        "name": "estimateTokens",
+        "kind": "function"
+      },
+      "expected": [
+        "c8bad45069ee18cd"
+      ]
+    },
+    {
+      "id": "c2",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "fitToBudget",
+      "target": {
+        "file": "src/util/tokens.ts",
+        "name": "fitToBudget",
+        "kind": "function"
+      },
+      "expected": [
+        "eaae94344719969e"
+      ]
+    },
+    {
+      "id": "c3",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "sha1",
+      "target": {
+        "file": "src/util/hash.ts",
+        "name": "sha1",
+        "kind": "function"
+      },
+      "expected": [
+        "d608ec300e304f04"
+      ]
+    },
+    {
+      "id": "c4",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "fnv1a",
+      "target": {
+        "file": "src/util/hash.ts",
+        "name": "fnv1a",
+        "kind": "function"
+      },
+      "expected": [
+        "c80eae278e24308f"
+      ]
+    },
+    {
+      "id": "c5",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "findRepoRoot",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "findRepoRoot",
+        "kind": "function"
+      },
+      "expected": [
+        "343152776de30679"
+      ]
+    },
+    {
+      "id": "c6",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "gwPath",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "gwPath",
+        "kind": "function"
+      },
+      "expected": [
+        "d3c5bbb34357f88e"
+      ]
+    },
+    {
+      "id": "c7",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "ensureGwDir",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "ensureGwDir",
+        "kind": "function"
+      },
+      "expected": [
+        "cdb6dd5f3d3ab79a"
+      ]
+    },
+    {
+      "id": "c8",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "toPosix",
+      "target": {
+        "file": "src/util/paths.ts",
+        "name": "toPosix",
+        "kind": "function"
+      },
+      "expected": [
+        "731081f56167b03b"
+      ]
+    },
+    {
+      "id": "c9",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "repoRelative",
+      "target": {
+        "file": "src/util/repo-file.ts",
+        "name": "repoRelative",
+        "kind": "function"
+      },
+      "expected": [
+        "ca6b33a1648ed7aa"
+      ]
+    },
+    {
+      "id": "c10",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "readRepoFile",
+      "target": {
+        "file": "src/util/repo-file.ts",
+        "name": "readRepoFile",
+        "kind": "function"
+      },
+      "expected": [
+        "f4305408004643df"
+      ]
+    }
+  ]
+}

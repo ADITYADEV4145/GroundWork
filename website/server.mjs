@@ -9,6 +9,7 @@ const types = new Map([
   ['/icon-192.png', ['icon-192.png', 'image/png']],
   ['/icon-512.png', ['icon-512.png', 'image/png']],
   ['/site.webmanifest', ['site.webmanifest', 'application/manifest+json']],
+  ...['token-reduction', 'copied-code', 'success', 'wall-time'].map(name => [`/bench/${name}.svg`, [`bench/${name}.svg`, 'image/svg+xml']]),
   ...['poster', 'workflow'].map(name => [`/groundwork-${name}.webp`, [`groundwork-${name}.webp`, 'image/webp']]),
 ]);
 const port = Number(process.env.PORT || 4173);

@@ -5,6 +5,12 @@ instrumentation/analysis changes are permitted. No experimental graph cache,
 callee_depth or relay bundle. Identical collection and acceptance rules in both
 arms. Existing suite graders/fixtures are unchanged. Experimental read paths stay off.
 
+Pre-data prompt exception approved by the user: restore only the v6 navigation
+GroundWork trace paragraph to v5/current-main guidance (targeted lookup followed
+by callees/batched read_symbol). V6 recommended callee_depth, which is not shipped
+in the product under test. Other non-harness instructions remain unchanged;
+baseline edits are only the revision/fetch pin and symmetric harness instructions.
+
 ## Collection
 
 Exactly 16 complete sessions per arm per suite (64 sessions), runs 1–16.

@@ -155,11 +155,12 @@ function locate(source: ts.SourceFile, fact: SymbolFact): Declaration {
   return hits[0]!;
 }
 
-function callableType(program: ts.Program, body: ts.ConciseBody): string | undefined {
+function callableType(program: ts.Program, name: ts.Identifier): string | undefined {
   const checker = program.getTypeChecker();
-  const signature = checker.getSignatureFromDeclaration(body.parent as ts.SignatureDeclaration);
-  if (!signature) return undefined;
-  return checker.signatureToString(signature, body.parent, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseFullyQualifiedType);
+  const visible = checker.getTypeAtLocation(name).getCallSignatures();
+  if (!visible.length) return undefined;
+  const flags = ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseFullyQualifiedType;
+  return JSON.stringify(visible.map((signature) => checker.signatureToString(signature, name, flags)));
 }
 
 const key = (file: string, start: number) => `${fileKey(file)}\0${start}`;
@@ -239,7 +240,7 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
       const body = declaration.body;
       if (!body || !['function', 'method', 'component'].includes(target.kind)) throw new Error('Only named functions and methods with bodies can be edited.');
       if (!request.body.trim() || request.body.length > MAX_BODY) throw new Error(`Provide a complete function body up to ${MAX_BODY} characters.`);
-      if (requireStableType) beforeType = callableType(service.getProgram()!, body);
+      if (requireStableType) beforeType = callableType(service.getProgram()!, declaration.name);
       changes.set(target.file, [{ start: body.getStart(source), end: body.end, text: request.body }]);
     }
     const beforeErrors = compilerErrors(service, ctx.root);
@@ -270,13 +271,14 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
       if (actual.size !== positions.size || [...positions].some((p) => !actual.has(p))) throw new Error('Rename would change symbol bindings or capture a different reference.');
     } else {
       const candidate = service.getProgram()!.getSourceFile(absolute)!;
-      const body = declarations(candidate, target.name).find((d) => d.name.getStart(candidate) === start)?.body;
+      const declaration = declarations(candidate, target.name).find((d) => d.name.getStart(candidate) === start);
+      const body = declaration?.body;
       const edit = edits[0]!.edits[0]!;
       const offset = edit.text.length - edit.text.trimStart().length;
       if (!body || body.getStart(candidate) !== edit.start + offset || body.end !== edit.start + edit.text.trimEnd().length) {
         throw new Error('Replacement must be exactly one function body, without changing its surrounding declaration.');
       }
-      if (requireStableType && (beforeType === undefined || beforeType !== callableType(service.getProgram()!, body))) {
+      if (requireStableType && (beforeType === undefined || beforeType !== callableType(service.getProgram()!, declaration.name))) {
         throw new Error('Cannot change the callable type when files outside the compiler project may use it.');
       }
     }

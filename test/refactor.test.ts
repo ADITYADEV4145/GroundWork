@@ -147,6 +147,21 @@ describe('guarded symbol refactoring', () => {
     expect(await refactor({ symbol: 'calc', body: '{ return 8; }' })).toMatchObject({ check: { status: 'PASS' } });
   });
 
+  it('keeps visible overloads stable without freezing the implementation return type', async () => {
+    put('tsconfig.json', JSON.stringify({ files: ['calc.ts'], compilerOptions: { strict: true } }));
+    put('calc.ts', [
+      'export function calc(n: number): number;',
+      'export function calc(n: string): string;',
+      'export function calc(n: number | string) { return n; }',
+      '',
+    ].join('\n'));
+    mkdirSync(path.join(root, 'other'));
+    put('other/tsconfig.json', JSON.stringify({ files: ['consumer.ts'] }));
+    put('other/consumer.ts', 'import { calc } from "../calc.js";\nexport const use: number = calc(2);\n');
+    expect(await refactor({ symbol: 'calc', body: '{ return n as unknown; }' })).toMatchObject({ check: { status: 'PASS' } });
+    await expect(refactor({ symbol: 'calc', body: '{ return null; }' })).rejects.toThrow(/TS2394/);
+  });
+
   it.skipIf(process.platform === 'win32')('refuses to edit a symlink even when it resolves inside the repository', async () => {
     put('source.ts', 'export const operation = () => 1;\n');
     symlinkSync('source.ts', path.join(root, 'link.ts'));

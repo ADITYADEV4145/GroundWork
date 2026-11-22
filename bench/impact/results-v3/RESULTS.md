@@ -56,7 +56,7 @@ All-task p50/p95: 47.379/675.449 ms. Complete execution coverage: true.
 
 ## Limitations and deviations
 
-- No checker fixes entered this frozen run after preregistration. No tasks removed, no selective reruns or threshold changes. Subsequent session-evidence-only fixes (findings 8–10) were separately authorized after the run; the v3 checker was not re-frozen or rerun.
+- No checker fixes entered this frozen run after preregistration. No tasks removed, no selective reruns or threshold changes. Subsequent session-evidence-only fixes (findings 8–12) were separately authorized after the run; the v3 checker was not re-frozen or rerun.
 - Compiler error files are a must-change proxy, not proof of semantic exhaustiveness. High-risk precision is task-level, not per-symbol calibration. Test oracle uses only static imports within depth two plus compiler errors.
 - complete describes indexed static evidence in one snapshot, not arbitrary dynamic runtime reachability. Zero complete answers is undefined accuracy and fails the registered rule, not a vacuous pass.
 - Timing excludes refresh, oracle and process startup. Stop uses a hard time-boxed worker; this benchmark does not measure total hook dispatch or establish agent behavior.
@@ -80,9 +80,11 @@ GroundWork files across its four mutations. The mechanical new-target selection
 was not changed after observing this limited coverage. Passing these registered
 rules does not establish negative-case calibration or the pending agent gate.
 
-After this single run, separately requested findings 8–10 changed only
-src/impact/evidence.ts: constrain discovery-root options, decline file coverage
-for name filters, and apply only whole-path exclusions. The benchmark calls
+After this single run, separately requested findings 8–12 changed only
+src/impact/evidence.ts: constrain Vitest discovery-root options (not pytest's
+rootdir configuration), decline file coverage for name filters, keep ignore paths
+literal, and conservatively mark any deselected-node file unrun. The later
+deselection fix deliberately supersedes the earlier node-deselection policy. The benchmark calls
 changeImpact without sessionId. sessionEvidence loads no session commands in that
 case, and its ran callback never enters selector parsing. Those changes cannot
 affect this run's caller, risk, test, completeness or timing observations. The

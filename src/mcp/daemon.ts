@@ -23,7 +23,27 @@ export async function runService(root: string): Promise<void> {
       socket.write(JSON.stringify({ version: info.version, pid: process.pid }) + '\n');
       socket.once('close', () => { void server.close(); });
       socket.once('end', () => socket.end());
-      await server.connect(new StdioServerTransport(socket, socket));
+      let input = Buffer.alloc(0);
+      const first = (chunk: Buffer) => {
+        input = Buffer.concat([input, chunk]);
+        if (input.length > 8 * 1024 * 1024) { socket.destroy(); return; }
+        const end = input.indexOf(10);
+        if (end < 0) return;
+        socket.pause();
+        socket.off('data', first);
+        let message: { groundworkHook?: number; agent?: unknown; event?: unknown; raw?: unknown };
+        try { message = JSON.parse(input.subarray(0, end).toString()); }
+        catch { socket.destroy(); return; }
+        if (message?.groundworkHook === 1) {
+          void import('../hooks/service.js').then(({ serviceHook }) => serviceHook(info.root, message)).then((output) => {
+            if (!socket.destroyed) socket.end(JSON.stringify({ output }) + '\n');
+          }).catch(() => socket.destroy());
+        } else {
+          socket.unshift(input);
+          void server.connect(new StdioServerTransport(socket, socket)).then(() => socket.resume()).catch(() => socket.destroy());
+        }
+      };
+      socket.on('data', first);
     }).catch(() => socket.destroy());
   });
   listener.once('error', () => { clearTimeout(timer); });

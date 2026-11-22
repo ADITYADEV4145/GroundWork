@@ -1,0 +1,80 @@
+import { lstatSync } from 'node:fs';
+import { connect } from 'node:net';
+import { serviceInfo } from '../mcp/relay.js';
+import { findRepoRoot } from '../util/paths.js';
+import type { AgentName, HookEventName } from './types.js';
+
+const MAX_INPUT = 8 * 1024 * 1024;
+
+export async function readHookInput(): Promise<string> {
+  if (process.stdin.isTTY) return '';
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let bytes = 0;
+    const cleanup = () => {
+      clearTimeout(timer);
+      process.stdin.pause();
+      process.stdin.off('data', data).off('end', end).off('error', fail);
+    };
+    const fail = (error: Error) => { cleanup(); reject(error); };
+    const data = (chunk: Buffer) => {
+      bytes += chunk.length;
+      if (bytes > MAX_INPUT) fail(new Error('Hook input too large'));
+      else chunks.push(chunk);
+    };
+    const end = () => { cleanup(); resolve(Buffer.concat(chunks).toString('utf8')); };
+    const timer = setTimeout(() => fail(new Error('Hook input timed out')), 1000);
+    process.stdin.on('data', data).once('end', end).once('error', fail);
+  });
+}
+
+export async function forwardHook(agent: AgentName, event: HookEventName, input: string, timeoutMs = 300): Promise<string | null> {
+  if (process.env.GW_HOOK_IN_PROCESS === '1' || process.platform === 'win32') return null;
+  try {
+    const raw = input.trim() ? JSON.parse(input) : {};
+    if (!raw || typeof raw !== 'object') return '';
+    if (!['pre_tool', 'post_tool'].includes(event) || !/^(Read|Edit|Write|MultiEdit|Delete|mcp__(?:plugin_groundwork_)?groundwork__find_code|MCP:find_code)$/.test(raw.tool_name ?? '')) return null;
+    const cwd = typeof raw.cwd === 'string' ? raw.cwd :
+      Array.isArray(raw.workspace_roots) && typeof raw.workspace_roots[0] === 'string' ? raw.workspace_roots[0] :
+        process.env.CURSOR_PROJECT_DIR ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
+    const info = serviceInfo(findRepoRoot(cwd));
+    try {
+      const st = lstatSync(info.socket);
+      if (!st.isSocket() || st.uid !== process.getuid!()) return '';
+    } catch (error) { return (error as NodeJS.ErrnoException).code === 'ENOENT' ? null : ''; }
+    return await new Promise((resolve) => {
+      let buffer = '', greeted = false, done = false;
+      const socket = connect(info.socket);
+      const finish = (output: string | null) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        socket.destroy();
+        resolve(output);
+      };
+      const timer = setTimeout(() => finish(''), timeoutMs);
+      socket.setEncoding('utf8');
+      socket.on('error', (error: NodeJS.ErrnoException) => finish(!greeted && ['ENOENT', 'ECONNREFUSED'].includes(error.code ?? '') ? null : ''));
+      socket.on('close', () => finish(''));
+      socket.on('data', (chunk: string) => {
+        buffer += chunk;
+        if (Buffer.byteLength(buffer) > (greeted ? 256 * 1024 : 4096)) return finish('');
+        const end = buffer.indexOf('\n');
+        if (end < 0) return;
+        try {
+          const value = JSON.parse(buffer.slice(0, end));
+          buffer = buffer.slice(end + 1);
+          if (!greeted) {
+            if (value.version !== info.version) return finish(null);
+            greeted = true;
+            socket.write(JSON.stringify({ groundworkHook: 1, agent, event, raw }) + '\n');
+          } else {
+            if (typeof value.output !== 'string') return finish('');
+            if (value.output && (!JSON.parse(value.output) || typeof JSON.parse(value.output) !== 'object')) return finish('');
+            finish(value.output);
+          }
+        } catch { finish(''); }
+      });
+    });
+  } catch { return ''; }
+}

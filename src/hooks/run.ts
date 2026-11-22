@@ -124,11 +124,11 @@ async function readStdin(): Promise<string> {
 }
 
 /** Entry point for `gw hook`. Fails open: any error or timeout means "allow" and exit 0. */
-export async function runHook(agent: AgentName, event: HookEventName, timeoutMs = 2000, startup: Record<string, number> = {}): Promise<void> {
+export async function runHook(agent: AgentName, event: HookEventName, timeoutMs = 2000, startup: Record<string, number> = {}, input?: string): Promise<void> {
   for (const [name, ms] of Object.entries(startup)) hookTiming(name, ms);
   let root = process.cwd();
   try {
-    const text = await readStdin();
+    const text = input ?? await readStdin();
     const raw: unknown = text.trim() ? JSON.parse(text) : {};
     const ev = normalise(agent, event, raw);
     root = findRepoRoot(ev.cwd);

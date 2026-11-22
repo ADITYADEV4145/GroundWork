@@ -7,6 +7,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { connectService, serviceInfo } from '../src/mcp/relay.js';
+import { forwardHook } from '../src/hooks/client.js';
 import { tempDir } from '../src/selftest/fixtures.js';
 
 const main = fileURLToPath(new URL('../src/cli/main.ts', import.meta.url));
@@ -77,6 +78,30 @@ describe.skipIf(process.platform === 'win32')('persistent MCP service', () => {
     vi.stubEnv('GW_RUNTIME_DIR', path.join(root, 'app.ts'));
     expect(await call(await client(), 'find_code', { query: 'normalize' })).toContain('normalize');
   });
+
+  it('handles Read hooks in the daemon with range, session, subagent and hash safeguards', async () => {
+    const value = await client();
+    await call(value, 'find_code', { query: 'normalize' });
+    vi.stubEnv('GW_BENCH_SUITE', 'long-horizon');
+    const raw = { cwd: root, session_id: 'read-test', tool_name: 'Read', tool_input: { file_path: path.join(root, 'app.ts') },
+      tool_response: { type: 'text', file: { filePath: path.join(root, 'app.ts'), startLine: 1, numLines: 1, content: source } } };
+    expect(await forwardHook('claude', 'post_tool', JSON.stringify(raw))).toBe('');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify({ ...raw, session_id: 'other' }))).toBe('');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify({ ...raw, agent_id: 'subagent' }))).toBe('');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw))).toContain('Unchanged since Read');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw))).toBe('');
+    writeFileSync(path.join(root, 'app.ts'), source.replace('normalize', 'changed'));
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw))).toBe('');
+  }, 20000);
+
+  it('refreshes edits and emits grounding findings through the hook socket', async () => {
+    const value = await client();
+    await call(value, 'find_code', { query: 'normalize' });
+    writeFileSync(path.join(root, 'use.ts'), "import { invented } from './app.js';\nexport function use() { return invented(); }\n");
+    const output = await forwardHook('claude', 'post_tool', JSON.stringify({ cwd: root, session_id: 'edit-test', tool_name: 'Write', tool_input: { file_path: path.join(root, 'use.ts'), content: "import { invented } from './app.js';\nexport function use() { return invented(); }\n" } }), 1500);
+    expect(output).toContain('invented');
+    expect(output).toContain('grounding');
+  }, 20000);
 
   it('resumes a pending call in-process after its service dies, without a second initialize response', async () => {
     const value = await client();

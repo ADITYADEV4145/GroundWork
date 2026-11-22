@@ -1,10 +1,12 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { applyPatch, git, unpackWorkspace } from './workspace.mjs';
+import { snapshot, editEvents } from './multiturn-reuse/hooks.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const source = path.resolve(here, '..');
@@ -45,14 +47,40 @@ function truncate(text) {
   return bytes.subarray(0, MAX_RESPONSE_BYTES - 64).toString('utf8') + '\n… truncated; narrow the search/read.\n';
 }
 
-function hook(root, event, tool, input, response) {
-  const { status, stdout } = spawnSync(process.execPath, [cli, 'hook', 'claude', event], {
-    cwd: root, input: JSON.stringify({ cwd: root, session_id: 'nav-benchmark', tool_name: tool,
-      tool_input: input, tool_response: response }),
-    encoding: 'utf8', timeout: 5_000,
-  });
-  if (stdout && (status === 0 || status === 2)) return JSON.parse(stdout);
+function hook(root, event, tool, input, response, extra = {}) {
+  try {
+    const { status, stdout } = spawnSync(process.execPath, [cli, 'hook', 'claude', event], {
+      cwd: root, input: JSON.stringify({ cwd: root, session_id: reuse ? 'reuse-' + createHash('sha256').update(root).digest('hex') : 'nav-benchmark', tool_name: tool,
+        tool_input: input, tool_response: response, ...extra }),
+      encoding: 'utf8', timeout: 5_000,
+    });
+    if (stdout && (status === 0 || status === 2)) {
+      const result = JSON.parse(stdout);
+      if (result && typeof result === 'object' && !Array.isArray(result)) return result;
+    }
+  } catch { /* Hooks fail open. */ }
   return {};
+}
+
+function hookText(result) {
+  return [result.hookSpecificOutput?.additionalContext, result.systemMessage, result.reason]
+    .filter(value => typeof value === 'string').join('\n');
+}
+
+function turnHook(observation, root, event, extra) {
+  const startedAt = Date.now(), start = performance.now();
+  if (event === 'prompt' && observation.task === tasks[0].id) {
+    try {
+      spawnSync(process.execPath, [cli, 'refresh'], { cwd: root, encoding: 'utf8', timeout: 5_000 });
+    } catch { /* Initial index preparation must also fail open. */ }
+  }
+  const response = hook(root, event, undefined, undefined, undefined, extra);
+  const blocked = response.decision === 'block' && typeof response.reason === 'string' && response.reason.length > 0;
+  const text = truncate((blocked ? 'Stop blocked: ' : '') + hookText(response));
+  observation.tools.push({ action: 'shell', name: 'hook:' + event,
+    startedAt, endedAt: Date.now(), durationMs: performance.now() - start,
+    bytes: Buffer.byteLength(text ? text + '\n' : '') });
+  return { text, blocked };
 }
 
 function read(root, treatment, [file, start, count]) {
@@ -70,14 +98,19 @@ function read(root, treatment, [file, start, count]) {
   if (lines.at(-1) === '') lines.pop();
   const selected = lines.slice(first - 1, limit === undefined ? undefined : first - 1 + limit);
   const content = truncate(selected.join('\n'));
+  let feedback = '';
   if (treatment && content) {
     // A truncated page may end mid-line. Only report complete lines to the read ledger.
     const actual = content === selected.join('\n') ? content : content.slice(0, content.lastIndexOf('\n… truncated')).split('\n').slice(0, -1).join('\n');
-    if (actual) hook(root, 'post_tool', 'Read', input, {
-      type: 'text', file: { filePath: absolute, startLine: first, numLines: actual.split('\n').length, content: actual },
-    });
+    if (actual) {
+      const post = hook(root, 'post_tool', 'Read', input, {
+        type: 'text', file: { filePath: absolute, startLine: first, numLines: actual.split('\n').length, content: actual },
+      });
+      if (reuse) feedback = hookText(post);
+    }
   }
-  return { text: [content, pre?.additionalContext].filter(Boolean).join('\n'), file: relative, readBytes: Buffer.byteLength(content) };
+  return { text: (reuse ? [pre?.additionalContext, feedback, content] : [content, pre?.additionalContext])
+    .filter(Boolean).join('\n'), file: relative, readBytes: Buffer.byteLength(content) };
 }
 
 async function mcp(root, [name, raw]) {
@@ -90,7 +123,10 @@ async function mcp(root, [name, raw]) {
     await client.connect(transport);
     const result = await client.callTool({ name, arguments: args }, undefined, { timeout: 30_000 });
     text = result.content.map((part) => part.type === 'text' ? part.text : '[non-text MCP result]').join('\n');
-    if (!result.isError && name === 'find_code') hook(root, 'post_tool', 'mcp__groundwork__find_code', args);
+    if (!result.isError && name === 'find_code') {
+      const post = hook(root, 'post_tool', 'mcp__groundwork__find_code', args);
+      if (reuse) text = [hookText(post), text].filter(Boolean).join('\n');
+    }
   } finally {
     await client.close();
   }
@@ -108,7 +144,7 @@ async function main([action, ...argv]) {
       const meta = readJson(path.join(dir, 'metadata.json'));
       if (meta.chain !== chain) throw new Error('Wrong chain');
       const next = tasks.find(t => !existsSync(path.join(dir, t.id + '.json')) || readJson(path.join(dir, t.id + '.json')).wallMs === undefined);
-      process.stdout.write(JSON.stringify(next ? [next] : []) + '\n');
+      process.stdout.write(JSON.stringify(next ? [{ id: next.id, repo: next.repo, sequence: next.sequence, step: next.step }] : []) + '\n');
     } else process.stdout.write(JSON.stringify(tasks) + '\n');
     return;
   }
@@ -153,7 +189,11 @@ async function main([action, ...argv]) {
       if (!(meta.protocol === 'stable-v1' && task === tasks[0])) unpackWorkspace(source, revision, task.repo, root);
       restoreSequence(task, dir, root);
     }
-    saveJson(record, { task: task.id, startedAt: Date.now(), tools: [] });
+    const observation = { task: task.id, startedAt: Date.now(), tools: [] };
+    const context = reuse && meta.condition === 'groundwork'
+      ? turnHook(observation, root, 'prompt', { hook_event_name: 'UserPromptSubmit', prompt: task.prompt }).text : '';
+    saveJson(record, observation);
+    if (reuse) process.stdout.write(JSON.stringify({ ...task, ...(context ? { hookContext: context } : {}) }) + '\n');
     return;
   }
   const observation = readJson(record);
@@ -165,6 +205,14 @@ async function main([action, ...argv]) {
     saveJson(metadata, meta);
   }
   if (action === 'finish') {
+    if (reuse && treatment) {
+      const stopped = turnHook(observation, root, 'stop', { hook_event_name: 'Stop', stop_hook_active: false });
+      if (stopped.text) process.stdout.write(stopped.text + '\n');
+      if (stopped.blocked) {
+        saveJson(record, observation);
+        return;
+      }
+    }
     observation.endedAt = Date.now();
     observation.wallMs = observation.endedAt - observation.startedAt;
     if (observation.wallMs < 0) throw new Error('Clock reversal');
@@ -195,10 +243,16 @@ async function main([action, ...argv]) {
         result = await mcp(root, args);
         break;
       case 'shell': {
+        const before = reuse && treatment ? snapshot(root) : null;
         const proc = spawnSync('sh', ['-c', args[0]], {
           cwd: root, encoding: 'utf8', timeout: 15_000, maxBuffer: 512 * 1024,
         });
-        result = { text: [proc.stdout, proc.stderr, proc.error?.message].filter(Boolean).join('\n') };
+        const feedback = [];
+        if (reuse && treatment) for (const edit of editEvents(root, before, snapshot(root))) {
+          feedback.push(hookText(hook(root, 'post_tool', edit.tool, edit.input,
+            { success: proc.status === 0 }, { hook_event_name: 'PostToolUse' })));
+        }
+        result = { text: [...feedback, proc.stdout, proc.stderr, proc.error?.message].filter(Boolean).join('\n') };
         break;
       }
       default: throw new Error('Unknown capture action');

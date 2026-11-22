@@ -21,7 +21,9 @@ for(const chain of manifest.chains) for(const style of ['ideal','copy']) {
     const disclosed=JSON.parse(capture('list',state));
     if(disclosed.length!==1||disclosed[0].step!==step)throw new Error('Requirement disclosure is not one turn at a time');
     const task=disclosed[0].id;
-    capture('begin',state,task);
+    if('prompt' in disclosed[0])throw new Error('List must not disclose the requirement before begin');
+    const begun=JSON.parse(capture('begin',state,task));
+    if(begun.id!==task||typeof begun.prompt!=='string'||!begun.prompt)throw new Error('Begin did not reveal the current requirement');
     const code=execFileSync(process.env.GW_REUSE_PYTHON??'python3',[path.join(source,'bench/multiturn-reuse/hidden/scripted.py'),workspace,chain.id,String(step),style],{encoding:'utf8'});
     const target=`src/${chain.package}/steps.py`;
     const command=`mkdir -p src/${chain.package}; printf '%s' '${Buffer.from(code).toString('base64')}' | base64 -d > ${target}`;

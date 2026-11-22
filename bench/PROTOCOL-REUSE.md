@@ -2,6 +2,26 @@
 
 Pre-collection amendment: PR #44 corrects nested-token double counting, conditional-function clone coverage, rebound local-import resolution, package-initializer relative imports, overwritten same-name clone sources (content-matched across turns, not ordinal identities) and comprehension-target scope isolation; no agent data exists and thresholds, estimands and decision rules are unchanged.
 
+2026-11-22 pre-collection harness amendment (before any agent session): in the
+GroundWork arm only, each turn's begin reveals its requirement and fires the
+product's Claude `prompt`/`UserPromptSubmit` hook with that exact prompt text;
+each changed, added or removed regular UTF-8 file after a captured shell command
+fires `post_tool`/`PostToolUse` as Edit (old/new content) or Write (new content);
+each finish attempt fires `stop`/`Stop`. A blocked Stop returns feedback without
+finalizing the turn, allowing edits and another finish. Baseline dispatches none
+of these hooks. List now discloses only the current ID/repo/sequence/step in both
+arms; repeated lists do not advance the product's turn. Existing Read and
+find_code hooks remain GroundWork-only. All hook errors/timeouts fail open and
+all hook feedback is returned to the agent. Edit-hook and file-detection costs
+are inside the captured shell span; prompt/Stop have instrumented `shell` spans
+named `hook:prompt`/`hook:stop`. The first prompt span also includes a fail-open
+product `refresh`, establishing a before-edit index so a multi-file first write
+cannot hide later files from session memory. Requirements themselves are input,
+not hook-output bytes. Events use one root-specific session ID across all five
+turns. No task, grader, threshold, estimand, bootstrap or session count changes;
+no agent data exists. Old products receive the same events and may return no
+session-memory context.
+
 Freeze this document and the task/hidden manifests, acceptance tests, clone detector,
 grader, collector and product pin before collection. Inspired by RepoReuse [1]
 (arXiv:2609.35357) and SlopCodeBench [3] (arXiv:2603.24755); not a reproduction
@@ -15,7 +35,7 @@ Two real repositories, pinned independently of the collector: Click (BSD-3-Claus
 git archives in an external cache. No synthetic replacement repositories.
 Two five-turn chains per repository. All five turns are required. Each independent
 agent context receives exactly one chain, one requirement at a time. Requirements
-are disclosed by stateful list after init and successive finishes, not as a batch.
+are disclosed by begin after stateful list and successive finishes, not as a batch.
 One persistent workspace per chain, including GroundWork state, survives all turns.
 Finish exports incremental patches; hidden grading replays all five patches in order.
 No hidden files or solutions are copied into the agent workspace.

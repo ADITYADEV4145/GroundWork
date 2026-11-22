@@ -110,8 +110,11 @@ test('old eight-run reports in synthetic v2/v3/v4 layouts populate every compari
       assert.match(content, /retried before work/);
       assert.match(content, /where_used validation error was not retried/);
       assert.match(content, /whole file using shell cat/);
-      assert.match(content, /received exports contain no session notes or protocol-deviation annotations/);
-      assert.match(content, /does not establish uniform protocol adherence/);
+      for (const pattern of [/V4 workflow session notes/, /outline calls failed on path\/files arguments/, /cwd\/environment setup failures/, /shell cat instead of the read wrapper/, /names from AGENTS.md or earlier tasks/, /scripts staged outside the workspace/, /unused \/tmp\/t4.mjs/, /not perfectly uniform protocol adherence/]) {
+        assert.match(content, pattern);
+        assert.match(read(path.join(root, 'bench/COMBINE.md')), pattern);
+      }
+      assert.doesNotMatch(content, /received exports contain no session notes/);
     }
     assert.equal(read(path.join(dir, 'bench/nav/results/combined.json')), before);
     assert.equal(existsSync(path.join(dir, 'docs/assets/bench/copied-code.svg')), false);
@@ -156,7 +159,7 @@ test('round 3 stays pending while the first three experiments remain unchanged',
       assert.match(content, /no measurements for those experiments are published yet/);
       assert.match(content, /explore-first traces/);
       assert.match(content, /verification-only rereads/);
-      assert.doesNotMatch(content, /V4 export limitations/);
+      assert.doesNotMatch(content, /V4 workflow session notes/);
     }
     for (const [name, chart] of Object.entries(comparisonCharts(rows))) {
       assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, name === 'wall' ? 4 : 2);

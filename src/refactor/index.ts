@@ -11,7 +11,7 @@ export async function refactorSymbol(ctx: ToolContext, request: RefactorRequest,
   const { target, edits } = planEdits(ctx, request);
   const id = createHash('sha256').update(JSON.stringify([request, edits.map(({ file, before, after }) => [file, before, after])])).digest('hex');
   if (expected !== undefined && expected !== id) throw new Error('Preview no longer matches. Generate a new preview.');
-  const { patch, check, assertCurrent } = await guardCandidate(ctx, edits);
+  const { patch, check, assertCurrent } = await guardCandidate(ctx, edits, request.name === undefined ? undefined : target.file);
   const applied = expected !== undefined && !check.blocked;
   if (applied) {
     assertCurrent();

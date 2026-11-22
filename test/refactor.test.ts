@@ -99,6 +99,20 @@ describe('guarded symbol refactoring', () => {
     expect(read('first.ts')).toBe('export function calc() { return 4; }\n');
   });
 
+  it('edits a qualified method independently of same-named methods and preserves CRLF', async () => {
+    const source = [
+      'export class First { work() { return "first"; } }',
+      'export class Second { work() { return "second"; } }',
+      '',
+    ].join('\r\n');
+    put('classes.ts', source);
+    await expect(refactor({ symbol: 'classes.ts:work', body: '{ return "changed"; }' })).rejects.toThrow('Ambiguous');
+    const request = { symbol: 'classes.ts:First.work', body: '{ return "changed"; }' };
+    const preview = await refactor(request);
+    expect(await refactor(request, preview.id)).toMatchObject({ applied: true });
+    expect(read('classes.ts')).toBe(source.replace('"first"', '"changed"'));
+  });
+
   it('refuses incomplete cross-config renames and references in uneditable files', async () => {
     put('tsconfig.json', JSON.stringify({ files: ['first.ts'] }));
     put('first.ts', 'export function calc() { return 4; }\n');
@@ -141,6 +155,18 @@ describe('guarded symbol refactoring', () => {
       expect.objectContaining({ kind: 'grounding', severity: 'BLOCK', grounding: expect.objectContaining({ kind: 'arity' }) }),
     ]));
     expect(read('edit.ts')).toBe(source);
+  });
+
+  it('blocks an unresolved CommonJS importer the compiler left outside the patch', async () => {
+    put('math.ts', 'export function total(n: number) { return n + 1; }\n');
+    put('use.ts', 'const { total } = require("./math.js");\nexport const use = () => total(2);\n');
+    const request = { symbol: 'total', name: 'sum' };
+    const result = await refactor(request);
+    expect(result.check.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: 'grounding', severity: 'BLOCK', grounding: expect.objectContaining({ file: 'use.ts', kind: 'unknown-export' }) }),
+    ]));
+    expect(await refactor(request, result.id)).toMatchObject({ applied: false });
+    expect(read('math.ts')).toContain('function total');
   });
 
   it('offers the same preview ID through MCP without mutating source', async () => {

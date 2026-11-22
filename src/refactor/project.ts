@@ -2,9 +2,11 @@ import { existsSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 import { discoverFiles, looksGenerated } from '../index/discover.js';
+import { sourceLocation } from '../index/navigation.js';
 import { fileFacts, findSymbols, symbolFact } from '../index/query.js';
 import type { SymbolFact } from '../index/query.js';
 import type { ToolContext } from '../mcp/registry.js';
+import { sha1 } from '../util/hash.js';
 import { readRepoFile, repoRelative } from '../util/repo-file.js';
 
 const scripts = /\.[cm]?[jt]sx?$/i;
@@ -178,6 +180,7 @@ function assertNoNewErrors(ctx: ToolContext, service: ts.LanguageService, before
 export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: FileEdit[]; target: SymbolFact } {
   const target = resolve(ctx, request.symbol);
   const original = readEditable(ctx, target.file);
+  if (sourceLocation(ctx.db, target.id)?.hash !== sha1(original)) throw new Error('The indexed symbol is stale. Refresh and try again.');
   const { absolute, service, changed, files } = project(ctx, target.file);
   try {
     const source = service.getProgram()?.getSourceFile(absolute);
@@ -214,7 +217,7 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
       }
     } else {
       const body = declaration.body;
-      if (!body || !['function', 'method'].includes(target.kind)) throw new Error('Only named functions and methods with bodies can be edited.');
+      if (!body || !['function', 'method', 'component'].includes(target.kind)) throw new Error('Only named functions and methods with bodies can be edited.');
       if (!request.body.trim() || request.body.length > MAX_BODY) throw new Error(`Provide a complete function body up to ${MAX_BODY} characters.`);
       changes.set(target.file, [{ start: body.getStart(source), end: body.end, text: request.body }]);
     }

@@ -1,0 +1,452 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-click-text-writer",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "e646fd2cccadb3d8513201cf25d34a58981365ab",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "src/standalone_wave6_text_writer.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "src/click/_compat.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_text_writer.py and update its 15 callers to use src/click/_compat.py."
+      },
+      {
+        "id": "e7b72cdbe957fc0bf02a494d7ad78731ab7562bc",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_make_text_stream",
+          "line": 17
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_make_text_stream",
+          "line": 19
+        },
+        "probability": 0.9905009670444577,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _make_text_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "691ac9d4e77f2d0456f98430e4d872dd5b1299d1",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "is_ascii_encoding",
+          "line": 38
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "is_ascii_encoding",
+          "line": 40
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of is_ascii_encoding: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "3486bf7b4dd29997416f92a604e831f795a47168",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "get_best_encoding",
+          "line": 46
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "get_best_encoding",
+          "line": 48
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_best_encoding: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "3e222a95ae0782319bc37ee1464c0b5cce114dd1",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_FixupStream",
+          "line": 80
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream",
+          "line": 82
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "de2602d10c3ac885f08a19245d458e7d495d953e",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_FixupStream.read1",
+          "line": 103
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.read1",
+          "line": 105
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.read1: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "cddd13b44c391d7895834c1c335efc4296575bf9",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_FixupStream.readable",
+          "line": 111
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.readable",
+          "line": 113
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.readable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "ef1d4f523b08f13b606b12e8f20c4377abd6f1f7",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_FixupStream.writable",
+          "line": 123
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.writable",
+          "line": 125
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.writable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "036463adab256dd9c7d4c272a9b0bfb54c95caaa",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 138
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 140
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.seekable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "5c0a3a9d685d4622fc9317395e9bbdd2add08194",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_is_binary_writer",
+          "line": 149
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_binary_writer",
+          "line": 160
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_binary_writer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "26341ab7c1341d49edff66aa7f0c095129319860",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_find_binary_writer",
+          "line": 162
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_find_binary_writer",
+          "line": 191
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _find_binary_writer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "fe567741234d9add7dfea916d1790254fe8fa5b7",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_stream_is_misconfigured",
+          "line": 180
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_stream_is_misconfigured",
+          "line": 209
+        },
+        "probability": 0.9905009670444577,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _stream_is_misconfigured: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "7be778c8a717de9a101bed6e8bdf491da5ecdc1b",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_is_compat_stream_attr",
+          "line": 189
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_compat_stream_attr",
+          "line": 218
+        },
+        "probability": 0.99132362600262,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_compat_stream_attr: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "2e89c97d30f7e6e628c853fb1139e433e67bbe35",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_is_compatible_text_stream",
+          "line": 198
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_compatible_text_stream",
+          "line": 227
+        },
+        "probability": 0.99132362600262,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_compatible_text_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "00700747d00d42ee8333862546b73899e1563d81",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "_force_correct_text_stream",
+          "line": 209
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_force_correct_text_stream",
+          "line": 238
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _force_correct_text_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "183b220c111d3951a9d1a0632ec2e36da2908313",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_text_writer.py",
+          "symbol": "vendored_text_writer",
+          "line": 255
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_force_correct_text_writer",
+          "line": 300
+        },
+        "probability": 0.9957419992524318,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9511218513441899
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _force_correct_text_writer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

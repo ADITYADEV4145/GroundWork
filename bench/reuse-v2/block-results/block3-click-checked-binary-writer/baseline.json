@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-click-checked-binary-writer",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "00f03cb51d928fb4d048337e249d22e159663a35",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/checked_binary_writer.py",
+          "symbol": "src/click/checked_binary_writer.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "src/click/core.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/checked_binary_writer.py; use src/click/core.py instead."
+      },
+      {
+        "id": "7be2039c34a60aac01c039ba0449f7082eaecaa9",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/checked_binary_writer.py",
+          "symbol": "checked_binary_writer",
+          "line": 6
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "_check_iter",
+          "line": 1974
+        },
+        "probability": 0.3977869570719657,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.2489449964406043
+          }
+        ],
+        "fix": "Duplicate of _check_iter: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

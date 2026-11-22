@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-synopsis-usage-prefix",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/synopsis_usage_prefix.py b/src/click/synopsis_usage_prefix.py\nnew file mode 100644\nindex 0000000..19d80b3\n--- /dev/null\n+++ b/src/click/synopsis_usage_prefix.py\n@@ -0,0 +1,22 @@\n+from __future__ import annotations\n+\n+from gettext import gettext as _\n+\n+from .formatting import HelpFormatter\n+\n+\n+class SynopsisUsagePrefix(HelpFormatter):\n+    \"\"\"A help formatter that labels usage lines with ``Synopsis:`` by default.\"\"\"\n+\n+    def write_usage(self, prog: str, args: str = \"\", prefix: str | None = None) -> None:\n+        \"\"\"Writes a usage line into the buffer.\n+\n+        :param prog: the program name.\n+        :param args: whitespace separated list of arguments.\n+        :param prefix: The prefix for the first line. Defaults to\n+            ``\"Synopsis: \"``.\n+        \"\"\"\n+        if prefix is None:\n+            prefix = f\"{_('Synopsis:')} \"\n+\n+        super().write_usage(prog, args, prefix)\n",
+  "decisions": [],
+  "notes": "SynopsisUsagePrefix supplies a translated Synopsis: default and delegates formatting to HelpFormatter. Explicit prefixes, including the empty string, pass through unchanged.\nAgent-reported tests_run (not independently verified): \".venv/bin/python -m pytest -q: 900 passed, 21 skipped, 1 xfailed; .venv/bin/python - (96 formatter comparisons plus signature and localization): passed; .venv/bin/ruff check --no-fix src/click/synopsis_usage_prefix.py, .venv/bin/ruff format --check src/click/synopsis_usage_prefix.py, and git diff --cached --check: passed.\"",
+  "session_id": "",
+  "acus": null
+}

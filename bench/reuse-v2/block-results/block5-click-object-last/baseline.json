@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block5-click-object-last",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "14fd958f464ebe28e628e9b97750beaf7768e77e",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_object_last.py",
+          "symbol": "src/standalone_object_last.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "src/click/decorators.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_object_last.py; use src/click/decorators.py instead."
+      },
+      {
+        "id": "2f6708e37672958bb58725c5cc71b9d8185bda7f",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_object_last.py",
+          "symbol": "pass_object_last",
+          "line": 18
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "pass_obj.new_func",
+          "line": 45
+        },
+        "probability": 0.7799229080677851,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.635081574901129
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of pass_obj.new_func: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "d5643b8ced815e4f8ab3a8a4bb7cafb26a551674",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_object_last.py",
+          "symbol": "pass_object_last.new_func",
+          "line": 23
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "pass_obj.new_func",
+          "line": 45
+        },
+        "probability": 0.8427216517136228,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of pass_obj.new_func: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

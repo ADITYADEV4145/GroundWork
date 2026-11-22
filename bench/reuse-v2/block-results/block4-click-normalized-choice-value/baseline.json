@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-normalized-choice-value",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "1693200582fc581e3adbe9917e3e08144932f5e0",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/normalized_choice_value.py",
+          "symbol": "src/click/normalized_choice_value.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "src/click/types.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/normalized_choice_value.py and update its 3 callers to use src/click/types.py."
+      },
+      {
+        "id": "ab10510bb33c78d838e269f909a1c10bd8ef7243",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/normalized_choice_value.py",
+          "symbol": "NormalizedChoiceValue",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "BoolParamType",
+          "line": 661
+        },
+        "probability": 0.46224680983983174,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.4032313556718002
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of BoolParamType: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "b3ab63444e2cc313b762bb504a2642f44dfebdaf",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/normalized_choice_value.py",
+          "symbol": "NormalizedChoiceValue.convert",
+          "line": 18
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "Choice",
+          "line": 233
+        },
+        "probability": 0.5544166784925767,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5512363544538005
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6666666666666667
+          }
+        ],
+        "fix": "Duplicate of Choice: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

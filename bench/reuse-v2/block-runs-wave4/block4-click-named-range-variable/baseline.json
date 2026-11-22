@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-named-range-variable",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/named_range_variable.py b/src/click/named_range_variable.py\nnew file mode 100644\nindex 0000000..1643db2\n--- /dev/null\n+++ b/src/click/named_range_variable.py\n@@ -0,0 +1,23 @@\n+from __future__ import annotations\n+\n+from .types import _NumberRangeBase\n+\n+\n+class NamedRangeVariable(_NumberRangeBase):\n+    \"\"\"A :class:`_NumberRangeBase` that names the variable ``value``\n+    instead of ``x`` when describing the range.\n+    \"\"\"\n+\n+    def _describe_range(self) -> str:\n+        \"\"\"Describe the range for use in help text.\"\"\"\n+        if self.min is None:\n+            op = \"<\" if self.max_open else \"<=\"\n+            return f\"value{op}{self.max}\"\n+\n+        if self.max is None:\n+            op = \">\" if self.min_open else \">=\"\n+            return f\"value{op}{self.min}\"\n+\n+        lop = \"<\" if self.min_open else \"<=\"\n+        rop = \"<\" if self.max_open else \"<=\"\n+        return f\"{self.min}{lop}value{rop}{self.max}\"\n",
+  "decisions": [],
+  "notes": "Added src/click/named_range_variable.py with NamedRangeVariable(_NumberRangeBase), overriding _describe_range with the same logic and signature as the base but using \"value\" instead of \"x\"; base has no super() calls or decorators to preserve, and no existing modules were edited.\nAgent-reported tests_run (not independently verified): \"pytest -q tests/test_types.py (40 passed); ruff check/format on new file (clean); manual _describe_range checks: 1<=value<=5, value<3, value>=2.\"",
+  "session_id": "",
+  "acus": null
+}

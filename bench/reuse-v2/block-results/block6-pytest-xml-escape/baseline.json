@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-pytest-xml-escape",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "8048eb30e59bc33494f24f53a34b6b86590b6132",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_xml_escape.py",
+          "symbol": "src/standalone_wave6_xml_escape.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/junitxml.py",
+          "symbol": "src/_pytest/junitxml.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_xml_escape.py and update its 4 callers to use src/_pytest/junitxml.py."
+      },
+      {
+        "id": "e744b5fba2706a6ed1376d7c8390a04d1194b8ec",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_xml_escape.py",
+          "symbol": "vendored_xml_escape",
+          "line": 15
+        },
+        "existing": {
+          "file": "src/_pytest/junitxml.py",
+          "symbol": "bin_xml_escape",
+          "line": 37
+        },
+        "probability": 0.9920494367728914,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9818573647017578
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of bin_xml_escape: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "65487ed8e5e0e1788aeeb8779eaee192250b3825",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_xml_escape.py",
+          "symbol": "vendored_xml_escape.repl",
+          "line": 26
+        },
+        "existing": {
+          "file": "src/_pytest/junitxml.py",
+          "symbol": "bin_xml_escape.repl",
+          "line": 48
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of bin_xml_escape.repl: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

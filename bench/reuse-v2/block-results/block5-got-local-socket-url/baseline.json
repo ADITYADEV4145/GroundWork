@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block5-got-local-socket-url",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "8684eac5fecb318bb2b4a18f13253af1b00a71a1",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "source/standalone/local-socket-url.ts",
+          "symbol": "source/standalone/local-socket-url.ts",
+          "line": 1
+        },
+        "existing": {
+          "file": "source/core/utils/url-to-options.ts",
+          "symbol": "source/core/utils/url-to-options.ts",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete source/standalone/local-socket-url.ts and update its 11 callers to use source/core/utils/url-to-options.ts."
+      },
+      {
+        "id": "5babae2a2888b1561990a4b5a72c36266ccb4226",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "source/standalone/local-socket-url.ts",
+          "symbol": "isLocalSocketURL",
+          "line": 2
+        },
+        "existing": {
+          "file": "source/core/utils/url-to-options.ts",
+          "symbol": "urlToOptions",
+          "line": 19
+        },
+        "probability": 0.6215590622076458,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.4830389371053695
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of urlToOptions: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

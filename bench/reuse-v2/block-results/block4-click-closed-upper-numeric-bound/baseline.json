@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-closed-upper-numeric-bound",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "408906fed7e2fa99b162742f2bf62b7131e4d288",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/closed_upper_numeric_bound.py",
+          "symbol": "src/click/closed_upper_numeric_bound.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "src/click/types.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/closed_upper_numeric_bound.py; use src/click/types.py instead."
+      },
+      {
+        "id": "62c94ede6df671d54a5ff5d751182cf5c99a90cf",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/closed_upper_numeric_bound.py",
+          "symbol": "ClosedUpperNumericBound",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "_NumberRangeBase._describe_range",
+          "line": 557
+        },
+        "probability": 0.6134062175029394,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.4106766533684627
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _NumberRangeBase._describe_range: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "f8b3d7d5d505f895fafd5601012cef0e39b61c48",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/closed_upper_numeric_bound.py",
+          "symbol": "ClosedUpperNumericBound.convert",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "_NumberRangeBase",
+          "line": 490
+        },
+        "probability": 0.7416351297341327,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.840142330772043
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6
+          }
+        ],
+        "fix": "Duplicate of _NumberRangeBase: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

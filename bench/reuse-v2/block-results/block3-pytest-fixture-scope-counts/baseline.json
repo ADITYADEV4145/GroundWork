@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "hard-negative",
+  "task_id": "block3-pytest-fixture-scope-counts",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "c9160bb5781ae91fe068d1816c56c8791683ff4f",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/fixture_scope_counts.py",
+          "symbol": "src/_pytest/fixture_scope_counts.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/python.py",
+          "symbol": "src/_pytest/python.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/fixture_scope_counts.py and update its 1 caller to use src/_pytest/python.py."
+      },
+      {
+        "id": "4203623dc10722b85a5bb7d7e1714452044980fd",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/fixture_scope_counts.py",
+          "symbol": "fixture_scope_counts",
+          "line": 15
+        },
+        "existing": {
+          "file": "src/_pytest/python.py",
+          "symbol": "Metafunc._validate_if_using_arg_names",
+          "line": 1456
+        },
+        "probability": 0.3942971444665853,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.40053610860297595
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6666666666666667
+          }
+        ],
+        "fix": "Duplicate of Metafunc._validate_if_using_arg_names: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

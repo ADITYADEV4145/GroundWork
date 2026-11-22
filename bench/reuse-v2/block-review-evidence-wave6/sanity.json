@@ -1,0 +1,607 @@
+[
+  {
+    "task_id": "block6-click-text-reader",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_text_reader.py",
+    "production_lines": 272,
+    "files": [
+      "src/standalone_wave6_text_reader.py",
+      "tests/test_standalone_wave6_text_reader.py"
+    ],
+    "patch_sha256": "1b03da04a9a10457bcc8059ef1c04f37f6cca6c8f1a4ecc1b1e802b9d33d2f20",
+    "agent_tests_unverified": "PYTHONPATH=src .venv/bin/python -m pytest -q: 908 passed, 21 skipped, 1 xfailed (8 focused tests passed); .venv/bin/python -I -S -m unittest discover -s tests -p test_standalone_wave6_text_reader.py -q: 7 passed; Ruff check --no-fix and format --check on both added files, .venv/bin/mypy src/standalone_wave6_text_reader.py, git diff --cached --check, and a Python source comparison against the pin: passed.",
+    "imports": [
+      "from __future__ import annotations",
+      "import codecs",
+      "import io",
+      "import sys",
+      "import typing as t"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_text_reader",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-text-writer",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_text_writer.py",
+    "production_lines": 282,
+    "files": [
+      "src/standalone_wave6_text_writer.py",
+      "tests/test_standalone_wave6_text_writer.py"
+    ],
+    "patch_sha256": "1e678e51bcf645099695781c68fc4d505920e5a9d70fb70c8b6b8482178cb583",
+    "agent_tests_unverified": "pytest tests/test_standalone_wave6_text_writer.py: 15 passed; ruff check + ruff format --check on new files: clean (full suite has a pre-existing test_basic.py collection error under the installed newer pytest, unrelated).",
+    "imports": [
+      "from __future__ import annotations",
+      "import codecs",
+      "import io",
+      "import sys",
+      "import typing as t"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_text_writer",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-ansi-stream",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_ansi_stream.py",
+    "production_lines": 183,
+    "files": [
+      "src/standalone_wave6_ansi_stream.py",
+      "tests/test_standalone_wave6_ansi_stream.py"
+    ],
+    "patch_sha256": "6b5af8d175ba35a0159b9600d6c0f46df09b162662ee852c42caf76834a2184c",
+    "agent_tests_unverified": "pytest tests/test_standalone_wave6_ansi_stream.py tests/test_compat.py (19 passed); pytest --ignore tests/test_basic.py (859 passed, 21 skipped, 1 xfailed; test_basic fails collection with a pre-existing pytest-version warning); ruff check/format and mypy on new files: clean",
+    "imports": [
+      "from __future__ import annotations",
+      "import collections.abc as cabc",
+      "import io",
+      "import sys",
+      "import typing as t",
+      "from weakref import WeakKeyDictionary",
+      "import colorama"
+    ],
+    "vendored_body_AST_equal": false,
+    "requested_symbol": "vendored_ansi_stream",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-pager",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_pager.py",
+    "production_lines": 988,
+    "files": [
+      "src/standalone_wave6_pager.py",
+      "tests/test_standalone_wave6_pager.py"
+    ],
+    "patch_sha256": "dfe955429dc1553bafa34a9aee6fa29d217c1c81c8e5a58c7d8072f619bb2179",
+    "agent_tests_unverified": "pytest tests/test_standalone_wave6_pager.py (20 passed); pytest tests -W ignore::pytest.PytestRemovedIn10Warning (920 passed, 21 skipped, 1 xfailed; the unfiltered run hits a pre-existing test_basic collection warning-as-error with the newer pytest); mypy for linux/win32/darwin platforms, ruff, and pre-commit run --all-files all clean.",
+    "imports": [
+      "from __future__ import annotations",
+      "import codecs",
+      "import collections.abc as cabc",
+      "import io",
+      "import os",
+      "import re",
+      "import shlex",
+      "import sys",
+      "import time",
+      "import typing as t",
+      "from io import StringIO",
+      "from pathlib import Path",
+      "from shutil import which",
+      "from types import TracebackType",
+      "from weakref import WeakKeyDictionary",
+      "import msvcrt",
+      "from ctypes import Array",
+      "from ctypes import byref",
+      "from ctypes import c_char",
+      "from ctypes import c_char_p",
+      "from ctypes import c_int",
+      "from ctypes import c_ssize_t",
+      "from ctypes import c_ulong",
+      "from ctypes import c_void_p",
+      "from ctypes import POINTER",
+      "from ctypes import py_object",
+      "from ctypes import Structure",
+      "from ctypes import windll",
+      "from ctypes.wintypes import DWORD",
+      "from ctypes.wintypes import HANDLE",
+      "import errno",
+      "import random",
+      "import tempfile",
+      "import subprocess",
+      "import subprocess",
+      "import tempfile",
+      "from collections.abc import Buffer",
+      "from ctypes import pythonapi",
+      "from typing_extensions import Buffer"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_pager",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-console-probe",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_console_probe.py",
+    "production_lines": 45,
+    "files": [
+      "src/standalone_wave6_console_probe.py",
+      "tests/test_standalone_wave6_console_probe.py"
+    ],
+    "patch_sha256": "dd645b36f14314e768c8876716c6b85ba27261424525106873768eb764d5d4fc",
+    "agent_tests_unverified": "pytest -q tests/test_standalone_wave6_console_probe.py -> 13 passed; ruff check + ruff format --check on both new files -> clean (full suite has an unrelated pre-existing collection error in tests/test_basic.py under latest pytest).",
+    "imports": [
+      "from __future__ import annotations",
+      "import io",
+      "import sys",
+      "import typing as t",
+      "from ctypes import byref",
+      "from ctypes.wintypes import DWORD",
+      "import msvcrt",
+      "from ctypes import windll"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_console_probe",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-console-stream",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_console_stream.py",
+    "production_lines": 409,
+    "files": [
+      "src/standalone_wave6_console_stream.py",
+      "tests/test_standalone_wave6_console_stream.py"
+    ],
+    "patch_sha256": "1e08d1df491318089815faa8df0818d299cd3a14b81b8e4612b02be70ae846f1",
+    "agent_tests_unverified": "pytest tests/test_standalone_wave6_console_stream.py: 25 passed; full suite (excluding tests/test_basic.py, which fails at collection with the installed pytest, unrelated): 866 passed, 21 skipped, 1 xfailed; ruff check/format clean.",
+    "imports": [
+      "from __future__ import annotations",
+      "import collections.abc as cabc",
+      "import io",
+      "import sys",
+      "import time",
+      "import typing as t",
+      "from ctypes import Array",
+      "from ctypes import byref",
+      "from ctypes import c_char",
+      "from ctypes import c_char_p",
+      "from ctypes import c_int",
+      "from ctypes import c_ssize_t",
+      "from ctypes import c_ulong",
+      "from ctypes import c_void_p",
+      "from ctypes import POINTER",
+      "from ctypes import py_object",
+      "from ctypes import Structure",
+      "from ctypes.wintypes import DWORD",
+      "from ctypes.wintypes import HANDLE",
+      "from ctypes.wintypes import LPCWSTR",
+      "from ctypes.wintypes import LPWSTR",
+      "import msvcrt",
+      "from ctypes import windll",
+      "from ctypes import WINFUNCTYPE",
+      "from collections.abc import Buffer",
+      "from ctypes import pythonapi",
+      "from typing_extensions import Buffer"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_console_stream",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-visible-commands",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_visible_commands.py",
+    "production_lines": 56,
+    "files": [
+      "src/standalone_wave6_visible_commands.py",
+      "tests/test_standalone_wave6_visible_commands.py"
+    ],
+    "patch_sha256": "fc530ac185022e20a2996ba82934500932af7709b58efa6dba01d52ac01de416",
+    "agent_tests_unverified": "python3 -m pytest tests/test_standalone_wave6_visible_commands.py: 8 passed; ruff check/format clean; mypy --strict on new module: no issues",
+    "imports": [
+      "from __future__ import annotations",
+      "import collections.abc as cabc",
+      "import typing as t"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_visible_commands",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-parameter-order",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_parameter_order.py",
+    "production_lines": 57,
+    "files": [
+      "src/standalone_wave6_parameter_order.py",
+      "tests/test_standalone_wave6_parameter_order.py"
+    ],
+    "patch_sha256": "4096d5fea32f231cb5e75350498242a90298b646b2d9bb2cdd9ef521e175f4ea",
+    "agent_tests_unverified": "pytest -q tests/test_standalone_wave6_parameter_order.py (12 passed); ruff check + ruff format --check (clean)",
+    "imports": [
+      "from __future__ import annotations",
+      "import collections.abc as cabc",
+      "import typing as t"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_parameter_order",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-color-default",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_color_default.py",
+    "production_lines": 83,
+    "files": [
+      "src/standalone_wave6_color_default.py",
+      "tests/test_standalone_wave6_color_default.py"
+    ],
+    "patch_sha256": "d7dd60d4cfa19755ddae03170d9e6a38c5f5c9c5759b4101adbfa7021410ccee",
+    "agent_tests_unverified": "python3 -m pytest -q tests/test_standalone_wave6_color_default.py (13 passed); ruff check/format on new files (clean)",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t",
+      "from threading import local"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_color_default",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-color-fragment",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_color_fragment.py",
+    "production_lines": 45,
+    "files": [
+      "src/standalone_wave6_color_fragment.py",
+      "tests/test_standalone_wave6_color_fragment.py"
+    ],
+    "patch_sha256": "098793337333f0670c16a98dd39b2b39d60d57679bf794bd44834f730326147c",
+    "agent_tests_unverified": ".tox/vendor-check/bin/python -m pytest -q (locked pytest 8.4.0: 903 passed, 21 skipped, 1 xfailed; initial pytest 9.2.0 run failed collection on an existing deprecation); python -I -m unittest discover -s tests -p test_standalone_wave6_color_fragment.py (3 passed); ruff check --no-fix and ruff format --check on both new files passed; Python source/AST comparison and git diff --cached --check passed.",
+    "imports": [
+      "from __future__ import annotations"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_color_fragment",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-shell-expansion",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_shell_expansion.py",
+    "production_lines": 81,
+    "files": [
+      "src/standalone_wave6_shell_expansion.py",
+      "tests/test_standalone_wave6_shell_expansion.py"
+    ],
+    "patch_sha256": "b17a6c697f39cc34372f10461fc05598233db01f2e1443d33aa4b52872f04443",
+    "agent_tests_unverified": "python -m pytest -q tests/test_standalone_wave6_shell_expansion.py tests/test_utils.py (157 passed); ruff check + ruff format --check on new files (clean)",
+    "imports": [
+      "from __future__ import annotations",
+      "import collections.abc as cabc",
+      "import os",
+      "import re",
+      "from glob import glob"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_shell_expansion",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-click-raw-terminal",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_raw_terminal.py",
+    "production_lines": 63,
+    "files": [
+      "src/standalone_wave6_raw_terminal.py",
+      "tests/test_standalone_wave6_raw_terminal.py"
+    ],
+    "patch_sha256": "0bd1d93056e35c2c394b5dfb4ff73ecf09f0c7d278648df6b1a9027d7cccdba5",
+    "agent_tests_unverified": "python -m pytest -q tests/test_standalone_wave6_raw_terminal.py -> 15 passed; pre-commit (ruff, ruff format, etc.) on new files -> passed; full suite collection fails in test_basic.py due to an unrelated pytest-version deprecation error.",
+    "imports": [
+      "from __future__ import annotations",
+      "import collections.abc as cabc",
+      "import contextlib",
+      "import os",
+      "import sys",
+      "import typing as t",
+      "import termios",
+      "import tty"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_raw_terminal",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-raw-code",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_raw_code.py",
+    "production_lines": 32,
+    "files": [
+      "src/standalone_wave6_raw_code.py",
+      "testing/test_standalone_wave6_raw_code.py"
+    ],
+    "patch_sha256": "fb7fe434d2deb5d1a9710bdc498e6dbf22d0b52f54e8bf644a00a9837bec66cf",
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_wave6_raw_code.py (17 passed); ruff check/format clean; mypy src/standalone_wave6_raw_code.py clean",
+    "imports": [
+      "from __future__ import annotations",
+      "import types"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_raw_code",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-statement-range",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_statement_range.py",
+    "production_lines": 47,
+    "files": [
+      "src/standalone_wave6_statement_range.py",
+      "testing/code/test_standalone_wave6_statement_range.py"
+    ],
+    "patch_sha256": "937da0dc7c07c6208db8002c2bace7e5cf27f9c1f73a189d1fa7d2b428f7a8f3",
+    "agent_tests_unverified": "python -m pytest testing/code/test_standalone_wave6_statement_range.py -q (18 passed); ruff check + ruff format (clean)",
+    "imports": [
+      "from __future__ import annotations",
+      "import ast",
+      "from bisect import bisect_right"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_statement_range",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-repr-exception",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_repr_exception.py",
+    "production_lines": 35,
+    "files": [
+      "src/standalone_wave6_repr_exception.py",
+      "testing/io/test_standalone_wave6_repr_exception.py"
+    ],
+    "patch_sha256": "5b0ac4db97effe84cd67a80c1f67c0d01c8e5fb0871018d0eb86ab8523bffabd",
+    "agent_tests_unverified": ".venv/bin/python -m pytest testing/io/test_standalone_wave6_repr_exception.py -q -> 14 passed; pre-commit run on new files -> all passed",
+    "imports": [
+      "from __future__ import annotations"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_repr_exception",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-chunk-copy",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_chunk_copy.py",
+    "production_lines": 46,
+    "files": [
+      "src/standalone_wave6_chunk_copy.py",
+      "testing/test_standalone_wave6_chunk_copy.py"
+    ],
+    "patch_sha256": "10c51fe47f1803a3bec1f4ae477b1760759cac82cf9b50a3b6841ed104136e21",
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_wave6_chunk_copy.py -q -> 15 passed; pre-commit run (ruff, mypy, etc.) on new files -> all passed",
+    "imports": [
+      "from __future__ import annotations",
+      "from typing import Any",
+      "from typing import IO",
+      "from typing import Protocol",
+      "from typing import TypeVar"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_chunk_copy",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-pyc-stream",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_pyc_stream.py",
+    "production_lines": 39,
+    "files": [
+      "src/standalone_wave6_pyc_stream.py",
+      "testing/test_standalone_wave6_pyc_stream.py"
+    ],
+    "patch_sha256": "f6e813b1ec46d6149094d32abb1ebdc9bb71067875720c3ec47ec41c96e873d4",
+    "agent_tests_unverified": "python -I -S -m unittest discover -s testing -p test_standalone_wave6_pyc_stream.py -v (3 passed); .venv/bin/python -m pytest -q testing/test_assertrewrite.py testing/test_standalone_wave6_pyc_stream.py (127 passed, 1 skipped); .venv/bin/ruff check and .venv/bin/ruff format --check on both new files (passed); .venv/bin/mypy on both new files (passed); inline Python reference comparison (exact except for function name); git diff --cached --check (passed).",
+    "imports": [
+      "from __future__ import annotations",
+      "import importlib.util",
+      "import marshal",
+      "import os",
+      "import struct",
+      "import types",
+      "from typing import IO"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_pyc_stream",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-pyc-file",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_pyc_file.py",
+    "production_lines": 74,
+    "files": [
+      "src/standalone_wave6_pyc_file.py",
+      "testing/test_standalone_wave6_pyc_file.py"
+    ],
+    "patch_sha256": "7cef74b434c2cf2cc60baf0e4bdc0a790448d72cf141bfdca44ef2fdcfe570a8",
+    "agent_tests_unverified": ".venv/bin/python -m pytest -q --basetemp=.venv/pytest-temp testing/test_standalone_wave6_pyc_file.py testing/test_assertrewrite.py (131 passed, 1 skipped); .venv/bin/ruff check, .venv/bin/ruff format --check, and .venv/bin/mypy on both new files (passed); Python source comparison and git diff --cached --check (passed).",
+    "imports": [
+      "from __future__ import annotations",
+      "import importlib.util",
+      "import marshal",
+      "import os",
+      "from pathlib import Path",
+      "import struct",
+      "import types",
+      "from typing import IO",
+      "from typing import Protocol"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_pyc_file",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-explanation-split",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_explanation_split.py",
+    "production_lines": 28,
+    "files": [
+      "src/standalone_wave6_explanation_split.py",
+      "testing/test_standalone_wave6_explanation_split.py"
+    ],
+    "patch_sha256": "69eafc6b427e0395bcd42021201b12718ffe0f2ab99d7f4f965c124ea8b1d28b",
+    "agent_tests_unverified": "python -I -S testing/test_standalone_wave6_explanation_split.py -v \u2014 3 passed; .venv/bin/python -m pytest -q testing/test_standalone_wave6_explanation_split.py testing/test_assertion.py testing/test_assertrewrite.py \u2014 287 passed, 1 skipped; .venv/bin/pre-commit run --files src/standalone_wave6_explanation_split.py testing/test_standalone_wave6_explanation_split.py \u2014 all applicable hooks passed; git diff --cached --check \u2014 passed.",
+    "imports": [
+      "from __future__ import annotations"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_explanation_split",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-explanation-lines",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_explanation_lines.py",
+    "production_lines": 52,
+    "files": [
+      "src/standalone_wave6_explanation_lines.py",
+      "testing/test_standalone_wave6_explanation_lines.py"
+    ],
+    "patch_sha256": "45c16be22f4c93f427a880d10f8936c3d867789aefc49bf3f0f8f7ef36e9cabd",
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_wave6_explanation_lines.py -q -> 9 passed; ruff check/format clean",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Sequence"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_explanation_lines",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-default-equality",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_default_equality.py",
+    "production_lines": 44,
+    "files": [
+      "src/standalone_wave6_default_equality.py",
+      "testing/test_standalone_wave6_default_equality.py"
+    ],
+    "patch_sha256": "7a5832f41ebcc9b317356bf7879fcd704361ed7c5e83c3d66a5b201f5a3d6e30",
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_wave6_default_equality.py -q -> 19 passed; pre-commit run --files <new files> (ruff, mypy, etc.) -> all passed",
+    "imports": [
+      "from __future__ import annotations",
+      "from typing import Any"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_default_equality",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-xml-escape",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_xml_escape.py",
+    "production_lines": 44,
+    "files": [
+      "src/standalone_wave6_xml_escape.py",
+      "testing/test_standalone_wave6_xml_escape.py"
+    ],
+    "patch_sha256": "21606eeed9e5eb707f3516835f747a91f93c5365dbab00e898f4ecf24cc32ab4",
+    "agent_tests_unverified": ".venv/bin/python -m pytest testing/test_standalone_wave6_xml_escape.py -q -> 18 passed; pre-commit run on both new files (ruff, mypy, etc.) -> all passed",
+    "imports": [
+      "from __future__ import annotations",
+      "import re"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_xml_escape",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-test-address",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_test_address.py",
+    "production_lines": 33,
+    "files": [
+      "src/standalone_wave6_test_address.py",
+      "testing/test_standalone_wave6_test_address.py"
+    ],
+    "patch_sha256": "fce57f14168319d9497b705c6d2e7dcff60a005665039f4d9566d7972193cb3f",
+    "agent_tests_unverified": ".venv/bin/python -m pytest testing/test_standalone_wave6_test_address.py -q -> 13 passed; ruff check/format --check -> clean",
+    "imports": [
+      "from __future__ import annotations",
+      "import re",
+      "import types"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_test_address",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-pytest-extended-path",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_wave6_extended_path.py",
+    "production_lines": 27,
+    "files": [
+      "src/standalone_wave6_extended_path.py",
+      "testing/test_standalone_wave6_extended_path.py"
+    ],
+    "patch_sha256": "d639af524f06308313fd724e8efae01e8f31fb82bcef4fe7c2eec047df5d8909",
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_wave6_extended_path.py -q -> 23 passed; ruff format/check -> clean",
+    "imports": [
+      "from __future__ import annotations"
+    ],
+    "vendored_body_AST_equal": true,
+    "requested_symbol": "vendored_extended_path",
+    "vendored_executable_body_AST_equal": true
+  },
+  {
+    "task_id": "block6-got-hook-inventory",
+    "kind": "hard-negative",
+    "production_file": "source/standalone/wave6-hook-inventory.ts",
+    "production_lines": 36,
+    "files": [
+      "source/standalone/wave6-hook-inventory.ts",
+      "test/wave6-hook-inventory.ts"
+    ],
+    "patch_sha256": "2d368e6adf108b2bcd68886a7b6245ab94e31428122a453f1cfcb31025897527",
+    "agent_tests_unverified": "npx ava test/wave6-hook-inventory.ts (10 passed); npx xo on new files (clean); npx tsc --noEmit (no errors in new files; pre-existing errors elsewhere)"
+  },
+  {
+    "task_id": "block6-click-alias-schema",
+    "kind": "hard-negative",
+    "production_file": "src/standalone_wave6_alias_schema.py",
+    "production_lines": 36,
+    "files": [
+      "src/standalone_wave6_alias_schema.py",
+      "tests/test_standalone_wave6_alias_schema.py"
+    ],
+    "patch_sha256": "9ebd8f08b1c541dde5424cfb640337e127e52de87077600aaf238bb60de3c324",
+    "agent_tests_unverified": "pytest tests/test_standalone_wave6_alias_schema.py (16 passed); ruff check/format and mypy --strict on new files: clean",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t"
+    ]
+  },
+  {
+    "task_id": "block6-pytest-source-status",
+    "kind": "hard-negative",
+    "production_file": "src/standalone_wave6_source_status.py",
+    "production_lines": 34,
+    "files": [
+      "src/standalone_wave6_source_status.py",
+      "testing/code/test_standalone_wave6_source_status.py"
+    ],
+    "patch_sha256": "e96335c72502a8952ae11d93151bf10a8f6951ef0a4b483001caae91b09dd216",
+    "agent_tests_unverified": ".venv/bin/python -m pytest testing/code/test_standalone_wave6_source_status.py -q (13 passed); ruff check/format and mypy on new files: clean",
+    "imports": [
+      "from __future__ import annotations",
+      "import inspect",
+      "from typing import TypedDict"
+    ]
+  }
+]

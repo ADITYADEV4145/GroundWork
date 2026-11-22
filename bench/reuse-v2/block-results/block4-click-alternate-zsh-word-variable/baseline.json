@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-alternate-zsh-word-variable",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "e796e387334578f6580730d62957683cff1dfbb8",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/alternate_zsh_word_variable.py",
+          "symbol": "src/click/alternate_zsh_word_variable.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "src/click/shell_completion.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/alternate_zsh_word_variable.py and update its 1 caller to use src/click/shell_completion.py."
+      },
+      {
+        "id": "cce0c866fb600db376ab8215fd8965fa1242838f",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/alternate_zsh_word_variable.py",
+          "symbol": "AlternateZshWordVariable",
+          "line": 9
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "FishComplete.get_completion_args",
+          "line": 405
+        },
+        "probability": 0.745161056825332,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6202057219704841
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of FishComplete.get_completion_args: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "37b7fa0c5c2096308b584516b89de0bad07d0281",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/alternate_zsh_word_variable.py",
+          "symbol": "AlternateZshWordVariable.get_completion_args",
+          "line": 15
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "FishComplete",
+          "line": 399
+        },
+        "probability": 0.7625400445651076,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6187783245122729
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of FishComplete: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

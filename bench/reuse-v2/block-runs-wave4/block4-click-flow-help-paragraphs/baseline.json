@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-flow-help-paragraphs",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/flow_help_paragraphs.py b/src/click/flow_help_paragraphs.py\nnew file mode 100644\nindex 0000000..a878d8d\n--- /dev/null\n+++ b/src/click/flow_help_paragraphs.py\n@@ -0,0 +1,20 @@\n+from __future__ import annotations\n+\n+from .formatting import HelpFormatter\n+from .formatting import wrap_text\n+\n+\n+class FlowHelpParagraphs(HelpFormatter):\n+    def write_text(self, text: str) -> None:\n+        \"\"\"Writes re-indented text into the buffer.\"\"\"\n+        indent = \" \" * self.current_indent\n+        self.write(\n+            wrap_text(\n+                text,\n+                self.width,\n+                initial_indent=indent,\n+                subsequent_indent=indent,\n+                preserve_paragraphs=False,\n+            )\n+        )\n+        self.write(\"\\n\")\n",
+  "decisions": [],
+  "notes": "Created src/click/flow_help_paragraphs.py with FlowHelpParagraphs(HelpFormatter) whose write_text mirrors HelpFormatter.write_text but passes preserve_paragraphs=False to wrap_text; no existing modules touched.\nAgent-reported tests_run (not independently verified): \"python -m pytest tests -x -q (pytest<9): 900 passed, 21 skipped, 1 xfailed; manual FlowHelpParagraphs write_text smoke test OK\"",
+  "session_id": "",
+  "acus": null
+}

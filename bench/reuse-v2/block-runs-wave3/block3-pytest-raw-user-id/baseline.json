@@ -1,0 +1,9 @@
+{
+  "task_id": "block3-pytest-raw-user-id",
+  "arm": "baseline",
+  "patch": "diff --git a/src/_pytest/raw_user_id.py b/src/_pytest/raw_user_id.py\nnew file mode 100644\nindex 000000000..b50a5ab99\n--- /dev/null\n+++ b/src/_pytest/raw_user_id.py\n@@ -0,0 +1,27 @@\n+\"\"\"Platform diagnostics helpers exposing raw OS-level values.\"\"\"\n+\n+from __future__ import annotations\n+\n+import os\n+import sys\n+\n+\n+def raw_user_id() -> int | None:\n+    \"\"\"Return the current process's real user id, or the raw unknown-user\n+    sentinel (-1) when the platform reports one.\n+\n+    This mirrors :func:`_pytest.compat.get_user_id`, except a return value of\n+    -1 from :func:`os.getuid` is returned unchanged instead of being converted\n+    to ``None``.\n+\n+    :return: The user id, -1 if the platform reported the unknown-user\n+        sentinel, or None if it could not be determined.\n+    \"\"\"\n+    if sys.platform == \"win32\" or sys.platform == \"emscripten\":\n+        # win32 does not have a getuid() function.\n+        # Emscripten has a return 0 stub.\n+        return None\n+    else:\n+        # On other platforms, a return value of -1 is the unknown-user\n+        # sentinel; it is returned unchanged here.\n+        return os.getuid()\n",
+  "decisions": [],
+  "notes": "Added src/_pytest/raw_user_id.py mirroring get_user_id, but returning the raw os.getuid() value so -1 passes through unchanged; win32/emscripten still return None.\nAgent-reported tests_run (not independently verified): \"python import check: raw_user_id()==1000, getuid mock -1 -> -1 (vs get_user_id None), mock 1000 -> 1000; all passed\"",
+  "session_id": "",
+  "acus": null
+}

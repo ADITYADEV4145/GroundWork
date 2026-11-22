@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-angle-optional-argument",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "e84bd6edd3e2845e7e441434333c9c369d2500cc",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/angle_optional_argument.py",
+          "symbol": "AngleOptionalArgument.make_metavar",
+          "line": 10
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Argument.make_metavar",
+          "line": 3116
+        },
+        "probability": 0.4185258978865314,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Argument.make_metavar: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

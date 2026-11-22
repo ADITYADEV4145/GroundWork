@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-pytest-inline-exception",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "1e70d85533230df36d018116777c9dd50059fb0f",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/inline_exception.py",
+          "symbol": "src/_pytest/inline_exception.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/_code/code.py",
+          "symbol": "src/_pytest/_code/code.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/inline_exception.py and update its 8 callers to use src/_pytest/_code/code.py."
+      },
+      {
+        "id": "d10c39b113ae2b85de81132f8f747c6d0c50bdce",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/inline_exception.py",
+          "symbol": "inline_exception",
+          "line": 10
+        },
+        "existing": {
+          "file": "src/_pytest/_code/code.py",
+          "symbol": "stringify_exception",
+          "line": 465
+        },
+        "probability": 0.47503845366801883,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8333700633662608
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of stringify_exception: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

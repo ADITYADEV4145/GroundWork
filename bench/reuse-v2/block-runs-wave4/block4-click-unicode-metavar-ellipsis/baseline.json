@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-unicode-metavar-ellipsis",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/unicode_metavar_ellipsis.py b/src/click/unicode_metavar_ellipsis.py\nnew file mode 100644\nindex 0000000..6e72ee5\n--- /dev/null\n+++ b/src/click/unicode_metavar_ellipsis.py\n@@ -0,0 +1,25 @@\n+from __future__ import annotations\n+\n+from .core import Context\n+from .core import Parameter\n+\n+\n+class UnicodeMetavarEllipsis(Parameter):\n+    \"\"\"A :class:`~click.core.Parameter` whose generated metavar uses the\n+    Unicode ellipsis character (``\u2026``) instead of three ASCII periods\n+    when ``nargs`` is not 1.\n+    \"\"\"\n+\n+    def make_metavar(self, ctx: Context) -> str:\n+        if self.metavar is not None:\n+            return self.metavar\n+\n+        metavar = self.type.get_metavar(param=self, ctx=ctx)\n+\n+        if metavar is None:\n+            metavar = self.type.name.upper()\n+\n+        if self.nargs != 1:\n+            metavar += \"\u2026\"\n+\n+        return metavar\n",
+  "decisions": [],
+  "notes": "Created src/click/unicode_metavar_ellipsis.py with UnicodeMetavarEllipsis(Parameter); make_metavar mirrors Parameter.make_metavar but appends the Unicode ellipsis when nargs != 1. Existing modules untouched.\nAgent-reported tests_run (not independently verified): \"python smoke test asserting make_metavar returns 'TEXT\\u2026' for nargs=-1, 'TEXT' for nargs=1, and honors explicit metavar (passed); ruff check and ruff format --check on the new file (passed)\"",
+  "session_id": "",
+  "acus": null
+}

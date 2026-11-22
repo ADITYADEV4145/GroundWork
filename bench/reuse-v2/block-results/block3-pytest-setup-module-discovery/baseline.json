@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-pytest-setup-module-discovery",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "eab34779b1e4e728cdbc9d6a67f532b9e74c3c5e",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/setup_module_discovery.py",
+          "symbol": "src/_pytest/setup_module_discovery.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/config/__init__.py",
+          "symbol": "src/_pytest/config/__init__.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/setup_module_discovery.py and update its 5 callers to use src/_pytest/config/__init__.py."
+      },
+      {
+        "id": "d8cc98db3d244a82ad940f8027b96a512468fdc8",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/setup_module_discovery.py",
+          "symbol": "setup_module_discovery",
+          "line": 10
+        },
+        "existing": {
+          "file": "src/_pytest/config/__init__.py",
+          "symbol": "_iter_rewritable_modules",
+          "line": 902
+        },
+        "probability": 0.5502778294434083,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.7511888999910964
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _iter_rewritable_modules: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

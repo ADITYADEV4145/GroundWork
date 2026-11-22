@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-last-date-format-first",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "22003db8a0f9cb6f3b58f9d05ecd44e495a0f4ba",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/last_date_format_first.py",
+          "symbol": "LastDateFormatFirst.convert",
+          "line": 21
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "DateTime._try_to_convert_date",
+          "line": 439
+        },
+        "probability": 0.5701248159682,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5992045893023125
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6666666666666667
+          }
+        ],
+        "fix": "Duplicate of DateTime._try_to_convert_date: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

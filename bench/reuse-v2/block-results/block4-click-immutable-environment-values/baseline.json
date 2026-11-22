@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-immutable-environment-values",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "4fd8e42b5eceda4ec1352153f731689af7695a91",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/immutable_environment_values.py",
+          "symbol": "ImmutableEnvironmentValues",
+          "line": 11
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "ParamType",
+          "line": 30
+        },
+        "probability": 0.4202928187267023,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.35396301977889705
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of ParamType: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "ca796f137a20a6eb2c97682354b40708ea0d74d5",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/immutable_environment_values.py",
+          "symbol": "ImmutableEnvironmentValues.value_from_envvar",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Parameter.value_from_envvar",
+          "line": 2377
+        },
+        "probability": 0.461074823708664,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6097260504136166
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Parameter.value_from_envvar: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

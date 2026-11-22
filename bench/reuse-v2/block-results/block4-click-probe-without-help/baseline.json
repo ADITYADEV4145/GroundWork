@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-probe-without-help",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "0f6aa89eab4559ea5af9057f925baa5f41bb745d",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/probe_without_help.py",
+          "symbol": "ProbeWithoutHelp.get_help_option",
+          "line": 9
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Command.make_parser",
+          "line": 1051
+        },
+        "probability": 0.5430641587694107,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.37595161660296683
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Command.make_parser: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

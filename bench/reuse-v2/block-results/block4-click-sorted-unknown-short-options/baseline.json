@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-sorted-unknown-short-options",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "26cbdb4d0a614e4b51f1548c82c0c498846c8ee6",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/sorted_unknown_short_options.py",
+          "symbol": "SortedUnknownShortOptions._match_short_opt",
+          "line": 17
+        },
+        "existing": {
+          "file": "src/click/parser.py",
+          "symbol": "_OptionParser._process_opts",
+          "line": 469
+        },
+        "probability": 0.7966562980249798,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6043227269357866
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _OptionParser._process_opts: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

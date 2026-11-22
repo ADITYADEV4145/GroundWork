@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-first-line-extra-indent",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "41fd96ac84f4bd6d5f6e78c4f21d141403b46726",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/first_line_extra_indent.py",
+          "symbol": "FirstLineExtraIndent",
+          "line": 9
+        },
+        "existing": {
+          "file": "src/click/_textwrap.py",
+          "symbol": "TextWrapper",
+          "line": 8
+        },
+        "probability": 0.660028377131646,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5738419153216754
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of TextWrapper: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "f7ea8456910a01f1ae94c341fcb040b4d6104366",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/first_line_extra_indent.py",
+          "symbol": "FirstLineExtraIndent.extra_indent",
+          "line": 14
+        },
+        "existing": {
+          "file": "src/click/formatting.py",
+          "symbol": "HelpFormatter.write_text",
+          "line": 194
+        },
+        "probability": 0.7107185514238155,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5146414886991684
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of HelpFormatter.write_text: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

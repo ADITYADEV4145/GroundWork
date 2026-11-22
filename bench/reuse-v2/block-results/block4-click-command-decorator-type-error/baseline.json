@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-command-decorator-type-error",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "5c67fd73e9abbc524aa6c708e1e527c72e32dceb",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/command_decorator_type_error.py",
+          "symbol": "CommandDecoratorTypeError.command.decorator",
+          "line": 52
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Group.command.decorator",
+          "line": 1628
+        },
+        "probability": 0.9841314380539381,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Group.command.decorator: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "afd3d7f2bd5e29944dc5d7ee61a1e830380472c4",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/command_decorator_type_error.py",
+          "symbol": "CommandDecoratorTypeError.command",
+          "line": 23
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Group.group",
+          "line": 1646
+        },
+        "probability": 0.5756460702015291,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8579376707069263
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Group.group: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,587 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-click-console-stream",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "73893a2ae34f07f2869f56e02e865ba1b2c2265c",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "MAX_BYTES_WRITTEN",
+          "line": 72
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "MAX_BYTES_WRITTEN",
+          "line": 69
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use MAX_BYTES_WRITTEN from src/click/_winconsole.py"
+      },
+      {
+        "id": "1ff2db015f695438afb84ca9d3160a0475cbe8a6",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "Py_buffer",
+          "line": 93
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "Py_buffer",
+          "line": 87
+        },
+        "probability": 0.9769851874184835,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Py_buffer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "803717962ac37f8094fbe583de492d93d0689bed",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "get_buffer",
+          "line": 111
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "get_buffer",
+          "line": 105
+        },
+        "probability": 0.9841314380539381,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_buffer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "658abdd083762882bed1a1894767977d5b0ca32b",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_FixupStream",
+          "line": 150
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream",
+          "line": 82
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "373bfb102021fdf194e4c34e957da2240fd20980",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_FixupStream.read1",
+          "line": 173
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.read1",
+          "line": 105
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.read1: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "4319a44f43d39a0850019b6a586d14ca380b7d8d",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_FixupStream.readable",
+          "line": 181
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.readable",
+          "line": 113
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.readable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "628e1d9306d8ab53fdaee508814289315bcc3906",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_FixupStream.writable",
+          "line": 193
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.writable",
+          "line": 125
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.writable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "2b50968d4e5e512953081a1bbd1446aebe0c9887",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 208
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 140
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.seekable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "9150c53754c83bf0f33997722b44e55b83e65ac5",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_WindowsConsoleReader",
+          "line": 228
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleReader",
+          "line": 127
+        },
+        "probability": 0.9769851874184835,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleReader: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "b719105c84fd953a3258869331c98f8c02a5979b",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_WindowsConsoleReader.readinto",
+          "line": 232
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleReader.readinto",
+          "line": 131
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleReader.readinto: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "81aecbc23455c6d3628b3a22e4991ec71e9f6113",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_WindowsConsoleWriter",
+          "line": 263
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleWriter",
+          "line": 162
+        },
+        "probability": 0.9769851874184835,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleWriter: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "6e28ac7ab1841673d321b37152efac4b3941ee10",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_WindowsConsoleWriter._get_error_message",
+          "line": 267
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleWriter._get_error_message",
+          "line": 166
+        },
+        "probability": 0.9597808623512812,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleWriter._get_error_message: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "c7860d3442599fec4aea10d07c6ef5593abd0cf3",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_WindowsConsoleWriter.write",
+          "line": 275
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleWriter.write",
+          "line": 174
+        },
+        "probability": 0.9656212964353162,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleWriter.write: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "334482377ec1b2bdd80e23ed03c55cc06f94a23f",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "ConsoleStream",
+          "line": 295
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "ConsoleStream",
+          "line": 194
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of ConsoleStream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "2bada4d8f5237e9d9f748c0286647d6d1e52bf0e",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "ConsoleStream.write",
+          "line": 304
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "ConsoleStream.write",
+          "line": 203
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of ConsoleStream.write: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "6741b8f28e17e342f2841f373d11c8c2a49f45ac",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_get_text_stdin",
+          "line": 327
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_text_stdin",
+          "line": 226
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_text_stdin: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "7f11ccbb0e1b6ed1e791736305d07a72d0a1f08b",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_get_text_stdout",
+          "line": 337
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_text_stdout",
+          "line": 236
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_text_stdout: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "812be9d7a3ae79e74026ecd57e39600bcebf7031",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_get_text_stderr",
+          "line": 347
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_text_stderr",
+          "line": 246
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_text_stderr: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "29c78fe981b050a3a4fb366e416cc76ae702f03b",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "_is_console",
+          "line": 364
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_is_console",
+          "line": 263
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_console: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "248c479ede2852eef309ebc6c5b2e8c1bfb1e4d1",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "vendored_console_stream",
+          "line": 377
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_windows_console_stream",
+          "line": 276
+        },
+        "probability": 0.9752588658781144,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9430553581632284
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_windows_console_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "1bb9a6c869e84c2263add6759e783fbc8f3af399",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_wave6_console_stream.py",
+          "symbol": "vendored_console_stream_variant",
+          "line": 400
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_windows_console_stream",
+          "line": 276
+        },
+        "probability": 0.4365987320303514,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.30994737194516137
+          }
+        ],
+        "fix": "Duplicate of _get_windows_console_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

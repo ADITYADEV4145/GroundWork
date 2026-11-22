@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-yellow-parameter-warning",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "976bc1a61c866472333a772400eae89482885aa7",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/yellow_parameter_warning.py",
+          "symbol": "YellowParameterWarning",
+          "line": 15
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "_NumberParamTypeBase",
+          "line": 472
+        },
+        "probability": 0.43544598970742937,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.3619552066574893
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _NumberParamTypeBase: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "cbd6bbf7faf3303f5ec2a893a3fa4f677fd14b9c",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/yellow_parameter_warning.py",
+          "symbol": "YellowParameterWarning.handle_parse_result",
+          "line": 20
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Parameter.consume_value",
+          "line": 2268
+        },
+        "probability": 0.5947998241044979,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5773769473361549
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6666666666666667
+          }
+        ],
+        "fix": "Duplicate of Parameter.consume_value: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

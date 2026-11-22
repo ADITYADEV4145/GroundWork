@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-trim-environment-result",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "b51afa98c5a1eb256579b4650d6725620c092c13",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/trim_environment_result.py",
+          "symbol": "TrimEnvironmentResult.resolve_envvar_value",
+          "line": 14
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Parameter.value_from_envvar",
+          "line": 2377
+        },
+        "probability": 0.64932117524902,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6585890019004389
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Parameter.value_from_envvar: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

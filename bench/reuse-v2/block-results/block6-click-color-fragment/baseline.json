@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-click-color-fragment",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "dbcf0a07f47852b7ddec83ccaf679825059f968c",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_color_fragment.py",
+          "symbol": "src/standalone_wave6_color_fragment.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/termui.py",
+          "symbol": "src/click/termui.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_color_fragment.py and update its 1 caller to use src/click/termui.py."
+      },
+      {
+        "id": "7bf9c51a71835a9da0558505604db2e9af2195e8",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_color_fragment.py",
+          "symbol": "vendored_color_fragment",
+          "line": 28
+        },
+        "existing": {
+          "file": "src/click/termui.py",
+          "symbol": "_interpret_color",
+          "line": 501
+        },
+        "probability": 0.9728534779719781,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8736916067776652
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _interpret_color: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

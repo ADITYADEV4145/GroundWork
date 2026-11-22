@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-pytest-statement-range",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "62eae3e3b4878f3be9f6616aeb901db735f5e127",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_statement_range.py",
+          "symbol": "vendored_statement_range",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/_pytest/_code/source.py",
+          "symbol": "get_statement_startend2",
+          "line": 153
+        },
+        "probability": 0.99518516862557,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9654701412983496
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_statement_startend2: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

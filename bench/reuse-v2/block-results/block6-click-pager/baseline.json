@@ -1,0 +1,1289 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-click-pager",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "8ef95c0ba6f4668fcaeaaf4a94aa7704717802fa",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_make_text_stream",
+          "line": 41
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_make_text_stream",
+          "line": 19
+        },
+        "probability": 0.9905009670444577,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _make_text_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "06b22d040845210bb169ae54354d9270c7ec4a33",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "is_ascii_encoding",
+          "line": 62
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "is_ascii_encoding",
+          "line": 40
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of is_ascii_encoding: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "ff1caa8da6e37d79b7a9065da426e672066b5df1",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "get_best_encoding",
+          "line": 70
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "get_best_encoding",
+          "line": 48
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_best_encoding: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "0abbb5827b0ac5567fd70f8dd84267b68f0742d5",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_FixupStream",
+          "line": 104
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream",
+          "line": 82
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "4f6d38e1d635bd9fe5d89b62b6004f41023acaa0",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_FixupStream.read1",
+          "line": 127
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.read1",
+          "line": 105
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.read1: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "45d4c95d1f3baf89dfe870e9789e7e566af45b91",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_FixupStream.readable",
+          "line": 135
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.readable",
+          "line": 113
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.readable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "ea4ada52bd8aa34741d650de5dbbe7df5a73a0bd",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_FixupStream.writable",
+          "line": 147
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.writable",
+          "line": 125
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.writable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "c9c42ad2c02e45503707454633259a8ce3341a86",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 162
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 140
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.seekable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "492786c73d84e055229bf6da62bd2c82a79fe7b0",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_is_binary_reader",
+          "line": 173
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_binary_reader",
+          "line": 151
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_binary_reader: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "68acf456a28f2861f6ad0eaf64cefc537c187933",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_is_binary_writer",
+          "line": 180
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_binary_writer",
+          "line": 160
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_binary_writer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "8d52d42b8ec93f85716cad313f1d7268a4f825d9",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_find_binary_reader",
+          "line": 193
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_find_binary_reader",
+          "line": 173
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _find_binary_reader: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "4c358563f8457f02bcbba725a8a670e11a1f175c",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_find_binary_writer",
+          "line": 211
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_find_binary_writer",
+          "line": 191
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _find_binary_writer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "d5c00dd5e92b5b9a2efd3bbd38c128d881aa60ca",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_stream_is_misconfigured",
+          "line": 229
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_stream_is_misconfigured",
+          "line": 209
+        },
+        "probability": 0.9905009670444577,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _stream_is_misconfigured: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "32f6d3d11393570324771020c210ecb4ba248992",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_is_compat_stream_attr",
+          "line": 238
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_compat_stream_attr",
+          "line": 218
+        },
+        "probability": 0.99132362600262,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_compat_stream_attr: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "64d49448d67f628d7f132dfacdb563b21552dcbd",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_is_compatible_text_stream",
+          "line": 247
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_compatible_text_stream",
+          "line": 227
+        },
+        "probability": 0.99132362600262,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_compatible_text_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "4051b267bfca2b24971f0469178470b01a0e9415",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_force_correct_text_stream",
+          "line": 258
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_force_correct_text_stream",
+          "line": 238
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _force_correct_text_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "56b8cac5a835da8122464aa0d47608335d971381",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_force_correct_text_reader",
+          "line": 304
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_force_correct_text_reader",
+          "line": 284
+        },
+        "probability": 0.9905009670444577,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _force_correct_text_reader: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "913e853ff7a635cec4798ecf69c4d199f0b77198",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_force_correct_text_writer",
+          "line": 320
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_force_correct_text_writer",
+          "line": 300
+        },
+        "probability": 0.9905009670444577,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _force_correct_text_writer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "7055c99f96d46fd9b460adce8bc17c85cf42ec1f",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "get_binary_stdin",
+          "line": 336
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "get_binary_stdin",
+          "line": 316
+        },
+        "probability": 0.9650683541579346,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_binary_stdin: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "e5822214f27ae070cf3d758a126a4c6e2b22838d",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "get_binary_stdout",
+          "line": 343
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "get_binary_stdout",
+          "line": 323
+        },
+        "probability": 0.9650683541579346,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_binary_stdout: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "9b58dc1affc6de08d5db66cf2ef08bd396822192",
+        "kind": "duplicate-constant",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "MAX_BYTES_WRITTEN",
+          "line": 390
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "MAX_BYTES_WRITTEN",
+          "line": 69
+        },
+        "signals": [
+          {
+            "name": "literalMatch",
+            "value": 1
+          },
+          {
+            "name": "existingNamedConstant",
+            "value": 1
+          }
+        ],
+        "fix": "use MAX_BYTES_WRITTEN from src/click/_winconsole.py"
+      },
+      {
+        "id": "f62bb01fffbb5a8eeaa6f492dc0e631c1f13bab9",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "Py_buffer",
+          "line": 400
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "Py_buffer",
+          "line": 87
+        },
+        "probability": 0.9769851874184835,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Py_buffer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "388ebd519a8e9b01fb9e65235a74acd4db714cc5",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "get_buffer",
+          "line": 418
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "get_buffer",
+          "line": 105
+        },
+        "probability": 0.9841314380539381,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_buffer: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "0e2eae1225cc6d19ee4d45cdd5123fd5608bfb84",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_WindowsConsoleReader",
+          "line": 438
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleReader",
+          "line": 127
+        },
+        "probability": 0.9769851874184835,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleReader: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "9db06cc807dd194d07357359895d9da27b5efe97",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_WindowsConsoleReader.readinto",
+          "line": 442
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleReader.readinto",
+          "line": 131
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleReader.readinto: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "2935713cc156054cac2163c767be07c435e1bf51",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_WindowsConsoleWriter",
+          "line": 472
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleWriter",
+          "line": 162
+        },
+        "probability": 0.9769851874184835,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleWriter: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "814c012ac27fc88d628b3464cc70c060a4ae24f3",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_WindowsConsoleWriter._get_error_message",
+          "line": 476
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleWriter._get_error_message",
+          "line": 166
+        },
+        "probability": 0.9597808623512812,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleWriter._get_error_message: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "c6e2f0514d48a3dadcd6af372d3541f361228d64",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_WindowsConsoleWriter.write",
+          "line": 484
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_WindowsConsoleWriter.write",
+          "line": 174
+        },
+        "probability": 0.9656212964353162,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _WindowsConsoleWriter.write: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "e4a6fc9ed0fc60ca794af422b477f7f2a562fa57",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "ConsoleStream",
+          "line": 503
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "ConsoleStream",
+          "line": 194
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of ConsoleStream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "ef6b14ff52d5274733871d30f05ffbef4ce77b99",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "ConsoleStream.write",
+          "line": 512
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "ConsoleStream.write",
+          "line": 203
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of ConsoleStream.write: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "ac136e070b771441aee0c9705411cc706f9232b4",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_get_text_stdin",
+          "line": 534
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_text_stdin",
+          "line": 226
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_text_stdin: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "6f56266f444d9aa33478475472d95b8e6fd7b668",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_get_text_stdout",
+          "line": 543
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_text_stdout",
+          "line": 236
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_text_stdout: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "17a8456ef2521c2409c8310d5e5255dae9229398",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_get_text_stderr",
+          "line": 552
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_text_stderr",
+          "line": 246
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_text_stderr: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "9e72d33261cd7e7499764dd80dbbea4a4ff147fc",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_is_console",
+          "line": 567
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_is_console",
+          "line": 263
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_console: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "a0a0dbae7c7fc0fa42cdc4fd2b4348fb1da66f21",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "get_text_stdin",
+          "line": 610
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "get_text_stdin",
+          "line": 337
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_text_stdin: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "70d647b4003a9542937928f54dea27c588bb301e",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "get_text_stdout",
+          "line": 617
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "get_text_stdout",
+          "line": 344
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of get_text_stdout: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "e21a76c42fb9876434dcabfce9e5dcd584752365",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_wrap_io_open",
+          "line": 624
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_wrap_io_open",
+          "line": 358
+        },
+        "probability": 0.971238496782752,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _wrap_io_open: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "dedc7b4ab3b5e8c78aa55e960274346e043b4637",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "open_stream",
+          "line": 637
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "open_stream",
+          "line": 371
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of open_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "5c75710f3103a42fa60a85338bd3624a52452d18",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_AtomicFile",
+          "line": 718
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_AtomicFile",
+          "line": 452
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _AtomicFile: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "d1328261813fafd0ba2922e43baaa680e6a9b45b",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_AtomicFile.close",
+          "line": 729
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_AtomicFile.close",
+          "line": 463
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _AtomicFile.close: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "0a6bd21eb1c51402d65d18ee4730eaf95a8c356f",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_make_cached_stream_func",
+          "line": 765
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_make_cached_stream_func",
+          "line": 579
+        },
+        "probability": 0.9841314380539381,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _make_cached_stream_func: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "37669f6ab858f4c09ac5980b8e8de8b092f6562f",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_make_cached_stream_func.func",
+          "line": 771
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_make_cached_stream_func.func",
+          "line": 585
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _make_cached_stream_func.func: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "6675348f24f17942b0caacbee1093ab32653ca92",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "vendored_pager",
+          "line": 796
+        },
+        "existing": {
+          "file": "src/click/_termui_impl.py",
+          "symbol": "pager",
+          "line": 370
+        },
+        "probability": 0.9773729704743244,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9946795722966228
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of pager: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "745bdda2c08e15145cc63e14e558b5536d28446a",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_pipepager",
+          "line": 838
+        },
+        "existing": {
+          "file": "src/click/_termui_impl.py",
+          "symbol": "_pipepager",
+          "line": 412
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _pipepager: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "7657b6d44cd66cabb940d02a209c6468ccd2408a",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_tempfilepager",
+          "line": 928
+        },
+        "existing": {
+          "file": "src/click/_termui_impl.py",
+          "symbol": "_tempfilepager",
+          "line": 502
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _tempfilepager: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "15fe01b436c1b1654505ccdc76cb5e11ae4e6a12",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_nullpager",
+          "line": 970
+        },
+        "existing": {
+          "file": "src/click/_termui_impl.py",
+          "symbol": "_nullpager",
+          "line": 544
+        },
+        "probability": 0.9841314380539381,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _nullpager: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "e647061f4cd18d3b238cbfbcc17d9c7747577a23",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_wave6_pager.py",
+          "symbol": "_get_windows_console_stream",
+          "line": 579
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_get_windows_console_stream",
+          "line": 276
+        },
+        "probability": 0.734348079365204,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_windows_console_stream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

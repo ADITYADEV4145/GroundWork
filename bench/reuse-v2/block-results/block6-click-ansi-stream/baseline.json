@@ -1,0 +1,290 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-click-ansi-stream",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "c2491cea73fe1902d123ebaec20f54cc07392af8",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "src/standalone_wave6_ansi_stream.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "src/click/_compat.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_ansi_stream.py and update its 15 callers to use src/click/_compat.py."
+      },
+      {
+        "id": "4eadccc4a6885b8f07d166355d98c4a025ac2bae",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "_FixupStream",
+          "line": 45
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream",
+          "line": 82
+        },
+        "probability": 0.9773539214447677,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "f77526f05688cc5b1fac5cd951d9e08876503a3d",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "_FixupStream.read1",
+          "line": 68
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.read1",
+          "line": 105
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.read1: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "15128510c24df49086188efe3bd5cf1370254247",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "_FixupStream.readable",
+          "line": 76
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.readable",
+          "line": 113
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.readable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "8a99801180b00c6de7006695007bd774ee874222",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "_FixupStream.writable",
+          "line": 88
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.writable",
+          "line": 125
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.writable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "1d68fa57e1781ef49eddeec8f4c10b0da1e03fa7",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 103
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_FixupStream.seekable",
+          "line": 140
+        },
+        "probability": 0.947448940157924,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _FixupStream.seekable: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "456b83c642049b159604f6bcd009bb3ed490270e",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "_is_jupyter_kernel_output",
+          "line": 114
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_is_jupyter_kernel_output",
+          "line": 492
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_jupyter_kernel_output: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "7674186630e784adff25f0b1d5475ea2491e9bf5",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "should_strip_ansi",
+          "line": 121
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "should_strip_ansi",
+          "line": 499
+        },
+        "probability": 0.9482658337615166,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of should_strip_ansi: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "9f18df609dc93d1cd9c412594261c0c5fc4d3ccb",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "vendored_ansi_stream",
+          "line": 141
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "auto_wrap_for_ansi",
+          "line": 522
+        },
+        "probability": 0.9871113830915021,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9737928356234665
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of auto_wrap_for_ansi: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "3ed5deb91ee71e79031944cb798d02565e410b07",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_ansi_stream.py",
+          "symbol": "vendored_ansi_stream._safe_write",
+          "line": 160
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "auto_wrap_for_ansi._safe_write",
+          "line": 541
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of auto_wrap_for_ansi._safe_write: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

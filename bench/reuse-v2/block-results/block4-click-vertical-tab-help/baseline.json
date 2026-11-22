@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-vertical-tab-help",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "5c33e3e350b5987868372443e763ec142ccdca1b",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/vertical_tab_help.py",
+          "symbol": "VerticalTabHelp.format_help_text",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Command.format_help_text",
+          "line": 1107
+        },
+        "probability": 0.7152178094163206,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Command.format_help_text: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

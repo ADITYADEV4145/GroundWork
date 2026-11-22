@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-list-option-values",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "ec3ef04cb00894b74f0e7fd23b5bd70b4f4f66b1",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/list_option_values.py",
+          "symbol": "ListOptionValues._get_value_from_state",
+          "line": 19
+        },
+        "existing": {
+          "file": "src/click/parser.py",
+          "symbol": "_Argument",
+          "line": 182
+        },
+        "probability": 0.5550900285412625,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.4121276379950449
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _Argument: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

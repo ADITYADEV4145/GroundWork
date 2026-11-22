@@ -1,9 +1,11 @@
 # V2 JavaScript oracle evidence — three confirmed omissions, one counterexample
 
 **This is targeted evidence for the published v2 FAIL, not a new benchmark run or rescore.**
-V1 and v2 results.json and RESULTS.md remain unchanged. No v3 was preregistered or
-run: the condition that all four precision misses arise from omitted JS checking
-does **not** hold. The six separately committed review fixes do not change these
+V1 and v2 results.json and RESULTS.md remain unchanged. At evidence completion no v3
+was preregistered or run: the claim that all four precision misses arise from
+omitted JS checking does **not** hold. Three are an oracle gap; return-shape is a
+genuine false high-risk rating under the preregistered must-change-caller criterion.
+The separately committed review fixes do not change these
 frozen v2 predictions; no impact calls were rerun to obtain them.
 
 ## Frozen inputs and scope
@@ -59,7 +61,7 @@ test('customer lookup and ticket ownership', () => {
 | customer-desk/required-param | test/services.test.mjs:8, import-resolved | TS2554 at test/services.test.mjs:8 | 1 | JS omission confirmed |
 | customer-desk/rename | test/services.test.mjs:8, name-only | TS2305 at test/services.test.mjs:3 | 1 | JS omission confirmed |
 | customer-desk/delete | test/services.test.mjs:8, name-only | TS2305 at test/services.test.mjs:3 | 1 | JS omission confirmed |
-| customer-desk/return-shape | test/services.test.mjs:8, import-resolved | TS2322 only in edited src/users.ts:6; no new external caller diagnostic | 0 | Claim disproven for this task |
+| customer-desk/return-shape | test/services.test.mjs:8, import-resolved | TS2322 only in edited src/users.ts:6; no new external caller diagnostic | 0 | Genuine false high-risk rating, not an oracle gap |
 
 The first three are not invented callers: broadening only the oracle finds new
 errors in the predicted JS file, and the actual test fails from a passing baseline.
@@ -306,7 +308,10 @@ exit: 0
 ## Decision
 
 The evidence supports the omitted-JS explanation for **three**, not four, tasks.
-Per the conditional instruction, stop before v3 and report this counterexample.
-No new seed, preregistration, oracle policy change, checker tuning or v3 run has
-been performed. A future v3 needs an explicit decision on the oracle/scoring rule;
-this evidence must not be presented as a v2 pass.
+The return-shape miss is a genuine false high-risk rating: the unchanged caller
+does not need an update for that mutation. Initially work stopped before v3 under
+the conditional instruction. The maintainer subsequently explicitly authorized a
+separate v3 anyway, retaining this counterexample and the same scoring rules,
+with a mechanically broadened JS oracle and no checker tuning after finding 7.
+See PREREGISTRATION-v3.md for that separate experiment. This evidence must not be
+presented as a v2 pass or a claim that all four misses were oracle errors.

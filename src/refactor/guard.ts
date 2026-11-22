@@ -13,7 +13,7 @@ import { checkIndexedChanges, type CheckReport } from '../reuse/check.js';
 import { openDb } from '../store/db.js';
 import { sha1 } from '../util/hash.js';
 import { readRepoFile, repoRelative } from '../util/repo-file.js';
-import type { FileEdit } from './project.js';
+import { originalPosition, type FileEdit } from './project.js';
 
 const maxSnapshotBytes = 128 * 1024 * 1024;
 const maxFileBytes = 8 * 1024 * 1024;
@@ -144,23 +144,25 @@ export async function guardCandidate(ctx: ToolContext, edits: FileEdit[], rename
         if (unchecked) throw new Error(`Cannot ground candidate in ${unchecked.file}: ${unchecked.unchecked}.`);
         const baselines = [...candidateFiles.keys()].map((file) => ({ file, ranges: null }));
         const baseFindings = verifyChanged(before, baseline, baselines, ctx.config).flatMap((r) => r.findings);
-        const signature = (f: typeof baseFindings[number], text: string) =>
-          JSON.stringify([f.file, f.kind, f.name, f.blocking, f.message, text.split('\n')[f.line - 1], f.column]);
         const byFile = new Map(edits.map((e) => [e.file, e]));
-        const unchanged = new Map<string, string>();
-        const getText = (file: string, revision: 'before' | 'after') => {
-          const edit = byFile.get(file);
-          if (edit) return edit[revision];
-          if (!unchanged.has(file)) unchanged.set(file, readFileSync(path.join(baseline, file), 'utf8'));
-          return unchanged.get(file)!;
+        const lineStarts = { before: new Map<string, number[]>(), after: new Map<string, number[]>() };
+        const signature = (f: typeof baseFindings[number], revision: 'before' | 'after') => {
+          const edit = byFile.get(f.file);
+          if (!lineStarts[revision].has(f.file)) {
+            const text = edit?.[revision] ?? readFileSync(path.join(baseline, f.file), 'utf8');
+            lineStarts[revision].set(f.file, [0, ...Array.from(text.matchAll(/\n/g), (m) => m.index + 1)]);
+          }
+          const offset = lineStarts[revision].get(f.file)![f.line - 1]! + (f.column ?? 0);
+          const original = edit && revision === 'after' ? originalPosition(edit.edits, offset) : offset;
+          return JSON.stringify([f.file, f.kind, f.name, f.blocking, f.message, original]);
         };
         const existing = new Map<string, number>();
         for (const f of baseFindings) {
-          const key = signature(f, getText(f.file, 'before'));
+          const key = signature(f, 'before');
           existing.set(key, (existing.get(key) ?? 0) + 1);
         }
         const findings = reports.flatMap((r) => r.findings).filter((f) => {
-          const key = signature(f, getText(f.file, 'after'));
+          const key = signature(f, 'after');
           const count = existing.get(key) ?? 0;
           if (count) existing.set(key, count - 1);
           return count === 0;

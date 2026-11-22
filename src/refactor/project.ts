@@ -170,7 +170,7 @@ function compilerErrors(service: ts.LanguageService, root: string): ts.Diagnosti
     .filter((d) => d.category === ts.DiagnosticCategory.Error);
 }
 
-function originalPosition(edits: TextEdit[], start: number): number {
+export function originalPosition(edits: TextEdit[], start: number): number {
   let offset = 0;
   for (const edit of edits) {
     if (start < edit.start + offset) break;

@@ -180,6 +180,27 @@ describe('guarded symbol refactoring', () => {
     expect(read('math.ts')).toContain('function total');
   });
 
+  it('does not excuse a new bad call that matches an untouched finding', async () => {
+    put('math.ts', 'export function known(n: number) { return n; }\n');
+    const source = [
+      '// @ts-nocheck',
+      'import { known } from "./math.js";',
+      'export function old() {',
+      '  return known(1, 2);',
+      '}',
+      'export function next() { return 1; }',
+      '',
+    ].join('\n');
+    put('edit.ts', source);
+    const request = { symbol: 'next', body: '{\n  return known(1, 2);\n}' };
+    const result = await refactor(request);
+    expect(result.check.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: 'grounding', severity: 'BLOCK', grounding: expect.objectContaining({ kind: 'arity', line: 7 }) }),
+    ]));
+    expect(await refactor(request, result.id)).toMatchObject({ applied: false });
+    expect(read('edit.ts')).toBe(source);
+  });
+
   it('offers the same preview ID through MCP without mutating source', async () => {
     const source = 'export const ready = () => true;\n';
     put('a.ts', source);

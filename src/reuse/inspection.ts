@@ -33,7 +33,9 @@ export function inspectSource(source: string, language: Language) {
       let context = n.parent;
       while (context && !['variable_declarator', 'var_spec', 'const_spec', 'short_var_declaration', 'assignment_statement', 'let_declaration', 'assignment', 'pair', 'keyword_argument', 'call', 'call_expression', 'return_statement',
         'required_parameter', 'optional_parameter', 'default_parameter', 'typed_default_parameter'].includes(context.type)) context = context.parent;
-      const label = assignmentLabel(context, n);
+      const label = ['go', 'rust', 'java', 'csharp', 'ruby'].includes(language) ? assignmentLabel(context, n) :
+        context?.childForFieldName('name') ?? context?.childForFieldName('pattern') ?? context?.childForFieldName('left') ??
+        context?.childForFieldName('key') ?? context?.childForFieldName('function');
       const string = n.type === 'string';
       const signed = !string && ['unary_expression', 'unary_operator'].includes(n.parent?.type ?? '') && /^[+-]\s*[\d.]/.test(n.parent!.text);
       const value = string ? n.text.replace(/^[rubf]*(?:"""|'''|"|')/i, '').replace(/(?:"""|'''|"|')$/, '') : signed ? n.parent!.text.replace(/\s/g, '') : n.text;

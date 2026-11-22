@@ -206,7 +206,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     for (const candidate of candidates.find(query)) {
       const candidateTurn = turns.get(candidate.id), addedTurn = turns.get(s.id);
       const chronological = candidateTurn !== undefined && addedTurn !== undefined && candidateTurn !== addedTurn;
-      if (!eligible.has(candidate.id) || (chronological && candidateTurn! > addedTurn!) ||
+      if (!eligible.has(candidate.id) || (!baseSymbols.has(candidate.id) && chronological && candidateTurn! > addedTurn!) ||
         (!baseSymbols.has(candidate.id) && !(chronological && candidateTurn! < addedTurn!) && order(candidate) >= order(s))) continue;
       if (delegates.get(s.id)?.has(candidate.id)) continue;
       const signals = pairSignals(query, candidate, candidates.idf);

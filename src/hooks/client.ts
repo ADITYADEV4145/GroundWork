@@ -1,4 +1,4 @@
-import { lstatSync } from 'node:fs';
+import { lstatSync, realpathSync } from 'node:fs';
 import { connect } from 'node:net';
 import { serviceInfo } from '../mcp/relay.js';
 import { findRepoRoot } from '../util/paths.js';
@@ -34,10 +34,13 @@ export async function forwardHook(agent: AgentName, event: HookEventName, input:
     const raw = input.trim() ? JSON.parse(input) : {};
     if (!raw || typeof raw !== 'object') return '';
     if (!['pre_tool', 'post_tool'].includes(event) || !/^(Read|Edit|Write|MultiEdit|Delete|mcp__(?:plugin_groundwork_)?groundwork__find_code|MCP:find_code)$/.test(raw.tool_name ?? '')) return null;
-    const cwd = typeof raw.cwd === 'string' ? raw.cwd :
-      Array.isArray(raw.workspace_roots) && typeof raw.workspace_roots[0] === 'string' ? raw.workspace_roots[0] :
-        process.env.CURSOR_PROJECT_DIR ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
-    const info = serviceInfo(findRepoRoot(cwd));
+    let cwd: string, info: ReturnType<typeof serviceInfo>;
+    try {
+      cwd = realpathSync(typeof raw.cwd === 'string' ? raw.cwd :
+        Array.isArray(raw.workspace_roots) && typeof raw.workspace_roots[0] === 'string' ? raw.workspace_roots[0] :
+          process.env.CURSOR_PROJECT_DIR ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
+      info = serviceInfo(findRepoRoot(cwd));
+    } catch { return null; }
     try {
       const st = lstatSync(info.socket);
       if (!st.isSocket() || st.uid !== process.getuid!()) return '';
@@ -67,8 +70,9 @@ export async function forwardHook(agent: AgentName, event: HookEventName, input:
           if (!greeted) {
             if (value.version !== info.version) return finish(null);
             greeted = true;
-            socket.write(JSON.stringify({ groundworkRoot: info.root, groundworkHook: 1, agent, event, raw }) + '\n');
+            socket.write(JSON.stringify({ groundworkRoot: info.root, groundworkCwd: cwd, groundworkHook: 1, agent, event, raw }) + '\n');
           } else {
+            if (value.fallback === true) return finish(null);
             if (typeof value.output !== 'string') return finish('');
             if (value.output && (!JSON.parse(value.output) || typeof JSON.parse(value.output) !== 'object')) return finish('');
             finish(value.output);

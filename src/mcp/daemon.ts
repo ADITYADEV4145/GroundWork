@@ -34,17 +34,21 @@ export async function runService(root: string): Promise<void> {
       clearTimeout(handshake);
       socket.pause();
       socket.off('data', first);
-      let message: { groundworkRoot?: unknown; groundworkHook?: number; agent?: unknown; event?: unknown; raw?: unknown };
+      let message: { groundworkRoot?: unknown; groundworkCwd?: unknown; groundworkHook?: number; agent?: unknown; event?: unknown; raw?: unknown } = {};
       let selected: string;
       try {
         message = JSON.parse(input.subarray(0, end).toString());
         if (typeof message?.groundworkRoot !== 'string' || message.groundworkRoot.length > 32768 || !path.isAbsolute(message.groundworkRoot)) throw new Error('Invalid workspace root');
         selected = realpathSync(message.groundworkRoot);
         if (!statSync(selected).isDirectory() || selected !== message.groundworkRoot || realpathSync(findRepoRoot(selected)) !== selected) throw new Error('Invalid workspace root');
-      } catch { socket.destroy(); return; }
+      } catch {
+        if (message?.groundworkHook === 1) socket.end(JSON.stringify({ fallback: true }) + '\n');
+        else socket.destroy();
+        return;
+      }
       if (message.groundworkHook === 1) {
         void import('../hooks/service.js').then(({ serviceHook }) => serviceHook(selected, message)).then((output) => {
-          if (!socket.destroyed) socket.end(JSON.stringify({ output }) + '\n');
+          if (!socket.destroyed) socket.end(JSON.stringify(output === null ? { fallback: true } : { output }) + '\n');
         }).catch(() => socket.destroy());
       } else {
         const remaining = input.subarray(end + 1);

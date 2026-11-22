@@ -85,7 +85,7 @@ describe.skipIf(process.platform === 'win32')('persistent MCP service', () => {
 
   it('rejects invalid root envelopes and fails open for mismatched hook cwd', async () => {
     await call(await client(), 'outline', { file: 'app.ts' });
-    for (const selected of ['relative', path.join(root, 'missing'), path.join(root, 'app.ts'), root]) {
+    for (const selected of [undefined, 'relative', path.join(root, 'missing'), path.join(root, 'app.ts'), root]) {
       const output = await new Promise<string>((resolve, reject) => {
         const socket = connect(serviceInfo(root).socket);
         let greeted = false, output = '';
@@ -93,13 +93,32 @@ describe.skipIf(process.platform === 'win32')('persistent MCP service', () => {
           if (greeted) output += chunk.toString();
           else {
             greeted = true;
-            socket.write(JSON.stringify({ groundworkRoot: selected, groundworkHook: 1, agent: 'claude', event: 'post_tool', raw: { cwd: path.dirname(root), session_id: 'bad', tool_name: 'Read' } }) + '\n');
+            socket.write(JSON.stringify({ groundworkRoot: selected, groundworkCwd: path.dirname(root), groundworkHook: 1, agent: 'claude', event: 'post_tool', raw: { cwd: path.dirname(root), session_id: 'bad', tool_name: 'Read' } }) + '\n');
           }
         }).on('close', () => resolve(output));
       });
-      expect(output).toBe(selected === root ? '{"output":""}\n' : '');
+      expect(output).toBe('{"fallback":true}\n');
     }
     expect(await call(await client(), 'read_symbol', { symbol: 'normalize' })).toContain('value.trim');
+  }, 20000);
+
+  it('uses the client env cwd for rootless hooks and relative paths in a different workspace', async () => {
+    const other = tempDir('gw-service-rootless-');
+    peers.push(other);
+    writeFileSync(path.join(other, 'app.ts'), source);
+    mkdirSync(path.join(other, 'nested'));
+    const a = await client();
+    await call(a, 'outline', { file: 'app.ts' });
+    const pid = (await greeting()).pid;
+    const b = await client(other);
+    await call(b, 'outline', { file: 'app.ts' });
+    vi.stubEnv('CLAUDE_PROJECT_DIR', path.join(other, 'nested'));
+    const raw = { session_id: 'rootless-client', tool_name: 'Read', tool_input: { file_path: '../app.ts' },
+      tool_response: { type: 'text', file: { filePath: '../app.ts', startLine: 1, numLines: 1, content: source } } };
+    expect(await forwardHook('claude', 'post_tool', JSON.stringify(raw))).toBe('');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw))).toContain('Unchanged since Read');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify({ ...raw, cwd: root, tool_input: { file_path: 'app.ts' } }))).toBe('');
+    expect((await greeting()).pid).toBe(pid);
   }, 20000);
 
   it('gates explore-first descriptions per root without removing the tool', async () => {

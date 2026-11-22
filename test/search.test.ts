@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { evaluateTask, manifest, metrics, prepareBenchmarkEmbeddings } from '../bench/search/run.js';
 import { defaultConfig } from '../src/config/load.js';
 import { findCode } from '../src/index/navigation.js';
+import { searchDocuments } from '../src/index/query.js';
 import { searchCodeTool } from '../src/mcp/tools/search_code.js';
 import { TOOLS } from '../src/mcp/tools/index.js';
 import * as embeddings from '../src/reuse/embeddings.js';
@@ -14,6 +15,19 @@ import { withIndexedFixture } from '../src/selftest/fixtures.js';
 import { estimateTokens } from '../src/util/tokens.js';
 
 describe('plain-English search', () => {
+  it('collects call and literal evidence with two queries independent of symbol count', async () => {
+    await withIndexedFixture('ts-app', async (db) => {
+      const prepare = vi.spyOn(db, 'prepare');
+      try {
+        const documents = searchDocuments(db);
+        expect(prepare).toHaveBeenCalledTimes(2);
+        expect(documents.length).toBeGreaterThan(20);
+        expect(documents.some((d) => d.body.includes('formatDate'))).toBe(true);
+        expect(documents.some((d) => d.body === '')).toBe(true);
+        expect(prepare.mock.calls[0]![0]).toContain('UNION ALL');
+      } finally { prepare.mockRestore(); }
+    });
+  });
   it('requires explicit benchmark download consent and records unavailable or broken setup', () => {
     const install = vi.fn();
     expect(prepareBenchmarkEmbeddings(['a'], false, () => false, install).semanticStatus).toBe('NOT RUN');

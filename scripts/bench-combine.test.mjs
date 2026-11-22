@@ -56,3 +56,30 @@ test('archive planning permits new and byte-identical captures but rejects repla
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('three-run replay selects only runs 1 through 3 from both bundled eight-run directories', () => {
+  const config = options([]);
+  for (const [suite, dir] of [['nav', config.navCaptures], ['long-horizon', config.lhCaptures]]) {
+    const rows = validateCaptures(dir, suite, 3);
+    assert.equal(rows.length, 6);
+    assert.deepEqual(rows.map(({ capture: c }) => `${c.condition}:${c.run}`).sort(),
+      ['baseline:1', 'baseline:2', 'baseline:3', 'groundwork:1', 'groundwork:2', 'groundwork:3']);
+  }
+});
+
+test('higher runs are ignored without masking missing or duplicate selected runs', () => {
+  const dir = mkdtempSync(path.join(os.homedir(), 'bench-selection-test-'));
+  try {
+    const capture = JSON.parse(readFileSync(new URL('../bench/nav/observations/nav-baseline-1.json', import.meta.url), 'utf8'));
+    const higher = { ...capture, run: 4, captureRevision: 'other' };
+    for (const file of ['higher-a.json', 'higher-b.json']) writeFileSync(path.join(dir, file), JSON.stringify(higher));
+    writeFileSync(path.join(dir, 'baseline.json'), JSON.stringify(capture));
+    assert.throws(() => validateCaptures(dir, 'nav', 1), /Expected 2/);
+    writeFileSync(path.join(dir, 'groundwork.json'), JSON.stringify({ ...capture, condition: 'groundwork' }));
+    assert.equal(validateCaptures(dir, 'nav', 1).length, 2);
+    writeFileSync(path.join(dir, 'duplicate.json'), JSON.stringify(capture));
+    assert.throws(() => validateCaptures(dir, 'nav', 1), /duplicate/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

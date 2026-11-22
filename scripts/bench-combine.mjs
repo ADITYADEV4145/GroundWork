@@ -23,7 +23,8 @@ export function options(args) {
 }
 
 export function validateCaptures(directory, suite, runs) {
-  const rows = readdirSync(directory).filter((p) => p.endsWith('.json')).map((p) => ({ source: path.join(directory, p), capture: json(path.join(directory, p)) }));
+  const rows = readdirSync(directory).filter((p) => p.endsWith('.json')).map((p) => ({ source: path.join(directory, p), capture: json(path.join(directory, p)) }))
+    .filter(({ capture: c }) => !Number.isInteger(c.run) || c.run <= runs);
   const pairs = new Set();
   for (const { capture: c } of rows) {
     if (c.suite !== suite || c.captureRevision !== pins[suite] || c.node !== 'v24.22.2' || c.agent !== 'Devin normal' || c.model !== null) throw new Error(`Unexpected ${suite} capture provenance`);
@@ -53,7 +54,10 @@ export function combine(config) {
     const rows = validateCaptures(directory, suite, config.runs);
     const copies = planArchive(rows, path.join(root, 'bench', suite, 'observations'), suite === 'nav' ? 'nav' : 'lh2');
     const output = path.join(scratch, suite);
-    const command = ['dist/cli/main.js', 'bench', '--suite', suite, '--runs', String(config.runs), '--observations', directory, '--output-dir', output];
+    const input = path.join(scratch, `${suite}-captures`);
+    mkdirSync(input);
+    for (const { source, capture: c } of rows) copyFileSync(source, path.join(input, `${c.condition}-${c.run}.json`));
+    const command = ['dist/cli/main.js', 'bench', '--suite', suite, '--runs', String(config.runs), '--observations', input, '--output-dir', output];
     console.log(`Grading ${suite} at ${revision}: node ${command.join(' ')}`);
     console.log(execFileSync(process.execPath, command, { cwd: build, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }));
     const resultFile = readdirSync(output).find((p) => p.endsWith('.json') && !p.endsWith('.evidence.json'));

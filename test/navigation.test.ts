@@ -97,6 +97,7 @@ describe('MCP navigation', () => {
         const exact = await runNavigationTool('find_code', { query: 'needle' }, ctx);
         expect(exact).toContain('Exact (2)');
         expect(exact).toContain('Lookalike.needle');
+        expect(await runNavigationTool('find_code', { query: 'needle', include_body: true }, ctx)).toBe(exact);
         const id = ambiguous.split('\n')[1]!.match(/\[(\w+)\]/)![1]!;
         let args: object = { symbol: id };
         let combined = '';
@@ -126,6 +127,69 @@ describe('MCP navigation', () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+
+  it('batches compact bodies and opts in to a unique exact body without changing default output', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const names = ['formatDate', 'pad'];
+      const batch = await runNavigationTool('read_symbol', { symbols: names }, ctx);
+      expect(batch).toContain('function formatDate');
+      expect(batch).toContain('function pad');
+      const separate = await Promise.all(names.map((symbol) => runNavigationTool('read_symbol', { symbol }, ctx)));
+      expect(Buffer.byteLength(batch)).toBeLessThan(separate.reduce((sum, body) => sum + Buffer.byteLength(body), 0));
+      const body = await runNavigationTool('find_code', { query: 'formatDate', include_body: true }, ctx);
+      expect(body).toContain('function formatDate');
+      expect(body).toContain('d.toISOString()');
+      expect(await runNavigationTool('find_code', { query: 'formatDate', breadth: 'all', include_body: true }, ctx)).toBe(body);
+      expect(await runNavigationTool('find_code', { query: 'formatDate' }, ctx)).not.toContain('d.toISOString()');
+      const query = { query: 'format date', limit: 1 };
+      const fuzzy = await runNavigationTool('find_code', query, ctx);
+      expect(fuzzy).not.toContain('include_body');
+      expect(await runNavigationTool('find_code', { query: 'nonexistentzz', include_body: true }, ctx)).toContain('No indexed matches');
+      expect(await runNavigationTool('read_symbol', {}, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('read_symbol', { symbol: 'pad', symbols: ['pad'] }, ctx)).toContain('exactly one');
+      await expect(runNavigationTool('read_symbol', { symbols: [] }, ctx)).rejects.toThrow();
+      await expect(runNavigationTool('read_symbol', { symbols: Array(21).fill('pad') }, ctx)).rejects.toThrow();
+      const unknown = await runNavigationTool('read_symbol', { symbols: ['notarealnamezz', 'formatDate'] }, ctx);
+      expect(unknown).toContain('No exact symbol match');
+      expect(unknown).toContain('function formatDate');
+      writeFileSync(path.join(root, 'src/utils/date.ts'), 'export function changed() {}');
+      expect(await runNavigationTool('find_code', { query: 'formatDate', include_body: true }, ctx)).toContain('changed after indexing');
+      expect(await runNavigationTool('read_symbol', { symbols: names }, ctx)).toContain('changed after indexing');
+    });
+  });
+
+  it('pages batched bodies and source continuations within a shared budget', async () => {
+    const root = tempDir('gw-nav-batch-');
+    try {
+      const names = Array.from({ length: 8 }, (_, i) => 'large' + i);
+      const literals = Array.from({ length: 90 }, () => `    '${'é😀'.repeat(20)}',`).join('\n');
+      writeFileSync(path.join(root, 'app.ts'), names.map((n) => `export function ${n}() {\n  return [\n${literals}\n  ].join('');\n}`).join('\n'));
+      await initSqlBackend(); await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const ctx = { root, db, config };
+        let args: object = { symbols: names, context_lines: 1 };
+        const seen: string[] = [];
+        for (let i = 0; i < 8; i++) {
+          const output = await runNavigationTool('read_symbol', args, ctx);
+          expect(output).not.toContain('\ufffd');
+          seen.push(...[...output.matchAll(/\] (large\d+) —/g)].map((match) => match[1]!));
+          const next = [...output.matchAll(/Next: read_symbol\(([^\n]+)\)/g)].map((match) => JSON.parse(match[1]!));
+          const source = next.find((a) => a.symbol);
+          expect(source.context_lines).toBe(1);
+          expect(source.offset).toBeGreaterThan(0);
+          expect(await runNavigationTool('read_symbol', source, ctx)).not.toContain('\ufffd');
+          const batch = next.find((a) => a.symbols);
+          if (!batch) break;
+          expect(batch.symbol_offset).toBeGreaterThan(0);
+          args = batch;
+        }
+        expect(seen).toEqual(names);
+        expect(await runNavigationTool('read_symbol', { symbols: names, offset: 1 }, ctx)).toContain('symbol_offset');
+      } finally { db.close(); }
+    } finally { rmSync(root, { recursive: true, force: true }); }
   });
 
   it('serves the registered tools over stdio and refreshes before the next call', async () => {

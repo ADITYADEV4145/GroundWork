@@ -61,26 +61,62 @@ const location = (s: NavigationSymbol) => compact(s.file, 160) + ':' + s.line;
 const choice = (s: NavigationSymbol) => `[${s.id}] ${compact(s.name, 70)} (${s.kind}) — ${location(s)}`;
 
 function oneSymbol<T extends { symbol: string; offset: number }>(
-  tool: keyof typeof NAVIGATION_BUDGETS, args: T, ctx: ToolContext,
+  tool: keyof typeof NAVIGATION_BUDGETS, args: T, ctx: ToolContext, budget: number = NAVIGATION_BUDGETS[tool],
 ): NavigationSymbol | string {
   const matches = navigationSymbols(ctx.db, args.symbol);
   if (matches.length === 0) return 'No exact symbol match. Try find_code with the name or a description.';
   if (matches.length === 1) return matches[0]!;
   return page({
     items: matches, title: 'Ambiguous symbol. Retry with a candidate ID in brackets.',
-    start: args.offset, budget: NAVIGATION_BUDGETS[tool], render: choice,
+    start: args.offset, budget, render: choice,
     next: (offset) => call(tool, { ...args, offset }),
   });
+}
+
+function readSource(args: { symbol: string; context_lines: number; offset: number }, ctx: ToolContext, budget: number = NAVIGATION_BUDGETS.read_symbol, brief = false): string {
+  const s = oneSymbol('read_symbol', args, ctx, budget);
+  if (typeof s === 'string') return s;
+  const loc = sourceLocation(ctx.db, s.id);
+  let raw: Buffer | null;
+  try { raw = readRepoFile(ctx.root, s.file, ctx.config.index.maxFileBytes); }
+  catch { raw = null; }
+  if (!raw || !loc || sha1(raw) !== loc.hash) return 'Source is unavailable or changed after indexing. Retry read_symbol or use a ranged Read.';
+  const source = raw.toString('utf8');
+  let { start, end } = loc;
+  if (args.context_lines) {
+    let newline = start > 0 ? source.lastIndexOf('\n', start - 1) : -1;
+    for (let i = 0; i < args.context_lines && newline >= 0; i++) newline = newline > 0 ? source.lastIndexOf('\n', newline - 1) : -1;
+    start = newline + 1;
+    for (let i = 0; i <= args.context_lines && end < source.length; i++) {
+      const newline = source.indexOf('\n', i === 0 ? end : end + 1);
+      end = newline < 0 ? source.length : newline;
+    }
+  }
+  const snippet = source.slice(start, end);
+  if (args.offset >= snippet.length) return 'No source remains at that offset. To restart, omit offset.';
+  const remainder = snippet.slice(args.offset);
+  const title = brief ? `[${s.id}] ${compact(s.name, 70)} — ${location(s)}-${s.endLine}\n` :
+    `${choice(s)} (definition lines ${s.line}-${s.endLine}; source offset ${args.offset})\n`;
+  const next = (n: number) => `\n… ${remainder.length - n} more characters. Next: ${call('read_symbol', { ...args, symbol: s.id, offset: args.offset + n })}`;
+  const available = budget * 4 - Buffer.byteLength(title);
+  if (Buffer.byteLength(remainder) <= available) return title + remainder;
+  const chunk = prefixBytes(remainder, available - Buffer.byteLength(next(remainder.length)) - 24);
+  const newline = chunk.lastIndexOf('\n');
+  const part = newline > chunk.length / 2 ? chunk.slice(0, newline + 1) : chunk;
+  return title + part + next(part.length);
 }
 
 const findCodeTool = defineTool({
   name: 'find_code',
   description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands to related results. Set locations_only: false for signatures/docs. Prefer rg for trivial literal text.',
-  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), offset },
-  handler(args, { db }) {
+  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(false), offset },
+  handler(args, ctx) {
+    const { db } = ctx;
     const all = findCode(db, args.query, args.kind);
     const query = args.query.toLowerCase();
     const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
+    if (args.include_body && exact.length === 1 && args.offset === 0)
+      return readSource({ symbol: exact[0]!.id, context_lines: 0, offset: 0 }, ctx, NAVIGATION_BUDGETS.find_code);
     const narrowed = args.breadth !== 'all' && exact.length > 0;
     const items = narrowed ? exact : all;
     return page({
@@ -88,7 +124,7 @@ const findCodeTool = defineTool({
       start: args.offset, count: args.limit ?? (args.locations_only ? 3 : 8), budget: NAVIGATION_BUDGETS.find_code,
       render: (s) => args.locations_only ? choice(s) :
         `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
-      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, offset }),
+      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, include_body: args.include_body ? true : undefined, offset }),
     });
   },
 });
@@ -113,40 +149,22 @@ const outlineTool = defineTool({
 const readSymbolTool = defineTool({
   name: 'read_symbol',
   description: 'Read exactly one symbol’s source (optional surrounding lines). If ambiguous, pick an ID from the returned candidates.',
-  inputSchema: { symbol, context_lines: z.number().int().min(0).max(20).default(0), offset },
+  inputSchema: {
+    symbol: symbol.optional(),
+    symbols: z.array(symbol).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter selectors or IDs for a batch.').optional(),
+    context_lines: z.number().int().min(0).max(20).default(0), offset, symbol_offset: offset,
+  },
   handler(args, ctx) {
-    const s = oneSymbol('read_symbol', args, ctx);
-    if (typeof s === 'string') return s;
-    const loc = sourceLocation(ctx.db, s.id);
-    let raw: Buffer | null;
-    try {
-      raw = readRepoFile(ctx.root, s.file, ctx.config.index.maxFileBytes);
-    } catch {
-      raw = null;
+    if (Boolean(args.symbol) === Boolean(args.symbols)) return 'Provide exactly one of symbol or symbols.';
+    if (args.symbols) {
+      if (args.offset) return 'Use symbol_offset to page a batch; use the individual Next calls for source offsets.';
+      return page({
+        items: args.symbols, title: `Symbols (${args.symbols.length}):`, start: args.symbol_offset, budget: NAVIGATION_BUDGETS.read_symbol,
+        render: (symbol) => readSource({ symbol, context_lines: args.context_lines, offset: 0 }, ctx, 400, true),
+        next: (symbol_offset) => call('read_symbol', { symbols: args.symbols, context_lines: args.context_lines, symbol_offset }),
+      });
     }
-    if (!raw || !loc || sha1(raw) !== loc.hash) return 'Source is unavailable or changed after indexing. Retry read_symbol or use a ranged Read.';
-    const source = raw.toString('utf8');
-    let { start, end } = loc;
-    if (args.context_lines) {
-      let newline = start > 0 ? source.lastIndexOf('\n', start - 1) : -1;
-      for (let i = 0; i < args.context_lines && newline >= 0; i++) newline = newline > 0 ? source.lastIndexOf('\n', newline - 1) : -1;
-      start = newline + 1;
-      for (let i = 0; i <= args.context_lines && end < source.length; i++) {
-        const newline = source.indexOf('\n', i === 0 ? end : end + 1);
-        end = newline < 0 ? source.length : newline;
-      }
-    }
-    const snippet = source.slice(start, end);
-    if (args.offset >= snippet.length) return 'No source remains at that offset. To restart, omit offset.';
-    const remainder = snippet.slice(args.offset);
-    const title = `${choice(s)} (definition lines ${s.line}-${s.endLine}; source offset ${args.offset})\n`;
-    const next = (n: number) => `\n… ${remainder.length - n} more characters. Next: ${call('read_symbol', { ...args, symbol: s.id, offset: args.offset + n })}`;
-    const available = NAVIGATION_BUDGETS.read_symbol * 4 - Buffer.byteLength(title);
-    if (Buffer.byteLength(remainder) <= available) return title + remainder;
-    const chunk = prefixBytes(remainder, available - Buffer.byteLength(next(remainder.length)) - 24);
-    const newline = chunk.lastIndexOf('\n');
-    const part = newline > chunk.length / 2 ? chunk.slice(0, newline + 1) : chunk;
-    return title + part + next(part.length);
+    return readSource({ symbol: args.symbol!, context_lines: args.context_lines, offset: args.offset }, ctx);
   },
 });
 

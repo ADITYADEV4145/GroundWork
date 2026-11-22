@@ -200,6 +200,7 @@ export function markdown(results: Results): string {
     '- This is a fixed seeded corpus and a designated-clean proxy, not a population precision estimate or agent success evaluation. A failure is published without tuning the checker.',
     '- Types remain Stop-only by default (`types.postToolHook: false`). No PostToolUse latency claim is made, and this evaluation does not authorize enabling that hook.',
     '- Post-registration checker fixes: none. The preregistered Stop-output filter fix affects presentation only, not either arm\'s blocking decisions.',
+    '- Runner-only correction after the initial run: explicitly validate anchor/history reachability and restrict reference changed-file metadata to its workflow target (excluding the unsupported dependency symlink). Both full runs are retained; checker policy, corpus and scoring are unchanged.',
     `- Environment: ${JSON.stringify(results.environment)}.`,
     '- Raw per-mutation findings, availability, clean cases, warm-up and samples: `results.json`.', '');
   return lines.join('\n');
@@ -213,7 +214,11 @@ function sourceHash(): string {
 export async function runBenchmark(): Promise<Results> {
   const { manifest, hash } = registeredManifest();
   if (git(project, 'rev-parse', '--is-shallow-repository') === 'true') throw new Error('Unshallow history before evaluation');
-  for (const row of manifest.cleanCommits) if (git(project, 'rev-list', '--parents', '-n', '1', row.commit) !== `${row.commit} ${row.parent}`) throw new Error(`Historical parent differs: ${row.commit}`);
+  git(project, 'merge-base', '--is-ancestor', manifest.sourceCommit, 'HEAD');
+  for (const row of manifest.cleanCommits) {
+    git(project, 'merge-base', '--is-ancestor', row.commit, manifest.sourceCommit);
+    if (git(project, 'rev-list', '--parents', '-n', '1', row.commit) !== `${row.commit} ${row.parent}`) throw new Error(`Historical parent differs: ${row.commit}`);
+  }
   const workParent = path.join(os.homedir(), 'work');
   if (!existsSync(workParent)) throw new Error(`Persistent workspace parent absent: ${workParent}`);
   const work = mkdtempSync(path.join(workParent, 'gw-types-gate-'));
@@ -233,7 +238,7 @@ export async function runBenchmark(): Promise<Results> {
     const ref = reference(repo);
     if (!existsSync(path.join(root, ref.target))) throw new Error(`Reference target absent: ${repo}/${ref.target}`);
     cpSync(path.join(anchor, ref.source), path.join(root, ref.target));
-    const changed = changedFromGit(root);
+    const changed = changedFromGit(root).filter((c) => c.file === ref.target);
     clean.push({ id: `reference/${repo}`, changed, ...await evaluate(root, changed, 'HEAD') });
     checkpoint();
     git(root, 'add', '--', ref.target); commit(root, 'Reference workflow baseline');

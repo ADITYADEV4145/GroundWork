@@ -190,6 +190,17 @@ describe('guarded symbol refactoring', () => {
     expect(read('math.ts')).toContain('function total');
   });
 
+  it('allows a rename with an unrelated declaration importer but never writes a declaration file', async () => {
+    put('lib.ts', 'export const first = 1;\nexport const second = "two";\n');
+    const declaration = 'import { first } from "./lib.js";\nexport declare const value: typeof first;\n';
+    put('types.d.ts', declaration);
+    const request = { symbol: 'second', name: 'next' };
+    const preview = await refactor(request);
+    expect(await refactor(request, preview.id)).toMatchObject({ applied: true });
+    await expect(refactor({ symbol: 'first', name: 'previous' })).rejects.toThrow('Not an editable');
+    expect(read('types.d.ts')).toBe(declaration);
+  });
+
   it('does not excuse a new bad call that matches an untouched finding', async () => {
     put('math.ts', 'export function known(n: number) { return n; }\n');
     const source = [

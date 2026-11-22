@@ -13,7 +13,7 @@ import { checkIndexedChanges, type CheckReport } from '../reuse/check.js';
 import { openDb } from '../store/db.js';
 import { sha1 } from '../util/hash.js';
 import { readRepoFile, repoRelative } from '../util/repo-file.js';
-import { originalPosition, type FileEdit } from './project.js';
+import { isDeclarationFile, originalPosition, type FileEdit } from './project.js';
 
 const maxSnapshotBytes = 128 * 1024 * 1024;
 const maxFileBytes = 8 * 1024 * 1024;
@@ -138,7 +138,9 @@ export async function guardCandidate(ctx: ToolContext, edits: FileEdit[], rename
       try {
         const importers = renamedFile === undefined ? [] : importingFiles(before, renamedFile);
         const candidateFiles = new Map(changedFiles(edits).map((c) => [c.file, c]));
-        for (const file of importers) candidateFiles.set(file, { file, ranges: null });
+        for (const file of importers) {
+          if (!isDeclarationFile(file)) candidateFiles.set(file, { file, ranges: null });
+        }
         const reports = verifyChanged(after, candidate, [...candidateFiles.values()], ctx.config);
         const unchecked = reports.find((r) => r.unchecked);
         if (unchecked) throw new Error(`Cannot ground candidate in ${unchecked.file}: ${unchecked.unchecked}.`);

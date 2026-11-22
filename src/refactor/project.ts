@@ -10,6 +10,7 @@ import { sha1 } from '../util/hash.js';
 import { readRepoFile, repoRelative } from '../util/repo-file.js';
 
 const scripts = /\.[cm]?[jt]sx?$/i;
+export const isDeclarationFile = (file: string) => /\.d\.[cm]?ts$/i.test(file);
 const compilerPath = (file: string) => path.resolve(file).split(path.sep).join('/');
 const fileKey = (file: string) => ts.sys.useCaseSensitiveFileNames ? compilerPath(file) : compilerPath(file).toLowerCase();
 export const MAX_BODY = 32_768;
@@ -34,7 +35,7 @@ export type RefactorRequest = { symbol: string } & ({ name: string; body?: never
 export function readEditable({ root, db, config }: ToolContext, file: string): string {
   const absolute = path.join(root, file);
   const facts = fileFacts(db, file);
-  if (!facts || facts.status !== 'ok' || facts.isGenerated || !scripts.test(file) || /\.d\.[cm]?ts$/i.test(file) ||
+  if (!facts || facts.status !== 'ok' || facts.isGenerated || !scripts.test(file) || isDeclarationFile(file) ||
     realpathSync(absolute) !== path.join(realpathSync(root), file)) {
     throw new Error(`Not an editable, fully indexed TypeScript/JavaScript file: ${file}`);
   }
@@ -118,7 +119,7 @@ function project(ctx: ToolContext, file: string) {
   };
   const service = ts.createLanguageService(host);
   const isFullyCovered = () => files.every((f) => {
-    if (/\.d\.[cm]?ts$/i.test(f)) return true;
+    if (isDeclarationFile(f)) return true;
     const file = path.join(ctx.root, f);
     return projectConfig(ctx.root, file) === configFile && service.getProgram()!.getSourceFile(file) !== undefined;
   });

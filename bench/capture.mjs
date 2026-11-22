@@ -41,10 +41,11 @@ function restoreSequence(task, dir, root) {
   }
 }
 
-function truncate(text) {
+function truncate(text, limit = MAX_RESPONSE_BYTES) {
   const bytes = Buffer.from(text, 'utf8');
-  if (bytes.length <= MAX_RESPONSE_BYTES) return text;
-  return bytes.subarray(0, MAX_RESPONSE_BYTES - 64).toString('utf8') + '\n… truncated; narrow the search/read.\n';
+  if (bytes.length <= limit) return text;
+  if (limit < 64) return '';
+  return bytes.subarray(0, limit - 64).toString('utf8') + '\n… truncated; narrow the search/read.\n';
 }
 
 function hook(root, event, tool, input, response, extra = {}) {
@@ -97,7 +98,9 @@ function read(root, treatment, [file, start, count]) {
   const lines = readFileSync(absolute, 'utf8').split(/\r?\n/);
   if (lines.at(-1) === '') lines.pop();
   const selected = lines.slice(first - 1, limit === undefined ? undefined : first - 1 + limit);
-  const content = truncate(selected.join('\n'));
+  const context = reuse && typeof pre?.additionalContext === 'string' ? pre.additionalContext : '';
+  const budget = reuse && treatment ? Math.max(0, MAX_RESPONSE_BYTES - 64 - Buffer.byteLength(context ? context + '\n' : '')) : MAX_RESPONSE_BYTES;
+  const content = truncate(selected.join('\n'), budget);
   let feedback = '';
   if (treatment && content) {
     // A truncated page may end mid-line. Only report complete lines to the read ledger.
@@ -109,7 +112,7 @@ function read(root, treatment, [file, start, count]) {
       if (reuse) feedback = hookText(post);
     }
   }
-  return { text: (reuse ? [pre?.additionalContext, feedback, content] : [content, pre?.additionalContext])
+  return { text: (reuse ? [context, content, feedback] : [content, pre?.additionalContext])
     .filter(Boolean).join('\n'), file: relative, readBytes: Buffer.byteLength(content) };
 }
 

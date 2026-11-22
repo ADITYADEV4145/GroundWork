@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,6 +26,9 @@ cp.spawnSync = (command, args, options) => {
   if(mode==='invalid') return {status:0,stdout:'not json'};
   if(mode==='empty') return {status:0,stdout:''};
   if(mode==='nonzero') return {status:1,stdout:'{"decision":"block","reason":"must fail open"}'};
+  if(payload.tool_name==='Read' && mode.startsWith('read-context')) return {status:0,stdout:JSON.stringify({hookSpecificOutput:{additionalContext:
+    args[3]==='pre_tool' ? 'PRE_READ_FEEDBACK\\n'+'上下文'.repeat(mode==='read-context-long'?1000:300)
+    : 'POST_READ_FEEDBACK\\n'+(mode==='read-context-post'?'post '.repeat(2000):'')}})};
   if(args[3]==='stop') return {status:0,stdout:JSON.stringify(mode==='block'
     ? {decision:'block',reason:'FIX_BEFORE_FINISH'} : {systemMessage:'STOP_FEEDBACK'})};
   return {status:0,stdout:JSON.stringify({hookSpecificOutput:{additionalContext:args[3]==='prompt'?'PROMPT_FEEDBACK':'EDIT_FEEDBACK'}})};
@@ -60,6 +63,74 @@ function fixture(condition, product) {
 }
 
 const write = (file, code) => `printf '%s' '${Buffer.from(code).toString('base64')}' | base64 -d > '${file}'`;
+
+test('reuse Read ledger contains only complete source lines visible after context and final truncation',()=>{
+  const baseline=fixture('baseline');
+  try {
+    const code='value = 123456789\n'.repeat(800);
+    writeFileSync(path.join(baseline.root,'large.py'),code);
+    baseline.run(['begin',baseline.state,tasks[0].id]);
+    const output=baseline.run(['read',baseline.state,tasks[0].id,'large.py'],'read-context');
+    assert.equal(output,Buffer.from(code.trimEnd()).subarray(0,7936).toString('utf8')+'\n… truncated; narrow the search/read.\n');
+    assert.deepEqual(baseline.events(),[]);
+  } finally { baseline.close(); }
+  for (const mode of ['read-context','read-context-long','read-context-post']) {
+    const f=fixture('groundwork');
+    try {
+      const lines=Array.from({length:800},(_,i)=>`value_${String(i).padStart(4,'0')} = "🙂_${i}"`);
+      writeFileSync(path.join(f.root,'large.py'),lines.join('\n')+'\n');
+      f.run(['begin',f.state,tasks[0].id]);
+      const output=f.run(['read',f.state,tasks[0].id,'large.py'],mode);
+      assert.match(output,/PRE_READ_FEEDBACK/);
+      assert.ok(Buffer.byteLength(output)<=8001);
+      const posts=f.events().filter(e=>e.event==='post_tool'&&e.payload.tool_name==='Read');
+      if (mode==='read-context-long') { assert.deepEqual(posts,[]); continue; }
+      assert.match(output,/POST_READ_FEEDBACK/);
+      assert.equal(posts.length,1);
+      const actual=posts[0].payload.tool_response.file;
+      assert.ok(output.includes(actual.content),'ledger recorded source hidden by hook context');
+      for (const line of actual.content.split('\n')) assert.ok(output.split('\n').includes(line));
+      assert.equal(actual.numLines,actual.content.split('\n').length);
+    } finally { f.close(); }
+  }
+  for (const code of ['', 'first\nsecond\nthird\n']) {
+    const f=fixture('groundwork');
+    try {
+      writeFileSync(path.join(f.root,'small.txt'),code);
+      f.run(['begin',f.state,tasks[0].id]);
+      const output=f.run(['read',f.state,tasks[0].id,'small.txt','2','1'],'read-context');
+      const posts=f.events().filter(e=>e.event==='post_tool'&&e.payload.tool_name==='Read');
+      if (!code) assert.deepEqual(posts,[]);
+      else {
+        assert.match(output,/second/);
+        assert.equal(posts[0].payload.tool_response.file.content,'second');
+        assert.equal(posts[0].payload.tool_response.file.startLine,2);
+        assert.equal(posts[0].payload.tool_response.file.numLines,1);
+      }
+    } finally { f.close(); }
+  }
+});
+
+test('real PR42 product permits a ranged Read of source hidden by a large-read hint',{
+  skip:!process.env.GW_REUSE_MEMORY_PRODUCT,
+},()=>{
+  const f=fixture('groundwork',process.env.GW_REUSE_MEMORY_PRODUCT);
+  try {
+    const lines=Array.from({length:800},(_,i)=>`value_${String(i).padStart(4,'0')} = ${i}`);
+    writeFileSync(path.join(f.root,'large.py'),lines.join('\n')+'\n');
+    f.run(['begin',f.state,tasks[0].id]);
+    const output=f.run(['read',f.state,tasks[0].id,'large.py']);
+    assert.match(output,/Large read allowed \(800 lines\)/);
+    const unseen=lines.findIndex(line=>!output.split('\n').includes(line));
+    assert.ok(unseen>0);
+    const ranged=f.run(['read',f.state,tasks[0].id,'large.py',String(unseen+1),'1']);
+    assert.doesNotMatch(ranged,/Unchanged since Read step/);
+    assert.match(ranged,new RegExp(lines[unseen]));
+    const sessions=path.join(f.root,'.groundwork/sessions');
+    const ledger=JSON.parse(readFileSync(path.join(sessions,readdirSync(sessions).find(file=>file.endsWith('.json')))));
+    assert.equal(ledger.navigation.blockedReads,0);
+  } finally { f.close(); }
+});
 
 test('reuse dispatches prompt, Write/Edit and Stop with host payloads only in GroundWork, with measured feedback',()=>{
   for (const condition of ['groundwork','baseline']) {
@@ -104,6 +175,7 @@ test('reuse hooks fail open on empty, malformed, failed, throwing and timed-out 
     try {
       f.run(['begin',f.state,tasks[0].id],mode);
       assert.equal(f.run(['shell',f.state,tasks[0].id,write('feature.py','value = 1\n')],mode).includes('Error:'),false);
+      assert.match(f.run(['read',f.state,tasks[0].id,'feature.py'],mode),/value = 1/);
       const stopped=f.run(['finish',f.state,tasks[0].id],mode);
       if (mode==='block') {
         assert.match(stopped,/FIX_BEFORE_FINISH/); assert.equal(f.record(1).wallMs,undefined);

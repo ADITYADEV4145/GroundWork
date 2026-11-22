@@ -39,6 +39,18 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('does not rate private or protected method signature changes as public high risk', async () => {
+    for (const visibility of ['private', 'protected', 'public']) {
+      const root = fixture();
+      const source = `export class Service { ${visibility} parse(value: string): string { return value; } }\n`;
+      writeFileSync(path.join(root, 'api.ts'), source);
+      writeFileSync(path.join(root, 'caller.ts'), 'import { Service } from "./api.js";\nexport function caller() { return new Service().parse("a"); }\n');
+      git(root, 'add', 'api.ts', 'caller.ts'); git(root, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Method visibility');
+      writeFileSync(path.join(root, 'api.ts'), source.replace('value: string)', 'value: string, required: number)'));
+      const method = (await run(root)).symbols.find((s) => s.name === 'Service.parse');
+      expect(method?.risk).toBe(visibility === 'public' ? 'high' : 'medium');
+    }
+  });
   it('respects package test script selectors rather than marking every test run', () => {
     const root = fixture();
     writeFileSync(path.join(root, 'package.json'), JSON.stringify({ scripts: { test: 'vitest run test/unit' } }));

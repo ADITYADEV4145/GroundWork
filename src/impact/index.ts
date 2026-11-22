@@ -7,7 +7,7 @@ import { DYNAMIC_TEXT } from '../grounding/verify.js';
 import { discoverFiles } from '../index/discover.js';
 import { readImpactState } from '../index/query.js';
 import { adapterFor, languageForPath } from '../lang/index.js';
-import { initParsers } from '../lang/parser.js';
+import { initParsers, parse } from '../lang/parser.js';
 import type { ExtractedSymbol } from '../lang/adapter.js';
 import type { Db } from '../store/db.js';
 import { ImportResolver } from '../resolve/imports.js';
@@ -25,6 +25,18 @@ export interface ImpactReport { symbols: ImpactSymbol[]; complete: boolean; inco
 export const isTestPath = (file: string) => /(^|\/)(__tests__|tests?)(\/|$)|\.(test|spec)\.[^.]+$|(^|\/)test_[^/]*\.py$|_test\.py$/.test(file);
 const key = (s: { qualifiedName: string; kind: string }) => `${s.qualifiedName}:${s.kind}`;
 const signature = (s: { signature: string; params: unknown; minArity: number; maxArity: number | null; exported: boolean }) => JSON.stringify([s.signature.replace(/\s+/g, ' ').trim(), s.params, s.minArity, s.maxArity, s.exported]);
+
+function isPublicMethod(file: string, source: string, symbol: { name: string; startByte: number; endByte: number }): boolean {
+  if (/^[_#]/.test(symbol.name)) return false;
+  const language = languageForPath(file);
+  if (!language || language === 'python') return true;
+  const tree = parse(language, source);
+  try {
+    const node = tree.rootNode.descendantForIndex(symbol.startByte, symbol.endByte);
+    const visibility = node?.namedChildren.find((child) => child?.type === 'accessibility_modifier')?.text;
+    return visibility !== 'private' && visibility !== 'protected';
+  } finally { tree.delete(); }
+}
 
 export async function changeImpact(db: Db, root: string, options: { base?: string; changed?: ChangedFile[]; sessionId?: string; config: GroundworkConfig }): Promise<ImpactReport> {
   const start = performance.now(), deadline = Date.now() + options.config.impact.timeoutMs;
@@ -47,7 +59,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
     const names = new Set<string>();
     const unresolvedImports = state.imports.filter((i) => !i.target && i.unresolvedReason !== 'external');
     await initParsers(); check();
-    const selected: { symbol: typeof state.symbols[number]; deleted: boolean; signatureChanged: boolean; exportNames: string[] }[] = [];
+    const selected: { symbol: typeof state.symbols[number]; deleted: boolean; signatureChanged: boolean; exportNames: string[]; publicMethod: boolean }[] = [];
     for (const file of paths) {
       check();
       if (path.isAbsolute(file) || file.split(/[\\/]/).includes('..')) { reasons.add('unsafe changed path'); continue; }
@@ -75,10 +87,10 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
         const exportNames = aliases(priorAliases, s.name);
         const signatureChanged = !!old && (signature(s) !== signature(old) || JSON.stringify(exportNames) !== JSON.stringify(aliases(currentAliases, s.name)));
         const bodyChanged = !options.changed && old && priorText.slice(old.startByte, old.endByte) !== currentText.slice(s.startByte, s.endByte);
-        if (bodyChanged || signatureChanged || changed.some((c) => c.file === file && c.ranges === null) || ranges.some(([a, b]) => s.line <= b && s.endLine >= a)) selected.push({ symbol: { ...s, exported: s.exported || !!old?.exported }, deleted: false, signatureChanged, exportNames });
+        if (bodyChanged || signatureChanged || changed.some((c) => c.file === file && c.ranges === null) || ranges.some(([a, b]) => s.line <= b && s.endLine >= a)) selected.push({ symbol: { ...s, exported: s.exported || !!old?.exported }, deleted: false, signatureChanged, exportNames, publicMethod: s.kind === 'method' && isPublicMethod(file, currentText, s) });
       }
       for (const old of prior.filter((s) => !now.some((n) => key(n) === key(s)))) selected.push({
-        symbol: { ...old, id: `base:${file}:${key(old)}`, file, fileId: -1, line: old.startLine, endLine: old.endLine, parentId: null }, deleted: true, signatureChanged: true, exportNames: aliases(priorAliases, old.name),
+        symbol: { ...old, id: `base:${file}:${key(old)}`, file, fileId: -1, line: old.startLine, endLine: old.endLine, parentId: null }, deleted: true, signatureChanged: true, exportNames: aliases(priorAliases, old.name), publicMethod: old.kind === 'method' && isPublicMethod(file, priorText, old),
       });
       if (discovered.has(file) && !files.has(file)) reasons.add(`changed file unindexed: ${file}`);
     }
@@ -95,7 +107,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
     }
     const byId = new Map(state.symbols.map((s) => [s.id, s]));
     const test = (file: string): ImpactTest => ({ file, ran: evidence.ran(file), command: testCommand(root, file) });
-    for (const { symbol: s, deleted, signatureChanged, exportNames } of selected) {
+    for (const { symbol: s, deleted, signatureChanged, exportNames, publicMethod } of selected) {
       check();
       const callers = new Map<string, ImpactCaller>(), tests = new Set<string>();
       const seen = new Set([s.id]);
@@ -134,7 +146,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
       }
       if (state.imports.some((i) => i.target && importFrontier.includes(i.target) && !reached.has(i.file))) reasons.add(`import depth truncated: ${s.file}`);
       const list = [...callers.values()].sort((a, b) => a.depth - b.depth || a.file.localeCompare(b.file) || a.line - b.line);
-      const publicSymbol = s.exported || (s.kind === 'method' && !/^_|\bprivate\b|\bprotected\b/.test(s.name + ' ' + s.signature));
+      const publicSymbol = s.kind === 'method' ? publicMethod : s.exported;
       const high = publicSymbol && (signatureChanged || deleted) && list.some((c) => !c.changedFile);
       report.symbols.push({ id: s.id, name: s.qualifiedName, file: s.file, line: s.line, deleted, signatureChanged,
         risk: high ? 'high' : list.length ? 'medium' : 'low', callers: list, tests: [...tests].sort().map(test) });

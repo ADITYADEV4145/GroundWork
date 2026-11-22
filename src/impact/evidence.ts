@@ -75,7 +75,9 @@ export function sessionEvidence(root: string, sessionId?: string) {
     const words = shellWords(command); if (!words) return false;
     const runnerArgs = (parts: string[]) => {
       const offset = parts[0] === 'npx' ? 1 : /^python(?:3)?$/.test(parts[0] ?? '') && parts[1] === '-m' ? 2 : 0;
-      return /^(vitest|jest|pytest)$/.test(parts[offset] ?? '') ? parts.slice(offset + 1) : null;
+      if (!/^(vitest|jest|pytest)$/.test(parts[offset] ?? '')) return null;
+      const args = parts.slice(offset + 1);
+      return parts[offset] === 'vitest' && args[0] === 'run' ? args.slice(1) : args;
     };
     let args: string[];
     const direct = runnerArgs(words);
@@ -85,13 +87,27 @@ export function sessionEvidence(root: string, sessionId?: string) {
       if (!selectors) return false;
       args = [...selectors, ...words.slice(words[1] === 'run' ? 3 : 2)];
     } else return false;
-    args = args.filter((a) => a !== '--' && a !== 'run' && a !== '--run');
-    if (!args.length) return path.resolve(root, file).startsWith(path.resolve(cwd) + path.sep);
-    return args.some((a) => {
-      if (a.startsWith('-')) return false;
+    const selectors: string[] = [], exclusions: string[] = [];
+    const flags = new Set(['--coverage', '--run', '--watch', '--silent', '--verbose', '--no-coverage', '--no-watch', '--passWithNoTests', '--ci', '--runInBand', '--watchAll', '--disable-warnings', '--no-header', '--no-summary', '-s', '-q', '-v', '-x']);
+    const values = new Set(['--ignore', '--deselect', '-k', '-m', '-t', '-c', '--config', '--project', '--selectProjects', '--workspace', '--root', '--dir', '--testNamePattern', '--reporter', '--outputFile', '--coverageDirectory', '--maxWorkers', '--minWorkers', '--pool', '--junitxml', '--maxfail', '-o', '--override-ini']);
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i]!;
+      if (arg === '--') continue;
+      if (!arg.startsWith('-')) { selectors.push(arg); continue; }
+      const equals = arg.indexOf('='), flag = equals < 0 ? arg : arg.slice(0, equals);
+      if (flags.has(flag)) continue;
+      if (!values.has(flag)) return false;
+      const value = equals < 0 ? args[++i] : arg.slice(equals + 1);
+      if (!value || value.startsWith('-')) return false;
+      if (flag === '--ignore' || flag === '--deselect') exclusions.push(value);
+    }
+    const matches = (a: string) => {
+      if (a === '.' || a === './') return path.resolve(root, file).startsWith(path.resolve(cwd) + path.sep);
       const selected = repoRelative(root, a.split('::')[0]!, cwd);
       return !!selected && (selected === file || file.startsWith(selected.replace(/\/$/, '') + '/'));
-    });
+    };
+    if (exclusions.some(matches)) return false;
+    return selectors.length ? selectors.some(matches) : path.resolve(root, file).startsWith(path.resolve(cwd) + path.sep);
   });
   return { opened, ran, known, commandsObserved };
 }

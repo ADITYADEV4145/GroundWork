@@ -39,6 +39,22 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('separates runner options, positional selectors and excluded test paths', () => {
+    const root = fixture();
+    writeFileSync(path.join(root, 'package.json'), JSON.stringify({ scripts: { test: 'vitest run --coverage --config vitest.config.ts --project unit' } }));
+    const record = (session: string, command: string) => recordImpactEvidence(root, { ...stopEvent(root, false, session), event: 'post_tool', tool: 'Bash', input: { command }, response: 'passed' });
+    record('coverage', 'npm test');
+    expect(sessionEvidence(root, 'coverage').ran('test/api.test.ts')).toBe(true);
+    record('ignored', 'pytest --ignore tests/unit tests/integration');
+    expect(sessionEvidence(root, 'ignored').ran('tests/unit/test_api.py')).toBe(false);
+    expect(sessionEvidence(root, 'ignored').ran('tests/integration/test_api.py')).toBe(true);
+    record('deselected', 'pytest --deselect=tests/unit/test_api.py -k smoke --config pytest.ini tests');
+    expect(sessionEvidence(root, 'deselected').ran('tests/unit/test_api.py')).toBe(false);
+    expect(sessionEvidence(root, 'deselected').ran('tests/integration/test_api.py')).toBe(true);
+    record('config', 'vitest run --config test/api.test.ts --project integration test/other.test.ts');
+    expect(sessionEvidence(root, 'config').ran('test/api.test.ts')).toBe(false);
+    expect(sessionEvidence(root, 'config').ran('test/other.test.ts')).toBe(true);
+  });
   it('does not rate private or protected method signature changes as public high risk', async () => {
     for (const visibility of ['private', 'protected', 'public']) {
       const root = fixture();

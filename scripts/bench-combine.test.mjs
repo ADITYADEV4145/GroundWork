@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { options, validateCaptures } from './bench-combine.mjs';
+import { options, planArchive, validateCaptures } from './bench-combine.mjs';
 
 test('combine defaults to eight runs and accepts explicit inputs', () => {
   assert.equal(options([]).runs, 8);
@@ -30,6 +30,28 @@ test('empty, duplicate and incompatible capture directories are rejected', () =>
     assert.throws(() => validateCaptures(dir, 'nav', 1), /duplicate/);
     writeFileSync(path.join(dir, 'b.json'), JSON.stringify({ ...capture, condition: 'groundwork', captureRevision: 'other' }));
     assert.throws(() => validateCaptures(dir, 'nav', 1), /provenance/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('archive planning permits new and byte-identical captures but rejects replacements', () => {
+  const dir = mkdtempSync(path.join(os.homedir(), 'bench-archive-test-'));
+  try {
+    const source = path.join(dir, 'source.json');
+    const target = path.join(dir, 'nav-baseline-1.json');
+    const capture = { condition: 'baseline', run: 1 };
+    const rows = [{ source, capture }];
+    const original = JSON.stringify(capture);
+    writeFileSync(source, original);
+    assert.deepEqual(planArchive([], dir, 'nav'), []);
+    assert.deepEqual(planArchive(rows, dir, 'nav'), [{ source, target }]);
+    writeFileSync(target, original);
+    assert.deepEqual(planArchive(rows, dir, 'nav'), []);
+    assert.deepEqual(planArchive([{ source: target, capture }], dir, 'nav'), []);
+    writeFileSync(source, original + '\n');
+    assert.throws(() => planArchive(rows, dir, 'nav'), /Refusing to overwrite differing archived capture/);
+    assert.equal(readFileSync(target, 'utf8'), original);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { constants, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -35,6 +35,15 @@ export function validateCaptures(directory, suite, runs) {
   return rows;
 }
 
+export function planArchive(rows, directory, prefix) {
+  return rows.flatMap(({ source, capture: c }) => {
+    const target = path.join(directory, `${prefix}-${c.condition}-${c.run}.json`);
+    if (!existsSync(target)) return [{ source, target }];
+    if (!readFileSync(source).equals(readFileSync(target))) throw new Error(`Refusing to overwrite differing archived capture: ${target} (source: ${source})`);
+    return [];
+  });
+}
+
 export function combine(config) {
   const scratch = mkdtempSync(path.join(os.homedir(), 'bench-combine-'));
   const reports = [];
@@ -42,6 +51,7 @@ export function combine(config) {
     const revision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: build, encoding: 'utf8' }).trim();
     if (revision !== pins[suite]) throw new Error(`Expected ${suite} build checkout ${pins[suite]}, got ${revision}`);
     const rows = validateCaptures(directory, suite, config.runs);
+    const copies = planArchive(rows, path.join(root, 'bench', suite, 'observations'), suite === 'nav' ? 'nav' : 'lh2');
     const output = path.join(scratch, suite);
     const command = ['dist/cli/main.js', 'bench', '--suite', suite, '--runs', String(config.runs), '--observations', directory, '--output-dir', output];
     console.log(`Grading ${suite} at ${revision}: node ${command.join(' ')}`);
@@ -52,16 +62,13 @@ export function combine(config) {
     const { summary: s } = report;
     if (data.length !== 1 || s.suite !== suite || s.runs !== config.runs || report.evidence.captures.some((c) => c.captureRevision !== pins[suite])) throw new Error(`Invalid ${suite} grader report`);
     console.log(`${suite}: ${s.runs} runs, success ${s.baseline.success}/${s.baseline.attempts} vs ${s.groundwork.success}/${s.groundwork.attempts}; tool-output reduction ${JSON.stringify(s.estimatedToolOutputReductionPct)}; wall reduction ${JSON.stringify(s.wallTimeReductionPct)}`);
-    reports.push({ suite, rows, report, markdown: readFileSync(path.join(output, resultFile.replace(/\.json$/, '.md')), 'utf8') });
+    reports.push({ suite, copies, report, markdown: readFileSync(path.join(output, resultFile.replace(/\.json$/, '.md')), 'utf8') });
   }
-  for (const { suite, rows, report, markdown } of reports) {
+  for (const { suite, copies, report, markdown } of reports) {
     const dir = path.join(root, 'bench', suite);
     mkdirSync(path.join(dir, 'results'), { recursive: true });
     mkdirSync(path.join(dir, 'observations'), { recursive: true });
-    for (const { source, capture: c } of rows) {
-      const target = path.join(dir, 'observations', `${suite === 'nav' ? 'nav' : 'lh2'}-${c.condition}-${c.run}.json`);
-      if (path.resolve(source) !== target) copyFileSync(source, target);
-    }
+    for (const { source, target } of copies) copyFileSync(source, target, constants.COPYFILE_EXCL);
     writeFileSync(path.join(dir, 'results/combined.evidence.json'), JSON.stringify(report.evidence, null, 2) + '\n');
     writeFileSync(path.join(dir, 'results/combined.json'), JSON.stringify([report], null, 2) + '\n');
     writeFileSync(path.join(dir, 'results/combined.md'), markdown);

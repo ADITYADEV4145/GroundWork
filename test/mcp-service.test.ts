@@ -13,12 +13,13 @@ import { tempDir } from '../src/selftest/fixtures.js';
 const main = fileURLToPath(new URL('../src/cli/main.ts', import.meta.url));
 let root: string;
 const clients: Client[] = [];
+const peers: string[] = [];
 const source = 'export function normalize(value: string) { const result = value.trim().toLowerCase(); if (!result) throw new Error("empty"); return result; }';
 
-async function client(): Promise<Client> {
+async function client(cwd = root): Promise<Client> {
   const value = new Client({ name: 'service-test', version: '1' });
   clients.push(value);
-  await value.connect(new StdioClientTransport({ command: process.execPath, args: ['--import', import.meta.resolve('tsx'), main, 'mcp'], cwd: root, stderr: 'pipe', env: Object.fromEntries(Object.entries(process.env).filter((e): e is [string, string] => e[1] !== undefined)) }));
+  await value.connect(new StdioClientTransport({ command: process.execPath, args: ['--import', import.meta.resolve('tsx'), main, 'mcp'], cwd, stderr: 'pipe', env: Object.fromEntries(Object.entries(process.env).filter((e): e is [string, string] => e[1] !== undefined)) }));
   return value;
 }
 
@@ -52,7 +53,54 @@ describe.skipIf(process.platform === 'win32')('persistent MCP service', () => {
     await delay(350);
     vi.unstubAllEnvs();
     rmSync(root, { recursive: true, force: true });
+    for (const peer of peers.splice(0)) rmSync(peer, { recursive: true, force: true });
   });
+
+  it('reuses one process across roots without sharing symbols, config or session ledgers', async () => {
+    const other = tempDir('gw-service-peer-');
+    peers.push(other);
+    writeFileSync(path.join(other, 'app.ts'), source);
+    writeFileSync(path.join(root, 'only.ts'), 'export function onlyA() { return 1; }');
+    writeFileSync(path.join(other, 'only.ts'), 'export function onlyB() { return 2; }');
+    expect(serviceInfo(root).socket).toBe(serviceInfo(other).socket);
+    const [a, b] = await Promise.all([client(), client(other)]);
+    const pid = (await greeting()).pid;
+    expect(await call(a, 'read_symbol', { symbol: 'onlyA' })).toContain('return 1');
+    expect(await call(b, 'read_symbol', { symbol: 'onlyA' })).toContain('No exact symbol');
+    expect(await call(b, 'read_symbol', { symbol: 'onlyB' })).toContain('return 2');
+    expect(await call(a, 'read_symbol', { symbol: 'onlyB' })).toContain('No exact symbol');
+    const raw = (cwd: string) => ({ cwd, session_id: 'same-session', tool_name: 'Read', tool_input: { file_path: path.join(cwd, 'app.ts') },
+      tool_response: { type: 'text', file: { filePath: path.join(cwd, 'app.ts'), startLine: 1, numLines: 1, content: source } } });
+    expect(await forwardHook('claude', 'post_tool', JSON.stringify(raw(root)))).toBe('');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw(other)))).toBe('');
+    expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw(root)))).toContain('Unchanged since Read');
+    mkdirSync(path.join(root, '.groundwork'), { recursive: true });
+    writeFileSync(path.join(root, '.groundwork/config.json'), JSON.stringify({ index: { exclude: ['**/*.ts'] } }));
+    expect(await call(a, 'read_symbol', { symbol: 'normalize' })).toContain('No exact symbol');
+    expect(await call(b, 'read_symbol', { symbol: 'normalize' })).toContain('value.trim');
+    expect((await greeting()).pid).toBe(pid);
+    expect(existsSync(path.join(root, '.groundwork/index.db'))).toBe(true);
+    expect(existsSync(path.join(other, '.groundwork/index.db'))).toBe(true);
+  }, 20000);
+
+  it('rejects invalid root envelopes and fails open for mismatched hook cwd', async () => {
+    await call(await client(), 'outline', { file: 'app.ts' });
+    for (const selected of ['relative', path.join(root, 'missing'), path.join(root, 'app.ts'), root]) {
+      const output = await new Promise<string>((resolve, reject) => {
+        const socket = connect(serviceInfo(root).socket);
+        let greeted = false, output = '';
+        socket.on('error', reject).on('data', (chunk) => {
+          if (greeted) output += chunk.toString();
+          else {
+            greeted = true;
+            socket.write(JSON.stringify({ groundworkRoot: selected, groundworkHook: 1, agent: 'claude', event: 'post_tool', raw: { cwd: path.dirname(root), session_id: 'bad', tool_name: 'Read' } }) + '\n');
+          }
+        }).on('close', () => resolve(output));
+      });
+      expect(output).toBe(selected === root ? '{"output":""}\n' : '');
+    }
+    expect(await call(await client(), 'read_symbol', { symbol: 'normalize' })).toContain('value.trim');
+  }, 20000);
 
   it('shares one service across concurrent clients, refreshes writes/config and expires idle', async () => {
     const [first, second] = await Promise.all([client(), client()]);

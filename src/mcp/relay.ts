@@ -16,12 +16,12 @@ export function serviceInfo(root: string): ServiceInfo {
   if (process.platform === 'win32') throw new Error('Local sockets unavailable');
   root = realpathSync(root);
   const runtime = privateDirectory(process.env.GW_RUNTIME_DIR ?? path.join(tmpdir(), `groundwork-${process.getuid!()}`));
-  const hash = createHash('sha256').update('groundwork-mcp-2').update(process.version).update(process.execPath);
+  const hash = createHash('sha256').update('groundwork-mcp-3').update(process.version).update(process.execPath);
   const code = fileURLToPath(new URL('../', import.meta.url));
   hash.update(runtimeFingerprint(code, fileURLToPath(new URL('../../package.json', import.meta.url)), runtime));
   hash.update(JSON.stringify(Object.entries(process.env).filter(([key]) => /^(GW_|HF_|TRANSFORMERS_)/.test(key) && !/^(GW_BENCH_|GW_HOOK_(?:TIMINGS|IN_PROCESS)$)/.test(key)).sort()));
   const version = hash.digest('hex');
-  const key = createHash('sha256').update(root).update(version).digest('hex').slice(0, 24);
+  const key = version.slice(0, 24);
   const socket = path.join(runtime, key + '.sock');
   if (Buffer.byteLength(socket) > 100) throw new Error('Local socket path too long');
   return { root, socket, version };
@@ -44,6 +44,7 @@ function openService(info: ServiceInfo): Promise<Socket> {
         socket.pause();
         cleanup();
         if (end + 1 < greeting.length) socket.unshift(greeting.subarray(end + 1));
+        socket.write(JSON.stringify({ groundworkRoot: info.root }) + '\n');
         resolve(socket);
       } catch (error) { fail(error as Error); }
     };

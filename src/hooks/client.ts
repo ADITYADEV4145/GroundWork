@@ -67,7 +67,7 @@ export async function forwardHook(agent: AgentName, event: HookEventName, input:
           if (!greeted) {
             if (value.version !== info.version) return finish(null);
             greeted = true;
-            socket.write(JSON.stringify({ groundworkHook: 1, agent, event, raw }) + '\n');
+            socket.write(JSON.stringify({ groundworkRoot: info.root, groundworkHook: 1, agent, event, raw }) + '\n');
           } else {
             if (typeof value.output !== 'string') return finish('');
             if (value.output && (!JSON.parse(value.output) || typeof JSON.parse(value.output) !== 'object')) return finish('');

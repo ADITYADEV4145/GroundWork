@@ -33,7 +33,7 @@ describe.skipIf(process.platform === 'win32')('slim hook transport', () => {
     await listen((socket, version) => {
       socket.write(JSON.stringify({ version }) + '\n');
       socket.on('data', (data) => {
-        expect(JSON.parse(data.toString())).toMatchObject({ groundworkHook: 1, agent: 'claude', event: 'pre_tool', raw: JSON.parse(input(root)) });
+        expect(JSON.parse(data.toString())).toMatchObject({ groundworkRoot: root, groundworkHook: 1, agent: 'claude', event: 'pre_tool', raw: JSON.parse(input(root)) });
         socket.end(JSON.stringify({ output: '{"hookSpecificOutput":{"permissionDecision":"deny"}}' }) + '\n');
       });
     });

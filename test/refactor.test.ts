@@ -114,6 +114,15 @@ describe('guarded symbol refactoring', () => {
     expect(read('classes.ts')).toBe(source.replace('"first"', '"changed"'));
   });
 
+  it('edits a JSX component in an inferred project without requiring a JSX runtime', async () => {
+    const source = 'export const Card = () => <div>before</div>;\n';
+    put('card.tsx', source);
+    const request = { symbol: 'card.tsx:Card', body: '<div>after</div>' };
+    const preview = await refactor(request);
+    expect(await refactor(request, preview.id)).toMatchObject({ applied: true });
+    expect(read('card.tsx')).toBe(source.replace('>before<', '>after<'));
+  });
+
   it('refuses incomplete cross-config renames and references in uneditable files', async () => {
     put('tsconfig.json', JSON.stringify({ files: ['first.ts'] }));
     put('first.ts', 'export function calc() { return 4; }\n');

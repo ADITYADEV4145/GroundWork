@@ -75,6 +75,7 @@ function project(ctx: ToolContext, file: string) {
   const options: ts.CompilerOptions = {
     allowJs: true, checkJs: true, noEmit: true, skipLibCheck: true,
     target: ts.ScriptTarget.ESNext, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext,
+    ...(!configFile && { jsx: ts.JsxEmit.Preserve }),
   };
   const peers = files.map((f) => path.join(ctx.root, f)).filter((f) => projectConfig(ctx.root, f) === configFile);
   let roots = peers;

@@ -6,13 +6,13 @@ import { once } from 'node:events';
 import { readFile, access } from 'node:fs/promises';
 
 test('all page assets resolve within a static host subdirectory', async () => {
-  const html = await readFile(new URL('./dist/index.html', import.meta.url), 'utf8');
+  const html = (await Promise.all(['index.html', 'benchmarks.html'].map(file => readFile(new URL(`./dist/${file}`, import.meta.url), 'utf8')))).join('\n');
   const base = new URL('https://example.com/GroundWork/');
   for (const [, relative] of html.matchAll(/(?:src|href)="([^"#]+)"/g)) {
     if (/^https?:/.test(relative)) continue;
     const resolved = new URL(relative, base);
     assert.ok(resolved.pathname.startsWith('/GroundWork/'), relative);
-    await access(new URL(`./dist/${relative}`, import.meta.url));
+    await access(new URL(`./dist/${relative === './benchmarks' ? 'benchmarks.html' : relative}`, import.meta.url));
   }
   const manifest = JSON.parse(await readFile(new URL('./dist/site.webmanifest', import.meta.url), 'utf8'));
   assert.equal(new URL(manifest.start_url, base).pathname, '/GroundWork/');
@@ -72,6 +72,12 @@ test('static server contains malformed targets and never exposes repository file
   const home = await fetch(base);
   assert.equal(home.status, 200, 'server stays alive after invalid request');
   assert.match(await home.text(), /Big ideas/);
+  const benchmarks = await fetch(base + '/benchmarks');
+  assert.equal(benchmarks.status, 200);
+  assert.match(await benchmarks.text(), /Less copied code/);
+  const homeHtml = await (await fetch(base)).text();
+  assert.doesNotMatch(homeHtml, /class="benchmarks"|bench\/.*\.svg/);
+  assert.equal([...homeHtml.matchAll(/href="\.\/benchmarks"/g)].length, 2);
   for (const name of ['token-reduction', 'copied-code', 'success', 'wall-time']) {
     const chart = await fetch(`${base}/bench/${name}.svg`);
     assert.equal(chart.status, 200);

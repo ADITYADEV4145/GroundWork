@@ -75,17 +75,19 @@ function read(root, treatment, [file, start, count]) {
   return { text: [content, pre?.additionalContext].filter(Boolean).join('\n'), file: relative, readBytes: Buffer.byteLength(content) };
 }
 
-async function mcp(root, [name, raw]) {
-  if (!mcpTools.includes(name)) throw new Error('Use one of: ' + mcpTools.join(', '));
+async function mcp(root, [name, raw], condition = 'groundwork') {
+  const competitor = ['serena', 'codebase-memory'].includes(condition);
+  if (!competitor && !mcpTools.includes(name)) throw new Error('Use one of: ' + mcpTools.join(', '));
   const args = JSON.parse(raw ?? '{}');
   const client = new Client({ name: 'nav-benchmark', version: '1.0.0' });
-  const transport = new StdioClientTransport({ command: process.execPath, args: [cli, 'mcp'], cwd: root, stderr: 'ignore' });
+  const config = competitor ? readJson(process.env.GW_BENCH_ARMS_CONFIG ?? path.join(here, 'head-to-head/arms.json'))[condition] : { command: process.execPath, args: [cli, 'mcp'] };
+  const transport = new StdioClientTransport({ command: config.command, args: config.args.map((arg) => arg.replaceAll('{root}', root)), cwd: root, stderr: 'ignore' });
   let text;
   try {
     await client.connect(transport);
     const result = await client.callTool({ name, arguments: args }, undefined, { timeout: 30_000 });
     text = result.content.map((part) => part.type === 'text' ? part.text : '[non-text MCP result]').join('\n');
-    if (!result.isError && name === 'find_code') hook(root, 'post_tool', 'mcp__groundwork__find_code', args);
+    if (!competitor && !result.isError && name === 'find_code') hook(root, 'post_tool', 'mcp__groundwork__find_code', args);
   } finally {
     await client.close();
   }
@@ -106,7 +108,7 @@ async function main([action, ...argv]) {
   const dir = path.resolve(directory);
   const metadata = path.join(dir, 'metadata.json');
   if (action === 'init') {
-    if (!['baseline', 'groundwork'].includes(id)) throw new Error('Invalid condition');
+    if (!['baseline', 'groundwork', 'serena', 'codebase-memory'].includes(id)) throw new Error('Invalid condition');
     if (id === 'groundwork' && !existsSync(cli)) throw new Error('Run npm run build before collecting Groundwork observations');
     const run = positiveInt(args[0]);
     mkdirSync(dir);
@@ -174,8 +176,8 @@ async function main([action, ...argv]) {
     switch (action) {
       case 'read': result = read(root, treatment, args); break;
       case 'mcp':
-        if (!treatment) throw new Error('MCP is unavailable in the baseline arm');
-        result = await mcp(root, args);
+        if (meta.condition === 'baseline') throw new Error('MCP is unavailable in the baseline arm');
+        result = await mcp(root, args, meta.condition);
         break;
       case 'shell': {
         const proc = spawnSync('sh', ['-c', args[0]], {

@@ -1,6 +1,6 @@
 import type { Evidence } from './schema.js';
 
-export function sessionInterval(baseline: number[], groundwork: number[]) {
+export function sessionInterval(baseline: number[], groundwork: number[], adjustedIndex = 124) {
   if (!baseline.length || !groundwork.length) return null;
   const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
   if ([...baseline, ...groundwork].some((x) => !Number.isFinite(x) || x < 0)) throw new Error('Invalid session metric');
@@ -15,7 +15,7 @@ export function sessionInterval(baseline: number[], groundwork: number[]) {
     values.push(100 * (1 - g / b));
   }
   values.sort((a, b) => a - b);
-  return { median: 100 * (1 - mean(groundwork) / mean(baseline)), low: values[249]!, high: values[9749]!, adjustedLow: values[124]! };
+  return { median: 100 * (1 - mean(groundwork) / mean(baseline)), low: values[249]!, high: values[9749]!, adjustedLow: values[adjustedIndex]! };
 }
 
 export function sessionSummary(evidence: Evidence, tasks: number, runs: number) {

@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "sourceCommit": "0f911fd26cfc066e5d3150ec336352723b043ca7",
+  "tasks": [
+    {
+      "id": "customer-desk/required-param",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserByEmail",
+      "operator": "required-param",
+      "before": "export function getUserByEmail(users: User[], email: string): User | null ",
+      "after": "export function getUserByEmail(users: User[], email: string, impactRequired: number): User | null "
+    },
+    {
+      "id": "customer-desk/rename",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserByEmail",
+      "operator": "rename",
+      "before": "export function getUserByEmail(users: User[], email: string): User | null ",
+      "after": "export function getUserByEmailRenamed(users: User[], email: string): User | null "
+    },
+    {
+      "id": "customer-desk/delete",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserByEmail",
+      "operator": "delete",
+      "before": "export function getUserByEmail(users: User[], email: string): User | null {\n  return users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase()) ?? null;\n}",
+      "after": ""
+    },
+    {
+      "id": "customer-desk/return-shape",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserByEmail",
+      "operator": "return-shape",
+      "before": "export function getUserByEmail(users: User[], email: string): User | null ",
+      "after": "export function getUserByEmail(users: User[], email: string): { id: number } | null "
+    },
+    {
+      "id": "parcel-ops/required-param",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "listOrders",
+      "operator": "required-param",
+      "before": "export function listOrders(orders: Order[], account: string, options: { includeCancelled?: boolean } = {}): Order[] ",
+      "after": "export function listOrders(orders: Order[], account: string, options: { includeCancelled?: boolean } = {}, impactRequired: number): Order[] "
+    },
+    {
+      "id": "parcel-ops/rename",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "listOrders",
+      "operator": "rename",
+      "before": "export function listOrders(orders: Order[], account: string, options: { includeCancelled?: boolean } = {}): Order[] ",
+      "after": "export function listOrdersRenamed(orders: Order[], account: string, options: { includeCancelled?: boolean } = {}): Order[] "
+    },
+    {
+      "id": "parcel-ops/delete",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "listOrders",
+      "operator": "delete",
+      "before": "export function listOrders(orders: Order[], account: string, options: { includeCancelled?: boolean } = {}): Order[] {\n  return orders.filter((o) => o.account === account && (options.includeCancelled || !o.cancelled));\n}",
+      "after": ""
+    },
+    {
+      "id": "parcel-ops/return-shape",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "listOrders",
+      "operator": "return-shape",
+      "before": "export function listOrders(orders: Order[], account: string, options: { includeCancelled?: boolean } = {}): Order[] ",
+      "after": "export function listOrders(orders: Order[], account: string, options: { includeCancelled?: boolean } = {}): number[] "
+    },
+    {
+      "id": "dispatch-desk/required-param",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "list_orders",
+      "operator": "required-param",
+      "before": "def list_orders(orders: list[Order], customer_id: str, *, include_cancelled: bool = False) -> list[Order]:",
+      "after": "def list_orders(orders: list[Order], customer_id: str, *, include_cancelled: bool = False, impact_required: int) -> list[Order]:"
+    },
+    {
+      "id": "dispatch-desk/rename",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "list_orders",
+      "operator": "rename",
+      "before": "def list_orders(orders: list[Order], customer_id: str, *, include_cancelled: bool = False) -> list[Order]:",
+      "after": "def list_ordersRenamed(orders: list[Order], customer_id: str, *, include_cancelled: bool = False) -> list[Order]:"
+    },
+    {
+      "id": "dispatch-desk/delete",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "list_orders",
+      "operator": "delete",
+      "before": "def list_orders(orders: list[Order], customer_id: str, *, include_cancelled: bool = False) -> list[Order]:\n    return [o for o in orders if o.customer_id == customer_id and (include_cancelled or not o.cancelled)]\n",
+      "after": ""
+    },
+    {
+      "id": "dispatch-desk/return-shape",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "list_orders",
+      "operator": "return-shape",
+      "before": "def list_orders(orders: list[Order], customer_id: str, *, include_cancelled: bool = False) -> list[Order]:",
+      "after": "def list_orders(orders: list[Order], customer_id: str, *, include_cancelled: bool = False) -> list[int]:"
+    },
+    {
+      "id": "groundwork/required-param",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "estimateTokens",
+      "operator": "required-param",
+      "before": "export function estimateTokens(text: string | number): number ",
+      "after": "export function estimateTokens(text: string | number, impactRequired: number): number "
+    },
+    {
+      "id": "groundwork/rename",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "estimateTokens",
+      "operator": "rename",
+      "before": "export function estimateTokens(text: string | number): number ",
+      "after": "export function estimateTokensRenamed(text: string | number): number "
+    },
+    {
+      "id": "groundwork/delete",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "estimateTokens",
+      "operator": "delete",
+      "before": "export function estimateTokens(text: string | number): number {\n  const bytes = typeof text === 'number' ? text : Buffer.byteLength(text, 'utf8');\n  return Math.ceil(bytes / 4);\n}",
+      "after": ""
+    },
+    {
+      "id": "groundwork/return-shape",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "estimateTokens",
+      "operator": "return-shape",
+      "before": "export function estimateTokens(text: string | number): number ",
+      "after": "export function estimateTokens(text: string | number): string "
+    }
+  ]
+}

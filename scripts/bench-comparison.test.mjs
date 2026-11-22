@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { AFTER_REVISION, comparisonCharts, generateComparison, loadComparison, sections, tableRows } from './bench-comparison.mjs';
+import { AFTER_REVISION, ROUND2_REVISION, comparisonCharts, generateComparison, loadComparison, sections, tableRows } from './bench-comparison.mjs';
 import { options } from './bench-combine-v2.mjs';
 import { combine, validateCaptures } from './bench-combine.mjs';
 
@@ -20,11 +20,11 @@ function fixture() {
   for (const file of ['README.md', 'website/public/benchmarks.html']) cpSync(path.join(root, file), path.join(dir, file));
   return dir;
 }
-function seedAfter(dir, transform = (report) => report) {
+function seedAfter(dir, transform = (report) => report, version = 'v2') {
   for (const suite of ['nav', 'long-horizon']) {
     const report = JSON.parse(read(path.join(dir, 'bench', suite, 'results/combined.json')));
-    for (const capture of report[0].evidence.captures) capture.captureRevision = AFTER_REVISION;
-    const target = path.join(dir, 'bench', suite, 'v2/results');
+    for (const capture of report[0].evidence.captures) capture.captureRevision = version === 'v2' ? AFTER_REVISION : ROUND2_REVISION;
+    const target = path.join(dir, 'bench', suite, version, 'results');
     mkdirSync(target, { recursive: true });
     writeFileSync(path.join(target, 'combined.json'), JSON.stringify(transform(report)));
   }
@@ -40,12 +40,26 @@ test('v2 inputs pin the new collector and use the branch build, never historical
   assert.throws(() => combine({ ...config, runs: 3 }), /eight runs/);
   assert.throws(() => validateCaptures(path.join(root, 'bench/nav/observations'), 'nav', 8, AFTER_REVISION), /provenance/);
 });
+test('v3 option selects isolated directories and the round-2 build revision regardless of argument order', () => {
+  const config = options(['--build', '/build', '--experiment', 'v3']);
+  assert.equal(config.experiment, 'v3');
+  assert.equal(config.captureRevision, ROUND2_REVISION);
+  assert.equal(config.navCaptures, path.join(root, 'bench/nav/v3/observations'));
+  assert.equal(config.lhCaptures, path.join(root, 'bench/long-horizon/v3/observations'));
+  assert.equal(config.navBuild, '/build');
+  assert.equal(config.lhBuild, '/build');
+  assert.equal(options(['--experiment', 'v3', '--nav-captures', '/nav3']).navCaptures, '/nav3');
+  assert.throws(() => options(['--experiment', 'v4']), /Use/);
+  assert.throws(() => combine({ ...config, runs: 3 }), /eight runs/);
+  assert.throws(() => combine({ ...config, experiment: 'v4' }), /Unknown experiment/);
+  assert.throws(() => validateCaptures(path.join(root, 'bench/nav/v2/observations'), 'nav', 8, ROUND2_REVISION), /provenance/);
+});
 test('empty after state is explicitly pending; generated prose/charts match saved data', () => {
   const dir = fixture();
   try {
     const rows = generateComparison(dir);
-    assert.equal(rows.filter((r) => !r.summary).length, 2);
-    assert.match(sections(rows).markdown, /After results are pending/);
+    assert.equal(rows.filter((r) => !r.summary).length, 4);
+    assert.match(sections(rows).markdown, /round 1 and round 2 results are pending/);
     const expected = sections(loadComparison());
     assert.ok(read(path.join(root, 'README.md')).includes(expected.markdown));
     assert.ok(read(path.join(root, 'website/public/benchmarks.html')).includes(expected.html));
@@ -54,24 +68,57 @@ test('empty after state is explicitly pending; generated prose/charts match save
     }
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
-test('old eight-run reports in a synthetic v2 layout populate every comparison cell without changing before', () => {
+test('old eight-run reports in synthetic v2/v3 layouts populate every comparison cell without changing before', () => {
   const dir = fixture();
   try {
     const before = read(path.join(dir, 'bench/nav/results/combined.json'));
     seedAfter(dir);
+    seedAfter(dir, undefined, 'v3');
     const rows = generateComparison(dir), cells = tableRows(rows);
     assert.equal(cells[0][1], '240/240 / 240/240');
     assert.deepEqual(cells[0].slice(1), cells[1].slice(1));
-    assert.deepEqual(cells[2].slice(1), cells[3].slice(1));
-    assert.equal(cells[3][2], '-63.2% [-86.1, -38.6]');
+    assert.equal(cells.length, 6);
+    assert.deepEqual(cells[1].slice(1), cells[2].slice(1));
+    assert.deepEqual(cells[3].slice(1), cells[4].slice(1));
+    assert.deepEqual(cells[4].slice(1), cells[5].slice(1));
+    assert.equal(cells[5][2], '-63.2% [-86.1, -38.6]');
     for (const cell of cells.flat()) {
       assert.ok(read(path.join(dir, 'README.md')).includes(cell));
       assert.ok(read(path.join(dir, 'website/public/benchmarks.html')).includes(cell));
     }
     assert.doesNotMatch(sections(rows).markdown, /results are pending/);
     assert.match(sections(rows).markdown, /protocol change/);
+    for (const content of Object.values(sections(rows))) {
+      assert.match(content, /small shared helpers/);
+      assert.match(content, /targets had already been read/);
+      assert.match(content, /retried before work/);
+      assert.match(content, /where_used validation error was not retried/);
+      assert.match(content, /whole file using shell cat/);
+    }
     assert.equal(read(path.join(dir, 'bench/nav/results/combined.json')), before);
     assert.equal(existsSync(path.join(dir, 'docs/assets/bench/copied-code.svg')), false);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+test('completed round 1 remains published while round 2 is pending in both suites and charts', () => {
+  const dir = fixture();
+  try {
+    seedAfter(dir);
+    const v2 = read(path.join(dir, 'bench/nav/v2/results/combined.json'));
+    const rows = generateComparison(dir);
+    assert.deepEqual(rows.map((row) => Boolean(row.summary)), [true, true, false, true, true, false]);
+    const content = sections(rows);
+    assert.match(content.markdown, /round 2 results are pending/);
+    assert.doesNotMatch(content.markdown, /no post-fix measurements/);
+    for (const revision of [AFTER_REVISION, ROUND2_REVISION]) assert.ok(content.markdown.includes(revision));
+    assert.match(content.markdown, /rg for trivial lookups, exact-first find_code, actionable-only find_similar/);
+    assert.match(content.markdown, /baselines were re-collected at that round’s commit/);
+    assert.equal(read(path.join(dir, 'bench/nav/v2/results/combined.json')), v2);
+    assert.equal(existsSync(path.join(dir, 'bench/nav/v3/results/combined.json')), false);
+    for (const chart of Object.values(comparisonCharts(rows))) {
+      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, chart.includes('wall time') ? 4 : 2);
+      assert.match(chart, /round 2/);
+      assert.doesNotMatch(chart, /NaN|undefined/);
+    }
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 test('incomplete, stale-revision and inconsistent after reports fail before publishing', () => {
@@ -88,5 +135,20 @@ test('incomplete, stale-revision and inconsistent after reports fail before publ
     seedAfter(dir, (reports) => { reports[0].summary.runs = 3; return reports; });
     assert.throws(() => generateComparison(dir), /eight-run/);
     assert.equal(read(path.join(dir, 'README.md')), original);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+test('partial, wrong-revision and inconsistent v3 reports cannot update published pages', () => {
+  const dir = fixture();
+  try {
+    seedAfter(dir);
+    seedAfter(dir, undefined, 'v3');
+    const page = read(path.join(dir, 'README.md'));
+    rmSync(path.join(dir, 'bench/nav/v3/results/combined.json'));
+    assert.throws(() => generateComparison(dir), /Both v3/);
+    seedAfter(dir, (reports) => { reports[0].evidence.captures[0].captureRevision = AFTER_REVISION; return reports; }, 'v3');
+    assert.throws(() => generateComparison(dir), /v3 capture revision/);
+    seedAfter(dir, (reports) => { reports[0].summary.groundwork.wallMs++; return reports; }, 'v3');
+    assert.throws(() => generateComparison(dir), /Inconsistent/);
+    assert.equal(read(path.join(dir, 'README.md')), page);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

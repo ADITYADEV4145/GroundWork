@@ -1,5 +1,39 @@
 # Combining paired runs
 
+## Round 5 (v6)
+
+Round 5 pins both arms to `2183b1ba50fb8669d43a318c883f3a9ac0c8ecb4`.
+The sessions still export `nav3-*` / `lh3-*` filenames; select v6 explicitly:
+
+```sh
+node scripts/bench-combine-v2.mjs --experiment v6 \
+  --nav-captures /path/to/v6-nav-exports \
+  --lh-captures /path/to/v6-lh-exports \
+  --build /path/to/built-2183b1b-checkout
+```
+
+V6 writes only `bench/{nav,long-horizon}/v6/{observations,results}` evidence,
+archiving unchanged export bytes as `nav6-*` / `lh6-*`. All earlier evidence
+and published rows are preserved. The sixth row per suite stays Pending until
+both fresh eight-run suite reports are present; experiments are not pooled.
+Synthetic orchestration tests are not benchmark results.
+
+Round 5 measured experimental product changes at `2183b1b`. **They are not
+shipped on main because they did not demonstrate a performance win.** This
+publication preserves the measurements without shipping the graph cache,
+callee_depth traces, relay bundle or associated guidance changes.
+
+The measured changes included versioned graph-cache clones into root-local indexes with freshness
+checks, budgeted resolved definitions via `read_symbol` `callee_depth`, a thin
+relay bootstrap, and trace/stop-at-location guidance. The Read hook pair and
+find_code post-hook remain; experimental read paths remain default-off behind
+`navigation.experimentalReadPaths`. The v6 navigation guidance adds the trace
+affordance and stop-at-location rule; LH guidance is unchanged apart from the
+revision setup. Baselines were freshly collected at 2183b1b. Cross-round changes
+do not isolate implementation effects from prompts or baseline variation.
+
+V6 workflow session notes: navigation baseline-3 ran one rg directly outside the capture wrapper. Navigation GroundWork-1 reported an early non-wrapper shell failure and a gw-01 finish retry. Several sessions chained begin/finish/tool calls sequentially and used external wrapper scripts for cwd/environment or shell-function persistence; LH GroundWork-3 retried early cwd/unset-variable failures. Navigation GroundWork-2 reused paths learned in earlier tasks, and several GroundWork runs seeded fitToBudget or formatZodError from preloaded AGENTS.md while confirming answers with current-task tools. Navigation GroundWork-7/8 used captured shell cat instead of the read wrapper. Extra maps, depth-2 orientation and repeated confirmation after resolved locations were also noted. Navigation GroundWork-5 captured an invalid read_symbols call. Several LH GroundWork runs used outline plus read_symbol (sometimes also repo_map) rather than one orientation step; GroundWork-8 repeated the unchanged normalizeEmail body. LH GroundWork-1/2/4/5 introduced or extracted shared sorting helpers without similarity checks. Explicit verify_calls was skipped with reported prior confirmation of cross-file targets, consistent with the guidance when that evidence was unchanged. Edits included corrections and ad-hoc shell-wrapper smoke checks, some were untested, and Python cache cleanup was noted. These are recorded executions, not perfectly uniform protocol adherence. Work outside wrappers or task timers is unmeasured; shell writes still do not dispatch edit or Stop hooks.
+
 ## Round 4 (v5)
 
 Round 4 pins both arms to `6f242a68c4e2461a4156089f1195d60affcbbc59`.

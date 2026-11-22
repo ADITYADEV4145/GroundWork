@@ -1,0 +1,592 @@
+{
+  "suite": "nav",
+  "revision": "e0709ce62f2e8766080ec753c90a46fc96620610",
+  "condition": "groundwork",
+  "run": 7,
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "2183b1ba50fb8669d43a318c883f3a9ac0c8ecb4",
+  "observations": [
+    {
+      "task": "gw-01",
+      "startedAt": 1795326379173,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 325
+        }
+      ],
+      "wallMs": 9134,
+      "answer": [
+        "src/index/refresh.ts:refreshIndex"
+      ]
+    },
+    {
+      "task": "gw-02",
+      "startedAt": 1795326388706,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 352
+        },
+        {
+          "action": "mcp",
+          "name": "callers",
+          "bytes": 82
+        },
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 336
+        }
+      ],
+      "wallMs": 8041,
+      "answer": [
+        "src/store/schema.ts:ensureSchema",
+        "src/index/store.ts:openIndex"
+      ]
+    },
+    {
+      "task": "gw-03",
+      "startedAt": 1795326397104,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 321
+        }
+      ],
+      "wallMs": 2712,
+      "answer": [
+        "src/lang/parser.ts:languageForPath"
+      ]
+    },
+    {
+      "task": "gw-04",
+      "startedAt": 1795326400191,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 351
+        },
+        {
+          "action": "shell",
+          "bytes": 355
+        },
+        {
+          "action": "read",
+          "bytes": 1537,
+          "file": "src/mcp/server.ts",
+          "readBytes": 1536
+        }
+      ],
+      "wallMs": 7932,
+      "answer": [
+        "src/mcp/server.ts:startMcpServer",
+        "src/index/refresh.ts:refreshIndex"
+      ]
+    },
+    {
+      "task": "gw-05",
+      "startedAt": 1795326408466,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 99
+        }
+      ],
+      "wallMs": 3762,
+      "answer": [
+        "src/util/tokens.ts:fitToBudget"
+      ]
+    },
+    {
+      "task": "gw-06",
+      "startedAt": 1795326412578,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 319
+        },
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 294
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 4273
+        }
+      ],
+      "wallMs": 6923,
+      "answer": [
+        "src/util/paths.ts:findRepoRoot",
+        "src/hooks/run.ts:runHook"
+      ]
+    },
+    {
+      "task": "gw-07",
+      "startedAt": 1795326419857,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 355
+        },
+        {
+          "action": "shell",
+          "bytes": 866
+        }
+      ],
+      "wallMs": 6529,
+      "answer": [
+        "src/hooks/handlers/read_guard.ts:readGuard"
+      ]
+    },
+    {
+      "task": "gw-08",
+      "startedAt": 1795326426749,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 356
+        },
+        {
+          "action": "mcp",
+          "name": "outline",
+          "bytes": 1445
+        },
+        {
+          "action": "mcp",
+          "name": "outline",
+          "bytes": 373
+        }
+      ],
+      "wallMs": 7696,
+      "answer": [
+        "src/store/db.ts:openDb"
+      ]
+    },
+    {
+      "task": "gw-09",
+      "startedAt": 1795326434834,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 344
+        },
+        {
+          "action": "shell",
+          "bytes": 630
+        }
+      ],
+      "wallMs": 3148,
+      "answer": [
+        "src/setup/apply.ts:applySetup",
+        "src/setup/apply.ts:planSetup"
+      ]
+    },
+    {
+      "task": "gw-10",
+      "startedAt": 1795326438375,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 372
+        }
+      ],
+      "wallMs": 2914,
+      "answer": [
+        "src/util/zod.ts:formatZodError"
+      ]
+    },
+    {
+      "task": "ts-01",
+      "startedAt": 1795326441593,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 287
+        },
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 232
+        }
+      ],
+      "wallMs": 5647,
+      "answer": [
+        "src/utils/date.ts:formatDate"
+      ]
+    },
+    {
+      "task": "ts-02",
+      "startedAt": 1795326447431,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "repo_map",
+          "bytes": 56
+        },
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 310
+        },
+        {
+          "action": "shell",
+          "bytes": 303
+        },
+        {
+          "action": "read",
+          "bytes": 858,
+          "file": "src/services/api.ts",
+          "readBytes": 857
+        },
+        {
+          "action": "read",
+          "bytes": 470,
+          "file": "src/main.ts",
+          "readBytes": 469
+        }
+      ],
+      "wallMs": 9084,
+      "answer": [
+        "src/main.ts:main",
+        "src/services/api.ts:ApiClient.get",
+        "src/services/api.ts:ApiClient.request"
+      ]
+    },
+    {
+      "task": "ts-03",
+      "startedAt": 1795326456706,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 498,
+          "file": "src/components/Button.tsx",
+          "readBytes": 497
+        },
+        {
+          "action": "shell",
+          "bytes": 641
+        }
+      ],
+      "wallMs": 3546,
+      "answer": [
+        "src/components/Button.tsx:Button",
+        "src/utils/text.ts:slug"
+      ]
+    },
+    {
+      "task": "ts-04",
+      "startedAt": 1795326460453,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 1058
+        }
+      ],
+      "wallMs": 2795,
+      "answer": [
+        "src/utils/date.ts:joinParts"
+      ]
+    },
+    {
+      "task": "ts-05",
+      "startedAt": 1795326463433,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 185,
+          "file": "src/legacy.js",
+          "readBytes": 184
+        },
+        {
+          "action": "shell",
+          "bytes": 65
+        }
+      ],
+      "wallMs": 2774,
+      "answer": [
+        "src/legacy.js:legacyPath",
+        "src/utils/text.ts:slug"
+      ]
+    },
+    {
+      "task": "ts-06",
+      "startedAt": 1795326466401,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 75
+        }
+      ],
+      "wallMs": 2735,
+      "answer": [
+        "src/services/api.ts:API_URL"
+      ]
+    },
+    {
+      "task": "ts-07",
+      "startedAt": 1795326469334,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 411
+        }
+      ],
+      "wallMs": 3702,
+      "answer": [
+        "src/main.ts:main",
+        "src/utils/date.ts:pad"
+      ]
+    },
+    {
+      "task": "py-01",
+      "startedAt": 1795326473244,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 390
+        }
+      ],
+      "wallMs": 2931,
+      "answer": [
+        "app/models.py:Invoice.total"
+      ]
+    },
+    {
+      "task": "py-02",
+      "startedAt": 1795326476369,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 598
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 522
+        }
+      ],
+      "wallMs": 4709,
+      "answer": [
+        "app/cli.py:main",
+        "app/services/billing.py:charge",
+        "app/services/tax.py:rate"
+      ]
+    },
+    {
+      "task": "py-03",
+      "startedAt": 1795326481258,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 500
+        }
+      ],
+      "wallMs": 2654,
+      "answer": [
+        "app/services/tax.py:fetch_rates"
+      ]
+    },
+    {
+      "task": "py-04",
+      "startedAt": 1795326484099,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 500
+        },
+        {
+          "action": "read",
+          "bytes": 311,
+          "file": "app/models.py",
+          "readBytes": 310
+        }
+      ],
+      "wallMs": 5226,
+      "answer": [
+        "app/models.py:Customer.display"
+      ]
+    },
+    {
+      "task": "py-05",
+      "startedAt": 1795326489504,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 376
+        }
+      ],
+      "wallMs": 2553,
+      "answer": [
+        "tests/test_billing.py:test_charge",
+        "app/services/billing.py:charge"
+      ]
+    },
+    {
+      "task": "py-06",
+      "startedAt": 1795326492238,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 502
+        }
+      ],
+      "wallMs": 2711,
+      "answer": [
+        "app/services/tax.py:TAX_RATE_ENV"
+      ]
+    },
+    {
+      "task": "py-07",
+      "startedAt": 1795326495149,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 371
+        }
+      ],
+      "wallMs": 2635,
+      "answer": [
+        "app/cli.py:main",
+        "app/models.py:Customer.parse"
+      ]
+    },
+    {
+      "task": "edit-01",
+      "startedAt": 1795326497965,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 189,
+          "file": "src/utils/text.ts",
+          "readBytes": 89
+        },
+        {
+          "action": "shell",
+          "bytes": 346
+        }
+      ],
+      "wallMs": 6333,
+      "patch": "diff --git a/src/utils/text.ts b/src/utils/text.ts\nindex dacdcc3..13d6918 100644\n--- a/src/utils/text.ts\n+++ b/src/utils/text.ts\n@@ -1,5 +1,5 @@\n export function slug(text: string): string {\n-  return text.toLowerCase().replace(/\\s+/g, '-');\n+  return text.trim().toLowerCase().replace(/\\s+/g, '-');\n }\n \n export type Casing = 'upper' | 'lower';\n"
+    },
+    {
+      "task": "edit-02",
+      "startedAt": 1795326504494,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 321,
+          "file": "app/cli.py",
+          "readBytes": 320
+        },
+        {
+          "action": "shell",
+          "bytes": 562
+        }
+      ],
+      "wallMs": 7913,
+      "patch": "diff --git a/app/cli.py b/app/cli.py\nindex d03b5bd..af8a6aa 100644\n--- a/app/cli.py\n+++ b/app/cli.py\n@@ -7,7 +7,13 @@ from app.services import tax\n def main(argv=None):\n     inv = m.Invoice(\"c1\", [1.0, 2.0])\n     print(charge(inv, region=\"us\"), tax.rate(\"us\"))\n-    cust = m.Customer.parse(argv or sys.argv[1])\n+    if not argv:\n+        raw = sys.argv[1]\n+    elif isinstance(argv, (list, tuple)):\n+        raw = argv[0]\n+    else:\n+        raw = argv\n+    cust = m.Customer.parse(raw)\n     return cust\n \n \n"
+    },
+    {
+      "task": "edit-03",
+      "startedAt": 1795326512596,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 677,
+          "file": "src/utils/date.ts",
+          "readBytes": 676
+        },
+        {
+          "action": "shell",
+          "bytes": 464
+        }
+      ],
+      "wallMs": 6609,
+      "patch": "diff --git a/src/utils/date.ts b/src/utils/date.ts\nindex 1e18c6e..9170167 100644\n--- a/src/utils/date.ts\n+++ b/src/utils/date.ts\n@@ -16,7 +16,7 @@ function pad(n: number, width = 2): string {\n }\n \n export function joinParts(sep: string, ...parts: string[]): string {\n-  return parts.map((p) => pad(Number(p))).join(sep);\n+  return parts.map((p) => (p.trim() !== '' && Number.isFinite(Number(p)) ? pad(Number(p)) : p)).join(sep);\n }\n \n export { pad as padNumber };\n"
+    },
+    {
+      "task": "edit-04",
+      "startedAt": 1795326519429,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 329,
+          "file": "app/models.py",
+          "readBytes": 329
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 338,
+          "file": "app/services/billing.py",
+          "readBytes": 229
+        },
+        {
+          "action": "shell",
+          "bytes": 441
+        }
+      ],
+      "wallMs": 7169,
+      "patch": "diff --git a/app/models.py b/app/models.py\nindex 46231f4..7e4e40f 100644\n--- a/app/models.py\n+++ b/app/models.py\n@@ -11,9 +11,10 @@ class Invoice:\n     customer_id: str\n     amounts: List[float] = field(default_factory=list)\n     currency: str = DEFAULT_CURRENCY\n+    discount: float = 0.0\n \n     def total(self) -> float:\n-        return sum(self.amounts)\n+        return sum(self.amounts) - self.discount\n \n \n class Customer:\n"
+    },
+    {
+      "task": "edit-05",
+      "startedAt": 1795326526800,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 791,
+          "file": "src/services/api.ts",
+          "readBytes": 791
+        },
+        {
+          "action": "shell",
+          "bytes": 1008
+        }
+      ],
+      "wallMs": 6832,
+      "patch": "diff --git a/src/services/api.ts b/src/services/api.ts\nindex 75dd31b..28ce98d 100644\n--- a/src/services/api.ts\n+++ b/src/services/api.ts\n@@ -7,7 +7,7 @@ const CONFIG_KEY = 'services.api.timeout';\n export class ApiClient {\n   private token: string | null = null;\n \n-  constructor(private readonly base: string, timeout?: number) {}\n+  constructor(private readonly base: string, private readonly timeout?: number) {}\n \n   static create(): ApiClient {\n     return new ApiClient(API_URL);\n@@ -20,7 +20,9 @@ export class ApiClient {\n \n   private request(method: string, url: string, body?: unknown): Promise<string> {\n     const key = process.env.API_TOKEN ?? '';\n-    return fetch(url, { method, headers: { key, cfg: CONFIG_KEY } }).then((r) => r.text());\n+    const init: RequestInit = { method, headers: { key, cfg: CONFIG_KEY } };\n+    if (this.timeout !== undefined) init.signal = AbortSignal.timeout(this.timeout);\n+    return fetch(url, init).then((r) => r.text());\n   }\n \n   label(name: string): string {\n"
+    },
+    {
+      "task": "edit-06",
+      "startedAt": 1795326533832,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 205,
+          "file": "app/services/tax.py",
+          "readBytes": 204
+        },
+        {
+          "action": "shell",
+          "bytes": 381
+        }
+      ],
+      "wallMs": 7648,
+      "patch": "diff --git a/app/services/tax.py b/app/services/tax.py\nindex 0a636a6..11e68a1 100644\n--- a/app/services/tax.py\n+++ b/app/services/tax.py\n@@ -8,4 +8,6 @@ def rate(region, default=0.2):\n \n \n async def fetch_rates(*regions, **opts):\n+    if \"default\" in opts:\n+        return [rate(r, default=opts[\"default\"]) for r in regions]\n     return [rate(r) for r in regions]\n"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { AFTER_REVISION, ROUND2_REVISION, ROUND3_REVISION, ROUND4_REVISION, comparisonCharts, generateComparison, loadComparison, sections, tableRows } from './bench-comparison.mjs';
+import { AFTER_REVISION, ROUND2_REVISION, ROUND3_REVISION, ROUND4_REVISION, ROUND5_REVISION, comparisonCharts, generateComparison, loadComparison, sections, tableRows } from './bench-comparison.mjs';
 import { options } from './bench-combine-v2.mjs';
 import { combine, validateCaptures } from './bench-combine.mjs';
 
@@ -23,7 +23,7 @@ function fixture() {
 function seedAfter(dir, transform = (report) => report, version = 'v2') {
   for (const suite of ['nav', 'long-horizon']) {
     const report = JSON.parse(read(path.join(dir, 'bench', suite, 'results/combined.json')));
-    for (const capture of report[0].evidence.captures) capture.captureRevision = ({ v2: AFTER_REVISION, v3: ROUND2_REVISION, v4: ROUND3_REVISION, v5: ROUND4_REVISION })[version];
+    for (const capture of report[0].evidence.captures) capture.captureRevision = ({ v2: AFTER_REVISION, v3: ROUND2_REVISION, v4: ROUND3_REVISION, v5: ROUND4_REVISION, v6: ROUND5_REVISION })[version];
     const target = path.join(dir, 'bench', suite, version, 'results');
     mkdirSync(target, { recursive: true });
     writeFileSync(path.join(target, 'combined.json'), JSON.stringify(transform(report)));
@@ -49,9 +49,9 @@ test('v3 option selects isolated directories and the round-2 build revision rega
   assert.equal(config.navBuild, '/build');
   assert.equal(config.lhBuild, '/build');
   assert.equal(options(['--experiment', 'v3', '--nav-captures', '/nav3']).navCaptures, '/nav3');
-  assert.throws(() => options(['--experiment', 'v6']), /Use/);
+  assert.throws(() => options(['--experiment', 'v7']), /Use/);
   assert.throws(() => combine({ ...config, runs: 3 }), /eight runs/);
-  assert.throws(() => combine({ ...config, experiment: 'v6' }), /Unknown experiment/);
+  assert.throws(() => combine({ ...config, experiment: 'v7' }), /Unknown experiment/);
   assert.throws(() => validateCaptures(path.join(root, 'bench/nav/v2/observations'), 'nav', 8, ROUND2_REVISION), /provenance/);
 });
 test('v4 option selects isolated directories and requires the round-3 build revision', () => {
@@ -90,21 +90,21 @@ test('round 4 is pending while all eight published rows, including real round 3 
       reports.push(path.join(dir, file));
     }
     const before = reports.map(read);
-    const expected = tableRows(loadComparison().filter((row) => row.experiment !== 'round4'));
+    const expected = tableRows(loadComparison().filter((row) => !['round4', 'round5'].includes(row.experiment)));
     const rows = generateComparison(dir);
-    assert.deepEqual(tableRows(rows.filter((row) => row.experiment !== 'round4')), expected);
+    assert.deepEqual(tableRows(rows.filter((row) => !['round4', 'round5'].includes(row.experiment))), expected);
     const pending = tableRows(rows.filter((row) => row.experiment === 'round4'));
     assert.equal(pending.length, 2);
     for (const row of pending) assert.deepEqual(row.slice(1), ['Pending', 'Pending', 'Pending', 'Pending']);
     for (const content of Object.values(sections(rows))) {
-      assert.match(content, /Round 4 at 6f242a6 results are pending/);
+      assert.match(content, /Round 4 at 6f242a6 and Round 5 at 2183b1b results are pending/);
       assert.match(content, /now default-off behind navigation.experimentalReadPaths/);
       assert.match(content, /V4 workflow session notes/);
       assert.match(content, /-73.5% \[-98.1, -35.4\]/);
     }
     for (const [name, chart] of Object.entries(comparisonCharts(rows))) {
-      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, name === 'wall' ? 4 : 2);
-      assert.match(chart, /Five experiments/);
+      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, name === 'wall' ? 8 : 4);
+      assert.match(chart, /Six experiments/);
       assert.doesNotMatch(chart, /NaN|undefined/);
       const height = Number(chart.match(/height="(\d+)"/)[1]);
       for (const [, y] of chart.matchAll(/<text x="[^"]+" y="([^"]+)"/g)) assert.ok(Number(y) < height - 10);
@@ -113,12 +113,60 @@ test('round 4 is pending while all eight published rows, including real round 3 
     for (const suite of ['nav', 'long-horizon']) assert.equal(existsSync(path.join(dir, 'bench', suite, 'v5')), false);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+test('v6 selects the round-5 pin with isolated destinations and rejects earlier capture provenance', () => {
+  const config = options(['--build', '/round5-build', '--experiment', 'v6']);
+  assert.equal(config.experiment, 'v6');
+  assert.equal(config.captureRevision, ROUND5_REVISION);
+  assert.equal(config.navCaptures, path.join(root, 'bench/nav/v6/observations'));
+  assert.equal(config.lhCaptures, path.join(root, 'bench/long-horizon/v6/observations'));
+  assert.equal(config.navBuild, '/round5-build');
+  assert.equal(config.lhBuild, '/round5-build');
+  assert.equal(options(['--experiment', 'v6']).navBuild, root);
+  assert.equal(options(['--nav-captures', '/nav3-inputs', '--lh-captures', '/lh3-inputs', '--experiment', 'v6']).lhCaptures, '/lh3-inputs');
+  assert.throws(() => combine({ ...config, runs: 3 }), /eight runs/);
+  assert.throws(() => validateCaptures(path.join(root, 'bench/nav/v5/observations'), 'nav', 8, ROUND5_REVISION), /provenance/);
+});
+test('round 5 is pending while all ten published rows and earlier reports remain unchanged', () => {
+  const dir = fixture();
+  try {
+    const reports = [];
+    for (const suite of ['nav', 'long-horizon']) for (const version of ['', 'v2', 'v3', 'v4', 'v5']) {
+      const file = path.join('bench', suite, version, 'results/combined.json');
+      mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
+      cpSync(path.join(root, file), path.join(dir, file));
+      reports.push(path.join(dir, file));
+    }
+    const before = reports.map(read);
+    const expected = tableRows(loadComparison().filter((row) => row.experiment !== 'round5'));
+    const rows = generateComparison(dir);
+    assert.deepEqual(tableRows(rows.filter((row) => row.experiment !== 'round5')), expected);
+    const pending = tableRows(rows.filter((row) => row.experiment === 'round5'));
+    assert.equal(pending.length, 2);
+    for (const row of pending) assert.deepEqual(row.slice(1), ['Pending', 'Pending', 'Pending', 'Pending']);
+    for (const content of Object.values(sections(rows))) {
+      assert.match(content, /Round 5 at 2183b1b results are pending/);
+      assert.match(content, /V4 workflow session notes/);
+      assert.match(content, /V5 workflow session notes/);
+      assert.match(content, /now default-off behind navigation.experimentalReadPaths/);
+      assert.match(content, /graph-cache clones/);
+      assert.match(content, /measured at 2183b1b and are not shipped on main because they did not demonstrate a performance win/);
+      assert.doesNotMatch(content, /V6 workflow session notes/);
+    }
+    for (const [name, chart] of Object.entries(comparisonCharts(rows))) {
+      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, name === 'wall' ? 4 : 2);
+      assert.match(chart, /Six experiments/);
+      assert.doesNotMatch(chart, /NaN|undefined/);
+    }
+    assert.deepEqual(reports.map(read), before);
+    for (const suite of ['nav', 'long-horizon']) assert.equal(existsSync(path.join(dir, 'bench', suite, 'v6')), false);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
 test('empty after state is explicitly pending; generated prose/charts match saved data', () => {
   const dir = fixture();
   try {
     const rows = generateComparison(dir);
-    assert.equal(rows.filter((r) => !r.summary).length, 8);
-    assert.match(sections(rows).markdown, /round 1 and round 2 and Round 3 at ff57851 and Round 4 at 6f242a6 results are pending/);
+    assert.equal(rows.filter((r) => !r.summary).length, 10);
+    assert.match(sections(rows).markdown, /round 1 and round 2 and Round 3 at ff57851 and Round 4 at 6f242a6 and Round 5 at 2183b1b results are pending/);
     const expected = sections(loadComparison());
     assert.ok(read(path.join(root, 'README.md')).includes(expected.markdown));
     assert.ok(read(path.join(root, 'website/public/benchmarks.html')).includes(expected.html));
@@ -127,7 +175,7 @@ test('empty after state is explicitly pending; generated prose/charts match save
     }
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
-test('old eight-run reports in synthetic v2/v3/v4/v5 layouts populate every comparison cell without changing before', () => {
+test('old eight-run reports in synthetic v2/v3/v4/v5/v6 layouts populate every comparison cell without changing before', () => {
   const dir = fixture();
   try {
     const before = read(path.join(dir, 'bench/nav/results/combined.json'));
@@ -135,18 +183,13 @@ test('old eight-run reports in synthetic v2/v3/v4/v5 layouts populate every comp
     seedAfter(dir, undefined, 'v3');
     seedAfter(dir, undefined, 'v4');
     seedAfter(dir, undefined, 'v5');
+    seedAfter(dir, undefined, 'v6');
     const rows = generateComparison(dir), cells = tableRows(rows);
     assert.equal(cells[0][1], '240/240 / 240/240');
     assert.deepEqual(cells[0].slice(1), cells[1].slice(1));
-    assert.equal(cells.length, 10);
-    assert.deepEqual(cells[1].slice(1), cells[2].slice(1));
-    assert.deepEqual(cells[2].slice(1), cells[3].slice(1));
-    assert.deepEqual(cells[3].slice(1), cells[4].slice(1));
-    assert.deepEqual(cells[5].slice(1), cells[6].slice(1));
-    assert.deepEqual(cells[6].slice(1), cells[7].slice(1));
-    assert.deepEqual(cells[7].slice(1), cells[8].slice(1));
-    assert.deepEqual(cells[8].slice(1), cells[9].slice(1));
-    assert.equal(cells[9][2], '-63.2% [-86.1, -38.6]');
+    assert.equal(cells.length, 12);
+    for (const start of [0, 6]) for (let i = 1; i < 6; i++) assert.deepEqual(cells[start].slice(1), cells[start + i].slice(1));
+    assert.equal(cells[11][2], '-63.2% [-86.1, -38.6]');
     for (const cell of cells.flat()) {
       assert.ok(read(path.join(dir, 'README.md')).includes(cell));
       assert.ok(read(path.join(dir, 'website/public/benchmarks.html')).includes(cell));
@@ -173,29 +216,29 @@ test('old eight-run reports in synthetic v2/v3/v4/v5 layouts populate every comp
     assert.equal(existsSync(path.join(dir, 'docs/assets/bench/copied-code.svg')), false);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
-test('completed round 1 remains published while rounds 2, 3 and 4 are pending in both suites and charts', () => {
+test('completed round 1 remains published while rounds 2, 3, 4 and 5 are pending in both suites and charts', () => {
   const dir = fixture();
   try {
     seedAfter(dir);
     const v2 = read(path.join(dir, 'bench/nav/v2/results/combined.json'));
     const rows = generateComparison(dir);
-    assert.deepEqual(rows.map((row) => Boolean(row.summary)), [true, true, false, false, false, true, true, false, false, false]);
+    assert.deepEqual(rows.map((row) => Boolean(row.summary)), [true, true, false, false, false, false, true, true, false, false, false, false]);
     const content = sections(rows);
-    assert.match(content.markdown, /round 2 and Round 3 at ff57851 and Round 4 at 6f242a6 results are pending/);
+    assert.match(content.markdown, /round 2 and Round 3 at ff57851 and Round 4 at 6f242a6 and Round 5 at 2183b1b results are pending/);
     assert.doesNotMatch(content.markdown, /no post-fix measurements/);
-    for (const revision of [AFTER_REVISION, ROUND2_REVISION, ROUND3_REVISION, ROUND4_REVISION]) assert.ok(content.markdown.includes(revision));
+    for (const revision of [AFTER_REVISION, ROUND2_REVISION, ROUND3_REVISION, ROUND4_REVISION, ROUND5_REVISION]) assert.ok(content.markdown.includes(revision));
     assert.match(content.markdown, /rg for trivial lookups, exact-first find_code, actionable-only find_similar/);
     assert.match(content.markdown, /baselines were re-collected at that round’s commit/);
     assert.equal(read(path.join(dir, 'bench/nav/v2/results/combined.json')), v2);
     assert.equal(existsSync(path.join(dir, 'bench/nav/v3/results/combined.json')), false);
     for (const chart of Object.values(comparisonCharts(rows))) {
-      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, chart.includes('wall time') ? 12 : 6);
+      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, chart.includes('wall time') ? 16 : 8);
       assert.match(chart, /round 2/);
       assert.doesNotMatch(chart, /NaN|undefined/);
     }
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
-test('rounds 3 and 4 stay pending while the first three experiments remain unchanged', () => {
+test('rounds 3, 4 and 5 stay pending while the first three experiments remain unchanged', () => {
   const dir = fixture();
   try {
     seedAfter(dir);
@@ -203,20 +246,20 @@ test('rounds 3 and 4 stay pending while the first three experiments remain uncha
     const reports = ['nav', 'long-horizon'].flatMap((suite) => ['', 'v2', 'v3'].map((version) => path.join(dir, 'bench', suite, version, 'results/combined.json')));
     const before = reports.map(read);
     const rows = generateComparison(dir);
-    assert.deepEqual(rows.map((row) => Boolean(row.summary)), [true, true, true, false, false, true, true, true, false, false]);
+    assert.deepEqual(rows.map((row) => Boolean(row.summary)), [true, true, true, false, false, false, true, true, true, false, false, false]);
     const pending = tableRows(rows).filter(([label]) => label.includes('Round 3 at ff57851'));
     assert.equal(pending.length, 2);
     for (const row of pending) assert.deepEqual(row.slice(1), ['Pending', 'Pending', 'Pending', 'Pending']);
     for (const content of Object.values(sections(rows))) {
-      assert.match(content, /Round 3 at ff57851 and Round 4 at 6f242a6 results are pending/);
+      assert.match(content, /Round 3 at ff57851 and Round 4 at 6f242a6 and Round 5 at 2183b1b results are pending/);
       assert.match(content, /no measurements for those experiments are published yet/);
       assert.match(content, /explore-first traces/);
       assert.match(content, /verification-only rereads/);
       assert.doesNotMatch(content, /V4 workflow session notes/);
     }
     for (const [name, chart] of Object.entries(comparisonCharts(rows))) {
-      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, name === 'wall' ? 8 : 4);
-      assert.match(chart, /Five experiments/);
+      assert.equal((chart.match(/Pending fresh eight-run results/g) ?? []).length, name === 'wall' ? 12 : 6);
+      assert.match(chart, /Six experiments/);
       assert.doesNotMatch(chart, /NaN|undefined/);
       const height = Number(chart.match(/height="(\d+)"/)[1]);
       for (const [, y] of chart.matchAll(/<text x="[^"]+" y="([^"]+)"/g)) assert.ok(Number(y) < height - 10);
@@ -295,6 +338,36 @@ test('partial, wrong-revision and inconsistent v5 reports cannot update publishe
     assert.throws(() => generateComparison(dir), /eight-run/);
     assert.deepEqual(pages.map(read), original);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+test('partial, wrong-revision and inconsistent v6 reports cannot update published pages', () => {
+  const dir = fixture();
+  try {
+    for (const version of ['v2', 'v3', 'v4', 'v5', 'v6']) seedAfter(dir, undefined, version);
+    const pages = ['README.md', 'website/public/benchmarks.html'].map((file) => path.join(dir, file));
+    const original = pages.map(read);
+    rmSync(path.join(dir, 'bench/nav/v6/results/combined.json'));
+    assert.throws(() => generateComparison(dir), /Both v6/);
+    seedAfter(dir, (reports) => { reports[0].evidence.captures[0].captureRevision = ROUND4_REVISION; return reports; }, 'v6');
+    assert.throws(() => generateComparison(dir), /v6 capture revision/);
+    seedAfter(dir, (reports) => { reports[0].summary.groundwork.wallMs++; return reports; }, 'v6');
+    assert.throws(() => generateComparison(dir), /Inconsistent/);
+    seedAfter(dir, (reports) => { reports[0].summary.runs = 3; return reports; }, 'v6');
+    assert.throws(() => generateComparison(dir), /eight-run/);
+    assert.deepEqual(pages.map(read), original);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+test('v6 deviations accompany completed round 5 only, with earlier disclosures retained', () => {
+  const rows = loadComparison();
+  for (const content of Object.values(sections(rows))) {
+    assert.match(content, /this publication does not ship the graph cache, callee_depth traces, relay bundle or associated guidance changes/);
+    for (const pattern of [/V6 workflow session notes/, /rg directly outside the capture wrapper/, /invalid read_symbols call/, /shared sorting helpers without similarity checks/, /repeated the unchanged normalizeEmail body/]) {
+      assert.match(content, pattern);
+      assert.match(read(path.join(root, 'bench/COMBINE.md')), pattern);
+    }
+    assert.match(content, /V4 workflow session notes/);
+    assert.match(content, /V5 workflow session notes/);
+  }
+  for (const content of Object.values(sections(rows.filter((row) => row.experiment !== 'round5')))) assert.doesNotMatch(content, /V6 workflow session notes/);
 });
 test('interpretation calls out wins and losses only when intervals exclude zero', () => {
   const row = loadComparison().find((row) => row.experiment === 'round3');

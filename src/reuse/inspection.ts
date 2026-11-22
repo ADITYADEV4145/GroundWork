@@ -28,9 +28,9 @@ export function inspectSource(source: string, language: Language) {
           plainReference(expression.childForFieldName('left')) && plainReference(expression.childForFieldName('right')))))
         trivialAccessors.push({ start: n.startIndex, end: n.endIndex });
     }
-    if (['number', 'integer', 'float', 'string'].includes(n.type)) {
+    if (['number', 'integer', 'float', 'string', 'int_literal', 'float_literal', 'integer_literal', 'real_literal', 'decimal_integer_literal', 'decimal_floating_point_literal', 'hex_integer_literal', 'octal_integer_literal', 'binary_integer_literal'].includes(n.type)) {
       let context = n.parent;
-      while (context && !['variable_declarator', 'assignment', 'pair', 'keyword_argument', 'call', 'call_expression', 'return_statement',
+      while (context && !['variable_declarator', 'var_spec', 'const_spec', 'short_var_declaration', 'assignment_statement', 'let_declaration', 'assignment', 'pair', 'keyword_argument', 'call', 'call_expression', 'return_statement',
         'required_parameter', 'optional_parameter', 'default_parameter', 'typed_default_parameter'].includes(context.type)) context = context.parent;
       const label = context?.childForFieldName('name') ?? context?.childForFieldName('pattern') ?? context?.childForFieldName('left') ??
         context?.childForFieldName('key') ?? context?.childForFieldName('function');

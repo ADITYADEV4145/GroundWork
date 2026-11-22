@@ -37,6 +37,18 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('reports importers broken by an export-alias-only rename or removal', async () => {
+    for (const replacement of ['export { local as renamed };', 'export {};']) {
+      const root = fixture();
+      const declaration = 'function local(value: string): string { return value; }\n';
+      writeFileSync(path.join(root, 'api.ts'), declaration + 'export { local as parse };\n');
+      git(root, 'add', 'api.ts'); git(root, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Export alias');
+      writeFileSync(path.join(root, 'api.ts'), declaration + replacement + '\n');
+      const report = await run(root);
+      expect(report.symbols).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'local', signatureChanged: true, risk: 'high', callers: expect.arrayContaining([expect.objectContaining({ file: 'caller.ts' })]) })]));
+      expect(report.complete).toBe(false);
+    }
+  });
   it('finds aliased default-import callers after deleting a default export', async () => {
     const root = fixture();
     writeFileSync(path.join(root, 'api.ts'), 'export default function parse(value: string): string { return value; }\n');

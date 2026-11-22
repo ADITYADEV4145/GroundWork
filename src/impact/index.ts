@@ -47,39 +47,43 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
     const names = new Set<string>();
     const unresolvedImports = state.imports.filter((i) => !i.target && i.unresolvedReason !== 'external');
     await initParsers(); check();
-    const selected: { symbol: typeof state.symbols[number]; deleted: boolean; signatureChanged: boolean }[] = [];
+    const selected: { symbol: typeof state.symbols[number]; deleted: boolean; signatureChanged: boolean; exportNames: string[] }[] = [];
     for (const file of paths) {
       check();
       if (path.isAbsolute(file) || file.split(/[\\/]/).includes('..')) { reasons.add('unsafe changed path'); continue; }
       const language = languageForPath(file); if (!language) continue;
       let prior: ExtractedSymbol[] = [];
       let priorText = '';
+      let priorAliases: { local: string; exported: string }[] = [];
       try {
         const source = git('show', `${base}:${file}`);
         priorText = source;
         if (Buffer.byteLength(source) > options.config.index.maxFileBytes) { reasons.add(`base file too large: ${file}`); continue; }
         const parsed = adapterFor(language).extract(source, language);
-        prior = parsed.symbols; if (parsed.hasErrors) reasons.add(`unparsed base file: ${file}`);
+        prior = parsed.symbols; priorAliases = parsed.exportAliases; if (parsed.hasErrors) reasons.add(`unparsed base file: ${file}`);
       } catch {
         if (git('ls-tree', '--name-only', base, '--', file).trim()) reasons.add(`base unavailable: ${file}`);
       }
       const now = state.symbols.filter((s) => s.file === file);
       const currentText = existsSync(path.join(root, file)) ? readFileSync(path.join(root, file), 'utf8') : '';
+      const currentAliases = adapterFor(language).extract(currentText, language).exportAliases;
+      const aliases = (entries: typeof priorAliases, name: string) => entries.filter((a) => a.local === name).map((a) => a.exported).sort();
       if (new Set(now.map(key)).size !== now.length || new Set(prior.map(key)).size !== prior.length) reasons.add(`ambiguous symbol declarations: ${file}`);
       const ranges = changed.find((c) => c.file === file)?.ranges ?? [];
       for (const s of now) {
         const old = prior.find((p) => key(p) === key(s));
-        const signatureChanged = !!old && signature(s) !== signature(old);
+        const exportNames = aliases(priorAliases, s.name);
+        const signatureChanged = !!old && (signature(s) !== signature(old) || JSON.stringify(exportNames) !== JSON.stringify(aliases(currentAliases, s.name)));
         const bodyChanged = !options.changed && old && priorText.slice(old.startByte, old.endByte) !== currentText.slice(s.startByte, s.endByte);
-        if (bodyChanged || signatureChanged || changed.some((c) => c.file === file && c.ranges === null) || ranges.some(([a, b]) => s.line <= b && s.endLine >= a)) selected.push({ symbol: s, deleted: false, signatureChanged });
+        if (bodyChanged || signatureChanged || changed.some((c) => c.file === file && c.ranges === null) || ranges.some(([a, b]) => s.line <= b && s.endLine >= a)) selected.push({ symbol: { ...s, exported: s.exported || !!old?.exported }, deleted: false, signatureChanged, exportNames });
       }
       for (const old of prior.filter((s) => !now.some((n) => key(n) === key(s)))) selected.push({
-        symbol: { ...old, id: `base:${file}:${key(old)}`, file, fileId: -1, line: old.startLine, endLine: old.endLine, parentId: null }, deleted: true, signatureChanged: true,
+        symbol: { ...old, id: `base:${file}:${key(old)}`, file, fileId: -1, line: old.startLine, endLine: old.endLine, parentId: null }, deleted: true, signatureChanged: true, exportNames: aliases(priorAliases, old.name),
       });
       if (discovered.has(file) && !files.has(file)) reasons.add(`changed file unindexed: ${file}`);
     }
     const selectedIds = new Set(selected.map((s) => s.symbol.id));
-    for (const { symbol } of selected) names.add(symbol.name.split('.').at(-1)!);
+    for (const { symbol, exportNames } of selected) { names.add(symbol.name.split('.').at(-1)!); exportNames.forEach((name) => names.add(name)); }
     const virtualFiles = state.files.map((f) => ({ id: f.id, path: f.file, language: languageForPath(f.file) }));
     for (const file of new Set(selected.filter((s) => s.deleted).map((s) => s.symbol.file))) {
       if (!files.has(file)) virtualFiles.push({ id: -(virtualFiles.length + 1), path: file, language: languageForPath(file) });
@@ -91,7 +95,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
     }
     const byId = new Map(state.symbols.map((s) => [s.id, s]));
     const test = (file: string): ImpactTest => ({ file, ran: evidence.ran(file), command: testCommand(root, file) });
-    for (const { symbol: s, deleted, signatureChanged } of selected) {
+    for (const { symbol: s, deleted, signatureChanged, exportNames } of selected) {
       check();
       const callers = new Map<string, ImpactCaller>(), tests = new Set<string>();
       const seen = new Set([s.id]);
@@ -100,7 +104,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
         if (c.calleeId === target.id) return true;
         const terminal = c.calleeText.split('.').at(-1);
         if ((!c.calleeId || c.confidence === 'name-only') && terminal === target.name) return true;
-        return deleted && target.id === s.id && state.imports.some((i) => i.file === c.file && i.target === s.file && (i.name === s.name || (s.isDefaultExport && i.name === 'default')) && (i.alias ?? i.name) === c.calleeText);
+        return (deleted || signatureChanged) && target.id === s.id && state.imports.some((i) => i.file === c.file && i.target === s.file && (i.name === s.name || exportNames.includes(i.name) || (s.isDefaultExport && i.name === 'default')) && (i.alias ?? i.name) === c.calleeText);
       });
       for (let depth = 1; depth <= options.config.impact.depth && frontier.length; depth++) {
         const next: typeof frontier = [];

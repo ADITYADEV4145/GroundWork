@@ -31,8 +31,10 @@ if (command === 'hook' && process.argv.length === 5 &&
   }
   process.exitCode = 0;
 } else if (command === 'mcp' && process.argv.length === 3) {
-  const { runMcp } = await import('../mcp/relay.js');
-  await runMcp();
+  let relay: typeof import('../mcp/relay.js');
+  try { relay = nodeModule.createRequire(import.meta.url)('../mcp/relay.bundle.cjs') as typeof relay; }
+  catch { relay = await import('../mcp/relay.js'); }
+  await relay.runMcp();
 } else if (command === '__mcp_service' && process.argv.length === 4) {
   const { runService } = await import('../mcp/daemon.js');
   await runService(agent!);

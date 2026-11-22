@@ -21,3 +21,14 @@ MRR retrieval horizon: search API returns at most 100 hits; baseline uses its fu
 Full returned ID lists and per-task ranks are retained in results.json.
 Limitations: small author-written corpus; behavior paraphrases are not an independent user sample.
 V1 remains FAIL. V2 ranking used v1 failures, not v2 outcomes. PREREGISTRATION-v2-main.md supersedes the unrun old-main anchor without query changes.
+
+## Post-run corrections
+
+The table above measured commit `b8c3935`'s ranking. It is preserved as the
+historical v2 result, not a measurement of subsequent fixes. Synonym expansion
+now stems once rather than re-stemming normalized terms: `settings` previously
+became `setting` then `set`, losing configuration synonyms. This changes ranking
+for settings-like double stems. By inspection only, task `v2-p37` contains
+`settings` ("fill missing settings from a named preset without overriding explicit values").
+The correction is not re-measured; no v2 evaluation was repeated and the frozen
+tasks and raw results remain unchanged.

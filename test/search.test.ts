@@ -45,8 +45,12 @@ describe('plain-English search', () => {
   });
   it('lightly stems retry inflections and symmetrically expands curated vocabulary', () => {
     expect(['retries', 'retrying', 'retried'].map(stemTerm)).toEqual(['retry', 'retry', 'retry']);
-    expect(alternatives('remove')).toContain(stemTerm('delete'));
-    expect(alternatives('delete')).toContain(stemTerm('remove'));
+    expect(alternatives(stemTerm('remove'))).toContain(stemTerm('delete'));
+    expect(alternatives(stemTerm('delete'))).toContain(stemTerm('remove'));
+    const settings = terms('settings')[0]!;
+    expect(settings).toBe('setting');
+    expect(alternatives(settings)).toEqual(expect.arrayContaining(['config', 'setting']));
+    expect(alternatives(settings)).not.toContain('set');
     expect(['parse', 'parsed', 'parsing'].map(stemTerm)).toEqual(['pars', 'pars', 'pars']);
     expect(['delete', 'deleted', 'deleting'].map(stemTerm)).toEqual(['delet', 'delet', 'delet']);
     expect(alternatives('fetch')).toEqual(expect.arrayContaining(['get', 'load', 'request']));

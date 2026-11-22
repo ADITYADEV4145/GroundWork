@@ -40,9 +40,8 @@ export function terms(text: string, dropStopwords = true): string[] {
 }
 
 const synonyms = GROUPS.map((g) => terms(g, false));
-export function alternatives(term: string): string[] {
-  const normalized = stemTerm(term);
-  return [...new Set([normalized, ...synonyms.filter((g) => g.includes(normalized)).flat()])];
+export function alternatives(normalizedTerm: string): string[] {
+  return [...new Set([normalizedTerm, ...synonyms.filter((g) => g.includes(normalizedTerm)).flat()])];
 }
 
 export function reciprocalRankFusion(rankings: string[][], k = 60): { id: string; score: number }[] {

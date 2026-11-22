@@ -10,6 +10,13 @@ const file = (id: number, path: string, language: string): FileInfo => ({ id, pa
 const symbol = (id: string, fileId: number, name: string, parentId: string | null = null): AdditionalSymbol => ({ id, fileId, name, qualifiedName: name, kind: parentId ? 'method' : 'function', parentId });
 
 describe('additional language resolution', () => {
+  it('resolves parent-relative Go packages without escaping the repo', () => {
+    const from = file(1, 'app/main.go', 'go');
+    const resolver = new AdditionalResolver('/missing', [from, file(2, 'store/store.go', 'go'), file(3, '../store/outside.go', 'go')]);
+    expect(resolver.targets(from, im('../store', 'store')).map((f) => f.id)).toEqual([2]);
+    expect(resolver.targets(from, im('../../store', 'store'))).toEqual([]);
+    expect(resolver.targets(from, im('/store', 'store'))).toEqual([]);
+  });
   it('does not use sibling methods for chained receivers', () => {
     const from = file(1, 'App.java', 'java');
     const resolver = new AdditionalResolver('/missing', [from]);

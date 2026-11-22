@@ -35,8 +35,9 @@ export class AdditionalResolver {
     if (from.language === 'go') {
       const dirs = new Set(this.files.filter((f) => f.language === 'go').map((f) => path.posix.dirname(f.path)));
       const local = this.module && (im.module === this.module || im.module.startsWith(this.module + '/')) ? im.module.slice(this.module.length).replace(/^\//, '') || '.' : null;
-      if (local === null && (this.module || !im.module.startsWith('./'))) return [];
+      if (local === null && (this.module || !/^\.\.?\//.test(im.module))) return [];
       const target = local ?? path.posix.normalize(path.posix.join(path.posix.dirname(from.path), im.module));
+      if (target === '..' || target.startsWith('../') || path.posix.isAbsolute(target)) return [];
       const matches = [...dirs].filter((d) => d === target);
       if (matches.length !== 1) return [];
       return this.files.filter((f) => f.language === 'go' && path.posix.dirname(f.path) === matches[0]);

@@ -10,6 +10,13 @@ const file = (id: number, path: string, language: string): FileInfo => ({ id, pa
 const symbol = (id: string, fileId: number, name: string, parentId: string | null = null): AdditionalSymbol => ({ id, fileId, name, qualifiedName: name, kind: parentId ? 'method' : 'function', parentId });
 
 describe('additional language resolution', () => {
+  it('does not use sibling methods for chained receivers', () => {
+    const from = file(1, 'App.java', 'java');
+    const resolver = new AdditionalResolver('/missing', [from]);
+    const syms = [symbol('caller', 1, 'Call', 'app'), symbol('run', 1, 'Run', 'app')];
+    expect(resolver.resolveCall(from, 'caller', 'this.worker.Run', 'Run', [], syms)).toBeNull();
+    expect(resolver.resolveCall(from, 'caller', 'this.Run', 'Run', [], syms)).toEqual({ id: 'run', conf: 'exact' });
+  });
   it('does not resolve external Go imports to local suffixes', () => {
     const root = mkdtempSync(path.join(os.tmpdir(), 'gw-module-'));
     const from = file(1, 'main.go', 'go');

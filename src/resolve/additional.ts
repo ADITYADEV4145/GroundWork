@@ -75,7 +75,7 @@ export class AdditionalResolver {
     const named = same.filter((s) => s.name === name);
     const qualified = /\.|::/.test(text);
     const caller = same.find((s) => s.id === callerId);
-    if (/^(this|self)\./.test(text) && caller?.parentId) return pick(named.filter((s) => s.parentId === caller.parentId), 'exact');
+    if (/^(this|self)\.[^.]+$/.test(text) && caller?.parentId) return pick(named.filter((s) => s.parentId === caller.parentId), 'exact');
     if (!qualified) {
       const local = named.filter((s) => s.fileId === from.id && (s.parentId === null || (caller?.parentId && s.parentId === caller.parentId)));
       if (local.length) return pick(local, 'exact');

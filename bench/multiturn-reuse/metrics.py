@@ -202,6 +202,15 @@ class CodeGraph:
         def visit(statement):
             if isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
                 return
+            if isinstance(statement, (ast.Assign, ast.AnnAssign, ast.AugAssign, ast.NamedExpr)):
+                if statement.value is not None:
+                    visit(statement.value)
+                targets = statement.targets if isinstance(statement, ast.Assign) else [statement.target]
+                for assigned in targets:
+                    visit(assigned)
+                return
+            if isinstance(statement, ast.Name) and isinstance(statement.ctx, (ast.Store, ast.Del)):
+                bindings[statement.id] = None
             if isinstance(statement, ast.If) and isinstance(statement.test, ast.Constant):
                 for child in (statement.body if statement.test.value else statement.orelse):
                     visit(child)

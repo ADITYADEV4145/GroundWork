@@ -7,6 +7,15 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_rebinding_a_local_import_invalidates_later_calls(self):
+        baseline={'src/pkg/helpers.py':'def canonical(x):\n    return x\n'}
+        for rebound in ['helper = lambda x: x', 'helper: object = lambda x: x', 'helper += other', 'del helper', '(helper := other)']:
+            code='def prepare(x):\n    from pkg.helpers import canonical as helper\n    '+rebound+'\n    return helper(x)\n'
+            with self.subTest(rebound=rebound):
+                self.assertNotIn(('src/pkg/helpers.py','canonical'),CodeGraph({**baseline,'src/feature.py':code}).reachable('src/feature.py','prepare'))
+        valid='def prepare(x):\n    from pkg.helpers import canonical as helper\n    result = helper(x)\n    helper = None\n    return result\n'
+        self.assertIn(('src/pkg/helpers.py','canonical'),CodeGraph({**baseline,'src/feature.py':valid}).reachable('src/feature.py','prepare'))
+
     def test_conditional_function_bodies_are_clone_sources(self):
         logic='\n'.join('        value = value + '+str(i) for i in range(30))+'\n        return value\n'
         source='if available:\n    def auto_wrap_for_ansi(value):\n'+logic

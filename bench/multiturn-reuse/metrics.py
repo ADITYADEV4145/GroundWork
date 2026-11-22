@@ -289,13 +289,15 @@ def all_bodies(files):
         def walk(nodes, scope=''):
             for node in nodes:
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    identity = scope + node.name
-                    occurrence = 2
+                    qualified = scope + node.name
+                    identity = qualified
+                    tokens = body_tokens(node, source)
+                    if (file, identity) in bodies:
+                        identity += '#' + hashlib.sha256('\x00'.join(tokens).encode()).hexdigest()
                     while (file, identity) in bodies:
-                        identity = scope + node.name + '#' + str(occurrence)
-                        occurrence += 1
-                    bodies[(file, identity)] = body_tokens(node, source)
-                    walk(node.body, identity + '.')
+                        identity += '#'
+                    bodies[(file, identity)] = tokens
+                    walk(node.body, qualified + '.')
                 elif isinstance(node, ast.ClassDef):
                     walk(node.body, scope + node.name + '.')
                 else:
@@ -313,6 +315,7 @@ class Trajectory:
             raise ValueError('Cannot parse pinned baseline: ' + repr(self.baseline_graph.invalid))
         self.repo_index = CloneIndex(self.baseline_graph.bodies)
         self.previous = {}
+        self.body_ids = set()
         self.history = {}
         self.created = {}
         self.capabilities = {}
@@ -324,6 +327,34 @@ class Trajectory:
         self.curves = []
         self.previous_loc = 0
 
+    def align_bodies(self, bodies):
+        remaining = dict(self.previous)
+        current = {}
+        pending = []
+
+        def binding(identity):
+            return identity[0], identity[1].split('#', 1)[0]
+
+        for identity, tokens in bodies.items():
+            previous = next((key for key, before in remaining.items()
+                             if binding(key) == binding(identity) and before == tokens), None)
+            if previous is None:
+                pending.append((identity, tokens))
+            else:
+                current[previous] = tokens
+                del remaining[previous]
+        for identity, tokens in pending:
+            previous = next((key for key in remaining if binding(key) == binding(identity)), None)
+            if previous is not None:
+                identity = previous
+                del remaining[previous]
+            else:
+                while identity in self.body_ids:
+                    identity = identity[0], identity[1] + '#'
+                self.body_ids.add(identity)
+            current[identity] = tokens
+        return current
+
     def advance(self, sources, step):
         if step != len(self.curves) + 1 or not 1 <= step <= 5:
             raise ValueError('Expected next turn, 1 through 5')
@@ -334,6 +365,7 @@ class Trajectory:
         for invalid in graph.invalid:
             if invalid in added:
                 current[(invalid, '<invalid>')] = normalized(added[invalid])
+        current = self.align_bodies(current)
         earlier = CloneIndex(self.history)
         n = repo_n = earlier_n = union_n = 0
         for identity, tokens in current.items():
@@ -355,7 +387,7 @@ class Trajectory:
         self.earlier_copied += earlier_n
         self.union_copied += union_n
         for identity in current:
-            self.created.setdefault(identity, step)
+            self.created.setdefault((identity[0], identity[1].split('#', 1)[0]), step)
         self.previous = current
         for identity, tokens in current.items():
             self.history[(*identity, step)] = tokens

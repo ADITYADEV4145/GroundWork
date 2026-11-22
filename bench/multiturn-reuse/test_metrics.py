@@ -7,6 +7,41 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_deleting_or_reordering_same_name_definitions_introduces_no_tokens(self):
+        first='def helper(value):\n'+''.join('    value = value + '+str(i)+'\n' for i in range(30))+'    return value\n'
+        second='if available:\n    def helper(value):\n'+''.join('        if value:\n            value = not value\n' for _ in range(30))+'        return value\n'
+        chain={'package':'feature','turns':[dict(entry='helper',opportunities=[dict(kind='repo',file='base.py',symbol='canonical')])]*2}
+        file='src/feature/steps.py'
+        for remaining in [first,second,second+first]:
+            with self.subTest(remaining=remaining[:40]):
+                trajectory=Trajectory({},chain)
+                before=trajectory.advance({file:first+second},1)
+                after=trajectory.advance({file:remaining},2)
+                self.assertEqual(after['introducedTokens'],0)
+                self.assertEqual(after['earlierDuplicateTokens'],0)
+                self.assertEqual(after['cumulativeTokens'],before['cumulativeTokens'])
+                self.assertEqual(after['duplicateRate'],before['duplicateRate'])
+
+    def test_same_name_body_alignment_preserves_edits_and_counts_new_copies(self):
+        first='def helper(value):\n'+''.join('    value = value + '+str(i)+'\n' for i in range(30))+'    return value\n'
+        second='if available:\n    def helper(value):\n'+''.join('        if value:\n            value = not value\n' for _ in range(30))+'        return value\n'
+        chain={'package':'feature','turns':[dict(entry='helper',opportunities=[dict(kind='repo',file='base.py',symbol='canonical')])]*3}
+        file='src/feature/steps.py'
+        trajectory=Trajectory({},chain)
+        trajectory.advance({file:first+second},1)
+        edited=first.replace('    return value','    value -= 1\n    return value')
+        row=trajectory.advance({file:second+edited},2)
+        self.assertEqual(row['introducedTokens'],len(normalized('value -= 1')))
+        self.assertEqual(row['earlierDuplicateTokens'],0)
+        trajectory=Trajectory({},chain)
+        before=trajectory.advance({file:first},1)
+        copied=trajectory.advance({file:first+first},2)
+        self.assertEqual(copied['introducedTokens'],before['introducedTokens'])
+        self.assertEqual(copied['earlierDuplicateTokens'],before['introducedTokens'])
+        deleted=trajectory.advance({file:first},3)
+        self.assertEqual(deleted['introducedTokens'],0)
+        self.assertEqual(deleted['duplicateRate'],copied['duplicateRate'])
+
     def test_comprehension_targets_do_not_rebind_outer_imports(self):
         baseline={'src/pkg/helpers.py':'def canonical(x):\n    return x\n'}
         expressions=['[helper for helper in xs]', '{helper for helper in xs}',

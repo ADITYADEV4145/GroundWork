@@ -7,6 +7,17 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_conditional_function_bodies_are_clone_sources(self):
+        logic='\n'.join('        value = value + '+str(i) for i in range(30))+'\n        return value\n'
+        source='if available:\n    def auto_wrap_for_ansi(value):\n'+logic
+        graph=CodeGraph({'src/upstream.py':source})
+        tokens=normalized(logic)
+        self.assertIn(('src/upstream.py','auto_wrap_for_ansi'),graph.bodies)
+        self.assertEqual(CloneIndex(graph.bodies).coverage(tokens),set(range(len(tokens))))
+        alternatives='try:\n    async def first():\n        return 1\nexcept ImportError:\n    def second():\n        return 2\nelse:\n    class C:\n        if enabled:\n            def method(self):\n                return 3\nfinally:\n    def last():\n        return 4\n'
+        bodies=CodeGraph({'src/branches.py':alternatives}).bodies
+        self.assertEqual({name for _,name in bodies},{'first','second','C.method','last'})
+
     def test_nested_helper_tokens_have_one_owner(self):
         code='def outer():\n    def inner(value):\n        return value + 1\n    return inner(2)\n'
         graph=CodeGraph({'src/feature/steps.py':code})

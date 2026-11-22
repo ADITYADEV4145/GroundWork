@@ -263,6 +263,8 @@ def all_bodies(files):
                     walk(node.body, identity + '.')
                 elif isinstance(node, ast.ClassDef):
                     walk(node.body, scope + node.name + '.')
+                else:
+                    walk(ast.iter_child_nodes(node), scope)
         walk(tree.body)
     return bodies
 

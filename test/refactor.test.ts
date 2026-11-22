@@ -131,6 +131,7 @@ describe('guarded symbol refactoring', () => {
     put('other/consumer.ts', "import { calc } from '../first.js';\nexport const result = calc();\n");
     await expect(refactor({ symbol: 'calc', name: 'next' })).rejects.toThrow('outside the compiler project');
     rmSync(path.join(root, 'tsconfig.json'));
+    rmSync(path.join(root, 'other/tsconfig.json'));
     mkdirSync(path.join(root, '.groundwork'), { recursive: true });
     put('.groundwork/config.json', JSON.stringify({ index: { exclude: ['other/consumer.ts'] } }));
     await expect(refactor({ symbol: 'calc', name: 'next' })).rejects.toThrow('Not an editable');

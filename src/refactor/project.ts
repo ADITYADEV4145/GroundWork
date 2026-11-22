@@ -157,7 +157,7 @@ function locate(source: ts.SourceFile, fact: SymbolFact): Declaration {
 
 function callableType(program: ts.Program, name: ts.Identifier): string | undefined {
   const checker = program.getTypeChecker();
-  const visible = checker.getTypeAtLocation(name).getCallSignatures();
+  const visible = checker.getNonNullableType(checker.getTypeAtLocation(name)).getCallSignatures();
   if (!visible.length) return undefined;
   const flags = ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseFullyQualifiedType;
   return JSON.stringify(visible.map((signature) => checker.signatureToString(signature, name, flags)));

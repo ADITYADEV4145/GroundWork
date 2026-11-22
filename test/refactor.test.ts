@@ -172,6 +172,18 @@ describe('guarded symbol refactoring', () => {
     await expect(refactor({ symbol: 'calc', body: '{ return null; }' })).rejects.toThrow(/TS2394/);
   });
 
+  it('preserves the signature of an optional callable property across projects', async () => {
+    put('tsconfig.json', JSON.stringify({ files: ['handler.ts'], compilerOptions: { strict: true } }));
+    put('handler.ts', 'export class Receiver { handler?: (value: number) => number = (value) => value + 1; }\n');
+    mkdirSync(path.join(root, 'other'));
+    put('other/tsconfig.json', JSON.stringify({ files: ['consumer.ts'] }));
+    put('other/consumer.ts', 'import { Receiver } from "../handler.js";\nexport const value = new Receiver().handler?.(2);\n');
+    const request = { symbol: 'Receiver.handler', body: 'value + 2' };
+    const preview = await refactor(request);
+    expect(await refactor(request, preview.id)).toMatchObject({ applied: true });
+    expect(read('handler.ts')).toContain('=> value + 2');
+  });
+
   it.skipIf(process.platform === 'win32')('refuses to edit a symlink even when it resolves inside the repository', async () => {
     put('source.ts', 'export const operation = () => 1;\n');
     symlinkSync('source.ts', path.join(root, 'link.ts'));

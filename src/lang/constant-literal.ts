@@ -2,6 +2,9 @@ import type { Node } from 'web-tree-sitter';
 import type { ExtractResult } from './adapter.js';
 
 export function constantOwner(node: Node, result: ExtractResult): { symbol: number; constName: string } | null {
+  if (result.symbols.some((s) => ['function', 'method'].includes(s.kind) && s.startByte <= node.startIndex && s.endByte >= node.endIndex)) return null;
+  for (let parent = node.parent; parent; parent = parent.parent)
+    if (['func_literal', 'function_literal', 'lambda_expression', 'closure_expression', 'lambda'].includes(parent.type)) return null;
   const candidates = result.symbols.map((s, symbol) => ({ ...s, symbol })).filter((s) =>
     s.kind === 'constant' && s.startByte <= node.startIndex && s.endByte >= node.endIndex);
   if (!candidates.length) return null;

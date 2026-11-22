@@ -18,9 +18,10 @@ One persistent workspace per chain, including GroundWork state, survives all tur
 Finish exports incremental patches; hidden grading replays all five patches in order.
 No hidden files or solutions are copied into the agent workspace.
 
-Run 16 independent chain-sessions per arm **for every chain and every agent**.
+Run 16 independent chain-sessions per arm **for every agent**, balanced four per chain.
 Agents are Devin normal and Devin fusion (distinct modes, not independent providers).
-Four chains × two modes × two arms × 16 = 256 sessions, 1,280 turns.
+Two modes × two arms × 16 = 64 sessions, 320 turns. Run r is assigned to
+chain (r−1) modulo 4 in repos.json order: four independent sessions per chain/arm/mode.
 No cross-context answers, no pooled normal/fusion analysis. Product/collector pins
 must be identical in both arms. Baseline has shell/Read; GroundWork additionally
 has the existing MCP tools and hooks. Requirements, acceptance, timing, output
@@ -73,7 +74,9 @@ Acceptance tests cannot establish arbitrary equivalence or security.
 
 ## Frozen analysis and gate
 
-For each mode, compute arithmetic mean chain-session rate within each chain and
+Pre-agent-data clarification: the requested 16 sessions per arm per agent are
+balanced across the four chains, not multiplied by the number of chains. Synthetic
+calibration is not agent collection. For each mode, compute arithmetic mean chain-session rate within each chain and
 then the equally weighted four-chain mean. Primary contrast is baseline minus
 GroundWork rate in percentage points (positive favors GroundWork). Avoid dividing
 by zero baseline duplicate rates. Report both means and 95% CIs using 10,000

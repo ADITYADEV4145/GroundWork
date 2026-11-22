@@ -95,6 +95,9 @@ async function mcp(root, [name, raw]) {
 
 async function main([action, ...argv]) {
   if (action === 'list') {
+    if (process.env.GW_BENCH_PROTOCOL === 'stable-v1') {
+      if (!argv[0] || readJson(path.join(argv[0], 'metadata.json')).protocol !== 'stable-v1') throw new Error('Stable list requires initialized STATE');
+    }
     process.stdout.write(JSON.stringify(tasks) + '\n');
     return;
   }
@@ -107,7 +110,10 @@ async function main([action, ...argv]) {
     if (id === 'groundwork' && !existsSync(cli)) throw new Error('Run npm run build before collecting Groundwork observations');
     const run = positiveInt(args[0]);
     mkdirSync(dir);
-    saveJson(metadata, { suite, revision, condition: id, run, agent: process.env.GW_BENCH_AGENT ?? 'Devin normal',
+    const stable = process.env.GW_BENCH_PROTOCOL === 'stable-v1';
+    if (stable && run > 16) throw new Error('Stable protocol requires runs 1–16');
+    if (stable) unpackWorkspace(source, revision, tasks[0].repo, path.join(dir, tasks[0].id));
+    saveJson(metadata, { suite, revision, condition: id, run, ...(stable ? { protocol: 'stable-v1', sessionStartedAt: Date.now(), sessionStartBasis: 'workspace-ready' } : {}), agent: process.env.GW_BENCH_AGENT ?? 'Devin normal',
       model: process.env.GW_BENCH_MODEL ?? null, node: process.version,
       captureRevision: git(source, 'rev-parse', 'HEAD').trim() });
     return;
@@ -127,7 +133,12 @@ async function main([action, ...argv]) {
   const root = path.join(dir, task.id);
   const record = path.join(dir, task.id + '.json');
   if (action === 'begin') {
-    unpackWorkspace(source, revision, task.repo, root);
+    if (existsSync(record)) throw new Error('Task already begun');
+    if (meta.protocol === 'stable-v1') {
+      const position = tasks.indexOf(task);
+      if (position && readJson(path.join(dir, tasks[position - 1].id + '.json')).wallMs === undefined) throw new Error('Finish previous task first');
+    }
+    if (!(meta.protocol === 'stable-v1' && task === tasks[0])) unpackWorkspace(source, revision, task.repo, root);
     restoreSequence(task, dir, root);
     saveJson(record, { task: task.id, startedAt: Date.now(), tools: [] });
     return;
@@ -135,16 +146,29 @@ async function main([action, ...argv]) {
   const observation = readJson(record);
   if (observation.wallMs !== undefined) throw new Error('Task already submitted');
   const treatment = meta.condition === 'groundwork';
+  if (meta.sessionStartedAt === undefined) {
+    meta.sessionStartedAt = Date.now();
+    meta.sessionStartBasis = 'first-captured-action';
+    saveJson(metadata, meta);
+  }
   if (action === 'finish') {
-    observation.wallMs = Date.now() - observation.startedAt;
+    observation.endedAt = Date.now();
+    observation.wallMs = observation.endedAt - observation.startedAt;
+    if (observation.wallMs < 0) throw new Error('Clock reversal');
     if (task.edit ?? ['fix', 'feature'].includes(task.category)) {
       git(root, 'add', '-N', '--', '.');
       observation.patch = git(root, 'diff', '--no-ext-diff', '--no-textconv', 'HEAD', '--', '.',
         ':(exclude).groundwork/**', ':(exclude)**/__pycache__/**');
     } else observation.answer = JSON.parse(args[0] ?? '[]');
     saveJson(record, observation);
+    if (meta.protocol !== 'stable-v1' || task === tasks.at(-1)) {
+      meta.sessionEndedAt = Date.now();
+      saveJson(metadata, meta);
+    }
     return;
   }
+  const startedAt = Date.now();
+  const monotonicStart = performance.now();
   let result;
   try {
     switch (action) {
@@ -168,7 +192,10 @@ async function main([action, ...argv]) {
   const output = truncate(result.text);
   const emitted = output ? output.endsWith('\n') ? output : output + '\n' : '';
   const { text, ...detail } = result;
-  observation.tools.push({ action, ...(action === 'mcp' ? { name: args[0] } : {}), bytes: Buffer.byteLength(emitted), ...detail });
+  const endedAt = Date.now();
+  const durationMs = performance.now() - monotonicStart;
+  if (endedAt < startedAt) throw new Error('Clock reversal');
+  observation.tools.push({ action, ...(action === 'mcp' ? { name: args[0] } : {}), bytes: Buffer.byteLength(emitted), ...detail, startedAt, endedAt, durationMs });
   saveJson(record, observation);
   process.stdout.write(emitted);
 }

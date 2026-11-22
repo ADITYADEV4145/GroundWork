@@ -88,10 +88,11 @@ test('higher runs are ignored without masking missing or duplicate selected runs
   }
 });
 
-for (const [experiment, revision, versions] of [['v4', ROUND3_REVISION, ['', 'v2', 'v3']], ['v5', ROUND4_REVISION, ['', 'v2', 'v3', 'v4']], ['v6', ROUND5_REVISION, ['', 'v2', 'v3', 'v4', 'v5']]]) test(`${experiment} isolates nav3/lh3 inputs and archives only after both graders succeed`, (t) => {
+for (const [experiment, revision, versions] of [['v4', ROUND3_REVISION, ['', 'v2', 'v3']], ['v5', ROUND4_REVISION, ['', 'v2', 'v3', 'v4']], ['v6', ROUND5_REVISION, ['', 'v2', 'v3', 'v4', 'v5']], ['v7', 'a'.repeat(40), ['', 'v2', 'v3', 'v4', 'v5', 'v6']]]) test(`${experiment} isolates nav3/lh3 inputs and archives only after both graders succeed`, (t) => {
   const root = new URL('../', import.meta.url).pathname;
   const dir = mkdtempSync(path.join(os.homedir(), `bench-${experiment}-combine-test-`));
   const scratch = new Set();
+  const runs = experiment === 'v7' ? 16 : 8;
   try {
     const prior = [];
     const sources = [];
@@ -105,10 +106,12 @@ for (const [experiment, revision, versions] of [['v4', ROUND3_REVISION, ['', 'v2
       cpSync(path.join(root, 'bench', suite, 'tasks.json'), path.join(dir, 'bench', suite, 'tasks.json'));
       const input = path.join(dir, suite + '-inputs');
       mkdirSync(input);
-      for (const condition of ['baseline', 'groundwork']) for (let run = 1; run <= 8; run++) {
+      for (const condition of ['baseline', 'groundwork']) for (let run = 1; run <= runs; run++) {
         const name = `${suite === 'nav' ? 'nav3' : 'lh3'}-${condition}-${run}.json`;
         const source = path.join(input, name);
-        const capture = JSON.parse(readFileSync(path.join(root, 'bench', suite, 'observations', `${suite === 'nav' ? 'nav' : 'lh2'}-${condition}-${run}.json`), 'utf8'));
+        const capture = JSON.parse(readFileSync(path.join(root, 'bench', suite, 'observations', `${suite === 'nav' ? 'nav' : 'lh2'}-${condition}-${(run - 1) % 8 + 1}.json`), 'utf8'));
+        capture.run = run;
+        if (experiment === 'v7') capture.protocol = 'stable-v1';
         capture.captureRevision = revision;
         writeFileSync(source, JSON.stringify(capture));
         sources.push({ suite, condition, run, source, bytes: readFileSync(source) });
@@ -127,6 +130,11 @@ for (const [experiment, revision, versions] of [['v4', ROUND3_REVISION, ['', 'v2
       scratch.add(path.dirname(output));
       if (suite === 'long-horizon' && failLh) throw new Error('synthetic grader failure');
       const reports = JSON.parse(readFileSync(path.join(dir, 'bench', suite, 'results/combined.json'), 'utf8'));
+      if (experiment === 'v7') {
+        reports[0].summary.runs = 16;
+        reports[0].summary.sessionPrimary = { basis: 'recorded-session', elapsedMsPerTask: {}, emittedBytesPerSession: {}, toolSideMsPerSession: {} };
+        reports[0].evidence.captures.push(...reports[0].evidence.captures.map((c) => ({ ...c, run: c.run + 8 })));
+      }
       for (const capture of reports[0].evidence.captures) capture.captureRevision = revision;
       mkdirSync(output);
       writeFileSync(path.join(output, 'report.json'), JSON.stringify(reports));
@@ -149,7 +157,7 @@ for (const [experiment, revision, versions] of [['v4', ROUND3_REVISION, ['', 'v2
     }
     for (const suite of ['nav', 'long-horizon']) {
       const report = JSON.parse(readFileSync(path.join(dir, 'bench', suite, `${experiment}/results/combined.json`), 'utf8'))[0];
-      assert.equal(report.summary.runs, 8);
+      assert.equal(report.summary.runs, runs);
       assert.ok(report.evidence.captures.every((capture) => capture.captureRevision === revision));
     }
     assert.deepEqual(prior.map((file) => readFileSync(file, 'utf8')), before);

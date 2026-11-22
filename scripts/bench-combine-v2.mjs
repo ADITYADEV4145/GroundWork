@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 export function options(args) {
   let experiment = 'v2';
   const overrides = {};
-  const usage = 'Use --experiment v2|v3|v4|v5|v6 --nav-captures DIR --lh-captures DIR --build DIR';
+  const usage = 'Use --experiment v2|v3|v4|v5|v6|v7 --nav-captures DIR --lh-captures DIR --build DIR';
   for (let i = 0; i < args.length; i += 2) {
     const value = args[i + 1];
     if (!value) throw new Error(usage);
@@ -19,8 +19,8 @@ export function options(args) {
     else throw new Error(usage);
   }
   const selected = EXPERIMENTS.find((entry) => entry.directory === experiment && entry.revision);
-  if (!selected) throw new Error(usage);
-  return { ...beforeOptions([]), experiment, captureRevision: selected.revision,
+  if (!selected && experiment !== 'v7') throw new Error(usage);
+  return { ...beforeOptions([]), runs: experiment === 'v7' ? 16 : 8, experiment, captureRevision: selected?.revision,
     navCaptures: path.join(root, 'bench/nav', experiment, 'observations'),
     lhCaptures: path.join(root, 'bench/long-horizon', experiment, 'observations'),
     navBuild: root, lhBuild: root, ...overrides };

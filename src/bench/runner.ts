@@ -72,6 +72,10 @@ async function score(task: Task, observation: Observation, ctx: GradeContext, gr
     readBytes: observation.tools.reduce((sum, tool) => sum + (tool.readBytes ?? 0), 0),
     readBlocks: observation.tools.filter((tool) => tool.blocked).length,
     wallMs: observation.wallMs,
+    startedAt: observation.startedAt,
+    endedAt: observation.endedAt ?? observation.startedAt + observation.wallMs,
+    toolSideMs: observation.tools.every((t) => t.durationMs !== undefined && t.startedAt !== undefined && t.endedAt !== undefined && t.endedAt >= t.startedAt)
+      ? observation.tools.reduce((sum, t) => sum + t.durationMs!, 0) : undefined,
     usage: observation.usage,
   };
 }
@@ -197,6 +201,14 @@ export function renderReport(report: BenchmarkSummary): string {
       `| ${task.task}${task.sequence ? ` (${task.sequence} #${task.step})` : ''} | ${task.category} | ${task.baseline.success}/${report.runs} | ${task.groundwork.success}/${report.runs} | ${estimate(task.baseline.estimatedToolOutputTokens / report.runs)} | ${estimate(task.groundwork.estimatedToolOutputTokens / report.runs)} | ${task.estimatedReductionPct === null ? 'N/A' : estimate(task.estimatedReductionPct) + '%'} |`),
     '',
   ];
+  lines.push('## Session primary estimands', '', `Clock basis: ${report.sessionPrimary.basis}. Independent whole-session bootstrap; task-window measures above are secondary.`, '',
+    '| Measure | Baseline mean | Groundwork mean | Reduction (95% CI) |', '| --- | ---: | ---: | --- |');
+  for (const [name, value] of Object.entries(report.sessionPrimary).filter(([name]) => name !== 'basis')) {
+    const metric = value as typeof report.sessionPrimary.elapsedMsPerTask;
+    lines.push(`| ${name} | ${metric ? estimate(metric.baselineMean) : 'unavailable'} | ${metric ? estimate(metric.groundworkMean) : 'unavailable'} | ${range(metric?.reductionPct ?? null)} |`);
+  }
+  lines.push('', `Success guardrail (no category drop): ${report.noSuccessDrop ? 'met' : 'NOT MET'}.`,
+    `Multiplicity-adjusted latency lower bound (97.5% per suite): ${report.sessionPrimary.elapsedMsPerTask?.reductionPct?.adjustedLow ?? 'unavailable'}%.`, '');
   if (Object.keys(report.metrics).length) lines.push(
     '| Suite metric | Baseline total | Groundwork total | Paired delta (GW – baseline, per task) | Task coverage |',
     '| --- | ---: | ---: | ---: | ---: |',

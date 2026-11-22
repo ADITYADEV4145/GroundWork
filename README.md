@@ -252,6 +252,58 @@ Every command accepts `--json`.
 
 ## Benchmark results
 
+<!-- stable-protocol:start -->
+### Stable protocol (v7)
+
+Completed: 16 sessions per arm per suite (64 total), collector 01b1426; product main at e0cad99, experimental read paths off. All submitted sessions are retained.
+
+Pre-registered primary estimands are session elapsed/task (ms), aggregate emitted UTF-8 bytes/session, and total tool-side ms/session. Each metric row reports baseline mean → GroundWork mean and reduction = 100 × (1 − GW mean / baseline mean), with a 95% whole-session bootstrap CI: 10,000 draws per arm, fixed seed 0x51ab17ed. Positive reduction favors GroundWork. Success is a guardrail (no category success drop); confirmatory latency claims also require the protocol’s multiplicity rule. Old median task-window metrics remain secondary.
+
+| Suite | Estimand | Baseline mean | GroundWork mean | Reduction [95% CI] | Success guardrail |
+| --- | --- | --- | --- | --- | --- |
+| nav | Session elapsed/task (ms) | 5341.10 | 6350.47 | -18.9% [-26.8, -11.2] | met: 480/480 / 480/480 |
+| nav | Emitted bytes/session | 33383.56 | 34914.25 | -4.6% [-12.1, 2.3] | met: 480/480 / 480/480 |
+| nav | Tool-side ms/session | 1599.86 | 10774.70 | -573.5% [-646.7, -503.6] | met: 480/480 / 480/480 |
+| long-horizon | Session elapsed/task (ms) | 9836.58 | 10536.84 | -7.1% [-19.7, 3.9] | met: 160/160 / 160/160 |
+| long-horizon | Emitted bytes/session | 5816.06 | 6858.38 | -17.9% [-27.6, -8.7] | met: 160/160 / 160/160 |
+| long-horizon | Tool-side ms/session | 523.46 | 1253.07 | -139.4% [-206.7, -88.9] | met: 160/160 / 160/160 |
+
+nav: session elapsed increased cost (nominal 95% CI excludes zero); emitted output inconclusive (95% CI includes zero); tool-side time increased cost (nominal 95% CI excludes zero). Success guardrail met. Multiplicity-adjusted latency lower bound: -27.9%; no confirmatory latency win. long-horizon: session elapsed inconclusive (95% CI includes zero); emitted output increased cost (nominal 95% CI excludes zero); tool-side time increased cost (nominal 95% CI excludes zero). Success guardrail met. Multiplicity-adjusted latency lower bound: -21.6%; no confirmatory latency win.
+
+V7 workflow notes (64 reviewed, including all 10 mentioning failed/error): early cwd/env/usage failures and retries, including harness-source inspection by LH GW-2/7; repeated orientation and begin attempts; external scratch/staged scripts and command files; captured shell cat/sed reads; AGENTS-seeded names and carried evidence; two captured invalid read_symbols calls; a similarity check after writing, new shared helpers without similarity checks, confirmation-based verify_calls skips, and uneven smoke testing. Sequential command chaining was also reported. All sessions remain included; these are not perfectly uniform executions. Session elapsed includes post-init retry/gap time, but uncaptured outputs and work before init remain unmeasured. Captured tool spans do not separate daemon, relay and hook subcomponents.
+
+[Tool-side totals and deviation review](bench/V7-ANALYSIS.md).
+
+The harness starts the v7 session clock once the first workspace is ready, before revealing tasks, and ends it at the last finish. Inter-task gaps are included; provisioning, install/build and pre-init instructions are excluded. Tool-side time sums serial dispatch spans, including hooks and transport, but excludes CLI startup before dispatch and final output delivery. This is not a clock around the entire outer agent call.
+
+Why change? Agent-owned begin→finish windows can include or exclude planning and turn latency depending on command batching. In archived v6 long-horizon runs, excluded gaps were about 50% of the baseline’s observed first-begin→last-finish span versus 11% of GroundWork’s. These figures show measurement-window allocation, not identified thinking/provider latency or a performance win.
+
+[Pre-registered protocol](https://github.com/ADITYADEV4145/GroundWork/blob/01b142647e338ce557ef85bb7ef6c15e0c4f9257/bench/PROTOCOL.md).
+
+#### Post-hoc historical envelope re-analysis (not v7)
+
+Post-hoc sensitivity only, not v7 results and not a replacement for the published historical rows below. Elapsed is a first-begin→last-finish envelope proxy reconstructed from old records, not pre-disclosure controller timing. Ratios of arm means use eight sessions/arm and 95% whole-session bootstrap CIs with the same seed/draw count. Historical tool-side time is unavailable. B = baseline; GW = GroundWork. Rounds changed products/protocols and are not pooled. Bytes are tool output, not billed model tokens or dollar savings.
+
+| Suite | Archive | Envelope s/task B → GW; reduction [95% CI] | Bytes/session B → GW; reduction [95% CI] | Tool-side time | Success B / GW | Guardrail |
+| --- | --- | --- | --- | --- | --- | --- |
+| nav | original | 5.81 → 7.67; -32.1% [-49.5, -15.8] | 34400.13 → 29380.38; 14.6% [4.3, 23.9] | unavailable | 240/240 / 240/240 | met |
+| nav | v2 | 5.43 → 6.86; -26.3% [-38.9, -13.8] | 34027.50 → 26857.63; 21.1% [13.3, 28.1] | unavailable | 240/240 / 240/240 | met |
+| nav | v3 | 5.44 → 6.31; -16.0% [-30.8, -3.2] | 35453.75 → 25243.75; 28.8% [19.1, 37.5] | unavailable | 240/240 / 240/240 | met |
+| nav | v4 | 5.47 → 6.68; -22.2% [-34.8, -11.5] | 35396.00 → 37306.63; -5.4% [-15.1, 3.7] | unavailable | 240/240 / 240/240 | met |
+| nav | v5 | 5.53 → 6.51; -17.8% [-33.8, -3.7] | 36081.63 → 36675.88; -1.6% [-16.8, 10.1] | unavailable | 240/240 / 240/240 | met |
+| nav | v6 | 5.46 → 6.24; -14.3% [-27.7, -2.8] | 34267.00 → 31159.50; 9.1% [-0.4, 17.8] | unavailable | 240/240 / 240/240 | met |
+| long-horizon | original | 8.47 → 11.29; -33.2% [-52.7, -14.5] | 5778.25 → 8038.25; -39.1% [-85.3, -3.3] | unavailable | 80/80 / 80/80 | met |
+| long-horizon | v2 | 9.70 → 11.51; -18.8% [-33.9, -5.0] | 5162.25 → 7199.88; -39.5% [-72.4, -16.5] | unavailable | 80/80 / 80/80 | met |
+| long-horizon | v3 | 9.73 → 10.05; -3.3% [-23.5, 13.7] | 5244.50 → 6565.88; -25.2% [-77.7, 9.0] | unavailable | 80/80 / 80/80 | met |
+| long-horizon | v4 | 9.72 → 11.31; -16.4% [-32.9, -1.7] | 6066.38 → 6098.13; -0.5% [-26.4, 18.6] | unavailable | 80/80 / 80/80 | met |
+| long-horizon | v5 | 9.34 → 9.84; -5.4% [-24.5, 9.9] | 6705.63 → 6493.00; 3.2% [-17.3, 23.8] | unavailable | 80/80 / 80/80 | met |
+| long-horizon | v6 | 8.85 → 10.42; -17.8% [-41.0, 1.0] | 4622.75 → 6098.25; -31.9% [-61.1, -11.4] | unavailable | 80/80 / 80/80 | met |
+
+Frozen report: [historical session analysis](bench/HISTORICAL-SESSION-ANALYSIS.md); reproduce with `node scripts/bench-historical.mjs OUTPUT.md` after building the collector.
+
+### Historical published results (original analysis)
+<!-- stable-protocol:end -->
+
 Recorded pre-fix Devin-agent runs show **less copied code, not demonstrated token or
 money savings**. Reuse v2 copied-code rate fell from **14/20 (70%) to 0/20 (0%)**.
 Task success was identical in each suite; grounding v3 had zero wrong calls in

@@ -19,7 +19,7 @@ export function constantOwner(node: Node, result: ExtractResult): { symbol: numb
     if (parent.type === 'const_spec') {
       const values = parent.childForFieldName('value')?.namedChildren ?? [];
       if (!values.some((v) => v?.id === node.id)) return null;
-      name = assignmentLabel(parent, node)?.text;
+      name = assignmentLabel(parent, node) ?? undefined;
       if (!name) return null;
       break;
     }

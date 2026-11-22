@@ -40,7 +40,7 @@ export function inspectSource(source: string, language: Language) {
       const signed = !string && ['unary_expression', 'unary_operator'].includes(n.parent?.type ?? '') && /^[+-]\s*[\d.]/.test(n.parent!.text);
       const value = string ? n.text.replace(/^[rubf]*(?:"""|'''|"|')/i, '').replace(/(?:"""|'''|"|')$/, '') : signed ? n.parent!.text.replace(/\s/g, '') : n.text;
       if (!string || !n.namedChildren.some((c) => c?.type === 'interpolation' || c?.type === 'string_interpolation'))
-        literals.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, value, kind: string ? 'string' : 'number', configish: !!label && configName(label.text) });
+        literals.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, value, kind: string ? 'string' : 'number', configish: !!label && configName(typeof label === 'string' ? label : label.text) });
       return;
     }
     for (const child of n.namedChildren) if (child) visit(child);

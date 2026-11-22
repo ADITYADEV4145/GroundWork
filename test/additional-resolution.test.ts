@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { AdditionalResolver, type AdditionalImport, type AdditionalSymbol } from '../src/resolve/additional.js';
 import type { FileInfo } from '../src/resolve/imports.js';
 
@@ -7,17 +10,30 @@ const file = (id: number, path: string, language: string): FileInfo => ({ id, pa
 const symbol = (id: string, fileId: number, name: string, parentId: string | null = null): AdditionalSymbol => ({ id, fileId, name, qualifiedName: name, kind: parentId ? 'method' : 'function', parentId });
 
 describe('additional language resolution', () => {
+  it('does not resolve external Go imports to local suffixes', () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), 'gw-module-'));
+    const from = file(1, 'main.go', 'go');
+    const files = [from, file(2, 'store/store.go', 'go')];
+    try {
+      writeFileSync(path.join(root, 'go.mod'), 'module example.org/app\n');
+      expect(new AdditionalResolver(root, files).targets(from, im('example.org/library/store', 'store'))).toEqual([]);
+      expect(new AdditionalResolver(root, files).targets(from, im('example.org/app/store', 'store'))).toHaveLength(1);
+      rmSync(path.join(root, 'go.mod'));
+      for (const spec of ['example.org/library/store', 'net/store', 'store'])
+        expect(new AdditionalResolver(root, files).targets(from, im(spec, 'store'))).toEqual([]);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
   it('resolves Go packages across multiple files and rejects external or ambiguous package paths', () => {
     const from = file(1, 'main.go', 'go');
     const files = [from, file(2, 'store/types.go', 'go'), file(3, 'store/format.go', 'go')];
     const resolver = new AdditionalResolver('/missing', files);
-    const imported = im('example.com/app/store', 'store', 'storage', 'module');
+    const imported = im('./store', 'store', 'storage', 'module');
     expect(resolver.resolveImport(from, imported).fileId).not.toBeNull();
     expect(resolver.resolveCall(from, null, 'storage.Format', 'Format', [imported], [symbol('format', 3, 'Format')])).toEqual({ id: 'format', conf: 'import-resolved' });
     expect(resolver.resolveCall(from, null, 'other.Format', 'Format', [], [symbol('format', 3, 'Format')])).toBeNull();
     const ambiguous = new AdditionalResolver('/missing', [...files, file(4, 'app/store/other.go', 'go')]);
-    expect(ambiguous.resolveImport(from, imported).fileId).toBeNull();
-    expect(ambiguous.resolveCall(from, null, 'storage.Format', 'Format', [imported], [symbol('format', 3, 'Format')])).toBeNull();
+    expect(ambiguous.resolveImport(from, imported).fileId).not.toBeNull();
+    expect(ambiguous.resolveCall(from, null, 'storage.Format', 'Format', [imported], [symbol('format', 3, 'Format')])?.id).toBe('format');
   });
 
   it('resolves Java class/static imports and refuses ambiguous suffixes', () => {

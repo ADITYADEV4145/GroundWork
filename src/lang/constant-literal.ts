@@ -1,5 +1,6 @@
 import type { Node } from 'web-tree-sitter';
 import type { ExtractResult } from './adapter.js';
+import { assignmentLabel } from './assignment-label.js';
 
 export function constantOwner(node: Node, result: ExtractResult): { symbol: number; constName: string } | null {
   if (result.symbols.some((s) => ['function', 'method'].includes(s.kind) && s.startByte <= node.startIndex && s.endByte >= node.endIndex)) return null;
@@ -17,9 +18,9 @@ export function constantOwner(node: Node, result: ExtractResult): { symbol: numb
     }
     if (parent.type === 'const_spec') {
       const values = parent.childForFieldName('value')?.namedChildren ?? [];
-      const index = values.findIndex((v) => v?.id === node.id);
-      if (index < 0) return null;
-      name = parent.childrenForFieldName('name')[index]?.text;
+      if (!values.some((v) => v?.id === node.id)) return null;
+      name = assignmentLabel(parent, node)?.text;
+      if (!name) return null;
       break;
     }
     if (['const_item', 'static_item', 'assignment'].includes(parent.type)) {

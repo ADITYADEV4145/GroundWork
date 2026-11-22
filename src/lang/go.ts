@@ -64,7 +64,7 @@ export const goAdapter: LanguageAdapter = {
         const type = node.childForFieldName('type')?.type;
         types.set(name, add(node, name, type === 'struct_type' ? 'class' : type === 'interface_type' ? 'interface' : 'type'));
       } else if (node.type === 'const_spec' || (node.type === 'var_spec' && node.parent?.parent?.type === 'source_file')) {
-        for (const name of node.childrenForFieldName('name')) add(node, name.text, node.type === 'const_spec' ? 'constant' : 'variable');
+        for (const name of node.childrenForFieldName('name')) if (name.type === 'identifier') add(node, name.text, node.type === 'const_spec' ? 'constant' : 'variable');
       } else if (node.type === 'import_spec') {
         const path = node.childForFieldName('path');
         if (path) {

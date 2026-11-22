@@ -29,6 +29,7 @@ interface Imp {
 
 const CALLABLE = new Set(['function', 'method', 'class', 'component', 'dataclass']);
 const CLASSY = new Set(['class', 'dataclass']);
+const languageFamily = (language: string | null | undefined) => ['typescript', 'tsx', 'javascript'].includes(language ?? '') ? 'typescript' : language;
 
 export interface LinkStats {
   imports: number;
@@ -257,10 +258,10 @@ export function linkIndex(db: Db, root: string, changed?: { files: number[]; nam
       }
     }
     if (parts.length > 1 && boundExternally(fileId, parts[0]!)) return null;
-    const language = fileById.get(fileId)?.language;
+    const family = languageFamily(fileById.get(fileId)?.language);
     if (changed && !globalCandidates.has(name)) globalCandidates.set(name,
       db.prepare(`SELECT ${symbolColumns} FROM symbols WHERE name = ?`).all(name).map(toSym).filter((s) => CALLABLE.has(s.kind)));
-    const cands = (changed ? globalCandidates : globalByName).get(name)?.filter((s) => fileById.get(s.fileId)?.language === language);
+    const cands = (changed ? globalCandidates : globalByName).get(name)?.filter((s) => languageFamily(fileById.get(s.fileId)?.language) === family);
     if (cands && cands.length === 1) return { id: cands[0]!.id, conf: 'name-only' };
     return null;
   };

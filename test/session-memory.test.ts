@@ -134,6 +134,35 @@ describe('session reuse memory', () => {
     });
   });
 
+  it('keeps a base symbol edited in turn 3 as a target for a duplicate written in turn 2', async () => {
+    await withCheckScenario('clean', async (root) => {
+      await initSqlBackend();
+      await refreshIndex(root);
+      const ctx = { root, config: defaultConfig() };
+      const edit = (file: string) => refreshOnEdit.run(normalise('claude', 'post_tool', {
+        session_id: 'base-target', cwd: root, tool_name: 'Write', tool_input: { file_path: file },
+      }), ctx);
+      nextTurn(root, 'base-target');
+      nextTurn(root, 'base-target');
+      writeScenarioFile(root, 'a.ts', source);
+      await edit('a.ts');
+      nextTurn(root, 'base-target');
+      writeScenarioFile(root, 'utils.ts', source.replaceAll('sessionHelper', 'parseDateString'));
+      await edit('utils.ts');
+      const written = sessionMemory(root, 'base-target').written;
+      expect(written).toEqual([
+        expect.objectContaining({ qualifiedName: 'sessionHelper', file: 'a.ts', turn: 2 }),
+        expect.objectContaining({ qualifiedName: 'parseDateString', file: 'utils.ts', turn: 3 }),
+      ]);
+      const report = await checkRepository(root, { sessionWritten: written });
+      expect(report.findings).toContainEqual(expect.objectContaining({
+        kind: 'duplicate',
+        added: expect.objectContaining({ file: 'a.ts', symbol: 'sessionHelper' }),
+        existing: expect.objectContaining({ file: 'utils.ts', symbol: 'parseDateString' }),
+      }));
+    });
+  });
+
   it('orders non-base duplicates by earlier turn rather than file order, never the reverse', async () => {
     await withCheckScenario('clean', async (root) => {
       await initSqlBackend();

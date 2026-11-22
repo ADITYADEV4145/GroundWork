@@ -147,6 +147,16 @@ describe('guarded symbol refactoring', () => {
     expect(await refactor({ symbol: 'calc', body: '{ return 8; }' })).toMatchObject({ check: { status: 'PASS' } });
   });
 
+  it('distinguishes escaped references from unrelated Unicode escapes outside the compiler project', async () => {
+    put('tsconfig.json', JSON.stringify({ files: ['calc.ts'] }));
+    put('calc.ts', 'export function calc() { return 4; }\n');
+    put('text.js', 'export const whitespace = /[\\u0000-\\u0008]+/;\n');
+    const request = { symbol: 'calc', name: 'compute' };
+    expect(await refactor(request)).toMatchObject({ check: { status: 'PASS' } });
+    put('text.js', 'import { ca\\u{006c}c } from "./calc.js";\nexport const result = ca\\u006cc();\n');
+    await expect(refactor(request)).rejects.toThrow('outside the compiler project');
+  });
+
   it('keeps visible overloads stable without freezing the implementation return type', async () => {
     put('tsconfig.json', JSON.stringify({ files: ['calc.ts'], compilerOptions: { strict: true } }));
     put('calc.ts', [

@@ -163,6 +163,14 @@ function callableType(program: ts.Program, name: ts.Identifier): string | undefi
   return JSON.stringify(visible.map((signature) => checker.signatureToString(signature, name, flags)));
 }
 
+function mayReferenceName(text: string, name: string): boolean {
+  if (text.includes(name)) return true;
+  return text.replace(/\\u(?:\{([\da-fA-F]+)\}|([\da-fA-F]{4}))/g, (escape, braced: string | undefined, fixed: string) => {
+    const point = Number.parseInt(braced ?? fixed, 16);
+    return point <= 0x10ffff ? String.fromCodePoint(point) : escape;
+  }).includes(name);
+}
+
 const key = (file: string, start: number) => `${fileKey(file)}\0${start}`;
 const errorText = (diagnostic: ts.Diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ');
 
@@ -232,7 +240,7 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
       for (const file of files) {
         if (service.getProgram()!.getSourceFile(path.join(ctx.root, file))) continue;
         const text = readRepoFile(ctx.root, file, ctx.config.index.maxFileBytes)?.toString('utf8');
-        if (text === undefined || text.includes(target.name) || /\\u(?:\{|[\da-f]{4})/i.test(text)) {
+        if (text === undefined || mayReferenceName(text, target.name)) {
           throw new Error(`Rename may be incomplete: ${file} is outside the compiler project.`);
         }
       }

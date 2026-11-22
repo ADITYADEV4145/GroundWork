@@ -127,6 +127,16 @@ describe('guarded symbol refactoring', () => {
     await expect(refactor({ symbol: 'calc', name: 'next' })).rejects.toThrow('Not an editable');
   });
 
+  it('preserves the callable type when another compiler project can use it', async () => {
+    put('tsconfig.json', JSON.stringify({ files: ['calc.ts'] }));
+    put('calc.ts', 'export function calc() { return 4; }\n');
+    mkdirSync(path.join(root, 'other'));
+    put('other/tsconfig.json', JSON.stringify({ files: ['consumer.ts'] }));
+    put('other/consumer.ts', "import { calc } from '../calc.js';\nexport const result: number = calc();\n");
+    await expect(refactor({ symbol: 'calc', body: '{ return "bad"; }' })).rejects.toThrow('outside the compiler project');
+    expect(await refactor({ symbol: 'calc', body: '{ return 8; }' })).toMatchObject({ check: { status: 'PASS' } });
+  });
+
   it.skipIf(process.platform === 'win32')('refuses to edit a symlink even when it resolves inside the repository', async () => {
     put('source.ts', 'export const operation = () => 1;\n');
     symlinkSync('source.ts', path.join(root, 'link.ts'));

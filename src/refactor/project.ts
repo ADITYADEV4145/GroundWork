@@ -76,7 +76,8 @@ function project(ctx: ToolContext, file: string) {
     allowJs: true, checkJs: true, noEmit: true, skipLibCheck: true,
     target: ts.ScriptTarget.ESNext, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext,
   };
-  let roots = files.map((f) => path.join(ctx.root, f));
+  const peers = files.map((f) => path.join(ctx.root, f)).filter((f) => projectConfig(ctx.root, f) === configFile);
+  let roots = peers;
   let references: readonly ts.ProjectReference[] | undefined;
   if (configFile) {
     const read = ts.readConfigFile(configFile, ts.sys.readFile);
@@ -86,8 +87,7 @@ function project(ctx: ToolContext, file: string) {
     references = parsed.projectReferences;
     Object.assign(options, parsed.options, { allowJs: parsed.options.allowJs ?? /jsconfig\.json$/.test(configFile) });
     // Test and tooling files may be excluded from compilation but still consume the project's symbols.
-    const peers = roots.filter((f) => (options.allowJs || /\.[cm]?tsx?$/i.test(f)) && projectConfig(ctx.root, f) === configFile);
-    roots = [...new Set([...parsed.fileNames, ...peers])];
+    roots = [...new Set([...parsed.fileNames, ...peers.filter((f) => options.allowJs || /\.[cm]?tsx?$/i.test(f))])];
   }
   if (roots.length > 3_000) throw new Error('Refactoring supports up to 3,000 configured root files.');
   const changed = new Map<string, string>();
@@ -115,7 +115,13 @@ function project(ctx: ToolContext, file: string) {
     directoryExists: ts.sys.directoryExists,
     getDirectories: ts.sys.getDirectories,
   };
-  return { absolute, service: ts.createLanguageService(host), changed, files };
+  const service = ts.createLanguageService(host);
+  const isFullyCovered = () => files.every((f) => {
+    if (/\.d\.[cm]?ts$/i.test(f)) return true;
+    const file = path.join(ctx.root, f);
+    return projectConfig(ctx.root, file) === configFile && service.getProgram()!.getSourceFile(file) !== undefined;
+  });
+  return { absolute, service, changed, files, isFullyCovered };
 }
 
 type Declaration = { name: ts.Identifier; node: ts.Node; body?: ts.ConciseBody };
@@ -145,6 +151,13 @@ function locate(source: ts.SourceFile, fact: SymbolFact): Declaration {
     (node.end === fact.endByte || (source.text[node.end - 1] === ';' && node.end === fact.endByte + 1)));
   if (hits.length !== 1) throw new Error('The indexed symbol has no unique supported compiler declaration.');
   return hits[0]!;
+}
+
+function callableType(program: ts.Program, body: ts.ConciseBody): string | undefined {
+  const checker = program.getTypeChecker();
+  const signature = checker.getSignatureFromDeclaration(body.parent as ts.SignatureDeclaration);
+  if (!signature) return undefined;
+  return checker.signatureToString(signature, body.parent, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseFullyQualifiedType);
 }
 
 const key = (file: string, start: number) => `${fileKey(file)}\0${start}`;
@@ -184,7 +197,7 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
   const target = resolve(ctx, request.symbol);
   const original = readEditable(ctx, target.file);
   if (sourceLocation(ctx.db, target.id)?.hash !== sha1(original)) throw new Error('The indexed symbol is stale. Refresh and try again.');
-  const { absolute, service, changed, files } = project(ctx, target.file);
+  const { absolute, service, changed, files, isFullyCovered } = project(ctx, target.file);
   try {
     const source = service.getProgram()?.getSourceFile(absolute);
     if (!source || source.text !== original) {
@@ -194,6 +207,8 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
     const changes = new Map<string, TextEdit[]>();
     const start = declaration.name.getStart(source);
     const rename = request.name;
+    const requireStableType = rename === undefined && !isFullyCovered();
+    let beforeType: string | undefined;
     if (rename !== undefined) {
       const scanner = ts.createScanner(ts.ScriptTarget.Latest, false, ts.LanguageVariant.Standard, rename);
       if (!/^[$_\p{ID_Start}][$_\u200c\u200d\p{ID_Continue}]*$/u.test(rename) || scanner.scan() !== ts.SyntaxKind.Identifier ||
@@ -222,6 +237,7 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
       const body = declaration.body;
       if (!body || !['function', 'method', 'component'].includes(target.kind)) throw new Error('Only named functions and methods with bodies can be edited.');
       if (!request.body.trim() || request.body.length > MAX_BODY) throw new Error(`Provide a complete function body up to ${MAX_BODY} characters.`);
+      if (requireStableType) beforeType = callableType(service.getProgram()!, body);
       changes.set(target.file, [{ start: body.getStart(source), end: body.end, text: request.body }]);
     }
     const beforeErrors = compilerErrors(service, ctx.root);
@@ -257,6 +273,9 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
       const offset = edit.text.length - edit.text.trimStart().length;
       if (!body || body.getStart(candidate) !== edit.start + offset || body.end !== edit.start + edit.text.trimEnd().length) {
         throw new Error('Replacement must be exactly one function body, without changing its surrounding declaration.');
+      }
+      if (requireStableType && (beforeType === undefined || beforeType !== callableType(service.getProgram()!, body))) {
+        throw new Error('Cannot change the callable type when files outside the compiler project may use it.');
       }
     }
     assertNoNewErrors(ctx, service, beforeErrors, edits);

@@ -1,0 +1,59 @@
+--- prompts/nav-groundwork.v10.tmpl.txt
++++ prompts/nav-groundwork.v10d.tmpl.txt
+@@ -17,7 +17,7 @@
+ Init prepares the first workspace and starts the session clock before task disclosure.
+ Do not list or inspect task prompts before init; use only the stateful list command below.
+ 
+-Set S to a new absolute directory (e.g. $HOME/nav10-groundwork-{RUN}, not precreated)
++Set S to a new absolute directory (e.g. $HOME/nav10d-groundwork-{RUN}, not precreated)
+ and use this exact run and condition: node bench/capture.mjs init "$S" groundwork {RUN}
+ List the public tasks once: node bench/capture.mjs list "$S"
+ Do all 30, one at a time, in this repo-group order: groundwork, ts-app, py-app, then edits. Keep each group in
+@@ -32,8 +32,8 @@
+    The Read wrapper dispatches the Groundwork Claude read guard. Repeat the exact Read once to force it only if needed.
+ 
+ Use the Groundwork navigation skill below. When it names a tool, use it via the capture wrapper above. Use only the captured tools to complete tasks.
+-1. Use `rg` for trivial literal or filename lookups; use `find_code({ "query": "what you need" })` for symbol, behavior and structure questions. Exact names return exact matches; use `breadth: "all"` only to expand. Set `locations_only: false` for signatures/docs, or `include_body: true` for the body with one exact match in the same call. Defaults stay location-only. Stop when the requested location is resolved.
+-2. Recall known helpers with `read_symbol({ "symbol": "name or ID" })`, not a whole-file Read; batch several with `read_symbol({ "symbols": ["name or ID", "another name or ID"] })`. Pass either symbol or symbols, not both. If only files are known, outline several files in one call, at most once per orientation: `outline({ "files": ["src/a.ts", "src/b.ts"] })`; keep file for one file. Read only needed bodies and skip outline for known symbols. Outline defaults to locations/ranges; `locations_only: false` adds signatures.
++1. Use `rg` for a trivial literal or filename lookup. Use the index for symbol, behavior and structure questions: `find_code({ "query": "what you need" })`. Exact names return exact matches; use `breadth: "all"` only when broader results are needed. Set `locations_only: false` for signatures or docs. The top matches come back with their source (`include_body` defaults on), so answer from that reply instead of following it with `read_symbol` or Read; pass `include_body: false` when only locations are needed. Send independent lookups together in one call, never one per turn: `find_code({ "queries": ["first thing", "second thing"] })` (up to 8; pass `query` or `queries`, not both). Stop when the request is resolved.
++2. For a known helper you need to recall, use `read_symbol({ "symbol": "exact name or ID" })` instead of a whole-file Read; batch several with `read_symbol({ "symbols": ["name or ID", "another name or ID"] })`. Pass either `symbol` or `symbols`, not both. If only files are known, outline several files in one call, at most once per orientation: `outline({ "files": ["src/a.ts", "src/b.ts"] })`. Keep `file` for one file. Choose symbols and read only needed bodies, not whole files. Skip outline when the symbol is known. Outline defaults to locations/ranges; set `locations_only: false` for signatures. A single small file comes back whole from `outline`; answer from it without a follow-up read.
+ 3. Use `repo_map({ "depth": 1 })` once only if unfamiliar-repo orientation is needed. For continuing work, do one orientation step: batched outline for unfamiliar files or batched read_symbol for known helpers, not a fresh map/outline cycle per task. Reuse unchanged definitions/signatures/source evidence across continuing steps and sessions only when carried into your current context. Another agent's reads are not your evidence; recheck after changes or if evidence is missing.
+ 4. For traces or "how does X work", use targeted lookup or chain callees/read_symbol (batch bodies), not outline plus whole-file Read at each hop. Use callers for incoming calls and where_used for references. `explore` stays available as optional budgeted context, not the default first step; answer directly from it when sufficient. Treat name-only/unresolved edges as leads, not proof; follow Next only for missing results/source.
+ 
+@@ -50,7 +50,7 @@
+ Do not wait for approval; this experiment is approved.
+ 
+ Export once at the end (or if you have a hard blocker, export the honest partial result):
+-node bench/capture.mjs export "$S" > "$HOME/nav10-groundwork-{RUN}.json"
++node bench/capture.mjs export "$S" > "$HOME/nav10d-groundwork-{RUN}.json"
+ Call upload_attachment with that absolute path, then call provide_structured_output with
+ the returned attachment URL, the count of finished tasks, and any protocol deviations in note.
+ Do not paste the capture into chat or create a PR.
+--- prompts/lh-groundwork.v10.tmpl.txt
++++ prompts/lh-groundwork.v10d.tmpl.txt
+@@ -16,7 +16,7 @@
+ Init prepares the first workspace and starts the session clock before task disclosure.
+ Do not list or inspect task prompts before init; use only the stateful list command below.
+ 
+-Set S to a new absolute directory ($HOME/lh10-groundwork-{RUN}, not precreated)
++Set S to a new absolute directory ($HOME/lh10d-groundwork-{RUN}, not precreated)
+ and use this exact run and condition: node bench/capture.mjs init "$S" groundwork {RUN}
+ List the public tasks once: node bench/capture.mjs list "$S"
+ Do all 10 steps lh-01 to lh-10 in order, one at a time; each step builds on your earlier steps' code.
+@@ -28,6 +28,7 @@
+    node bench/capture.mjs mcp "$S" <id> <tool> '<JSON args>'   # Groundwork MCP tools: repo_map, find_code, outline, read_symbol, callers, callees, where_used, find_similar, verify_calls
+    Groundwork Read hooks are active in this arm; follow their feedback. Shell writes do not dispatch edit or Stop hooks.
+    For continuing long-horizon work, do one orientation step: outline({"files":["src/a.js","src/b.js"]}) for unfamiliar files or read_symbol({"symbols":["name or ID","another name or ID"]}) for known helpers. Outline several files in one call, at most once per orientation; keep file for one file. Do not repeat a map/outline cycle each step. Fetch only missing or changed evidence afterward.
++- `outline({"file":"src/utils/date.ts"})` shows symbol names and ranges. A single file small enough for the 400-token budget comes back whole, so answer from it without a follow-up read; pass `include_body:false` for the list only. Set `locations_only:false` for signatures. Skip outline when you already know which symbol to read.
+    Call find_similar only for genuinely new non-trivial helpers/functions, not once per task or for every edit: {"description":"what it does","name":"planned name"}; optionally include signature/code. Skip small edits, inline code, constants and already-confirmed helpers. Reuse unchanged evidence across continuing steps and sessions when carried into your current context; repeat only if relevant code changed or evidence is missing. Recall known helpers with batched read_symbol, not whole-file Reads. Default matches are actionable reuse/extend; use "detail":"full" only for useful related matches.
+    State REUSE <symbol> / EXTEND <symbol> / NEW because <reason> once for the planned helper. Reuse or extend existing logic instead of duplicating it.
+    Never re-read a file only to satisfy the verify rule. After edits are ready, use verify_calls at most once per task, only for new cross-file targets unconfirmed by unchanged evidence in your current context: one batched call instead of rereads, verify_calls({"files":[{"file":"src/x.js","lines":"10-40"},{"file":"src/y.js"}]}). Skip if none remain. Evidence can carry across steps/sessions only while definitions are unchanged; another agent's reads are not your evidence. Reassess affected evidence after changes. Read bodies only to understand/change behavior. Fix findings using tests and automatic feedback, not another explicit verification pass; grounding and duplicate-gate checks are not disabled.
+@@ -38,7 +39,7 @@
+ maintainable code, not a particular number or score. Do not wait for approval; this experiment is approved.
+ 
+ Export once at the end (or, on a hard blocker, export the honest partial result):
+-node bench/capture.mjs export "$S" > "$HOME/lh10-groundwork-{RUN}.json"
++node bench/capture.mjs export "$S" > "$HOME/lh10d-groundwork-{RUN}.json"
+ Call upload_attachment with that absolute path, then call provide_structured_output with
+ the returned attachment URL, the count of finished tasks, and any protocol deviations in note.
+ Do not paste the capture into chat or create a PR.

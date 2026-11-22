@@ -1,0 +1,386 @@
+[
+  {
+    "label": "v10-lh-baseline-1",
+    "note": "All 10 tasks (lh-01 to lh-10) finished in order using only the capture wrappers. No protocol deviations. One cross-step refactor: lh-08 added a shared stable sortByStart helper to agenda.js, and buildAgenda now uses it with the same behavior."
+  },
+  {
+    "label": "v10-lh-baseline-10",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via capture wrappers under GW_BENCH_PROTOCOL=stable-v1, GW_BENCH_SUITE=long-horizon. No protocol deviations."
+  },
+  {
+    "label": "v10-lh-baseline-11",
+    "note": "All 10 tasks lh-01..lh-10 finished in order via capture wrappers (stable-v1, baseline run 11). No protocol deviations; used a local helper script ~/c.sh that only invokes bench/capture.mjs with the required env vars."
+  },
+  {
+    "label": "v10-lh-baseline-12",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via capture wrappers; no protocol deviations. Worktree ~/gw-lh12 at e3bdc74, GW_BENCH_PROTOCOL=stable-v1 and GW_BENCH_SUITE=long-horizon set throughout. Quick ad-hoc node checks run via shell wrapper; no tests edited."
+  },
+  {
+    "label": "v10-lh-baseline-13",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via capture wrappers under stable-v1. No protocol deviations. Wrote shell-wrapper commands via a local helper file (~/cmd.sh, outside the workspace) passed as the wrapper's command string; all edits were made inside the workspace through the shell wrapper."
+  },
+  {
+    "label": "v10-lh-baseline-14",
+    "note": "All 10 tasks finished in order using only the begin/shell/finish wrappers. One deviation: the first shell call failed because the persistent shell did not keep exported env vars (S was empty), so the harness printed a usage error and nothing ran. I reran the same command as one-shot calls with GW_BENCH_SUITE, GW_BENCH_PROTOCOL and S set on each call. The read wrapper was never used; file contents were viewed with cat through the shell wrapper."
+  },
+  {
+    "label": "v10-lh-baseline-15",
+    "note": "All 10 tasks (lh-01..lh-10) begun/finished in order via capture wrappers under GW_BENCH_PROTOCOL=stable-v1, GW_BENCH_SUITE=long-horizon, detached worktree ~/gw-lh-wt at e3bdc74. No protocol deviations: all reads/edits through read/shell wrappers (shell commands passed as a heredoc-built string from the outer shell); no source checkout, validation/acceptance files, or other sessions consulted."
+  },
+  {
+    "label": "v10-lh-baseline-16",
+    "note": "All 10 tasks finished in order via the capture wrappers. No protocol deviations: the setup steps (fetch, worktree, npm ci, build) ran outside the wrappers, as the instructions said."
+  },
+  {
+    "label": "v10-lh-baseline-2",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via capture wrappers under stable-v1. Files were written with a helper script that base64-pipes content through the captured shell wrapper. No protocol deviations."
+  },
+  {
+    "label": "v10-lh-baseline-3",
+    "note": "No harness protocol deviations."
+  },
+  {
+    "label": "v10-lh-baseline-4",
+    "note": "All 10 tasks finished in order using only the capture wrappers. No protocol deviations. One minor note: on lh-03 the first shell write was replaced by a cleaner version in a second shell call before finish."
+  },
+  {
+    "label": "v10-lh-baseline-5",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via capture wrappers with GW_BENCH_SUITE=long-horizon and GW_BENCH_PROTOCOL=stable-v1. Deviations: none of substance; files were written via base64-encoded content echoed through the shell wrapper (no staging files); several begin/shell/finish calls were chained sequentially in one host command."
+  },
+  {
+    "label": "v10-lh-baseline-6",
+    "note": "All 10 tasks finished in order via wrappers. Minor deviations: first begin attempt failed because the shell lost env vars/cwd (no state changed; re-ran with GW_BENCH_PROTOCOL/SUITE set via a small ~/cap.sh wrapper script around bench/capture.mjs). In lh-08, refactored agenda.js to export scheduleEvents (buildAgenda behavior unchanged)."
+  },
+  {
+    "label": "v10-lh-baseline-7",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order under GW_BENCH_PROTOCOL=stable-v1, GW_BENCH_SUITE=long-horizon. Minor deviations: (1) at lh-01 I viewed package.json once with cat via the shell wrapper rather than the read wrapper; (2) during lh-01 a stray quick-check command wrote a small unused file /tmp/t1.mjs outside the workspace (it was never used); (3) files were written by local helper scripts that only invoke the captured shell wrapper with a heredoc, so every write still went through capture."
+  },
+  {
+    "label": "v10-lh-baseline-8",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via the capture wrappers under stable-v1. Minor deviation: for lh-01, a throwaway quick-check script was written to /tmp/t1.mjs (outside the workspace, via the shell wrapper); later checks used inline node stdin. No feature code was written outside the workspace and no tests were edited."
+  },
+  {
+    "label": "v10-lh-baseline-9",
+    "note": "All 10 tasks finished in order. No harness protocol deviations."
+  },
+  {
+    "label": "v10-lh-groundwork-1",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order and exported. Minor deviations: (1) two failed wrapper invocations before lh-01 began: once from the wrong cwd (module not found), and once after the persistent shell lost the exported GW_BENCH_* env vars, which threw 'Capture state does not match this suite' before any state change. After that every invocation passed GW_BENCH_PROTOCOL=stable-v1 and GW_BENCH_SUITE=long-horizon per call, with GW_EXPERIMENTAL_READ_PATHS unset. (2) Files were written by piping base64-encoded content through the shell wrapper (echo | base64 -d > file inside the workspace). (3) Orientation was one batched outline plus one batched read_symbol in lh-01, and one 3-line read of src/catalog.js to check the import style. find_similar was called once (lh-03, for the new sortedEventCards helper), and verify_calls was never called because all cross-file targets were already confirmed by unchanged read_symbol evidence. No Read-hook feedback was emitted."
+  },
+  {
+    "label": "v10-lh-groundwork-10",
+    "note": "No protocol deviations. All 10 tasks lh-01..lh-10 finished in order via the wrappers in the detached worktree at e3bdc74, with GW_BENCH_PROTOCOL=stable-v1, GW_BENCH_SUITE=long-horizon and GW_EXPERIMENTAL_READ_PATHS unset. One batched outline and one read_symbol orientation were done in lh-01; find_similar was called once (sortChronologically, no matches). verify_calls was not needed because all cross-file targets were already confirmed by read_symbol and unchanged."
+  },
+  {
+    "label": "v10-lh-groundwork-11",
+    "note": "All tasks finished in order and passed their smoke checks. One mistyped lh-04 wrapper action was rejected and corrected without accessing the workspace."
+  },
+  {
+    "label": "v10-lh-groundwork-12",
+    "note": "All 10 tasks finished in order via the wrappers. Protocol deviations: none. GW_EXPERIMENTAL_READ_PATHS was unset, GW_BENCH_PROTOCOL=stable-v1 was set for every call, and the wrappers ran through a small local script (~/c.sh) that sets these env vars. Orientation in lh-01 was one batched outline of all 6 files plus one batched read_symbol. find_similar ran once (lh-03 sortByStartsAt: no matches, so NEW). verify_calls was skipped because every cross-file target was already confirmed by unchanged read_symbol evidence. No full-file reads were used."
+  },
+  {
+    "label": "v10-lh-groundwork-13",
+    "note": "All 10 tasks finished in order via wrappers. No protocol deviations. Small notes: outlining the src/lib directory returned 'not indexed', so I outlined the individual files in a second call. lh-03 was edited twice within the task to remove double card construction. find_similar was called once (lh-03 sortByStart). verify_calls was not used because all targets were confirmed by read_symbol evidence."
+  },
+  {
+    "label": "v10-lh-groundwork-14",
+    "note": "All 10 tasks finished. Minor deviation: the lh-04 quick check failed to run because of a shell-quoting mistake in the test path (the feature code was already written); it was re-run and passed in the lh-05 workspace before the lh-05 edits. Ad-hoc checks used node stdin/-e and wrote no files into workspaces except a /tmp script for lh-04. No verify_calls used; find_similar called once (lh-03, orderByStart)."
+  },
+  {
+    "label": "v10-lh-groundwork-15",
+    "note": "All 10 tasks finished. Minor deviations: used a local wrapper script (~/c.sh) that sets GW_BENCH_SUITE/GW_BENCH_PROTOCOL, unsets GW_EXPERIMENTAL_READ_PATHS, and calls bench/capture.mjs; one repo_map call plus one batched outline/read_symbol at lh-01 only; no find_similar or verify_calls calls (new code reused helpers confirmed via read_symbol)."
+  },
+  {
+    "label": "v10-lh-groundwork-16",
+    "note": "All 10 tasks (lh-01..lh-10) begun and finished in order via wrappers. No protocol deviations. Ran quick node checks through the shell wrapper; I did not call verify_calls because nothing I depended on had changed since read_symbol. Used find_similar once (lh-08, for the new sortEventsByStart helper; no matches)."
+  },
+  {
+    "label": "v10-lh-groundwork-2",
+    "note": "All 10 tasks finished in order via the captured wrappers (worktree ~/gw-lh2 at e3bdc74, GW_BENCH_PROTOCOL=stable-v1, GW_EXPERIMENTAL_READ_PATHS unset). No protocol deviations. The first few wrapper calls failed before lh-01 begin because a non-persistent shell lost its cwd and env; they changed no state, and every later call went through a script that sets cwd and env. Orientation: one outline and one batched read_symbol in lh-01. find_similar once (lh-03, new sortByStart helper). verify_calls never called because nothing cross-file was left unconfirmed. Quick checks ran as node -e through the shell wrapper."
+  },
+  {
+    "label": "v10-lh-groundwork-3",
+    "note": "All 10 tasks finished in order. Deviations: (1) first begin attempts failed because the env vars/cwd were not persisted between exec calls (one ran with the wrong cwd, one gave a suite mismatch with GW_BENCH_SUITE unset); fixed with a wrapper script that cds into the worktree and exports GW_BENCH_SUITE/GW_BENCH_PROTOCOL before every call. These failed calls happened before lh-01 began and recorded nothing. (2) In lh-01, after the outline call I made a separate batched read_symbol for all 9 helpers, plus one shell rg for import/export style and the README. verify_calls was skipped every task because all cross-file targets were confirmed by unchanged read_symbol evidence. find_similar was not called; the new helper sortEventCards (lh-08) extends buildAgenda."
+  },
+  {
+    "label": "v10-lh-groundwork-4",
+    "note": "All 10 tasks (lh-01..lh-10) begun/finished in order via capture wrappers under GW_BENCH_PROTOCOL=stable-v1, GW_BENCH_SUITE=long-horizon, GW_EXPERIMENTAL_READ_PATHS unset. Used a small bash wrapper (~/c.sh) that just invokes node bench/capture.mjs with those env vars. One outline + one batched read_symbol orientation in lh-01; no find_similar or verify_calls calls (all helpers reused from confirmed evidence; new cross-file targets were own files just written). No protocol deviations otherwise."
+  },
+  {
+    "label": "v10-lh-groundwork-5",
+    "note": "Reused unchanged orientation evidence on lh-05, lh-08, lh-09, and lh-10 without fresh orientation MCP calls. All ten tasks finished in order; exported once."
+  },
+  {
+    "label": "v10-lh-groundwork-6",
+    "note": "All 10 tasks finished via wrappers. Minor deviations: first begin call failed because S was not persisted across shell calls (re-run via a helper script that sets env each call); one plain read of src/catalog.js for import style; find_similar called once (lh-01); verify_calls not used (no unconfirmed cross-file targets)."
+  },
+  {
+    "label": "v10-lh-groundwork-7",
+    "note": "All 10 tasks finished. Minor deviations: lh-01 used one extra read_symbol after the outline (to read helper bodies), and one shell grep to check import/export style; lh-03's agenda.js was written twice within the same task before finishing. find_similar and verify_calls were never called, because every helper was REUSE of an existing lib function or small feature-local code."
+  },
+  {
+    "label": "v10-lh-groundwork-8",
+    "note": "All 10 tasks finished in order. No protocol deviations. Used a small ~/gw.sh wrapper script that only calls node bench/capture.mjs with GW_EXPERIMENTAL_READ_PATHS unset and GW_BENCH_SUITE/GW_BENCH_PROTOCOL set. One batched outline and one read_symbol at lh-01; one find_similar at lh-03 for the new sortByStart helper (no matches); verify_calls was not needed."
+  },
+  {
+    "label": "v10-lh-groundwork-9",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order. Deviation: env vars (GW_BENCH_SUITE, GW_BENCH_PROTOCOL) did not persist between non-tty exec calls, so the first 'begin lh-01' attempt failed with 'Capture state does not match this suite' before any task work; fixed with a wrapper script that exports them (and unsets GW_EXPERIMENTAL_READ_PATHS) on every invocation. Used one batched read_symbol on lib helpers in lh-01 (in addition to outline); no find_similar or verify_calls calls (all targets confirmed by read_symbol evidence). In lh-08, agenda.js was refactored to export orderEventsChronologically, reused by the digest."
+  },
+  {
+    "label": "v10-nav-baseline-1",
+    "note": "Baseline arm run 1, stable-v1 protocol, all 30 tasks done in the required order. No protocol deviations. In edit-02, edit-04 and edit-06 I ran short python3 one-liners through the captured shell wrapper to check the edits; no tests were edited."
+  },
+  {
+    "label": "v10-nav-baseline-10",
+    "note": "Baseline arm, run 10, protocol stable-v1: all 30 tasks finished in the required order using only the capture wrappers. Nothing deviated from the protocol. The worktree was a detached checkout at e3bdc74 in ~/gw-bench-b10."
+  },
+  {
+    "label": "v10-nav-baseline-11",
+    "note": "Baseline arm, run 11. All 30 tasks done in order (groundwork, ts-app, py-app, then edits), using only the capture wrappers with GW_BENCH_PROTOCOL=stable-v1 set throughout. No protocol deviations. Minor: rg --type ts/py filters returned nothing in task workspaces, so I used plain rg paths instead."
+  },
+  {
+    "label": "v10-nav-baseline-12",
+    "note": "No protocol deviations. All 30 tasks done in order (groundwork, ts-app, py-app, then edits) using only the capture wrappers, with GW_BENCH_PROTOCOL=stable-v1 set. Worktree was ~/gw-bench-12 at e3bdc74 (detached), S=$HOME/nav10-baseline-12."
+  },
+  {
+    "label": "v10-nav-baseline-13",
+    "note": "All 30 tasks done in the required order (groundwork, ts-app, py-app, then edits) through the capture wrappers, with GW_BENCH_PROTOCOL=stable-v1 set on every call. No protocol deviations. I called the wrappers through a small helper script (~/c.sh) that sets the env var and runs node bench/capture.mjs <cmd> $S. Each edit was checked with a quick python3/git diff run through the shell wrapper. No tests were edited, and nothing was committed or pushed."
+  },
+  {
+    "label": "v10-nav-baseline-14",
+    "note": "No protocol deviations. GW_BENCH_PROTOCOL=stable-v1 was set on every wrapper call through a small ~/c script that also cd's into the worktree, and nothing but the wrappers touched the task workspaces. Edits were made with short Python replace scripts via the shell wrapper and none were tested."
+  },
+  {
+    "label": "v10-nav-baseline-15",
+    "note": "Baseline arm run 15, protocol stable-v1, all 30 tasks finished in the required order using only the capture shell/read wrappers. No protocol deviations. Edits were not run or tested inside the workspaces."
+  },
+  {
+    "label": "v10-nav-baseline-16",
+    "note": "No protocol deviations. All 30 tasks done in the required order (groundwork, ts-app, py-app, then edits), using only the capture wrappers with GW_BENCH_PROTOCOL=stable-v1. Worktree ~/gw-bench16 detached at e3bdc74. A few edit tasks ran short python3 checks of the patched code through the shell wrapper."
+  },
+  {
+    "label": "v10-nav-baseline-2",
+    "note": "Baseline run 2, stable-v1, all 30 tasks finished in the required order. No protocol deviations. Notes: gw-01 got a second shell call after its first one, because a bash function didn't persist across one-shot execs; I then used a small wrapper script (~/c.sh) that calls bench/capture.mjs with GW_BENCH_PROTOCOL=stable-v1. In ts-01 I printed all ts-app src files with a single wrapper shell call. Some edit tasks ran quick python sanity checks through the shell wrapper."
+  },
+  {
+    "label": "v10-nav-baseline-3",
+    "note": "All 30 tasks finished in the required order. Deviations: none in the protocol. For convenience I used a small wrapper script (~/b) that only calls node bench/capture.mjs with S and GW_BENCH_PROTOCOL=stable-v1 set. I ran several wrapper calls one after another inside a single exec, never in parallel. For the Python edit tasks I ran quick sanity checks through the shell wrapper and then deleted the __pycache__ dirs before finishing."
+  },
+  {
+    "label": "v10-nav-baseline-4",
+    "note": "No protocol deviations. All 30 tasks done in the required order (groundwork, ts-app, py-app, then edits) using only the capture wrappers, with GW_BENCH_PROTOCOL=stable-v1 set throughout, in a detached worktree at e3bdc74. Edit tasks were checked by printing the changed lines only; no tests were run."
+  },
+  {
+    "label": "v10-nav-baseline-5",
+    "note": "All 30 tasks done in the order given, using only the capture wrappers. Minor deviations: in edit-01 a shell command printed the first 3 lines of src/utils/text.ts with cat|head instead of using the read wrapper. In edit-04 a python3 sanity run through the shell wrapper created __pycache__, which I deleted before finish."
+  },
+  {
+    "label": "v10-nav-baseline-6",
+    "note": "All 30 tasks finished in protocol order under GW_BENCH_PROTOCOL=stable-v1. No deviations. Edits were made with short Python scripts through the shell wrapper."
+  },
+  {
+    "label": "v10-nav-baseline-7",
+    "note": "All 30 tasks finished in the required order via the wrappers. Deviations: none. Small process notes: one wrapper call failed with 'command not found' because the shell helper function didn't persist, and it was rerun through a helper script; after reading a file with `read`, some tasks used several wrapper calls chained in one command."
+  },
+  {
+    "label": "v10-nav-baseline-8",
+    "note": "All 30 tasks finished in the required order. Minor deviation: on gw-06 I ran one shell command that printed lines 1-30 of src/util/paths.ts with sed instead of using the read wrapper. It still went through the captured shell wrapper. Also, the edit-02, edit-04 and edit-06 sanity checks ran short python3 one-liners inside the task workspace via the shell wrapper."
+  },
+  {
+    "label": "v10-nav-baseline-9",
+    "note": "Baseline run 9, stable-v1, all 30 tasks finished in the required order. One minor deviation: the Python patch scripts for edit-02 through edit-06 were written to ~/nav9-edits (outside the task workspaces) with a plain exec, then run inside each workspace through the capture shell wrapper. All code reads and edits of the target workspaces went through the wrappers."
+  },
+  {
+    "label": "v10-nav-groundwork-1",
+    "note": "All 30 tasks finished in the required order. Deviations: in a few tasks (py-07, edit-01/03/05) a short `sed -n`/`head`/`cat` ran through the shell wrapper to view small ranges or check results after edits, not through the read wrapper. In edit-02/04/06 a python3 one-liner ran through the shell wrapper to sanity-check the edit. Used a tiny ~/b.sh launcher that unsets GW_EXPERIMENTAL_READ_PATHS, exports GW_BENCH_PROTOCOL=stable-v1 and calls bench/capture.mjs; each invocation was manual and sequential."
+  },
+  {
+    "label": "v10-nav-groundwork-10",
+    "note": "All 30 tasks done in order (groundwork, ts-app, py-app, edits). Protocol: stable-v1, condition groundwork, run 10, GW_EXPERIMENTAL_READ_PATHS unset. No deviations, except that the first two wrapper invocations failed before reaching the harness: the shell lost the cwd and env between calls. After that, a wrapper script exported GW_BENCH_PROTOCOL=stable-v1 and S for every call."
+  },
+  {
+    "label": "v10-nav-groundwork-11",
+    "note": "All 30 tasks done in the required order under GW_BENCH_PROTOCOL=stable-v1 with GW_EXPERIMENTAL_READ_PATHS unset. Minor deviations: (1) an early `begin gw-01`/`find_code` attempt failed with MODULE_NOT_FOUND because the shell cwd had been lost, so no capture was recorded; I reran it from the worktree through a small ~/c wrapper script around bench/capture.mjs. (2) The finish commands printed nothing, so I relied on export to confirm all 30 observations."
+  },
+  {
+    "label": "v10-nav-groundwork-12",
+    "note": "All 30 tasks finished in the required order (groundwork, ts-app, py-app, edits) under stable-v1, run groundwork/12, with GW_EXPERIMENTAL_READ_PATHS unset. No protocol deviations. The capture wrapper ran through a small helper script (~/c.sh) that sets the env and runs node bench/capture.mjs from the detached worktree ~/gw-bench12."
+  },
+  {
+    "label": "v10-nav-groundwork-13",
+    "note": "All 30 tasks finished in the prescribed order (groundwork, ts-app, py-app, edits) under stable-v1, with GW_EXPERIMENTAL_READ_PATHS unset. No protocol deviations. Extra steps taken: a small python3 smoke check through the shell wrapper on edits 02, 04 and 06."
+  },
+  {
+    "label": "v10-nav-groundwork-14",
+    "note": "All 30 tasks done in the required order via capture wrappers. GW_BENCH_PROTOCOL=stable-v1 was set and GW_EXPERIMENTAL_READ_PATHS was unset for every invocation. Deviations: none in protocol. Minor: one wrapper call failed with 'c: command not found' before reaching the harness, then a wrapper script was used. Edit tasks ran small sanity checks through the shell wrapper (python import/asyncio)."
+  },
+  {
+    "label": "v10-nav-groundwork-15",
+    "note": "All 30 tasks finished in the required order. One harmless deviation: in gw-07 I ran a shell sed range read plus a Read wrapper read of the same lines (both captured). No other deviations: GW_EXPERIMENTAL_READ_PATHS was unset and GW_BENCH_PROTOCOL=stable-v1 was set for every wrapper call."
+  },
+  {
+    "label": "v10-nav-groundwork-16",
+    "note": "All 30 tasks finished in the required order (groundwork, ts-app, py-app, then edits). GW_BENCH_PROTOCOL=stable-v1 was set and GW_EXPERIMENTAL_READ_PATHS was unset for every wrapper call, through a small ~/c.sh launcher script. No protocol deviations. One shell-function call failed before reaching the wrapper, so no tool ran and it was retried. Tests were not run on the edits."
+  },
+  {
+    "label": "v10-nav-groundwork-2",
+    "note": "All 30 tasks done in the order given, through the capture wrappers only, with GW_BENCH_PROTOCOL=stable-v1 and GW_EXPERIMENTAL_READ_PATHS unset. Minor deviations: (1) a small helper script ~/c.sh set the env, cd'd to the worktree and forwarded the arguments to bench/capture.mjs; every call still went through capture. (2) For gw-05 I queried find_code with the exact name 'fitToBudget', which I knew from the repo's AGENTS.md (always-on rule already in context), not a descriptive query. (3) Some tasks chained finish, the next begin and the first lookup in one shell command; they still ran in sequence."
+  },
+  {
+    "label": "v10-nav-groundwork-3",
+    "note": "All 30 tasks finished in the required order. Deviations: gw-07 used shell sed for a range read instead of the read wrapper; edit-02..06 ran edit scripts written to /tmp, outside the workspace, through the shell wrapper."
+  },
+  {
+    "label": "v10-nav-groundwork-4",
+    "note": "All 30 tasks completed in the required order (groundwork, ts-app, py-app, edits). No protocol deviations: GW_EXPERIMENTAL_READ_PATHS unset, GW_BENCH_PROTOCOL=stable-v1 on every call through a wrapper script, and only capture-wrapper tools were used. One harmless slip: a single gw-01 finish attempt failed with 'command not found' because shell functions do not persist across calls. No wrapper ran, and the retry through the script succeeded."
+  },
+  {
+    "label": "v10-nav-groundwork-5",
+    "note": "No protocol deviations. All 30 tasks done in order (groundwork, ts-app, py-app, then edits), using only the capture wrappers. GW_EXPERIMENTAL_READ_PATHS was unset and GW_BENCH_PROTOCOL=stable-v1 was set. Detached worktree at e3bdc74 in ~/gw-bench5. No commits or PRs."
+  },
+  {
+    "label": "v10-nav-groundwork-6",
+    "note": "All 30 tasks finished in the required order. Deviations: (1) the one public `list` call ran with GW_BENCH_PROTOCOL unset and an empty STATE argument, because shell state did not persist between calls; list is stateless and returned the task list. init, and every wrapper call through ~/c.sh, had stable-v1 set and GW_EXPERIMENTAL_READ_PATHS unset. (2) Three small range reads went through the captured shell wrapper with `sed -n` instead of the read wrapper: gw-07 read_guard.ts lines 60-80, and the edit-01 post-edit check of text.ts lines 1-3. After that, edits were checked with git diff. (3) Edit tasks were not run or tested."
+  },
+  {
+    "label": "v10-nav-groundwork-7",
+    "note": "All 30 tasks done in the required order (groundwork, ts-app, py-app, edits) via capture wrappers; GW_BENCH_PROTOCOL=stable-v1, GW_EXPERIMENTAL_READ_PATHS unset. Minor: one ts-01 shell rg call with a '!node_modules' glob returned empty due to bash history expansion in the tty shell and was rerun without the glob."
+  },
+  {
+    "label": "v10-nav-groundwork-8",
+    "note": "No protocol deviations. Worktree detached at e3bdc74; GW_BENCH_PROTOCOL=stable-v1 set; GW_EXPERIMENTAL_READ_PATHS unset. All 30 tasks done sequentially in group order (groundwork, ts-app, py-app, edits)."
+  },
+  {
+    "label": "v10-nav-groundwork-9",
+    "note": "All 30 tasks finished in prescribed order (groundwork, ts-app, py-app, edits). GW_BENCH_PROTOCOL=stable-v1 set for every wrapper call; GW_EXPERIMENTAL_READ_PATHS unset. No protocol deviations. Edits were not test-run (no test execution performed)."
+  },
+  {
+    "label": "v10d-lh-groundwork-1",
+    "note": "All 10 tasks lh-01..lh-10 finished in order via wrappers. Minor deviations: file contents were written by passing a locally composed heredoc script as the shell-wrapper command (files written directly in the workspace); lh-01 initially used double quotes and was normalized to single quotes with sed. No verify_calls or find_similar calls (all reused helpers confirmed via one batched read_symbol in lh-01; new helper sortChronologically was exported from agenda.js in lh-03 and reused in lh-08). One repo_map, one batched outline, one batched read_symbol total."
+  },
+  {
+    "label": "v10d-lh-groundwork-10",
+    "note": "All 10 tasks finished in order. Deviations: in lh-01 I read src/catalog.js once with the read wrapper and ran one shell ls/grep/cat on README and package.json to orient myself. I called find_similar 0 times and verify_calls 0 times, because all new code called helpers already confirmed by read_symbol. In lh-08 I extended agenda.js by extracting orderByStart so the digest could reuse it. Tests were quick node -e checks run through the shell wrapper."
+  },
+  {
+    "label": "v10d-lh-groundwork-11",
+    "note": "All 10 tasks finished in order via the wrappers. Deviations: did not call find_similar (I judged the new helpers trivial or already covered by the batched read_symbol evidence; sortChronologically in agenda.js was the one non-trivial new helper and was later reused by digest). Did not call verify_calls because all cross-file targets had been confirmed by the lh-01 read_symbol of unchanged lib files plus my own files. No Read-hook feedback came up, since no full-file reads went through the read wrapper. One orientation step (batched outline plus read_symbol) in lh-01."
+  },
+  {
+    "label": "v10d-lh-groundwork-12",
+    "note": "All 10 tasks finished via wrappers. Deviations: used a small local wrapper script (~/c12.sh) that sets env and calls capture.mjs with S; one shell call listed workspace files/README before first MCP use; one outline call followed by a batched read_symbol of all 9 lib symbols in lh-01 (outline was locations-only). No find_similar or verify_calls calls (all helpers reused, no unconfirmed cross-file targets)."
+  },
+  {
+    "label": "v10d-lh-groundwork-13",
+    "note": "All ten tasks finished and smoke checks passed. One malformed wrapper invocation after beginning lh-04 printed usage and exited without accessing the workspace; the task then continued through the specified wrappers."
+  },
+  {
+    "label": "v10d-lh-groundwork-14",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order under stable-v1, GW_EXPERIMENTAL_READ_PATHS unset. No protocol deviations. Orientation in lh-01: one batched outline of all 6 files, then one batched read_symbol of the 9 helpers. No find_similar calls: every task reused existing helpers. In lh-08 I extended buildAgenda by extracting sortChronologically. No verify_calls: all cross-file targets were my own unchanged code or helpers I had already read. The read wrapper was never used. Quick node checks ran via the shell wrapper."
+  },
+  {
+    "label": "v10d-lh-groundwork-15",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via the captured wrappers with GW_BENCH_PROTOCOL=stable-v1, GW_BENCH_SUITE=long-horizon, GW_EXPERIMENTAL_READ_PATHS unset. No protocol deviations. One orientation step: an outline of the lib files plus a batched read_symbol in lh-01. find_similar ran twice, for createEventCard and sortByStart. verify_calls was skipped because every cross-file target was confirmed by unchanged read_symbol evidence. README and file list were viewed with shell cat/find through the shell wrapper."
+  },
+  {
+    "label": "v10d-lh-groundwork-16",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via wrappers with GW_BENCH_PROTOCOL=stable-v1, GW_BENCH_SUITE=long-horizon, GW_EXPERIMENTAL_READ_PATHS unset. No protocol deviations. Minor: lh-01 used repo_map plus an orientation shell listing and a batched outline+read_symbol of all six lib files; find_similar and verify_calls were not called (all helpers already confirmed by read_symbol). New files use double quotes, unlike the repo's single-quote style."
+  },
+  {
+    "label": "v10d-lh-groundwork-2",
+    "note": "All 10 tasks (lh-01..lh-10) finished in order via wrappers. Deviations: env vars did not persist across shell calls, so a small ~/gwenv.sh (unset GW_EXPERIMENTAL_READ_PATHS, export GW_BENCH_SUITE/GW_BENCH_PROTOCOL/S, cd worktree) was sourced before each wrapper call; one early begin attempt failed before running (wrong cwd/missing env), no effect on capture. In lh-08, agenda.js was refactored (extracted sortEventsWithCards) to share chronological sorting with the digest. verify_calls and find_similar not used (helpers confirmed via read_symbol in-context)."
+  },
+  {
+    "label": "v10d-lh-groundwork-3",
+    "note": "All ten steps finished in order and passed local smoke checks. The first lh-01 begin command failed before loading the wrapper because of the working directory; the corrected invocation succeeded without changing harness state on the failed attempt."
+  },
+  {
+    "label": "v10d-lh-groundwork-4",
+    "note": "No known capture protocol deviations."
+  },
+  {
+    "label": "v10d-lh-groundwork-5",
+    "note": "All 10 tasks finished via wrappers. Minor deviations: used one batched read_symbol on lib helpers in lh-01 after outline (outline returned locations only); one small range read of src/catalog.js imports; no find_similar or verify_calls calls (helpers were reused, new helpers small). In lh-03 I added an exported sortByStart helper in agenda.js, and digest reuses it. Ran quick node -e checks through the shell wrapper."
+  },
+  {
+    "label": "v10d-lh-groundwork-6",
+    "note": "All 10 tasks finished via the wrappers. No protocol deviations. Files were written with base64-decoded content through the shell wrapper. find_similar and verify_calls were not called: every task reused helpers already confirmed by read_symbol or by my own earlier code, and the one new shared helper (sortChronologically, lh-03) is small. I used a single orientation (outline of all 6 lib files plus read_symbol) at lh-01."
+  },
+  {
+    "label": "v10d-lh-groundwork-7",
+    "note": "All 10 tasks finished in order via wrappers. Deviations: one repo_map call plus a shell file listing in lh-01 orientation; outline was followed by a batched read_symbol and a small read of catalog.js/collections.js head; verify_calls skipped (targets confirmed by unchanged read_symbol evidence); lh-08 refactored agenda.js to export orderEventsByStart for reuse by digest."
+  },
+  {
+    "label": "v10d-lh-groundwork-8",
+    "note": "All 10 tasks finished via the capture wrappers (stable-v1, GW_EXPERIMENTAL_READ_PATHS unset). No protocol deviations. Notes: one batched outline + one batched read_symbol at lh-01 orientation; no find_similar or verify_calls (all helpers confirmed by read_symbol; new targets were own files); lh-08 extended agenda.js with an exported sortEventsChronologically helper reused by digest."
+  },
+  {
+    "label": "v10d-lh-groundwork-9",
+    "note": "All 10 tasks finished in order. Minor deviations: one wrapper call (start of lh-01) failed with a usage error because the env vars were not carried into a new shell; I re-exported them and reran it. One lh-10 shell check failed with a quoting error (no edits) and was rerun. lh-08 refactored agenda.js to extract orderChronologically, which digest reuses. No verify_calls or find_similar calls were made."
+  },
+  {
+    "label": "v10d-nav-groundwork-1",
+    "note": "All 30 tasks finished in the specified order (groundwork, ts-app, py-app, edits). Deviations (minor): a few wrapper calls were chained in one shell command (sequential, not parallel); edit-02 and edit-04/06 were sanity-checked with a short python3 run inside the captured shell. GW_EXPERIMENTAL_READ_PATHS unset, GW_BENCH_PROTOCOL=stable-v1 set for every call."
+  },
+  {
+    "label": "v10d-nav-groundwork-10",
+    "note": "All 30 tasks done in the required order (groundwork, ts-app, py-app, edits) under stable-v1, with GW_EXPERIMENTAL_READ_PATHS unset. Deviations: the first gw-01 begin attempt failed with a wrong-path error before any task started, so no capture was affected. The shell did not keep state between calls, so a small ~/c wrapper script re-exported GW_BENCH_PROTOCOL, unset GW_EXPERIMENTAL_READ_PATHS and called bench/capture.mjs for each invocation. No edits were tested by running code."
+  },
+  {
+    "label": "v10d-nav-groundwork-11",
+    "note": "All 30 tasks finished in the required order (groundwork, ts-app, py-app, edits). Deviations: (1) whole small files were printed with cat via the shell wrapper instead of the read wrapper on 3 tasks: ts-05 src/legacy.js, edit-02 app/cli.py, edit-06 app/services/tax.py. (2) On the other edit tasks, sed printed the changed lines to confirm the edits. (3) The read wrapper was never used, so the Read guard was never dispatched. (4) The persistent shell lost its variables after init, so a helper script set GW_BENCH_PROTOCOL=stable-v1 and unset GW_EXPERIMENTAL_READ_PATHS on every wrapper call. experimentalReadPaths was left unset."
+  },
+  {
+    "label": "v10d-nav-groundwork-12",
+    "note": "All 30 tasks finished through the capture wrapper, in the required group order. No protocol deviations in solving. Setup notes: the exec tool's shell did not keep exported env or shell functions between calls, so every wrapper call went through a small script (~/c). That script unsets GW_EXPERIMENTAL_READ_PATHS, exports GW_BENCH_PROTOCOL=stable-v1, and runs bench/capture.mjs from the detached worktree ~/gw-bench12 at e3bdc74. One early begin attempt failed because of a wrong cwd and a missing S variable, before any tool ran. Edits were not run or tested; the instructions did not ask for that."
+  },
+  {
+    "label": "v10d-nav-groundwork-13",
+    "note": "All 30 tasks finished in the required order (groundwork, ts-app, py-app, then edits), stable-v1, GW_EXPERIMENTAL_READ_PATHS unset. Minor deviations: (1) env/shell functions did not persist between exec calls, so the first two gw-01 begin attempts failed before the wrapper ran (module-not-found / usage error with empty state dir; nothing recorded); all later calls went through a small ~/c.sh launcher that sets GW_BENCH_PROTOCOL=stable-v1, unsets GW_EXPERIMENTAL_READ_PATHS and runs bench/capture.mjs from the worktree. (2) gw-05: the find_code query used the name fitToBudget, which I knew from the repo's AGENTS.md rule auto-injected into my context (not from source); I confirmed it with read_symbol. (3) Several tasks used the shell to cat/sed files after edits to check them, and some small-file reads used the read wrapper instead of outline."
+  },
+  {
+    "label": "v10d-nav-groundwork-14",
+    "note": "All 30 tasks finished in the required order (groundwork, ts-app, py-app, then edits). Deviations: none intentional. The persistent shell did not keep exported env vars, so every wrapper call went through a small ~/c script that cds to the worktree, unsets GW_EXPERIMENTAL_READ_PATHS, exports GW_BENCH_PROTOCOL=stable-v1 and calls node bench/capture.mjs. One call failed (cwd/function missing) before any task began. On gw-05 the query fitToBudget came from the repo's AGENTS.md rule, which was loaded into context automatically."
+  },
+  {
+    "label": "v10d-nav-groundwork-15",
+    "note": "All 30 tasks finished in prescribed order. Deviations: (1) gw-09 one invalid mcp tool name 'read_symbols' (errored, recorded in capture); (2) edit-01 used `cat` via shell wrapper to view the full small file instead of the read wrapper; (3) ts-04 queried find_code by exact name joinParts, a name seen in ts-01's find_code results; (4) edits not test-run (only a Python parse check). GW_EXPERIMENTAL_READ_PATHS unset, GW_BENCH_PROTOCOL=stable-v1 set for all invocations."
+  },
+  {
+    "label": "v10d-nav-groundwork-16",
+    "note": "All 30 tasks finished in the required order (stable-v1 protocol, GW_EXPERIMENTAL_READ_PATHS unset). Deviations: (1) edit-03 had one stray invalid MCP call (tool name 'read_symbols', output discarded) before the correct read_symbol call. (2) Python verification runs in edit-02/04/06 created __pycache__, which was deleted before finish. (3) gw-05 queried fitToBudget by its exact name, which I already knew from the repo's AGENTS.md rule that was injected into context, and then confirmed it with read_symbol."
+  },
+  {
+    "label": "v10d-nav-groundwork-2",
+    "note": "All 30 tasks finished in the required order. Minor deviations: in gw-07 I used shell `sed -n 60,80p | rg` on read_guard.ts, and in ts-07 I used shell `cat` on src/utils/date.ts (plus rg). Those are whole-file or ranged views through the shell wrapper rather than the read wrapper. For the edit tasks I printed my changed lines with shell sed/head after the Python edits. No other deviations: GW_BENCH_PROTOCOL=stable-v1 was set throughout and GW_EXPERIMENTAL_READ_PATHS was unset."
+  },
+  {
+    "label": "v10d-nav-groundwork-3",
+    "note": "All 30 tasks finished in the required order under stable-v1, condition groundwork, run 3. GW_EXPERIMENTAL_READ_PATHS was unset. Minor deviation: init ran in a one-shot shell with GW_BENCH_PROTOCOL exported inline, and all later wrapper calls ran in a persistent shell with it exported. No forced repeat Reads."
+  },
+  {
+    "label": "v10d-nav-groundwork-4",
+    "note": "All 30 tasks done in the specified order (groundwork, ts-app, py-app, edits), with GW_BENCH_PROTOCOL=stable-v1 and GW_EXPERIMENTAL_READ_PATHS unset. No protocol deviations. Before gw-01, two wrapper calls failed before reaching the harness: a wrong cwd gave module-not-found, and an empty state dir gave a usage error. I then switched to a fixed wrapper script."
+  },
+  {
+    "label": "v10d-nav-groundwork-5",
+    "note": "All 30 tasks finished in protocol order (groundwork, ts-app, py-app, edits). Deviations: (1) in gw-01 one batched find_code also included a query for gw-02's topic; gw-02 was still independently resolved with its own read_symbol call. (2) In edit-03 one mcp call used an invalid tool name (read_symbols), which errored harmlessly before the correct read_symbol call. (3) gw-05 query used the name fitToBudget, recalled from AGENTS.md rules auto-loaded into context, then confirmed via the index. Edits were applied via base64-piped Python scripts through the shell wrapper. GW_EXPERIMENTAL_READ_PATHS unset, GW_BENCH_PROTOCOL=stable-v1 set throughout."
+  },
+  {
+    "label": "v10d-nav-groundwork-6",
+    "note": "All 30 tasks finished in the required order with GW_BENCH_PROTOCOL=stable-v1 set and GW_EXPERIMENTAL_READ_PATHS unset. Protocol deviations: (1) I used `cat` through the shell wrapper on two small files instead of the read wrapper: src/hooks/handlers/index.ts (gw-07) and src/utils/index.ts (ts-07). (2) After several edit tasks I printed the edited file with cat/sed through the shell wrapper to check the patch. (3) gw-05 queried the exact name fitToBudget, which I knew from the repo's AGENTS.md that was loaded as always-on rules context. (4) My first gw-01 finish failed with a local shell-function error before it reached the harness, and I re-ran it right away through a wrapper script. No commits, PRs or harness changes."
+  },
+  {
+    "label": "v10d-nav-groundwork-7",
+    "note": "All 30 tasks finished in the given order with GW_BENCH_PROTOCOL=stable-v1 set and GW_EXPERIMENTAL_READ_PATHS unset. Small deviations: in py-07 I read the 15-line app/cli.py with `cat` through the shell wrapper instead of the read wrapper. In ts-05, ts-06 and py-05 I used `ls -R`/`ls` through the shell wrapper to get oriented. Edits were checked with short python3 runs through the shell wrapper (py-app only). No TS typecheck was run for edit-05."
+  },
+  {
+    "label": "v10d-nav-groundwork-8",
+    "note": "All 30 tasks finished in the required order under stable-v1, condition groundwork, run 8, with GW_EXPERIMENTAL_READ_PATHS unset. Two possible protocol deviations. (1) The always-on repo rule (AGENTS.md) was auto-injected into context and names fitToBudget, so the gw-05 find_code query used that exact name; the body was still checked with read_symbol through the wrapper before submitting. (2) Before init, two wrapper calls failed with a usage error because the env vars and $S were lost between shell calls; neither reached the harness state. No other deviations."
+  },
+  {
+    "label": "v10d-nav-groundwork-9",
+    "note": "All 30 tasks finished in the required order (groundwork, ts-app, py-app, edits). No protocol deviations. GW_BENCH_PROTOCOL=stable-v1 was set and GW_EXPERIMENTAL_READ_PATHS was unset. Edits were applied with short Python scripts through the shell wrapper and were not test-run."
+  }
+]

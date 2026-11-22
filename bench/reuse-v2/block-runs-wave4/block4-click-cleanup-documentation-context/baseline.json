@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-cleanup-documentation-context",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/cleanup_documentation_context.py b/src/click/cleanup_documentation_context.py\nnew file mode 100644\nindex 0000000..5f3319d\n--- /dev/null\n+++ b/src/click/cleanup_documentation_context.py\n@@ -0,0 +1,28 @@\n+from __future__ import annotations\n+\n+import typing as t\n+\n+from .core import Context\n+from .core import Group\n+\n+\n+class CleanupDocumentationContext(Group):\n+    \"\"\"A group that cleans up subcommand contexts during documentation traversal.\"\"\"\n+\n+    def to_info_dict(self, ctx: Context) -> dict[str, t.Any]:\n+        info_dict = super(Group, self).to_info_dict(ctx)\n+        commands = {}\n+\n+        for name in self.list_commands(ctx):\n+            command = self.get_command(ctx, name)\n+\n+            if command is None:\n+                continue\n+\n+            sub_ctx = ctx._make_sub_context(command)\n+\n+            with sub_ctx.scope(cleanup=True):\n+                commands[name] = command.to_info_dict(sub_ctx)\n+\n+        info_dict.update(commands=commands, chain=self.chain)\n+        return info_dict\n",
+  "decisions": [],
+  "notes": "The new subclass mirrors Group.to_info_dict and enables cleanup when each subcommand scope exits. It preserves the original method resolution after Group and leaves existing modules unchanged.\nAgent-reported tests_run (not independently verified): \"PYTHONPATH=src .venv/bin/python -m pytest -q: 900 passed, 21 skipped, 1 xfailed with locked pytest 8.4.0 (pytest 9.2.0 failed at collection); PYTHONPATH=src .venv/bin/python -: focused cleanup, exception, signature, and metadata checks passed; .venv/bin/ruff check --no-fix and .venv/bin/ruff format --check on the new module, and git diff --cached --check: passed.\"",
+  "session_id": "",
+  "acus": null
+}

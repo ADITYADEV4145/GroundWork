@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-numeric-type-error",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/numeric_type_error.py b/src/click/numeric_type_error.py\nnew file mode 100644\nindex 0000000..0a9037c\n--- /dev/null\n+++ b/src/click/numeric_type_error.py\n@@ -0,0 +1,28 @@\n+from __future__ import annotations\n+\n+import typing as t\n+from gettext import gettext as _\n+\n+from .types import _NumberParamTypeBase\n+\n+if t.TYPE_CHECKING:\n+    from .core import Context\n+    from .core import Parameter\n+\n+\n+class NumericTypeError(_NumberParamTypeBase):\n+    \"\"\"Report invalid numeric input as a bad parameter for either error type.\"\"\"\n+\n+    def convert(\n+        self, value: t.Any, param: Parameter | None, ctx: Context | None\n+    ) -> t.Any:\n+        try:\n+            return self._number_class(value)\n+        except (TypeError, ValueError):\n+            self.fail(\n+                _(\"{value!r} is not a valid {number_type}.\").format(\n+                    value=value, number_type=self.name\n+                ),\n+                param,\n+                ctx,\n+            )\n",
+  "decisions": [],
+  "notes": "Added NumericTypeError in a standalone module. Its override preserves the base signature and localized failure path, and handles TypeError alongside ValueError without editing existing modules.\nAgent-reported tests_run (not independently verified): \"PYTHONPATH=src .git/task-venv/bin/python -m pytest -q: pytest 9.2.0 failed collection on an existing deprecation; locked pytest 8.4.0 passed (900 passed, 21 skipped, 1 xfailed). PYTHONPATH=src .git/task-venv/bin/python - (focused conversion assertions), Ruff check and format --check, and git diff --cached --check passed.\"",
+  "session_id": "",
+  "acus": null
+}

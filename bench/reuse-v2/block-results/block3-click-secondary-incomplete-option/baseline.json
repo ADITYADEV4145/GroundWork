@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-click-secondary-incomplete-option",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "eb236e1ecbaf1850d83cceb4bec9c696b322e40a",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/secondary_incomplete_option.py",
+          "symbol": "src/click/secondary_incomplete_option.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "src/click/shell_completion.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/secondary_incomplete_option.py and update its 10 callers to use src/click/shell_completion.py."
+      },
+      {
+        "id": "a59eed9061fed275a39f9ddb677761b71aae2e74",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/secondary_incomplete_option.py",
+          "symbol": "secondary_incomplete_option",
+          "line": 9
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "ShellComplete.get_completions",
+          "line": 271
+        },
+        "probability": 0.5168686486272053,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.4618589704100952
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6666666666666667
+          }
+        ],
+        "fix": "Duplicate of ShellComplete.get_completions: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

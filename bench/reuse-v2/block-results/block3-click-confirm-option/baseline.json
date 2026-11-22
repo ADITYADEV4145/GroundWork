@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-click-confirm-option",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "17830ec0b6289032fa9eaf8b1c763c21c2f5abe3",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/confirm_option.py",
+          "symbol": "src/click/confirm_option.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "src/click/decorators.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/confirm_option.py and update its 4 callers to use src/click/decorators.py."
+      },
+      {
+        "id": "4d3374fde15f18f0d5c85c531e62bef54d60947d",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/confirm_option.py",
+          "symbol": "confirm_option",
+          "line": 11
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "confirmation_option",
+          "line": 380
+        },
+        "probability": 0.8277897602398245,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.939036024353573
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of confirmation_option: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

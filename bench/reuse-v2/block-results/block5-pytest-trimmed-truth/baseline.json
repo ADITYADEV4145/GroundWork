@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block5-pytest-trimmed-truth",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "d94bbe650a0303f71087c68b207694ef9e47041c",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_trimmed_truth.py",
+          "symbol": "src/standalone_trimmed_truth.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/logging.py",
+          "symbol": "src/_pytest/logging.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_trimmed_truth.py and update its 3 callers to use src/_pytest/logging.py."
+      },
+      {
+        "id": "5f5ad766409aaa75abe2f6a45a7ddc2eee56b065",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_trimmed_truth.py",
+          "symbol": "strtobool_trimmed",
+          "line": 9
+        },
+        "existing": {
+          "file": "src/_pytest/logging.py",
+          "symbol": "PercentStyleMultiline._get_auto_indent",
+          "line": 151
+        },
+        "probability": 0.417770451700312,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.28120125457600403
+          }
+        ],
+        "fix": "Duplicate of PercentStyleMultiline._get_auto_indent: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

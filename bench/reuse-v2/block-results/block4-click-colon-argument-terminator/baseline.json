@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-colon-argument-terminator",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "411d0b0c7ac4893b5a2b1d73d9e4cd1e4c558db7",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/colon_argument_terminator.py",
+          "symbol": "ColonArgumentTerminator._process_args_for_options",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/click/parser.py",
+          "symbol": "_OptionParser",
+          "line": 222
+        },
+        "probability": 0.6845503766714441,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.531666435824409
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _OptionParser: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

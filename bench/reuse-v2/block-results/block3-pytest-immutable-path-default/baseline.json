@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-pytest-immutable-path-default",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "856aeed59f58583ff1595a62acbb497665e28a06",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/immutable_path_default.py",
+          "symbol": "src/_pytest/immutable_path_default.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/config/__init__.py",
+          "symbol": "src/_pytest/config/__init__.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/immutable_path_default.py and update its 3 callers to use src/_pytest/config/__init__.py."
+      },
+      {
+        "id": "b8c60413de3d6c08fa56ec89f186f2fb4567e585",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/immutable_path_default.py",
+          "symbol": "immutable_path_default",
+          "line": 7
+        },
+        "existing": {
+          "file": "src/_pytest/config/__init__.py",
+          "symbol": "Config.getini",
+          "line": 1587
+        },
+        "probability": 0.5647435093741965,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.25774599108002033
+          }
+        ],
+        "fix": "Duplicate of Config.getini: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

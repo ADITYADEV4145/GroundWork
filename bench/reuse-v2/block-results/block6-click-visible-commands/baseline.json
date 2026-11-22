@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-click-visible-commands",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "0c57287f8693ac1c99612795b25d0bf7dc658fe0",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_visible_commands.py",
+          "symbol": "vendored_visible_commands",
+          "line": 29
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "_complete_visible_commands",
+          "line": 53
+        },
+        "probability": 0.9924542141298346,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9744049285431695
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _complete_visible_commands: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

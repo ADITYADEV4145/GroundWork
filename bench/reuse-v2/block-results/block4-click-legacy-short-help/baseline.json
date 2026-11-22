@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-legacy-short-help",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "8a3e87883db7cd32af16691070cdc73db366e270",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/legacy_short_help.py",
+          "symbol": "LegacyShortHelp.get_short_help_str",
+          "line": 17
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Command.get_short_help_str",
+          "line": 1067
+        },
+        "probability": 0.6697915486360578,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Command.get_short_help_str: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

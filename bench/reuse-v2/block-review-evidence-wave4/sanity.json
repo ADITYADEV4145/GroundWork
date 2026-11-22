@@ -1,0 +1,931 @@
+[
+  {
+    "task_id": "block4-click-missing-callback-lookup",
+    "production_file": "src/click/missing_callback_lookup.py",
+    "requested_symbol": "MissingCallbackLookup.invoke",
+    "production_lines": 67,
+    "production_ast_nodes": 254,
+    "files": [
+      "src/click/missing_callback_lookup.py",
+      "tests/test_missing_callback_lookup.py"
+    ],
+    "patch_sha256": "d1053aad9d6ae93940f851ac046512b0aa0350663d6480d42b7f1e0f6bb6e4df",
+    "agent_reported_tests": "pytest -q tests (pytest<9): 904 passed, 21 skipped, 1 xfailed; ruff check/format and mypy on new files: clean",
+    "notes": "Added MissingCallbackLookup(Context) in src/click/missing_callback_lookup.py, overriding invoke with the same overloads, signature and body as Context.invoke but raising LookupError for a callback-less Command; added tests. No existing modules edited.",
+    "comparison_to_reference": "--- Context.invoke\n\n+++ MissingCallbackLookup.invoke\n\n@@ -3,3 +3,3 @@\n\n     if other_cmd.callback is None:\n-        raise TypeError('The given command does not have a callback that can be invoked.')\n+        raise LookupError('The given command does not have a callback that can be invoked.')\n     else:"
+  },
+  {
+    "task_id": "block4-click-parameter-warning-stack",
+    "production_file": "src/click/parameter_warning_stack.py",
+    "requested_symbol": "ParameterWarningStack.get_params",
+    "production_lines": 42,
+    "production_ast_nodes": 138,
+    "files": [
+      "src/click/parameter_warning_stack.py"
+    ],
+    "patch_sha256": "d64601890ba6966d5d31592dac09a46df16a91866cbaed859b38244db3f0159d",
+    "agent_reported_tests": "python -m compileall on the new file (passed); ran a script instantiating ParameterWarningStack with duplicate --x options and confirmed get_params emits the duplicate-option warning (1 warning, correct message).",
+    "notes": "Created src/click/parameter_warning_stack.py containing ParameterWarningStack(Command) whose get_params mirrors Command.get_params exactly (same signature, help-option handling, duplicate-option warning) but uses stacklevel=4 so a plugin wrapper frame is skipped. No existing modules were modified.",
+    "comparison_to_reference": "--- Command.get_params\n\n+++ ParameterWarningStack.get_params\n\n@@ -10,3 +10,3 @@\n\n     for duplicate_opt in duplicate_opts:\n-        warnings.warn(f'The parameter {duplicate_opt} is used more than once. Remove its duplicate as parameters should be unique.', stacklevel=3)\n+        warnings.warn(f'The parameter {duplicate_opt} is used more than once. Remove its duplicate as parameters should be unique.', stacklevel=4)\n return params"
+  },
+  {
+    "task_id": "block4-click-probe-without-help",
+    "production_file": "src/click/probe_without_help.py",
+    "requested_symbol": "ProbeWithoutHelp.get_help_option",
+    "production_lines": 21,
+    "production_ast_nodes": 41,
+    "files": [
+      "src/click/probe_without_help.py"
+    ],
+    "patch_sha256": "f811c789825bc53804fa606153b8d836a2e93c5740abfad34efd06c3d6e1df52",
+    "agent_reported_tests": "pip install -e . && python -m pytest tests -q: 900 passed, 21 skipped, 1 xfailed; plus a manual sanity script asserting resilient_parsing short-circuits to None, help option is created/cached otherwise, and add_help_option=False returns None \u2014 all passed.",
+    "notes": "Added src/click/probe_without_help.py with ProbeWithoutHelp(Command); its get_help_option returns None immediately when ctx.resilient_parsing is true, then delegates to super().get_help_option(ctx), preserving the base caching/behavior, signature, and the super() parent-call target. No existing modules were modified.",
+    "comparison_to_reference": "--- Command.get_help_option\n\n+++ ProbeWithoutHelp.get_help_option\n\n@@ -1,8 +1,3 @@\n\n-help_option_names = self.get_help_option_names(ctx)\n-if not help_option_names or not self.add_help_option:\n+if ctx.resilient_parsing:\n     return None\n-if self._help_option is None:\n-    from .decorators import help_option\n-    help_option(*help_option_names)(self)\n-    self._help_option = self.params.pop()\n-return self._help_option\n+return super().get_help_option(ctx)"
+  },
+  {
+    "task_id": "block4-click-legacy-short-help",
+    "production_file": "src/click/legacy_short_help.py",
+    "requested_symbol": "LegacyShortHelp.get_short_help_str",
+    "production_lines": 38,
+    "production_ast_nodes": 114,
+    "files": [
+      "src/click/legacy_short_help.py"
+    ],
+    "patch_sha256": "63267319f544423ea178beede2e372f126a4308512fec6128877e4b64d73fdd0",
+    "agent_reported_tests": "python -m pytest tests -q -k \"short_help or deprecated\" \u2014 30 passed; manual check: LegacyShortHelp yields 'hi (LEGACY)' and 'hi (LEGACY: use z)'",
+    "notes": "Added src/click/legacy_short_help.py with LegacyShortHelp(Command) overriding get_short_help_str, an exact copy of Command's implementation with DEPRECATED replaced by LEGACY for both the bare and custom-message cases. No existing modules edited.",
+    "comparison_to_reference": "--- Command.get_short_help_str\n\n+++ LegacyShortHelp.get_short_help_str\n\n@@ -7,3 +7,3 @@\n\n if self.deprecated:\n-    deprecated_message = f'(DEPRECATED: {self.deprecated})' if isinstance(self.deprecated, str) else '(DEPRECATED)'\n+    deprecated_message = f'(LEGACY: {self.deprecated})' if isinstance(self.deprecated, str) else '(LEGACY)'\n     text = _('{text} {deprecated_message}').format(text=text, deprecated_message=deprecated_message)"
+  },
+  {
+    "task_id": "block4-click-vertical-tab-help",
+    "production_file": "src/click/vertical_tab_help.py",
+    "requested_symbol": "VerticalTabHelp.format_help_text",
+    "production_lines": 38,
+    "production_ast_nodes": 128,
+    "files": [
+      "src/click/vertical_tab_help.py"
+    ],
+    "patch_sha256": "b4a8bb958946244836254d7f205ca441549b31d2aec086421fc12f87af7db405",
+    "agent_reported_tests": "Smoke script via CliRunner (help truncated at \\v, deprecated suffix kept): pass; mypy src/click/vertical_tab_help.py: no issues; pytest tests (pytest<9): 900 passed, 21 skipped, 1 xfailed.",
+    "notes": "Added src/click/vertical_tab_help.py with VerticalTabHelp(Command), whose format_help_text is a copy of Command.format_help_text that partitions on \"\\v\" instead of \"\\f\"; the base method has no decorators or super() calls, and no existing modules were edited.",
+    "comparison_to_reference": "--- Command.format_help_text\n\n+++ VerticalTabHelp.format_help_text\n\n@@ -1,3 +1,3 @@\n\n if self.help is not None:\n-    text = inspect.cleandoc(self.help).partition('\\x0c')[0]\n+    text = inspect.cleandoc(self.help).partition('\\x0b')[0]\n else:"
+  },
+  {
+    "task_id": "block4-click-comma-extra-arguments",
+    "production_file": "src/click/comma_extra_arguments.py",
+    "requested_symbol": "CommaExtraArguments.parse_args",
+    "production_lines": 37,
+    "production_ast_nodes": 190,
+    "files": [
+      "src/click/comma_extra_arguments.py",
+      "tests/test_comma_extra_arguments.py"
+    ],
+    "patch_sha256": "4d238d256ca75d032855ec1d64560c2614ddaf90ba97524c1e307f1ff29f62f5",
+    "agent_reported_tests": "~/work/venv/bin/python -m pytest -q tests/test_comma_extra_arguments.py tests/test_commands.py -> 66 passed",
+    "notes": "Added CommaExtraArguments(Command) overriding parse_args with a verbatim copy of Command.parse_args (which does not call super()) except extra args are joined with \", \"; added tests.",
+    "comparison_to_reference": "--- Command.parse_args\n\n+++ CommaExtraArguments.parse_args\n\n@@ -7,3 +7,3 @@\n\n if args and (not ctx.allow_extra_args) and (not ctx.resilient_parsing):\n-    ctx.fail(ngettext('Got unexpected extra argument ({args})', 'Got unexpected extra arguments ({args})', len(args)).format(args=' '.join(map(str, args))))\n+    ctx.fail(ngettext('Got unexpected extra argument ({args})', 'Got unexpected extra arguments ({args})', len(args)).format(args=', '.join(map(str, args))))\n ctx.args = args"
+  },
+  {
+    "task_id": "block4-click-yellow-deprecation",
+    "production_file": "src/click/yellow_deprecation.py",
+    "requested_symbol": "YellowDeprecation.invoke",
+    "production_lines": 31,
+    "production_ast_nodes": 112,
+    "files": [
+      "src/click/yellow_deprecation.py",
+      "tests/test_yellow_deprecation.py"
+    ],
+    "patch_sha256": "7abec475f9943fd98800b206aa37d6025884d8447f9f6d7fe23f293feb043397",
+    "agent_reported_tests": "~/work/venv/bin/python -m pytest -q tests (pytest<9): 902 passed, 21 skipped, 1 xfailed; ruff check/format and mypy on new files: clean",
+    "notes": "Added YellowDeprecation(Command) in src/click/yellow_deprecation.py whose invoke mirrors Command.invoke verbatim (same signature, docstring, i18n message, callback dispatch) but styles the warning with fg=\"yellow\"; the reference has no super() call or decorators to preserve, and no existing modules were edited. Added tests in tests/test_yellow_deprecation.py.",
+    "comparison_to_reference": "--- Command.invoke\n\n+++ YellowDeprecation.invoke\n\n@@ -3,3 +3,3 @@\n\n     message = _('DeprecationWarning: The command {name!r} is deprecated.{extra_message}').format(name=self.name, extra_message=extra_message)\n-    echo(style(message, fg='red'), err=True)\n+    echo(style(message, fg='yellow'), err=True)\n if self.callback is not None:"
+  },
+  {
+    "task_id": "block4-click-hidden-option-suggestions",
+    "production_file": "src/click/hidden_option_suggestions.py",
+    "requested_symbol": "HiddenOptionSuggestions.shell_complete",
+    "production_lines": 61,
+    "production_ast_nodes": 237,
+    "files": [
+      "src/click/hidden_option_suggestions.py"
+    ],
+    "patch_sha256": "1549dea95ea8057a461eaca44c85ee3f816977f6aaedd7412e02ca2311ba3b7f",
+    "agent_reported_tests": "Manual completion check via ShellComplete (hidden --secret suggested) and pytest tests/test_shell_completion.py: 50 passed.",
+    "notes": "Added HiddenOptionSuggestions(Command) overriding shell_complete with the base implementation minus the param.hidden exclusion; eligibility checks and chained-group sibling completion unchanged.",
+    "comparison_to_reference": "--- Command.shell_complete\n\n+++ HiddenOptionSuggestions.shell_complete\n\n@@ -4,3 +4,3 @@\n\n     for param in self.get_params(ctx):\n-        if not isinstance(param, Option) or param.hidden or (not param.multiple and ctx.get_parameter_source(param.name) is ParameterSource.COMMANDLINE):\n+        if not isinstance(param, Option) or (not param.multiple and ctx.get_parameter_source(param.name) is ParameterSource.COMMANDLINE):\n             continue"
+  },
+  {
+    "task_id": "block4-click-suggest-environment",
+    "production_file": "src/click/suggest_environment.py",
+    "requested_symbol": "SuggestEnvironment._main_shell_completion",
+    "production_lines": 43,
+    "production_ast_nodes": 126,
+    "files": [
+      "src/click/suggest_environment.py",
+      "tests/test_suggest_environment.py"
+    ],
+    "patch_sha256": "5ac500e21d45d4d9cb75448505d539b5c4953b71da884ddfb3a1fa43c222e19b",
+    "agent_reported_tests": "pytest tests/test_suggest_environment.py tests/test_shell_completion.py: 53 passed; pre-commit (ruff, ruff format, etc.) on new files: passed",
+    "notes": "Added SuggestEnvironment(Command) overriding _main_shell_completion with identical logic, only the default env var suffix changed to _SUGGEST; added tests for default, ignored _COMPLETE, and explicit complete_var.",
+    "comparison_to_reference": "--- Command._main_shell_completion\n\n+++ SuggestEnvironment._main_shell_completion\n\n@@ -2,3 +2,3 @@\n\n     complete_name = prog_name.replace('-', '_').replace('.', '_')\n-    complete_var = f'_{complete_name}_COMPLETE'.upper()\n+    complete_var = f'_{complete_name}_SUGGEST'.upper()\n instruction = os.environ.get(complete_var)"
+  },
+  {
+    "task_id": "block4-click-cleanup-documentation-context",
+    "production_file": "src/click/cleanup_documentation_context.py",
+    "requested_symbol": "CleanupDocumentationContext.to_info_dict",
+    "production_lines": 28,
+    "production_ast_nodes": 130,
+    "files": [
+      "src/click/cleanup_documentation_context.py"
+    ],
+    "patch_sha256": "587e2705187da748983c878e13a3bd69cc50d0339211828755c55badbede947c",
+    "agent_reported_tests": "PYTHONPATH=src .venv/bin/python -m pytest -q: 900 passed, 21 skipped, 1 xfailed with locked pytest 8.4.0 (pytest 9.2.0 failed at collection); PYTHONPATH=src .venv/bin/python -: focused cleanup, exception, signature, and metadata checks passed; .venv/bin/ruff check --no-fix and .venv/bin/ruff format --check on the new module, and git diff --cached --check: passed.",
+    "notes": "The new subclass mirrors Group.to_info_dict and enables cleanup when each subcommand scope exits. It preserves the original method resolution after Group and leaves existing modules unchanged.",
+    "comparison_to_reference": "--- Group.to_info_dict\n\n+++ CleanupDocumentationContext.to_info_dict\n\n@@ -1,2 +1,2 @@\n\n-info_dict = super().to_info_dict(ctx)\n+info_dict = super(Group, self).to_info_dict(ctx)\n commands = {}\n@@ -7,3 +7,3 @@\n\n     sub_ctx = ctx._make_sub_context(command)\n-    with sub_ctx.scope(cleanup=False):\n+    with sub_ctx.scope(cleanup=True):\n         commands[name] = command.to_info_dict(sub_ctx)"
+  },
+  {
+    "task_id": "block4-click-command-decorator-type-error",
+    "production_file": "src/click/command_decorator_type_error.py",
+    "requested_symbol": "CommandDecoratorTypeError.command",
+    "production_lines": 60,
+    "production_ast_nodes": 284,
+    "files": [
+      "src/click/command_decorator_type_error.py",
+      "tests/test_command_decorator_type_error.py"
+    ],
+    "patch_sha256": "5c0bbc659727acfdf4b4d2d2e60df4ba630ca18194b9343bf6b2fac979024187",
+    "agent_reported_tests": "pytest tests/test_command_decorator_type_error.py (4 passed); ruff check/format and mypy on new files: clean",
+    "notes": "Added CommandDecoratorTypeError(Group) overriding command (with its overloads) by copying Group.command's body, replacing the assert with an equivalent if-not check raising TypeError with the same message; added tests.",
+    "comparison_to_reference": "--- Group.command\n\n+++ CommandDecoratorTypeError.command\n\n@@ -3,3 +3,4 @@\n\n if args and callable(args[0]):\n-    assert len(args) == 1 and (not kwargs), \"Use 'command(**kwargs)(callable)' to provide arguments.\"\n+    if not (len(args) == 1 and (not kwargs)):\n+        raise TypeError(\"Use 'command(**kwargs)(callable)' to provide arguments.\")\n     func, = args"
+  },
+  {
+    "task_id": "block4-click-plain-child-group",
+    "production_file": "src/click/plain_child_group.py",
+    "requested_symbol": "PlainChildGroup.group",
+    "production_lines": 59,
+    "production_ast_nodes": 296,
+    "files": [
+      "src/click/plain_child_group.py",
+      "tests/test_plain_child_group.py"
+    ],
+    "patch_sha256": "937a644659cc7e00c4890aa714c055124727bc2a527535507f2fcf7655dc7e27",
+    "agent_reported_tests": "python -m pytest -q tests/test_plain_child_group.py tests/test_commands.py -> 65 passed",
+    "notes": "Added PlainChildGroup overriding group() with the same overloads, signature and body as Group.group, except group_class=type maps to Group instead of type(self); added tests.",
+    "comparison_to_reference": "--- Group.group\n\n+++ PlainChildGroup.group\n\n@@ -8,3 +8,3 @@\n\n     if self.group_class is type:\n-        kwargs['cls'] = type(self)\n+        kwargs['cls'] = Group\n     else:"
+  },
+  {
+    "task_id": "block4-click-replace-result-default",
+    "production_file": "src/click/replace_result_default.py",
+    "requested_symbol": "ReplaceResultDefault.result_callback",
+    "production_lines": 24,
+    "production_ast_nodes": 56,
+    "files": [
+      "src/click/replace_result_default.py",
+      "tests/test_replace_result_default.py"
+    ],
+    "patch_sha256": "e92d6480293d7f4016344dd2e0a07df1d07c761d4d7678c286d7a81d2d0ece96",
+    "agent_reported_tests": "pytest tests/test_replace_result_default.py tests/test_chain.py (18 passed, 1 xfailed); ruff check/format and mypy on new files: clean",
+    "notes": "Added ReplaceResultDefault(Group) overriding result_callback with replace defaulting to True and delegating to super().result_callback(replace=replace), so all other behavior is inherited; added tests for default replace and explicit replace=False chaining.",
+    "comparison_to_reference": "--- Group.result_callback\n\n+++ ReplaceResultDefault.result_callback\n\n@@ -1,12 +1 @@\n\n-def decorator(f: F) -> F:\n-    old_callback = self._result_callback\n-    if old_callback is None or replace:\n-        self._result_callback = f\n-        return f\n-\n-    def function(value: t.Any, /, *args: t.Any, **kwargs: t.Any) -> t.Any:\n-        inner = old_callback(value, *args, **kwargs)\n-        return f(inner, *args, **kwargs)\n-    self._result_callback = rv = update_wrapper(t.cast(F, function), f)\n-    return rv\n-return decorator\n+return super().result_callback(replace=replace)"
+  },
+  {
+    "task_id": "block4-click-subcommands-heading",
+    "production_file": "src/click/subcommands_heading.py",
+    "requested_symbol": "SubcommandsHeading.format_commands",
+    "production_lines": 41,
+    "production_ast_nodes": 173,
+    "files": [
+      "src/click/subcommands_heading.py",
+      "tests/test_subcommands_heading.py"
+    ],
+    "patch_sha256": "2312055bf2a19696a0a56e970ecf54404acb6d66eb241b76792291bf726f1422",
+    "agent_reported_tests": "python -m pytest -q tests/test_subcommands_heading.py tests/test_commands.py -> 65 passed",
+    "notes": "Added SubcommandsHeading(Group) in src/click/subcommands_heading.py overriding format_commands with the same signature and logic as Group.format_commands (which makes no super() call), changing only the section label to \"Subcommands\"; added tests.",
+    "comparison_to_reference": "--- Group.format_commands\n\n+++ SubcommandsHeading.format_commands\n\n@@ -15,3 +15,3 @@\n\n     if rows:\n-        with formatter.section(_('Commands')):\n+        with formatter.section(_('Subcommands')):\n             formatter.write_dl(rows)"
+  },
+  {
+    "task_id": "block4-click-chain-argument-preview",
+    "production_file": "src/click/chain_argument_preview.py",
+    "requested_symbol": "ChainArgumentPreview.parse_args",
+    "production_lines": 26,
+    "production_ast_nodes": 125,
+    "files": [
+      "src/click/chain_argument_preview.py",
+      "tests/test_chain_argument_preview.py"
+    ],
+    "patch_sha256": "ae642c1017092596091651f2c54891d60809e703fc694b47cf75b003825f5f4e",
+    "agent_reported_tests": "pytest==8.4.0 `pytest -q tests` -> 903 passed, 21 skipped, 1 xfailed; ruff check/format --check and mypy on new files -> clean.",
+    "notes": "Added src/click/chain_argument_preview.py with ChainArgumentPreview(Group) whose parse_args mirrors Group.parse_args but sets ctx.args = rest in the chain branch; the parent call uses super(Group, self) to keep targeting Command.parse_args as the original super() did. Added tests/test_chain_argument_preview.py.",
+    "comparison_to_reference": "--- Group.parse_args\n\n+++ ChainArgumentPreview.parse_args\n\n@@ -2,6 +2,6 @@\n\n     raise NoArgsIsHelpError(ctx)\n-rest = super().parse_args(ctx, args)\n+rest = super(Group, self).parse_args(ctx, args)\n if self.chain:\n     ctx._protected_args = rest\n-    ctx.args = []\n+    ctx.args = rest\n elif rest:"
+  },
+  {
+    "task_id": "block4-click-unknown-command-message",
+    "production_file": "src/click/unknown_command_message.py",
+    "requested_symbol": "UnknownCommandMessage.resolve_command",
+    "production_lines": 42,
+    "production_ast_nodes": 186,
+    "files": [
+      "src/click/unknown_command_message.py",
+      "tests/test_unknown_command_message.py"
+    ],
+    "patch_sha256": "158fd2275ca6f632c1c98e0cb43104c46f0882de57a769d6bb686985918affac",
+    "agent_reported_tests": "pytest -q tests (pytest<8.4): 905 passed, 21 skipped, 1 xfailed; ruff check + ruff format --check: clean; mypy src/click/unknown_command_message.py: no issues",
+    "notes": "Added UnknownCommandMessage(Group) in a new module whose resolve_command mirrors Group.resolve_command verbatim (same signature, normalization, option reparse, resilient_parsing) but fails with \"Unknown command\"; no existing modules edited. Added tests covering unknown, known, normalized, --help reparse and resilient-parsing paths.",
+    "comparison_to_reference": "--- Group.resolve_command\n\n+++ UnknownCommandMessage.resolve_command\n\n@@ -9,3 +9,3 @@\n\n         self.parse_args(ctx, args)\n-    ctx.fail(_('No such command {name!r}.').format(name=original_cmd_name))\n+    ctx.fail(_('Unknown command {name!r}.').format(name=original_cmd_name))\n return (cmd_name if cmd else None, cmd, args[1:])"
+  },
+  {
+    "task_id": "block4-click-reverse-source-priority",
+    "production_file": "src/click/reverse_source_priority.py",
+    "requested_symbol": "ReverseSourcePriority.get_command",
+    "production_lines": 27,
+    "production_ast_nodes": 104,
+    "files": [
+      "src/click/reverse_source_priority.py"
+    ],
+    "patch_sha256": "8d23b2ff2653f4272b9c06edb88e5a36e0d660ea0937b88442444eccbfeb0240",
+    "agent_reported_tests": "`.git/task-venv/bin/python -m pytest -o cache_dir=.git/pytest-cache --basetemp=.git/pytest-tmp` \u2014 900 passed, 21 skipped, 1 xfailed; `PYTHONPATH=src python` (inline lookup regressions) \u2014 passed; `.git/task-venv/bin/mypy --cache-dir .git/mypy-cache src/click/reverse_source_priority.py` \u2014 passed; `pre-commit run --files src/click/reverse_source_priority.py` \u2014 applicable hooks passed; `git diff --cached --check 528fd7a798abe0077060c5720e13791a34167f66` \u2014 passed.",
+    "notes": "The override anchors super() at CommandCollection to preserve its direct lookup and MRO, then searches sources in reverse without modifying the list. Chain validation and miss handling are unchanged, and no existing modules were edited.",
+    "comparison_to_reference": "--- CommandCollection.get_command\n\n+++ ReverseSourcePriority.get_command\n\n@@ -1,5 +1,5 @@\n\n-rv = super().get_command(ctx, cmd_name)\n+rv = super(CommandCollection, self).get_command(ctx, cmd_name)\n if rv is not None:\n     return rv\n-for source in self.sources:\n+for source in reversed(self.sources):\n     rv = source.get_command(ctx, cmd_name)"
+  },
+  {
+    "task_id": "block4-click-parameter-kind-key",
+    "production_file": "src/click/parameter_kind_key.py",
+    "requested_symbol": "ParameterKindKey.to_info_dict",
+    "production_lines": 24,
+    "production_ast_nodes": 51,
+    "files": [
+      "src/click/parameter_kind_key.py"
+    ],
+    "patch_sha256": "e6e782facf84f55b4b1af44f2251d7d26649dbc109265bf096fdf8799145488e",
+    "agent_reported_tests": "pip install -e .; python check via `class K(ParameterKindKey, Option)` to_info_dict: 'param_type_name' absent, 'kind' == 'option', all other keys preserved \u2014 passed.",
+    "notes": "Added src/click/parameter_kind_key.py defining ParameterKindKey(Parameter). Its to_info_dict calls super().to_info_dict() (following Option.to_info_dict's pattern), then pops 'param_type_name' and re-emits the value under 'kind', keeping signature and all other behavior unchanged.",
+    "comparison_to_reference": "--- Parameter.to_info_dict\n\n+++ ParameterKindKey.to_info_dict\n\n@@ -1 +1,3 @@\n\n-return {'name': self.name, 'param_type_name': self.param_type_name, 'opts': self.opts, 'secondary_opts': self.secondary_opts, 'type': self.type.to_info_dict(), 'required': self.required, 'nargs': self.nargs, 'multiple': self.multiple, 'default': self.default, 'envvar': self.envvar}\n+info_dict = super().to_info_dict()\n+info_dict['kind'] = info_dict.pop('param_type_name')\n+return info_dict"
+  },
+  {
+    "task_id": "block4-click-unicode-metavar-ellipsis",
+    "production_file": "src/click/unicode_metavar_ellipsis.py",
+    "requested_symbol": "UnicodeMetavarEllipsis.make_metavar",
+    "production_lines": 25,
+    "production_ast_nodes": 83,
+    "files": [
+      "src/click/unicode_metavar_ellipsis.py"
+    ],
+    "patch_sha256": "9fd711fab89bd03481f1590d08c9f7c3baffbedba1a2a3adeb6c00590b43d4ff",
+    "agent_reported_tests": "python smoke test asserting make_metavar returns 'TEXT\u2026' for nargs=-1, 'TEXT' for nargs=1, and honors explicit metavar (passed); ruff check and ruff format --check on the new file (passed)",
+    "notes": "Created src/click/unicode_metavar_ellipsis.py with UnicodeMetavarEllipsis(Parameter); make_metavar mirrors Parameter.make_metavar but appends the Unicode ellipsis when nargs != 1. Existing modules untouched.",
+    "comparison_to_reference": "--- Parameter.make_metavar\n\n+++ UnicodeMetavarEllipsis.make_metavar\n\n@@ -6,3 +6,3 @@\n\n if self.nargs != 1:\n-    metavar += '...'\n+    metavar += '\u2026'\n return metavar"
+  },
+  {
+    "task_id": "block4-click-explicit-null-option",
+    "production_file": "src/click/explicit_null_option.py",
+    "requested_symbol": "ExplicitNullOption.consume_value",
+    "production_lines": 39,
+    "production_ast_nodes": 178,
+    "files": [
+      "src/click/explicit_null_option.py",
+      "tests/test_explicit_null_option.py"
+    ],
+    "patch_sha256": "68b2198a86eb614931a9de82707fe88592f5144879e2e91ab2da59ef0090147b",
+    "agent_reported_tests": "pytest -q tests (903 passed, 21 skipped, 1 xfailed, with pytest<9); ruff check + ruff format --check src tests (clean); mypy src/click/explicit_null_option.py (no issues)",
+    "notes": "Added ExplicitNullOption(Parameter) in a new module whose consume_value mirrors Parameter.consume_value (same signature, no decorators, no super() call in the base) but returns (None, COMMANDLINE) immediately when self.name is present in opts with a None value; added unit tests covering explicit None, normal values, and env/default_map/default fallthrough.",
+    "comparison_to_reference": "--- Parameter.consume_value\n\n+++ ExplicitNullOption.consume_value\n\n@@ -1 +1,3 @@\n\n+if self.name in opts and opts[self.name] is None:\n+    return (None, ParameterSource.COMMANDLINE)\n value = opts.get(self.name)"
+  },
+  {
+    "task_id": "block4-click-trim-environment-result",
+    "production_file": "src/click/trim_environment_result.py",
+    "requested_symbol": "TrimEnvironmentResult.resolve_envvar_value",
+    "production_lines": 30,
+    "production_ast_nodes": 98,
+    "files": [
+      "src/click/trim_environment_result.py",
+      "tests/test_trim_environment_result.py"
+    ],
+    "patch_sha256": "16f8936ec01b1bb4b89a567ee38d64b86d72015f39cbe720accfd6ec8000f98d",
+    "agent_reported_tests": "pytest tests/test_trim_environment_result.py: 3 passed",
+    "notes": "Added TrimEnvironmentResult(Parameter) overriding resolve_envvar_value with the base logic unchanged (truthiness check on the raw value), returning the selected value stripped; added tests.",
+    "comparison_to_reference": "--- Parameter.resolve_envvar_value\n\n+++ TrimEnvironmentResult.resolve_envvar_value\n\n@@ -5,3 +5,3 @@\n\n     if rv:\n-        return rv\n+        return rv.strip()\n else:\n@@ -10,3 +10,3 @@\n\n         if rv:\n-            return rv\n+            return rv.strip()\n return None"
+  },
+  {
+    "task_id": "block4-click-yellow-parameter-warning",
+    "production_file": "src/click/yellow_parameter_warning.py",
+    "requested_symbol": "YellowParameterWarning.handle_parse_result",
+    "production_lines": 61,
+    "production_ast_nodes": 244,
+    "files": [
+      "src/click/yellow_parameter_warning.py"
+    ],
+    "patch_sha256": "903cc1600ed56a55edde70337220d7f9997577796e6733bfd8962848c9bec090",
+    "agent_reported_tests": "pytest -q tests (pytest<9): 900 passed, 21 skipped, 1 xfailed; manual CliRunner check shows deprecation warning emitted with \\x1b[33m (yellow).",
+    "notes": "Added src/click/yellow_parameter_warning.py with YellowParameterWarning(Parameter) overriding handle_parse_result as a verbatim copy of the base implementation (no super() or decorators in the original) with fg=\"yellow\" instead of \"red\"; no existing modules edited.",
+    "comparison_to_reference": "--- Parameter.handle_parse_result\n\n+++ YellowParameterWarning.handle_parse_result\n\n@@ -5,3 +5,3 @@\n\n         message = _('DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}').format(param_type=self.param_type_name, name=self.human_readable_name, extra_message=extra_message)\n-        echo(style(message, fg='red'), err=True)\n+        echo(style(message, fg='yellow'), err=True)\n     ctx.set_parameter_source(self.name, source)"
+  },
+  {
+    "task_id": "block4-click-plain-custom-completion",
+    "production_file": "src/click/plain_custom_completion.py",
+    "requested_symbol": "PlainCustomCompletion.shell_complete",
+    "production_lines": 28,
+    "production_ast_nodes": 107,
+    "files": [
+      "src/click/plain_custom_completion.py"
+    ],
+    "patch_sha256": "625c845f90555423a75ddf8de5bbdbe9dcb61c216465c4c169c18352d95e49ea",
+    "agent_reported_tests": "pip install -e . pytest; python smoke test instantiating a (PlainCustomCompletion, Option) subclass with custom shell_complete returning strings -> CompletionItems with type='plain'; type-based path returns [] as base. Passed.",
+    "notes": "Copied Parameter.shell_complete verbatim into PlainCustomCompletion in src/click/plain_custom_completion.py, changing only CompletionItem(c) to CompletionItem(c, type='plain') for string custom-completion results.",
+    "comparison_to_reference": "--- Parameter.shell_complete\n\n+++ PlainCustomCompletion.shell_complete\n\n@@ -3,4 +3,3 @@\n\n     if results and isinstance(results[0], str):\n-        from click.shell_completion import CompletionItem\n-        results = [CompletionItem(c) for c in results]\n+        results = [CompletionItem(c, type='plain') for c in results]\n     return t.cast('list[CompletionItem]', results)"
+  },
+  {
+    "task_id": "block4-click-option-hidden-key",
+    "production_file": "src/click/option_hidden_key.py",
+    "requested_symbol": "OptionHiddenKey.to_info_dict",
+    "production_lines": 23,
+    "production_ast_nodes": 79,
+    "files": [
+      "src/click/option_hidden_key.py",
+      "tests/test_option_hidden_key.py"
+    ],
+    "patch_sha256": "401a71cb1b4be44de5cf58689a49b511d196bf8b2b42af83d506f209f746e566",
+    "agent_reported_tests": "pytest tests/test_option_hidden_key.py tests/test_info_dict.py (24 passed); ruff check/format and mypy on new files clean",
+    "notes": "Added OptionHiddenKey(Option) whose to_info_dict mirrors Option.to_info_dict but emits is_hidden; it calls super(Option, self).to_info_dict() so the parent call still targets Parameter.to_info_dict like the original. Added tests comparing against Option output with the key renamed.",
+    "comparison_to_reference": "--- Option.to_info_dict\n\n+++ OptionHiddenKey.to_info_dict\n\n@@ -1,3 +1,3 @@\n\n-info_dict = super().to_info_dict()\n-info_dict.update(help=self.help, prompt=self.prompt, is_flag=self.is_flag, flag_value=self.flag_value, count=self.count, hidden=self.hidden)\n+info_dict = super(Option, self).to_info_dict()\n+info_dict.update(help=self.help, prompt=self.prompt, is_flag=self.is_flag, flag_value=self.flag_value, count=self.count, is_hidden=self.hidden)\n return info_dict"
+  },
+  {
+    "task_id": "block4-click-nullable-secondary-flag",
+    "production_file": "src/click/nullable_secondary_flag.py",
+    "requested_symbol": "NullableSecondaryFlag.add_to_parser",
+    "production_lines": 32,
+    "production_ast_nodes": 123,
+    "files": [
+      "src/click/nullable_secondary_flag.py",
+      "tests/test_nullable_secondary_flag.py"
+    ],
+    "patch_sha256": "442e148c8bca6ce49afe642b7299d3d5eec3c43f98c1f7b50741d3a270ee75d2",
+    "agent_reported_tests": ".venv/bin/python -m pytest -q: pytest 9.2.0 failed collection on an existing deprecation; lockfile pytest 8.4.0 rerun: 904 passed, 21 skipped, 1 xfailed. .venv/bin/ruff check --no-fix and .venv/bin/ruff format --check on both new files, plus git diff --cached --check: passed.",
+    "notes": "The subclass registers paired boolean spellings with True and None and delegates all other registrations to Option. Added parser-level regression tests without editing existing modules.",
+    "comparison_to_reference": "--- Option.add_to_parser\n\n+++ NullableSecondaryFlag.add_to_parser\n\n@@ -1,15 +1,11 @@\n\n+if not (self.is_flag and self.is_bool_flag and self.secondary_opts):\n+    super().add_to_parser(parser, ctx)\n+    return\n if self.multiple:\n-    action = 'append'\n+    action = 'append_const'\n elif self.count:\n-    action = 'count'\n+    action = 'count_const'\n else:\n-    action = 'store'\n-if self.is_flag:\n-    action = f'{action}_const'\n-    if self.is_bool_flag and self.secondary_opts:\n-        parser.add_option(obj=self, opts=self.opts, dest=self.name, action=action, const=True)\n-        parser.add_option(obj=self, opts=self.secondary_opts, dest=self.name, action=action, const=False)\n-    else:\n-        parser.add_option(obj=self, opts=self.opts, dest=self.name, action=action, const=self.flag_value)\n-else:\n-    parser.add_option(obj=self, opts=self.opts, dest=self.name, action=action, nargs=self.nargs)\n+    action = 'store_const'\n+parser.add_option(obj=self, opts=self.opts, dest=self.name, action=action, const=True)\n+parser.add_option(obj=self, opts=self.secondary_opts, dest=self.name, action=action, const=None)"
+  },
+  {
+    "task_id": "block4-click-prompt-without-choices",
+    "production_file": "src/click/prompt_without_choices.py",
+    "requested_symbol": "PromptWithoutChoices.prompt_for_value",
+    "production_lines": 48,
+    "production_ast_nodes": 135,
+    "files": [
+      "src/click/prompt_without_choices.py"
+    ],
+    "patch_sha256": "a328d2c1f5f41f53d6549813e98ef6ca53f1802071dae324b624d3fa13f18374",
+    "agent_reported_tests": "PYTHONPATH=src pytest -q tests (pytest<8.4): 900 passed, 21 skipped, 1 xfailed; manual CliRunner check with Choice option shows prompt \"C: \" without choices.",
+    "notes": "Added src/click/prompt_without_choices.py with PromptWithoutChoices(Option) whose prompt_for_value mirrors Option.prompt_for_value (no super() in the reference) but passes show_choices=False to prompt; bool-flag confirm path unchanged.",
+    "comparison_to_reference": "--- Option.prompt_for_value\n\n+++ PromptWithoutChoices.prompt_for_value\n\n@@ -7,2 +7,2 @@\n\n     prompt_kwargs['show_default'] = self.show_default\n-return prompt(self.prompt, default=default, type=self.type, hide_input=self.hide_input, show_choices=self.show_choices, confirmation_prompt=self.confirmation_prompt, value_proc=lambda x: self.process_value(ctx, x), **prompt_kwargs)\n+return prompt(self.prompt, default=default, type=self.type, hide_input=self.hide_input, show_choices=False, confirmation_prompt=self.confirmation_prompt, value_proc=lambda x: self.process_value(ctx, x), **prompt_kwargs)"
+  },
+  {
+    "task_id": "block4-click-double-underscore-autoenv",
+    "production_file": "src/click/double_underscore_autoenv.py",
+    "requested_symbol": "DoubleUnderscoreAutoenv.resolve_envvar_value",
+    "production_lines": 37,
+    "production_ast_nodes": 106,
+    "files": [
+      "src/click/double_underscore_autoenv.py"
+    ],
+    "patch_sha256": "fe13e30d05c32a56898acf1379b6042cae1c0e0e820df2bad64aa3e60e67590b",
+    "agent_reported_tests": "pip install -e .; pytest tests -q (900 passed, 21 skipped, 1 xfailed, using pytest<8 for compatibility); pre-commit run --files src/click/double_underscore_autoenv.py (all passed); manual CliRunner check confirmed FOO__BAR lookup beats FOO_BAR and explicit envvar still resolves.",
+    "notes": "Copied Option.resolve_envvar_value verbatim into a new Option subclass and changed the autoenv join to a double underscore. Used super(Option, self).resolve_envvar_value so the super() call keeps the original parent target (Parameter), avoiding Option's own single-underscore autoenv branch.",
+    "comparison_to_reference": "--- Option.resolve_envvar_value\n\n+++ DoubleUnderscoreAutoenv.resolve_envvar_value\n\n@@ -1,2 +1,2 @@\n\n-rv = super().resolve_envvar_value(ctx)\n+rv = super(Option, self).resolve_envvar_value(ctx)\n if rv is not None:\n@@ -4,3 +4,3 @@\n\n if self.allow_from_autoenv and ctx.auto_envvar_prefix is not None and (self.name is not None):\n-    envvar = f'{ctx.auto_envvar_prefix}_{self.name.upper()}'\n+    envvar = f'{ctx.auto_envvar_prefix}__{self.name.upper()}'\n     rv = os.environ.get(envvar)"
+  },
+  {
+    "task_id": "block4-click-immutable-environment-values",
+    "production_file": "src/click/immutable_environment_values.py",
+    "requested_symbol": "ImmutableEnvironmentValues.value_from_envvar",
+    "production_lines": 44,
+    "production_ast_nodes": 174,
+    "files": [
+      "src/click/immutable_environment_values.py",
+      "tests/test_immutable_environment_values.py"
+    ],
+    "patch_sha256": "b4059d147bb650d63a7df64c6e7bdc16745d095d5c7acb57bd06f9ed74445d12",
+    "agent_reported_tests": "python -m pytest -q tests --ignore=tests/test_basic.py -> 846 passed, 21 skipped, 1 xfailed (test_basic.py fails to collect at the pin due to a pytest-version warning, unrelated); ruff check/format on new files -> clean",
+    "notes": "Added ImmutableEnvironmentValues(Option) whose value_from_envvar mirrors Option.value_from_envvar verbatim but returns tuple(multi_rv) in the value_depth > 0 branch (covering batched multiple+nargs), plus parametrized tests.",
+    "comparison_to_reference": "--- Option.value_from_envvar\n\n+++ ImmutableEnvironmentValues.value_from_envvar\n\n@@ -12,3 +12,3 @@\n\n         multi_rv = batch(multi_rv, self.nargs)\n-    return multi_rv\n+    return tuple(multi_rv)\n return rv"
+  },
+  {
+    "task_id": "block4-click-angle-optional-argument",
+    "production_file": "src/click/angle_optional_argument.py",
+    "requested_symbol": "AngleOptionalArgument.make_metavar",
+    "production_lines": 22,
+    "production_ast_nodes": 106,
+    "files": [
+      "src/click/angle_optional_argument.py",
+      "tests/test_angle_optional_argument.py"
+    ],
+    "patch_sha256": "89638d909cadeaf3917261b922ef8c3943dc1d7e1bcc2d96caf6b057c62e5f22",
+    "agent_reported_tests": "PYTHONPATH=src .venv/bin/python -m pytest -q (pytest 8.4.0): 907 passed, 21 skipped, 1 xfailed; PRE_COMMIT_HOME=\"$(pwd)/.tox/pre-commit\" .venv/bin/pre-commit run: all applicable hooks passed; git diff --cached --check: passed.",
+    "notes": "The override keeps Click's metavar logic and replaces only the optional argument's outer delimiters. Added coverage for required arguments, choices, custom metavars, deprecation, and arity.",
+    "comparison_to_reference": "--- Argument.make_metavar\n\n+++ AngleOptionalArgument.make_metavar\n\n@@ -8,3 +8,3 @@\n\n if not self.required:\n-    var = f'[{var}]'\n+    var = f'<{var}>'\n if self.nargs != 1:"
+  },
+  {
+    "task_id": "block4-click-casefold-argument-name",
+    "production_file": "src/click/casefold_argument_name.py",
+    "requested_symbol": "CasefoldArgumentName._parse_decls",
+    "production_lines": 28,
+    "production_ast_nodes": 133,
+    "files": [
+      "src/click/casefold_argument_name.py",
+      "tests/test_casefold_argument_name.py"
+    ],
+    "patch_sha256": "98a40639601a419d4c91dfe240202e2b84a33c66283a8a47118cf73691331613",
+    "agent_reported_tests": "python -m pytest -q tests (905 passed, 21 skipped, 1 xfailed); pre-commit run on new files (ruff, ruff format, etc. passed)",
+    "notes": "Added CasefoldArgumentName in src/click/casefold_argument_name.py overriding _parse_decls with identical logic to Argument._parse_decls but using str.casefold() for the internal name; opts keep the original declaration. Added tests in tests/test_casefold_argument_name.py.",
+    "comparison_to_reference": "--- Argument._parse_decls\n\n+++ CasefoldArgumentName._parse_decls\n\n@@ -6,3 +6,3 @@\n\n     name = arg = decls[0]\n-    name = name.replace('-', '_').lower()\n+    name = name.replace('-', '_').casefold()\n else:"
+  },
+  {
+    "task_id": "block4-click-synopsis-usage-prefix",
+    "production_file": "src/click/synopsis_usage_prefix.py",
+    "requested_symbol": "SynopsisUsagePrefix.write_usage",
+    "production_lines": 22,
+    "production_ast_nodes": 61,
+    "files": [
+      "src/click/synopsis_usage_prefix.py"
+    ],
+    "patch_sha256": "dea6d58138d3eff076d5701e309fc4c71df02a3b52542eb1125ce09e07dedc44",
+    "agent_reported_tests": ".venv/bin/python -m pytest -q: 900 passed, 21 skipped, 1 xfailed; .venv/bin/python - (96 formatter comparisons plus signature and localization): passed; .venv/bin/ruff check --no-fix src/click/synopsis_usage_prefix.py, .venv/bin/ruff format --check src/click/synopsis_usage_prefix.py, and git diff --cached --check: passed.",
+    "notes": "SynopsisUsagePrefix supplies a translated Synopsis: default and delegates formatting to HelpFormatter. Explicit prefixes, including the empty string, pass through unchanged.",
+    "comparison_to_reference": "--- HelpFormatter.write_usage\n\n+++ SynopsisUsagePrefix.write_usage\n\n@@ -1,13 +1,3 @@\n\n if prefix is None:\n-    prefix = f\"{_('Usage:')} \"\n-usage_prefix = f'{prefix:>{self.current_indent}}{prog} '\n-text_width = self.width - self.current_indent\n-if text_width >= term_len(usage_prefix) + 20:\n-    indent = ' ' * term_len(usage_prefix)\n-    self.write(wrap_text(args, text_width, initial_indent=usage_prefix, subsequent_indent=indent))\n-else:\n-    self.write(usage_prefix)\n-    self.write('\\n')\n-    indent = ' ' * (max(self.current_indent, term_len(prefix)) + 4)\n-    self.write(wrap_text(args, text_width, initial_indent=indent, subsequent_indent=indent))\n-self.write('\\n')\n+    prefix = f\"{_('Synopsis:')} \"\n+super().write_usage(prog, args, prefix)"
+  },
+  {
+    "task_id": "block4-click-flow-help-paragraphs",
+    "production_file": "src/click/flow_help_paragraphs.py",
+    "requested_symbol": "FlowHelpParagraphs.write_text",
+    "production_lines": 20,
+    "production_ast_nodes": 59,
+    "files": [
+      "src/click/flow_help_paragraphs.py"
+    ],
+    "patch_sha256": "caef254b102612cfc430f55ff2393cf2c76c0c7aff7aa29ab1a37cf3a0941c4c",
+    "agent_reported_tests": "python -m pytest tests -x -q (pytest<9): 900 passed, 21 skipped, 1 xfailed; manual FlowHelpParagraphs write_text smoke test OK",
+    "notes": "Created src/click/flow_help_paragraphs.py with FlowHelpParagraphs(HelpFormatter) whose write_text mirrors HelpFormatter.write_text but passes preserve_paragraphs=False to wrap_text; no existing modules touched.",
+    "comparison_to_reference": "--- HelpFormatter.write_text\n\n+++ FlowHelpParagraphs.write_text\n\n@@ -1,3 +1,3 @@\n\n indent = ' ' * self.current_indent\n-self.write(wrap_text(text, self.width, initial_indent=indent, subsequent_indent=indent, preserve_paragraphs=True))\n+self.write(wrap_text(text, self.width, initial_indent=indent, subsequent_indent=indent, preserve_paragraphs=False))\n self.write('\\n')"
+  },
+  {
+    "task_id": "block4-click-wider-definition-minimum",
+    "production_file": "src/click/wider_definition_minimum.py",
+    "requested_symbol": "WiderDefinitionMinimum.write_dl",
+    "production_lines": 59,
+    "production_ast_nodes": 298,
+    "files": [
+      "src/click/wider_definition_minimum.py"
+    ],
+    "patch_sha256": "daac342f85ae87b9ed5e51184dd6d88e966f326df9357777bc8055fa1ce07603",
+    "agent_reported_tests": "pytest tests/test_formatting.py: 17 passed; manual check: at width 80 output matches HelpFormatter.write_dl, at width 40 descriptions wrap at the 20-column minimum instead of 10.",
+    "notes": "Added src/click/wider_definition_minimum.py with a HelpFormatter subclass that overrides write_dl, copying the base logic with the minimum text width changed from 10 to 20. The base method has no super() calls or decorators, so there was nothing to keep beyond that.",
+    "comparison_to_reference": "--- HelpFormatter.write_dl\n\n+++ WiderDefinitionMinimum.write_dl\n\n@@ -15,3 +15,3 @@\n\n         self.write(' ' * (first_col + self.current_indent))\n-    text_width = max(self.width - first_col - 2, 10)\n+    text_width = max(self.width - first_col - 2, 20)\n     wrapped_text = wrap_text(second, text_width, preserve_paragraphs=True)"
+  },
+  {
+    "task_id": "block4-click-double-count-action",
+    "production_file": "src/click/double_count_action.py",
+    "requested_symbol": "DoubleCountAction.process",
+    "production_lines": 13,
+    "production_ast_nodes": 79,
+    "files": [
+      "src/click/double_count_action.py"
+    ],
+    "patch_sha256": "04f495c8837e0eeee41e5db33292c3cda3f36da7802e8d63c27c4774be1d05c4",
+    "agent_reported_tests": "pip install -e .; inline python smoke test asserting two count calls yield 4 with order appended, and store action stores value via super() \u2014 passed",
+    "notes": "Added DoubleCountAction subclassing _Option; for action='count' it mirrors _Option.process with +2 (including state.order append), all other actions delegate to super().process unchanged.",
+    "comparison_to_reference": "--- _Option.process\n\n+++ DoubleCountAction.process\n\n@@ -1,13 +1,5 @@\n\n-if self.action == 'store':\n-    state.opts[self.dest] = value\n-elif self.action == 'store_const':\n-    state.opts[self.dest] = self.const\n-elif self.action == 'append':\n-    state.opts.setdefault(self.dest, []).append(value)\n-elif self.action == 'append_const':\n-    state.opts.setdefault(self.dest, []).append(self.const)\n-elif self.action == 'count':\n-    state.opts[self.dest] = state.opts.get(self.dest, 0) + 1\n+if self.action == 'count':\n+    state.opts[self.dest] = state.opts.get(self.dest, 0) + 2\n+    state.order.append(self.obj)\n else:\n-    raise ValueError(f\"unknown action '{self.action}'\")\n-state.order.append(self.obj)\n+    super().process(value, state)"
+  },
+  {
+    "task_id": "block4-click-partial-argument-value-error",
+    "production_file": "src/click/partial_argument_value_error.py",
+    "requested_symbol": "PartialArgumentValueError.process",
+    "production_lines": 39,
+    "production_ast_nodes": 171,
+    "files": [
+      "src/click/partial_argument_value_error.py"
+    ],
+    "patch_sha256": "e0a91aae828c98f872b6073c06b1a5809b2ee33c24ef4c92eac94fa1281d5e95",
+    "agent_reported_tests": "pytest -q tests (pytest<9): 900 passed, 21 skipped, 1 xfailed; mypy on new module: no issues; manual check: partial nargs=2 raises ValueError \"Argument 'x' takes 2 values.\"",
+    "notes": "Added src/click/partial_argument_value_error.py with PartialArgumentValueError(_Argument) overriding process as a copy of the base logic, swapping BadArgumentUsage for ValueError with the same translated message; no existing modules edited.",
+    "comparison_to_reference": "--- _Argument.process\n\n+++ PartialArgumentValueError.process\n\n@@ -6,3 +6,3 @@\n\n     elif holes != 0:\n-        raise BadArgumentUsage(_('Argument {name!r} takes {nargs} values.').format(name=self.dest, nargs=self.nargs))\n+        raise ValueError(_('Argument {name!r} takes {nargs} values.').format(name=self.dest, nargs=self.nargs))\n if self.nargs == -1 and self.obj.envvar is not None and (value == ()):"
+  },
+  {
+    "task_id": "block4-click-colon-argument-terminator",
+    "production_file": "src/click/colon_argument_terminator.py",
+    "requested_symbol": "ColonArgumentTerminator._process_args_for_options",
+    "production_lines": 27,
+    "production_ast_nodes": 107,
+    "files": [
+      "src/click/colon_argument_terminator.py",
+      "tests/test_colon_argument_terminator.py"
+    ],
+    "patch_sha256": "bdda0ff590952d7e95c0c9a15898efa9221bfae2987744fd84843777a86946a6",
+    "agent_reported_tests": "pytest tests -W ignore::pytest.PytestRemovedIn10Warning: 903 passed, 21 skipped, 1 xfailed (incl. 3 new tests); ruff check/format clean",
+    "notes": "Added ColonArgumentTerminator subclassing _OptionParser, overriding _process_args_for_options with an identical copy of the base loop that stops on \"::\" instead of \"--\" (so \"--\" goes through normal _process_opts); base method has no decorators or super() calls. Added tests in tests/test_colon_argument_terminator.py.",
+    "comparison_to_reference": "--- _OptionParser._process_args_for_options\n\n+++ ColonArgumentTerminator._process_args_for_options\n\n@@ -3,3 +3,3 @@\n\n     arglen = len(arg)\n-    if arg == '--':\n+    if arg == '::':\n         return"
+  },
+  {
+    "task_id": "block4-click-five-option-suggestions",
+    "production_file": "src/click/five_option_suggestions.py",
+    "requested_symbol": "FiveOptionSuggestions._match_long_opt",
+    "production_lines": 42,
+    "production_ast_nodes": 156,
+    "files": [
+      "src/click/five_option_suggestions.py"
+    ],
+    "patch_sha256": "60912e6ea240626bd20b866cad10b94e13bdabfca362819b376504c8b3a5f27a",
+    "agent_reported_tests": "python -c smoke test on installed package: subclass returned 5 possibilities vs base's 3 for an unknown --hello option; parse of unknown option raised NoSuchOption as expected.",
+    "notes": "Added src/click/five_option_suggestions.py with FiveOptionSuggestions(_OptionParser) whose _match_long_opt copies the base implementation verbatim, changing only get_close_matches(..., n=5). No existing modules edited.",
+    "comparison_to_reference": "--- _OptionParser._match_long_opt\n\n+++ FiveOptionSuggestions._match_long_opt\n\n@@ -1,4 +1,3 @@\n\n if opt not in self._long_opt:\n-    from difflib import get_close_matches\n-    possibilities = get_close_matches(opt, self._long_opt)\n+    possibilities = get_close_matches(opt, self._long_opt, n=5)\n     raise NoSuchOption(opt, possibilities=possibilities, ctx=self.ctx)"
+  },
+  {
+    "task_id": "block4-click-sorted-unknown-short-options",
+    "production_file": "src/click/sorted_unknown_short_options.py",
+    "requested_symbol": "SortedUnknownShortOptions._match_short_opt",
+    "production_lines": 53,
+    "production_ast_nodes": 218,
+    "files": [
+      "src/click/sorted_unknown_short_options.py",
+      "tests/test_sorted_unknown_short_options.py"
+    ],
+    "patch_sha256": "d88dad523f3f4abf0788c255f1f272e90b09d86d1b229512a692376158bce040",
+    "agent_reported_tests": "pytest tests/test_sorted_unknown_short_options.py tests/test_parser.py: 8 passed",
+    "notes": "Subclassed _OptionParser and copied _match_short_opt verbatim, changing only the final ignored-token reconstruction to join sorted(unknown_options); added a small test.",
+    "comparison_to_reference": "--- _OptionParser._match_short_opt\n\n+++ SortedUnknownShortOptions._match_short_opt\n\n@@ -24,2 +24,2 @@\n\n if self.ignore_unknown_options and unknown_options:\n-    state.largs.append(f\"{prefix}{''.join(unknown_options)}\")\n+    state.largs.append(f\"{prefix}{''.join(sorted(unknown_options))}\")"
+  },
+  {
+    "task_id": "block4-click-list-option-values",
+    "production_file": "src/click/list_option_values.py",
+    "requested_symbol": "ListOptionValues._get_value_from_state",
+    "production_lines": 55,
+    "production_ast_nodes": 187,
+    "files": [
+      "src/click/list_option_values.py"
+    ],
+    "patch_sha256": "22e9a32b2e05cda95b156afb16f444f2ba58d77f2ed4ef0552f04401c1f43a89",
+    "agent_reported_tests": "pip install -e . 'pytest<9'; python -m pytest -q tests -> 900 passed, 21 skipped, 1 xfailed (one earlier run had a single flaky failure that did not reproduce); manual parse check: ListOptionValues with nargs=2 returns ['a','b'].",
+    "notes": "Added src/click/list_option_values.py with ListOptionValues(_OptionParser), overriding _get_value_from_state as a copy of the base method (which uses no super() or decorators) except list(...) replaces tuple(...) for fixed nargs > 1; no existing modules edited.",
+    "comparison_to_reference": "--- _OptionParser._get_value_from_state\n\n+++ ListOptionValues._get_value_from_state\n\n@@ -13,3 +13,3 @@\n\n else:\n-    value = tuple(state.rargs[:nargs])\n+    value = list(state.rargs[:nargs])\n     del state.rargs[:nargs]"
+  },
+  {
+    "task_id": "block4-click-colon-option-assignment",
+    "production_file": "src/click/colon_option_assignment.py",
+    "requested_symbol": "ColonOptionAssignment._process_opts",
+    "production_lines": 44,
+    "production_ast_nodes": 125,
+    "files": [
+      "src/click/colon_option_assignment.py",
+      "tests/test_colon_option_assignment.py"
+    ],
+    "patch_sha256": "21cfc8cff83cef7707330394ac2ce9edeb020ce9b1059c1d0c1526fd48a599f8",
+    "agent_reported_tests": "pytest tests/test_colon_option_assignment.py tests/test_parser.py (11 passed); pytest tests/ --ignore=tests/test_basic.py (845 passed, 21 skipped, 1 xfailed; test_basic fails collection on this pytest version, unrelated); pre-commit run on new files (passed)",
+    "notes": "Added ColonOptionAssignment subclassing _OptionParser with _process_opts copied verbatim from the base except splitting attached long-option values on the first ':' instead of '='; long/short dispatch and unknown-option handling unchanged. Added tests in tests/test_colon_option_assignment.py.",
+    "comparison_to_reference": "--- _OptionParser._process_opts\n\n+++ ColonOptionAssignment._process_opts\n\n@@ -1,4 +1,4 @@\n\n explicit_value = None\n-if '=' in arg:\n-    long_opt, explicit_value = arg.split('=', 1)\n+if ':' in arg:\n+    long_opt, explicit_value = arg.split(':', 1)\n else:"
+  },
+  {
+    "task_id": "block4-click-type-class-key",
+    "production_file": "src/click/type_class_key.py",
+    "requested_symbol": "TypeClassKey.to_info_dict",
+    "production_lines": 33,
+    "production_ast_nodes": 85,
+    "files": [
+      "src/click/type_class_key.py",
+      "tests/test_type_class_key.py"
+    ],
+    "patch_sha256": "ee2bf463765ad8f3cb929797795bfa72231e21738b55ebb93c7ba8340c161f18",
+    "agent_reported_tests": "pytest tests/test_type_class_key.py tests/test_info_dict.py: 24 passed; pre-commit run on new files: all passed",
+    "notes": "Added TypeClassKey(ParamType) overriding to_info_dict with the same signature, docstring and logic as ParamType.to_info_dict, emitting type_class instead of param_type; added tests. No existing modules edited.",
+    "comparison_to_reference": "--- ParamType.to_info_dict\n\n+++ TypeClassKey.to_info_dict\n\n@@ -1,3 +1,3 @@\n\n-param_type = type(self).__name__.partition('ParamType')[0]\n-param_type = param_type.partition('ParameterType')[0]\n+type_class = type(self).__name__.partition('ParamType')[0]\n+type_class = type_class.partition('ParameterType')[0]\n if hasattr(self, 'name'):\n@@ -5,3 +5,3 @@\n\n else:\n-    name = param_type\n-return {'param_type': param_type, 'name': name}\n+    name = type_class\n+return {'type_class': type_class, 'name': name}"
+  },
+  {
+    "task_id": "block4-click-ignore-invalid-utf8",
+    "production_file": "src/click/ignore_invalid_utf8.py",
+    "requested_symbol": "IgnoreInvalidUtf8.convert",
+    "production_lines": 37,
+    "production_ast_nodes": 135,
+    "files": [
+      "src/click/ignore_invalid_utf8.py"
+    ],
+    "patch_sha256": "a937c6f7bbb15286c4352c077ee108dd744d9946068fbe568759aff1b0023e96",
+    "agent_reported_tests": "python -m pytest -q -W ignore::pytest.PytestRemovedIn10Warning tests -> 900 passed, 21 skipped, 1 xfailed; manual convert checks on invalid bytes -> invalid bytes dropped ('ab') in both fallback branches.",
+    "notes": "Added IgnoreInvalidUtf8 in src/click/ignore_invalid_utf8.py, overriding convert with StringParamType.convert logic copied verbatim except errors=\"ignore\" in the two final UTF-8 fallbacks; the reference uses no super() calls and has no decorators, so none were added.",
+    "comparison_to_reference": "--- StringParamType.convert\n\n+++ IgnoreInvalidUtf8.convert\n\n@@ -10,5 +10,5 @@\n\n             except UnicodeError:\n-                value = value.decode('utf-8', 'replace')\n+                value = value.decode('utf-8', 'ignore')\n         else:\n-            value = value.decode('utf-8', 'replace')\n+            value = value.decode('utf-8', 'ignore')\n     return value"
+  },
+  {
+    "task_id": "block4-click-comma-choice-metavar",
+    "production_file": "src/click/comma_choice_metavar.py",
+    "requested_symbol": "CommaChoiceMetavar.get_metavar",
+    "production_lines": 33,
+    "production_ast_nodes": 156,
+    "files": [
+      "src/click/comma_choice_metavar.py"
+    ],
+    "patch_sha256": "3f6102bddfb028f2feb03b1d55a51b3267f026cd05b5dff06df14fabec3ac38a",
+    "agent_reported_tests": ".venv/bin/python -m pytest -q: 900 passed, 21 skipped, 1 xfailed; .venv/bin/python - (targeted metavar and conversion assertions): passed; .venv/bin/ruff check --no-fix and .venv/bin/ruff format --check on the new module: passed; .venv/bin/mypy src/click/comma_choice_metavar.py and git diff --cached --check: passed.",
+    "notes": "Added a generic Choice subclass that mirrors the original metavar logic, changing only the separator in both join branches. No existing modules changed.",
+    "comparison_to_reference": "--- Choice.get_metavar\n\n+++ CommaChoiceMetavar.get_metavar\n\n@@ -2,5 +2,5 @@\n\n     choice_metavars = [convert_type(type(choice)).name.upper() for choice in self.choices]\n-    choices_str = '|'.join([*dict.fromkeys(choice_metavars)])\n+    choices_str = ','.join([*dict.fromkeys(choice_metavars)])\n else:\n-    choices_str = '|'.join([str(i) for i in self._normalized_mapping(ctx=ctx).values()])\n+    choices_str = ','.join([str(i) for i in self._normalized_mapping(ctx=ctx).values()])\n if param.required and param.param_type_name == 'argument':"
+  },
+  {
+    "task_id": "block4-click-normalized-choice-value",
+    "production_file": "src/click/normalized_choice_value.py",
+    "requested_symbol": "NormalizedChoiceValue.convert",
+    "production_lines": 43,
+    "production_ast_nodes": 131,
+    "files": [
+      "src/click/normalized_choice_value.py",
+      "tests/test_normalized_choice_value.py"
+    ],
+    "patch_sha256": "a72fc56216107d40bf7006397666912fdf65790e5b8ae1b5686b07c473b7c7da",
+    "agent_reported_tests": "pytest tests/test_normalized_choice_value.py tests/test_types.py (43 passed); mypy on new module (no issues); pre-commit on new files (passed)",
+    "notes": "Subclassed Choice[ParamTypeValue] in a new module and overrode convert with the same signature and docstring style, returning the matched normalized value (cast to keep the return annotation) and failing identically; added focused tests.",
+    "comparison_to_reference": "--- Choice.convert\n\n+++ NormalizedChoiceValue.convert\n\n@@ -3,3 +3,3 @@\n\n try:\n-    return next((original for original, normalized in normalized_mapping.items() if normalized == normed_value))\n+    return t.cast(ParamTypeValue, next((normalized for normalized in normalized_mapping.values() if normalized == normed_value)))\n except StopIteration:"
+  },
+  {
+    "task_id": "block4-click-typed-choice-completion",
+    "production_file": "src/click/typed_choice_completion.py",
+    "requested_symbol": "TypedChoiceCompletion.shell_complete",
+    "production_lines": 38,
+    "production_ast_nodes": 129,
+    "files": [
+      "src/click/typed_choice_completion.py"
+    ],
+    "patch_sha256": "4acbd03c5aeca046c21b7900357d3cb37cda9ca333c2e93414ef83fde13cc30c",
+    "agent_reported_tests": ".venv/bin/python -m pytest -q: 900 passed, 21 skipped, 1 xfailed with locked pytest 8.4.0 (initial pytest 9.2.0 hit a collection deprecation); .venv/bin/python - (inline parity and integration checks): passed 14 cases; .venv/bin/ruff check --no-fix src/click/typed_choice_completion.py, .venv/bin/ruff format --check src/click/typed_choice_completion.py, and git diff --cached --check: passed.",
+    "notes": "The new subclass retains Choice's generic parameter and copies its completion method, changing only the CompletionItem constructor to pass type=\"choice\". No existing modules were edited.",
+    "comparison_to_reference": "--- Choice.shell_complete\n\n+++ TypedChoiceCompletion.shell_complete\n\n@@ -7,2 +7,2 @@\n\n     matched = (c for c in str_choices if c.lower().startswith(incomplete))\n-return [CompletionItem(c) for c in matched]\n+return [CompletionItem(c, type='choice') for c in matched]"
+  },
+  {
+    "task_id": "block4-click-last-date-format-first",
+    "production_file": "src/click/last_date_format_first.py",
+    "requested_symbol": "LastDateFormatFirst.convert",
+    "production_lines": 42,
+    "production_ast_nodes": 141,
+    "files": [
+      "src/click/last_date_format_first.py"
+    ],
+    "patch_sha256": "354766eb783d9cd8bc92648635cbcbf88dcad62fbd004ff02a694685268e2296",
+    "agent_reported_tests": "PYTHONPATH=src python3 -c \"...\" \u2014 LastDateFormatFirst converts valid input, raises BadParameter on invalid, and returns datetime instances unchanged; all passed.",
+    "notes": "Added src/click/last_date_format_first.py with LastDateFormatFirst(DateTime), copying DateTime.convert verbatim except iterating reversed(self.formats); signature, decorators and parent-call targets unchanged.",
+    "comparison_to_reference": "--- DateTime.convert\n\n+++ LastDateFormatFirst.convert\n\n@@ -2,3 +2,3 @@\n\n     return value\n-for format in self.formats:\n+for format in reversed(self.formats):\n     converted = self._try_to_convert_date(value, format)"
+  },
+  {
+    "task_id": "block4-click-numeric-type-error",
+    "production_file": "src/click/numeric_type_error.py",
+    "requested_symbol": "NumericTypeError.convert",
+    "production_lines": 28,
+    "production_ast_nodes": 88,
+    "files": [
+      "src/click/numeric_type_error.py"
+    ],
+    "patch_sha256": "fc63d70ceda6fcd5bc51a82dd81eaad4d8339a13d88ba985980cf1a867e2399e",
+    "agent_reported_tests": "PYTHONPATH=src .git/task-venv/bin/python -m pytest -q: pytest 9.2.0 failed collection on an existing deprecation; locked pytest 8.4.0 passed (900 passed, 21 skipped, 1 xfailed). PYTHONPATH=src .git/task-venv/bin/python - (focused conversion assertions), Ruff check and format --check, and git diff --cached --check passed.",
+    "notes": "Added NumericTypeError in a standalone module. Its override preserves the base signature and localized failure path, and handles TypeError alongside ValueError without editing existing modules.",
+    "comparison_to_reference": "--- _NumberParamTypeBase.convert\n\n+++ NumericTypeError.convert\n\n@@ -2,3 +2,3 @@\n\n     return self._number_class(value)\n-except ValueError:\n+except (TypeError, ValueError):\n     self.fail(_('{value!r} is not a valid {number_type}.').format(value=value, number_type=self.name), param, ctx)"
+  },
+  {
+    "task_id": "block4-click-closed-upper-numeric-bound",
+    "production_file": "src/click/closed_upper_numeric_bound.py",
+    "requested_symbol": "ClosedUpperNumericBound.convert",
+    "production_lines": 43,
+    "production_ast_nodes": 206,
+    "files": [
+      "src/click/closed_upper_numeric_bound.py"
+    ],
+    "patch_sha256": "cfec688309e90191ccf124636cb3e5185fe414de3f03e612e2b96b5bb11ae449",
+    "agent_reported_tests": "PYTHONPATH=src .venv/bin/python -m pytest -q: 900 passed, 21 skipped, 1 xfailed on locked pytest 8.4.0 (pytest 9.2.0 failed collection on a deprecation); PYTHONPATH=src .venv/bin/python -: 224 boundary cases and parent-call check passed; Ruff check and format --check passed; git diff --cached --check passed.",
+    "notes": "The override uses operator.gt for the upper-bound comparison and preserves the original parent conversion through the MRO. Lower-bound checks, clamping, and error messages are unchanged; no existing modules were edited.",
+    "comparison_to_reference": "--- _NumberRangeBase.convert\n\n+++ ClosedUpperNumericBound.convert\n\n@@ -1,5 +1,5 @@\n\n import operator\n-rv = super().convert(value, param, ctx)\n+rv = super(_NumberRangeBase, self).convert(value, param, ctx)\n lt_min: bool = self.min is not None and (operator.le if self.min_open else operator.lt)(rv, self.min)\n-gt_max: bool = self.max is not None and (operator.ge if self.max_open else operator.gt)(rv, self.max)\n+gt_max: bool = self.max is not None and operator.gt(rv, self.max)\n if self.clamp:"
+  },
+  {
+    "task_id": "block4-click-named-range-variable",
+    "production_file": "src/click/named_range_variable.py",
+    "requested_symbol": "NamedRangeVariable._describe_range",
+    "production_lines": 23,
+    "production_ast_nodes": 114,
+    "files": [
+      "src/click/named_range_variable.py"
+    ],
+    "patch_sha256": "5fc1c2c90c220f3e31d54679bdc39c45b3afa80e7d2ee4d34596b38203f6d58a",
+    "agent_reported_tests": "pytest -q tests/test_types.py (40 passed); ruff check/format on new file (clean); manual _describe_range checks: 1<=value<=5, value<3, value>=2.",
+    "notes": "Added src/click/named_range_variable.py with NamedRangeVariable(_NumberRangeBase), overriding _describe_range with the same logic and signature as the base but using \"value\" instead of \"x\"; base has no super() calls or decorators to preserve, and no existing modules were edited.",
+    "comparison_to_reference": "--- _NumberRangeBase._describe_range\n\n+++ NamedRangeVariable._describe_range\n\n@@ -2,8 +2,8 @@\n\n     op = '<' if self.max_open else '<='\n-    return f'x{op}{self.max}'\n+    return f'value{op}{self.max}'\n if self.max is None:\n     op = '>' if self.min_open else '>='\n-    return f'x{op}{self.min}'\n+    return f'value{op}{self.min}'\n lop = '<' if self.min_open else '<='\n rop = '<' if self.max_open else '<='\n-return f'{self.min}{lop}x{rop}{self.max}'\n+return f'{self.min}{lop}value{rop}{self.max}'"
+  },
+  {
+    "task_id": "block4-click-semicolon-boolean-states",
+    "production_file": "src/click/semicolon_boolean_states.py",
+    "requested_symbol": "SemicolonBooleanStates.convert",
+    "production_lines": 30,
+    "production_ast_nodes": 96,
+    "files": [
+      "src/click/semicolon_boolean_states.py",
+      "tests/test_semicolon_boolean_states.py"
+    ],
+    "patch_sha256": "d3094f061e26c0c70fb138b86dfefdb888c9d45b2ddddf18e6f0e82dd007137b",
+    "agent_reported_tests": "python -m pytest -q tests (pytest<9): 907 passed, 21 skipped, 1 xfailed; ruff check/format and mypy on new files: clean",
+    "notes": "Added SemicolonBooleanStates(BoolParamType) whose convert copies BoolParamType.convert (the reference does not call super()) and joins the sorted bool_states with \"; \" in the error message; added tests in tests/test_semicolon_boolean_states.py.",
+    "comparison_to_reference": "--- BoolParamType.convert\n\n+++ SemicolonBooleanStates.convert\n\n@@ -2,3 +2,3 @@\n\n if normalized is None:\n-    self.fail(_('{value!r} is not a valid boolean. Recognized values: {states}').format(value=value, states=', '.join(sorted(self.bool_states))), param, ctx)\n+    self.fail(_('{value!r} is not a valid boolean. Recognized values: {states}').format(value=value, states='; '.join(sorted(self.bool_states))), param, ctx)\n return normalized"
+  },
+  {
+    "task_id": "block4-click-strict-trailing-uuid-space",
+    "production_file": "src/click/strict_trailing_uuid_space.py",
+    "requested_symbol": "StrictTrailingUuidSpace.convert",
+    "production_lines": 34,
+    "production_ast_nodes": 102,
+    "files": [
+      "src/click/strict_trailing_uuid_space.py",
+      "tests/test_strict_trailing_uuid_space.py"
+    ],
+    "patch_sha256": "7900f9d2ba8e7788bb98710933f2e7eacba7ea4acf4b11a6c3e1e16644e2876e",
+    "agent_reported_tests": "click-venv/bin/python -m pytest tests/test_strict_trailing_uuid_space.py tests/test_types.py (45 passed); ruff check/format and mypy on new files: clean",
+    "notes": "Added StrictTrailingUuidSpace subclassing UUIDParameterType with convert mirroring the base (same signature, UUID passthrough, fail message) but using lstrip() so trailing whitespace is rejected; base calls no super(), so none is used. Added tests.",
+    "comparison_to_reference": "--- UUIDParameterType.convert\n\n+++ StrictTrailingUuidSpace.convert\n\n@@ -3,3 +3,3 @@\n\n     return value\n-value = value.strip()\n+value = value.lstrip()\n try:"
+  },
+  {
+    "task_id": "block4-click-file-open-error-prefix",
+    "production_file": "src/click/file_open_error_prefix.py",
+    "requested_symbol": "FileOpenErrorPrefix.convert",
+    "production_lines": 66,
+    "production_ast_nodes": 261,
+    "files": [
+      "src/click/file_open_error_prefix.py"
+    ],
+    "patch_sha256": "7ee99a599083de5a72b3f9eef87f6cf1ca5a492d51d89b0c036157f568d6bffa",
+    "agent_reported_tests": "pytest -q tests/test_types.py -x -> 40 passed; manual check: FileOpenErrorPrefix().convert('/nonexistent/path/xyz', None, None) -> BadParameter \"Cannot open '/nonexistent/path/xyz': No such file or directory\"",
+    "notes": "Added src/click/file_open_error_prefix.py defining FileOpenErrorPrefix(File) with a convert method copied verbatim from File.convert; the only change is prefixing the OSError self.fail message with 'Cannot open '. No existing modules were edited.",
+    "comparison_to_reference": "--- File.convert\n\n+++ FileOpenErrorPrefix.convert\n\n@@ -18,2 +18,2 @@\n\n except OSError as e:\n-    self.fail(f\"'{format_filename(value)}': {e.strerror}\", param, ctx)\n+    self.fail(f\"Cannot open '{format_filename(value)}': {e.strerror}\", param, ctx)"
+  },
+  {
+    "task_id": "block4-click-executable-path-metadata",
+    "production_file": "src/click/executable_path_metadata.py",
+    "requested_symbol": "ExecutablePathMetadata.to_info_dict",
+    "production_lines": 22,
+    "production_ast_nodes": 84,
+    "files": [
+      "src/click/executable_path_metadata.py"
+    ],
+    "patch_sha256": "d1eb097135e927e3e01d3640bc0dff25f02e854dedc976a42751a6fe46a34389",
+    "agent_reported_tests": "PYTHONPATH=src .tox/task/bin/python -m pytest -q --basetemp=.tox/task-pytest -o cache_dir=.tox/task-pytest-cache: 900 passed, 21 skipped, 1 xfailed; PYTHONPATH=src python3 (signature, metadata, and parent-lookup smoke check), Ruff check and format --check on the new file, and git diff --cached --check passed.",
+    "notes": "Added ExecutablePathMetadata in a new module without touching existing files. The override keeps the original signature and parent lookup and appends the executable flag.",
+    "comparison_to_reference": "--- Path.to_info_dict\n\n+++ ExecutablePathMetadata.to_info_dict\n\n@@ -1,3 +1,3 @@\n\n-info_dict = super().to_info_dict()\n-info_dict.update(exists=self.exists, file_okay=self.file_okay, dir_okay=self.dir_okay, writable=self.writable, readable=self.readable, allow_dash=self.allow_dash)\n+info_dict = super(Path, self).to_info_dict()\n+info_dict.update(exists=self.exists, file_okay=self.file_okay, dir_okay=self.dir_okay, writable=self.writable, readable=self.readable, allow_dash=self.allow_dash, executable=self.executable)\n return info_dict"
+  },
+  {
+    "task_id": "block4-click-list-composite-values",
+    "production_file": "src/click/list_composite_values.py",
+    "requested_symbol": "ListCompositeValues.convert",
+    "production_lines": 35,
+    "production_ast_nodes": 129,
+    "files": [
+      "src/click/list_composite_values.py",
+      "tests/test_list_composite_values.py"
+    ],
+    "patch_sha256": "e2a03274e2eab4d754022a57e4c68b4f976faa192b5d3b20a271775cf8e52c0c",
+    "agent_reported_tests": "pytest tests/test_list_composite_values.py tests/test_types.py tests/test_imports.py: 44 passed; ruff check + format --check: clean",
+    "notes": "Added ListCompositeValues(Tuple) in src/click/list_composite_values.py, overriding convert with the same arity check and error message as Tuple.convert but returning a list; Tuple.convert does not call super(), so none is used. Added tests.",
+    "comparison_to_reference": "--- Tuple.convert\n\n+++ ListCompositeValues.convert\n\n@@ -4,2 +4,2 @@\n\n     self.fail(ngettext('{len_type} values are required, but {len_value} was given.', '{len_type} values are required, but {len_value} were given.', len_value).format(len_type=len_type, len_value=len_value), param=param, ctx=ctx)\n-return tuple((ty(x, param, ctx) for ty, x in zip(self.types, value, strict=False)))\n+return [ty(x, param, ctx) for ty, x in zip(self.types, value, strict=False)]"
+  },
+  {
+    "task_id": "block4-click-first-line-extra-indent",
+    "production_file": "src/click/first_line_extra_indent.py",
+    "requested_symbol": "FirstLineExtraIndent.extra_indent",
+    "production_lines": 24,
+    "production_ast_nodes": 68,
+    "files": [
+      "src/click/first_line_extra_indent.py",
+      "tests/test_first_line_extra_indent.py"
+    ],
+    "patch_sha256": "0f70cb95230b39f3f12963412e893fcb6af79dac1311c67e3cb118a38b90d272",
+    "agent_reported_tests": "python -m pytest -q tests/test_first_line_extra_indent.py tests/test_formatting.py -> 19 passed",
+    "notes": "Added FirstLineExtraIndent subclassing click._textwrap.TextWrapper, overriding the @contextmanager extra_indent to only extend initial_indent while saving/restoring both indents; added tests.",
+    "comparison_to_reference": "--- TextWrapper.extra_indent\n\n+++ FirstLineExtraIndent.extra_indent\n\n@@ -3,3 +3,2 @@\n\n self.initial_indent += indent\n-self.subsequent_indent += indent\n try:"
+  },
+  {
+    "task_id": "block4-click-crlf-indented-text",
+    "production_file": "src/click/crlf_indented_text.py",
+    "requested_symbol": "CrlfIndentedText.indent_only",
+    "production_lines": 22,
+    "production_ast_nodes": 78,
+    "files": [
+      "src/click/crlf_indented_text.py",
+      "tests/test_crlf_indented_text.py"
+    ],
+    "patch_sha256": "3b333e098a7dd649d26b280c7c936101b9ef36bb71d36d7b5c11ef97b06d5d76",
+    "agent_reported_tests": "python -m pytest -q tests/test_crlf_indented_text.py -> 3 passed",
+    "notes": "Added CrlfIndentedText subclassing click._textwrap.TextWrapper, overriding indent_only with identical logic but joining with CRLF (base uses no super() call or decorators on indent_only); added tests.",
+    "comparison_to_reference": "--- TextWrapper.indent_only\n\n+++ CrlfIndentedText.indent_only\n\n@@ -6,2 +6,2 @@\n\n     rv.append(f'{indent}{line}')\n-return '\\n'.join(rv)\n+return '\\r\\n'.join(rv)"
+  },
+  {
+    "task_id": "block4-click-quiet-eta-progressbar",
+    "production_file": "src/click/quiet_eta_progressbar.py",
+    "requested_symbol": "quiet_eta_progressbar",
+    "production_lines": 95,
+    "production_ast_nodes": 408,
+    "files": [
+      "src/click/quiet_eta_progressbar.py"
+    ],
+    "patch_sha256": "8285d297b17a72acfcc4db97c72a4a0fa838e59f1616c16fe1000fa7b603742f",
+    "agent_reported_tests": "python3 smoke test: imported quiet_eta_progressbar via PYTHONPATH=src, iterated a length=3 bar and an iterable bar, asserted ProgressBar.show_eta is False even with show_eta=True passed \u2014 passed.",
+    "notes": "Mirrored click.termui.progressbar (signature, both @t.overload variants, resolve_color_default, ProgressBar construction) in a new src/click/quiet_eta_progressbar.py, with show_eta=False forwarded unconditionally. No existing modules were edited.",
+    "comparison_to_reference": "--- progressbar\n\n+++ quiet_eta_progressbar\n\n@@ -1,3 +1,2 @@\n\n-from ._termui_impl import ProgressBar\n color = resolve_color_default(color)\n-return ProgressBar(iterable=iterable, length=length, hidden=hidden, show_eta=show_eta, show_percent=show_percent, show_pos=show_pos, item_show_func=item_show_func, fill_char=fill_char, empty_char=empty_char, bar_template=bar_template, info_sep=info_sep, file=file, label=label, width=width, color=color, update_min_steps=update_min_steps)\n+return ProgressBar(iterable=iterable, length=length, hidden=hidden, show_eta=False, show_percent=show_percent, show_pos=show_pos, item_show_func=item_show_func, fill_char=fill_char, empty_char=empty_char, bar_template=bar_template, info_sep=info_sep, file=file, label=label, width=width, color=color, update_min_steps=update_min_steps)"
+  },
+  {
+    "task_id": "block4-click-alternate-zsh-word-variable",
+    "production_file": "src/click/alternate_zsh_word_variable.py",
+    "requested_symbol": "AlternateZshWordVariable.get_completion_args",
+    "production_lines": 25,
+    "production_ast_nodes": 92,
+    "files": [
+      "src/click/alternate_zsh_word_variable.py",
+      "tests/test_alternate_zsh_word_variable.py"
+    ],
+    "patch_sha256": "8e20e6df071add28cabb7e3e6f466a33987d65453cacdee729596fc1a41b3f6f",
+    "agent_reported_tests": "pytest tests/test_alternate_zsh_word_variable.py tests/test_shell_completion.py: 53 passed; pre-commit (ruff, ruff format, etc.) on new files: passed",
+    "notes": "Added AlternateZshWordVariable subclassing ZshComplete in a new module, overriding get_completion_args to mirror the base implementation but read SUGGEST_WORDS (index still from COMP_CWORD); the base method uses no super() or decorators. Added a parametrized test.",
+    "comparison_to_reference": "--- ZshComplete.get_completion_args\n\n+++ AlternateZshWordVariable.get_completion_args\n\n@@ -1,2 +1,2 @@\n\n-cwords = split_arg_string(os.environ['COMP_WORDS'])\n+cwords = split_arg_string(os.environ['SUGGEST_WORDS'])\n cword = int(os.environ['COMP_CWORD'])"
+  },
+  {
+    "task_id": "block4-click-tab-zsh-record",
+    "production_file": "src/click/tab_zsh_record.py",
+    "requested_symbol": "TabZshRecord.format_completion",
+    "production_lines": 14,
+    "production_ast_nodes": 67,
+    "files": [
+      "src/click/tab_zsh_record.py",
+      "tests/test_tab_zsh_record.py"
+    ],
+    "patch_sha256": "dc73097d7764e5f5b6f01bc1d1c5d9fc39c254c5a86232d76f14b47a91745c68",
+    "agent_reported_tests": "pytest -q (locked pytest 8.4.0): 904 passed, 21 skipped, 1 xfailed; Ruff check and format --check on both new files and git diff --cached --check passed. Initial Ruff check flagged a long line (fixed); pytest 9.2.0 failed collection on an existing deprecation.",
+    "notes": "Subclassed ZshComplete and changed only the record separators. Added regression coverage for colon escaping, the help sentinel, and embedded newlines without editing existing modules.",
+    "comparison_to_reference": "--- ZshComplete.format_completion\n\n+++ TabZshRecord.format_completion\n\n@@ -2,2 +2,2 @@\n\n value = item.value.replace(':', '\\\\:') if help_ != '_' else item.value\n-return f'{item.type}\\n{value}\\n{help_}'\n+return f'{item.type}\\t{value}\\t{help_}'"
+  },
+  {
+    "task_id": "block4-click-empty-fish-partial",
+    "production_file": "src/click/empty_fish_partial.py",
+    "requested_symbol": "EmptyFishPartial.get_completion_args",
+    "production_lines": 20,
+    "production_ast_nodes": 92,
+    "files": [
+      "src/click/empty_fish_partial.py"
+    ],
+    "patch_sha256": "6ac3ee788927eeb2147ec616c27f887ec0c05710c2fdbae9d82da829c9e1df06",
+    "agent_reported_tests": "PYTHONPATH=src .venv/bin/python -m pytest -q --basetemp=.venv/pytest-tmp: pytest 9.2.0 hit a collection deprecation; locked pytest 8.4.0 passed (900 passed, 21 skipped, 1 xfailed); PYTHONPATH=src .venv/bin/python - (inline checks): 8 cases passed; .venv/bin/ruff check --no-fix and .venv/bin/ruff format --check on the new module, and git diff --cached --check: passed.",
+    "notes": "EmptyFishPartial inherits FishComplete and preserves its parsing, slicing, and return value, removing the final argument whenever it matches the partial word, including an empty match. No existing modules changed.",
+    "comparison_to_reference": "--- FishComplete.get_completion_args\n\n+++ EmptyFishPartial.get_completion_args\n\n@@ -3,3 +3,3 @@\n\n args = cwords[1:]\n-if incomplete and args and (args[-1] == incomplete):\n+if args and args[-1] == incomplete:\n     args.pop()"
+  },
+  {
+    "task_id": "block4-pytest-manifest-suffix-counts",
+    "production_file": "src/_pytest/manifest_suffix_counts.py",
+    "requested_symbol": "manifest_suffix_counts",
+    "production_lines": 37,
+    "production_ast_nodes": 130,
+    "files": [
+      "src/_pytest/manifest_suffix_counts.py",
+      "testing/test_manifest_suffix_counts.py"
+    ],
+    "patch_sha256": "73b111b80edc1e447d925d0505acf3f20c57c591df5656a00310c05df1c0ba21",
+    "agent_reported_tests": "pytest testing/test_manifest_suffix_counts.py -q (14 passed); pre-commit run on the new files (ruff, ruff-format, mypy, codespell etc. all passed)",
+    "notes": "Added a pure string-based manifest_suffix_counts that skips entries ending in \"/\", takes the lowercased final suffix of the last path component using pathlib.PurePath.suffix rules (hidden files and a trailing dot count as <none>), and returns a dict with sorted keys built from a Counter. Tests cover case folding, multi-suffix names, directories, sorting, and a check that the filesystem is never read.",
+    "comparison_to_reference": "counts = Counter((_final_suffix(name) for name in names if not name.endswith('/')))\nreturn dict(sorted(counts.items()))"
+  },
+  {
+    "task_id": "block4-pytest-manifest-origin-label",
+    "production_file": "src/_pytest/manifest_origin_label.py",
+    "requested_symbol": "manifest_origin_label",
+    "production_lines": 25,
+    "production_ast_nodes": 51,
+    "files": [
+      "src/_pytest/manifest_origin_label.py",
+      "testing/test_manifest_origin_label.py"
+    ],
+    "patch_sha256": "983dcfdfb6098e6d5b0f9b53cf8f6cd2a5a4d3628ff5384a728fbd7d711bd7f0",
+    "agent_reported_tests": "python -m pytest testing/test_manifest_origin_label.py -q \u2014 11 passed",
+    "notes": "Added manifest_origin_label() in src/_pytest/manifest_origin_label.py as a pure lexical classifier: str() the value (returning 'invalid' on exception), then check http(s) prefix -> 'remote', leading '/' -> 'absolute', else 'relative'. No filesystem access, no Path objects. Added a parametrized test file covering remote/absolute/relative/invalid cases.",
+    "comparison_to_reference": "try:\n    text = str(value)\nexcept Exception:\n    return 'invalid'\nif text.startswith(('http://', 'https://')):\n    return 'remote'\nif text.startswith('/'):\n    return 'absolute'\nreturn 'relative'"
+  },
+  {
+    "task_id": "block4-pytest-event-window-filter",
+    "production_file": "src/_pytest/event_window_filter.py",
+    "requested_symbol": "event_window_filter",
+    "production_lines": 29,
+    "production_ast_nodes": 82,
+    "files": [
+      "src/_pytest/event_window_filter.py",
+      "testing/test_event_window_filter.py"
+    ],
+    "patch_sha256": "64bcc00b554c682094d8d378640480a5ce91232d3f4b4e51c0877f7d1bdfb1fa",
+    "agent_reported_tests": "pip install -e .; python -m pytest testing/test_event_window_filter.py -q (5 passed, also with -W error)",
+    "notes": "Added src/_pytest/event_window_filter.py with event_window_filter(events, start, stop): a list comprehension keeping dicts with start <= tick < stop and hidden falsy, preserving order without mutating records, typed per repo conventions. Added testing/test_event_window_filter.py covering boundaries, hidden exclusion, order/no-mutation, and empty windows.",
+    "comparison_to_reference": "return [event for event in events if start <= event['tick'] < stop and (not event.get('hidden', False))]"
+  },
+  {
+    "task_id": "block4-pytest-mapping-value-kind-counts",
+    "production_file": "src/_pytest/mapping_value_kind_counts.py",
+    "requested_symbol": "mapping_value_kind_counts",
+    "production_lines": 23,
+    "production_ast_nodes": 122,
+    "files": [
+      "src/_pytest/mapping_value_kind_counts.py",
+      "testing/test_mapping_value_kind_counts.py"
+    ],
+    "patch_sha256": "e708250632ff84c3c5c2895f042b549a447c32c484841781ebd075b1a50bb008",
+    "agent_reported_tests": "python -m pytest -q testing/test_mapping_value_kind_counts.py testing/io (120 passed); ruff check and ruff format --check for both changed files passed; pre-commit run (all applicable hooks passed); git diff --cached --check passed.",
+    "notes": "The implementation counts all five kinds in one pass over mapping items, checking bool before Number without rendering entries. Focused tests cover mixed and empty mappings and entries that cannot be rendered.",
+    "comparison_to_reference": "counts = {'null': 0, 'bool': 0, 'number': 0, 'text': 0, 'other': 0}\nfor _, value in mapping.items():\n    if value is None:\n        kind = 'null'\n    elif isinstance(value, bool):\n        kind = 'bool'\n    elif isinstance(value, Number):\n        kind = 'number'\n    elif isinstance(value, str):\n        kind = 'text'\n    else:\n        kind = 'other'\n    counts[kind] += 1\nreturn counts"
+  }
+]

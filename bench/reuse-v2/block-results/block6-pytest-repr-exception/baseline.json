@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-pytest-repr-exception",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "356cb735ea5beafb2b004588dc5c2638e93a5de7",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_repr_exception.py",
+          "symbol": "src/standalone_wave6_repr_exception.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/_io/saferepr.py",
+          "symbol": "src/_pytest/_io/saferepr.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_repr_exception.py and update its 9 callers to use src/_pytest/_io/saferepr.py."
+      },
+      {
+        "id": "d0e8ab9cd0c6fae35395284a0243374eaf0b4e96",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_repr_exception.py",
+          "symbol": "_try_repr_or_str",
+          "line": 12
+        },
+        "existing": {
+          "file": "src/_pytest/_io/saferepr.py",
+          "symbol": "_try_repr_or_str",
+          "line": 7
+        },
+        "probability": 0.982638787530041,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _try_repr_or_str: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "6e2702f56d2794918fa9a864018aca1c41814b6e",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_repr_exception.py",
+          "symbol": "vendored_repr_exception",
+          "line": 21
+        },
+        "existing": {
+          "file": "src/_pytest/_io/saferepr.py",
+          "symbol": "_format_repr_exception",
+          "line": 16
+        },
+        "probability": 0.9894822512625472,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9275505842459079
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _format_repr_exception: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

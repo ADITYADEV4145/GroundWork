@@ -1,4 +1,5 @@
 {
+  "suite": "reuse-v2",
   "task_id": "click-notice_panel",
   "arm": "groundwork",
   "session_id": "",
@@ -7,7 +8,7 @@
   "success": false,
   "acceptance": {
     "exitCode": 1,
-    "output": "F                                                                        [100%]\n=================================== FAILURES ===================================\n__________________________________ test_panel __________________________________\n\n    def test_panel():\n        assert notice_panel(\"one two three four\", 12) == \"  one two\\n  three four\"\n        assert notice_panel(\"alpha\\n\\nbeta\", 20) == \"  alpha\\n  \\n  beta\"\n        assert notice_panel(\"\\b\\n  raw    code that is long\", 10) == \"    raw    code that is long\"\n>       assert notice_panel(\"  indented text\", 30) == \"    indented text\"\nE       AssertionError: assert '  indented text' == '    indented text'\nE         \nE         -     indented text\nE         ? --\nE         +   indented text\n\nbench_v2_test_notice_panel.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED bench_v2_test_notice_panel.py::test_panel - AssertionError: assert '  ...\n1 failed in 0.08s\n"
+    "output": "F                                                                        [100%]\n=================================== FAILURES ===================================\n__________________________________ test_panel __________________________________\n\n    def test_panel():\n        assert notice_panel(\"one two three four\", 12) == \"  one two\\n  three four\"\n        assert notice_panel(\"alpha\\n\\nbeta\", 20) == \"  alpha\\n  \\n  beta\"\n        assert notice_panel(\"\\b\\n  raw    code that is long\", 10) == \"    raw    code that is long\"\n>       assert notice_panel(\"  indented text\", 30) == \"    indented text\"\nE       AssertionError: assert '  indented text' == '    indented text'\nE         \nE         -     indented text\nE         ? --\nE         +   indented text\n\nbench_v2_test_notice_panel.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED bench_v2_test_notice_panel.py::test_panel - AssertionError: assert '  ...\n1 failed in 0.09s\n"
   },
   "check": {
     "status": "PASS",

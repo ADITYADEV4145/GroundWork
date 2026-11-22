@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-named-range-variable",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "d96a2511694ac1289e5be382ea50d536046689e0",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/named_range_variable.py",
+          "symbol": "src/click/named_range_variable.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "src/click/types.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/named_range_variable.py; use src/click/types.py instead."
+      },
+      {
+        "id": "5197b48efd1fd419356e4ca37ed1cd1c13d968d0",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/named_range_variable.py",
+          "symbol": "NamedRangeVariable",
+          "line": 6
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "_NumberRangeBase._describe_range",
+          "line": 557
+        },
+        "probability": 0.4727358083528617,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.7524009488347894
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _NumberRangeBase._describe_range: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "77cd575c7dbc9a67b2c29bce0f8f26b316a697ba",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/named_range_variable.py",
+          "symbol": "NamedRangeVariable._describe_range",
+          "line": 11
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "_NumberRangeBase.to_info_dict",
+          "line": 505
+        },
+        "probability": 0.592874862335696,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.45479405621069396
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _NumberRangeBase.to_info_dict: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

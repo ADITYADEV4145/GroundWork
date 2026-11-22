@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-reverse-source-priority",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "215a730433d21040a9168e4b23181359df6bf240",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/reverse_source_priority.py",
+          "symbol": "ReverseSourcePriority.get_command",
+          "line": 12
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "CommandCollection.list_commands",
+          "line": 1965
+        },
+        "probability": 0.4535026032880168,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5444698455363415
+          },
+          {
+            "name": "paramCount",
+            "value": 0.5
+          }
+        ],
+        "fix": "Duplicate of CommandCollection.list_commands: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "hard-negative",
+  "task_id": "block6-pytest-source-status",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "bd663653857ee4ac3a243db894f19604dc4053d2",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_wave6_source_status.py",
+          "symbol": "src/standalone_wave6_source_status.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/_code/code.py",
+          "symbol": "src/_pytest/_code/code.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_source_status.py; use src/_pytest/_code/code.py instead."
+      },
+      {
+        "id": "6cd32a10593820586083c880431f4f0603b18ef2",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_wave6_source_status.py",
+          "symbol": "vendored_source_status_variant",
+          "line": 22
+        },
+        "existing": {
+          "file": "src/_pytest/_code/code.py",
+          "symbol": "getfslineno",
+          "line": 1477
+        },
+        "probability": 0.5054501249144909,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.3622044844708074
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of getfslineno: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

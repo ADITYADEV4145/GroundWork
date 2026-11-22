@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-partial-argument-value-error",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "1bdbf1662578d1ca63833e93be8a53582f14da3f",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/partial_argument_value_error.py",
+          "symbol": "PartialArgumentValueError.process",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Argument.add_to_parser",
+          "line": 3153
+        },
+        "probability": 0.686435107225045,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.41156802950476895
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Argument.add_to_parser: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

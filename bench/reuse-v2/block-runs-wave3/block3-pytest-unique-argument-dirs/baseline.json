@@ -1,0 +1,9 @@
+{
+  "task_id": "block3-pytest-unique-argument-dirs",
+  "arm": "baseline",
+  "patch": "diff --git a/src/_pytest/unique_argument_dirs.py b/src/_pytest/unique_argument_dirs.py\nnew file mode 100644\nindex 000000000..18c6db676\n--- /dev/null\n+++ b/src/_pytest/unique_argument_dirs.py\n@@ -0,0 +1,16 @@\n+from __future__ import annotations\n+\n+from collections.abc import Iterable\n+from pathlib import Path\n+\n+from _pytest.config.findpaths import get_dirs_from_args\n+\n+\n+def unique_argument_dirs(args: Iterable[str]) -> list[Path]:\n+    \"\"\"Return the directories given in the command-line arguments, like\n+    :func:`_pytest.config.findpaths.get_dirs_from_args`, but with repeated\n+    directories removed, preserving first-seen order.\n+\n+    Used for a root-search preview which requires unique directories.\n+    \"\"\"\n+    return list(dict.fromkeys(get_dirs_from_args(args)))\n",
+  "decisions": [],
+  "notes": "Added src/_pytest/unique_argument_dirs.py defining unique_argument_dirs, a thin wrapper over get_dirs_from_args that deduplicates via dict.fromkeys to preserve first-seen order; all other behavior (option filtering, nodeid splitting, missing paths, empty input) inherited unchanged.\nAgent-reported tests_run (not independently verified): \"python smoke test calling unique_argument_dirs with duplicate dirs, a file path, a nodeid, an option, and a nonexistent path \\u2014 returned unique dirs in first-seen order; empty input returned []\"",
+  "session_id": "",
+  "acus": null
+}

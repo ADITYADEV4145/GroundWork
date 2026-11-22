@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-click-live-cached-stream",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "d7c13c636a7dfa20b294a1f2c2b3bb002e8544d7",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/live_cached_stream.py",
+          "symbol": "live_cached_stream",
+          "line": 8
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_make_cached_stream_func",
+          "line": 579
+        },
+        "probability": 0.61191465488178,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8170400341934511
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _make_cached_stream_func: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

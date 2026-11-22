@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-unicode-metavar-ellipsis",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "348ddaf8f7e9ccc662a3d85d0fec3d0a653b9995",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/unicode_metavar_ellipsis.py",
+          "symbol": "UnicodeMetavarEllipsis.make_metavar",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Command.collect_usage_pieces",
+          "line": 1005
+        },
+        "probability": 0.500721380162621,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.3416594292807653
+          }
+        ],
+        "fix": "Duplicate of Command.collect_usage_pieces: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-plain-child-group",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "3658855ada476c1c01bf6d248e97eb4a292843fd",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/plain_child_group.py",
+          "symbol": "PlainChildGroup.group.decorator",
+          "line": 51
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Group.group.decorator",
+          "line": 1680
+        },
+        "probability": 0.9841314380539381,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Group.group.decorator: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "f496178e666a2e5a8188a36ae8fdccc1d9ff511a",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/plain_child_group.py",
+          "symbol": "PlainChildGroup.group",
+          "line": 22
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Group.add_command",
+          "line": 1579
+        },
+        "probability": 0.5199373364247248,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.3518170339168109
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Group.add_command: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

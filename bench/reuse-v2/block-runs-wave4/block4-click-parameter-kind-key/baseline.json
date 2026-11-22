@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-parameter-kind-key",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/parameter_kind_key.py b/src/click/parameter_kind_key.py\nnew file mode 100644\nindex 0000000..cc3a71c\n--- /dev/null\n+++ b/src/click/parameter_kind_key.py\n@@ -0,0 +1,24 @@\n+import typing as t\n+\n+from .core import Parameter\n+\n+\n+class ParameterKindKey(Parameter):\n+    \"\"\"A :class:`~click.core.Parameter` whose :meth:`to_info_dict` emits the\n+    key ``kind`` instead of ``param_type_name``.\n+    \"\"\"\n+\n+    def to_info_dict(self) -> dict[str, t.Any]:\n+        \"\"\"Gather information that could be useful for a tool generating\n+        user-facing documentation.\n+\n+        Works exactly like :meth:`Parameter.to_info_dict`, except the\n+        parameter's ``param_type_name`` is emitted under the key ``kind``\n+        rather than ``param_type_name``.\n+\n+        Use :meth:`click.Context.to_info_dict` to traverse the entire\n+        CLI structure.\n+        \"\"\"\n+        info_dict = super().to_info_dict()\n+        info_dict[\"kind\"] = info_dict.pop(\"param_type_name\")\n+        return info_dict\n",
+  "decisions": [],
+  "notes": "Added src/click/parameter_kind_key.py defining ParameterKindKey(Parameter). Its to_info_dict calls super().to_info_dict() (following Option.to_info_dict's pattern), then pops 'param_type_name' and re-emits the value under 'kind', keeping signature and all other behavior unchanged.\nAgent-reported tests_run (not independently verified): \"pip install -e .; python check via `class K(ParameterKindKey, Option)` to_info_dict: 'param_type_name' absent, 'kind' == 'option', all other keys preserved \\u2014 passed.\"",
+  "session_id": "",
+  "acus": null
+}

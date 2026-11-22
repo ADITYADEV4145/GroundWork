@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "hard-negative",
+  "task_id": "block3-click-invocation-kind",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "1956803243832d8bdfafbe33151a4d696640c60e",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/invocation_kind.py",
+          "symbol": "src/click/invocation_kind.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/utils.py",
+          "symbol": "src/click/utils.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/invocation_kind.py and update its 4 callers to use src/click/utils.py."
+      },
+      {
+        "id": "48b21991ebefb4b8d796ec47e60bca0e44058d1d",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/invocation_kind.py",
+          "symbol": "invocation_kind",
+          "line": 11
+        },
+        "existing": {
+          "file": "src/click/utils.py",
+          "symbol": "_detect_program_name",
+          "line": 523
+        },
+        "probability": 0.4779459703292484,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.7136324825052746
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _detect_program_name: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-colon-option-assignment",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "324caa4111c5b849ee746bbbcc481b0f593b061d",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/colon_option_assignment.py",
+          "symbol": "ColonOptionAssignment._process_opts",
+          "line": 14
+        },
+        "existing": {
+          "file": "src/click/parser.py",
+          "symbol": "_OptionParser._match_short_opt",
+          "line": 391
+        },
+        "probability": 0.7985415224021689,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.605766384619723
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _OptionParser._match_short_opt: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

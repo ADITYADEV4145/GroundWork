@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-click-console-probe",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "31c53679a08674dc69a4425e585dee1e608e36d2",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_console_probe.py",
+          "symbol": "vendored_console_probe",
+          "line": 25
+        },
+        "existing": {
+          "file": "src/click/_winconsole.py",
+          "symbol": "_is_console",
+          "line": 263
+        },
+        "probability": 0.9817240091029221,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9515209716902242
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _is_console: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

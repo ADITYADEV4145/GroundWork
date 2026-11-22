@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "hard-negative",
+  "task_id": "block5-got-request-callable-fields",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "585ef791ff12a4243170656df6c04385fd33cc82",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "source/standalone/request-callable-fields.ts",
+          "symbol": "source/standalone/request-callable-fields.ts",
+          "line": 1
+        },
+        "existing": {
+          "file": "source/core/options.ts",
+          "symbol": "source/core/options.ts",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete source/standalone/request-callable-fields.ts and update its 10 callers to use source/core/options.ts."
+      },
+      {
+        "id": "77b5fcac98257f1e8b1bb5acaae252df8866924f",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "source/standalone/request-callable-fields.ts",
+          "symbol": "isPlainObjectLike",
+          "line": 3
+        },
+        "existing": {
+          "file": "source/core/options.ts",
+          "symbol": "Options.https",
+          "line": 2209
+        },
+        "probability": 0.5973396134868936,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.4058733176959682
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Options.https: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "a5389ec6a1c0ac4b865b65d8a70444fe90ff4da5",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "source/standalone/request-callable-fields.ts",
+          "symbol": "requestCallableFields",
+          "line": 13
+        },
+        "existing": {
+          "file": "source/core/options.ts",
+          "symbol": "Options.agent",
+          "line": 1136
+        },
+        "probability": 0.39101230203494974,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.2606204545825425
+          }
+        ],
+        "fix": "Duplicate of Options.agent: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

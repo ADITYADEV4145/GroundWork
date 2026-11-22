@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-type-class-key",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "2a181f9f3e490b992dd2d23301a6858c0a1952f5",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/type_class_key.py",
+          "symbol": "TypeClassKey",
+          "line": 8
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "Tuple.to_info_dict",
+          "line": 1077
+        },
+        "probability": 0.5830452391187458,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.40853747184295486
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Tuple.to_info_dict: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "8ad626284133bd10467542bcab5ffa34a3550ef1",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/type_class_key.py",
+          "symbol": "TypeClassKey.to_info_dict",
+          "line": 14
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Parameter.to_info_dict",
+          "line": 2171
+        },
+        "probability": 0.7550597032200284,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8021521779883803
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Parameter.to_info_dict: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-crlf-indented-text",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "9fbcb847986085f3bb5573b9350136db95620373",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/crlf_indented_text.py",
+          "symbol": "CrlfIndentedText.indent_only",
+          "line": 11
+        },
+        "existing": {
+          "file": "src/click/_textwrap.py",
+          "symbol": "TextWrapper.indent_only",
+          "line": 40
+        },
+        "probability": 0.683963346811536,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of TextWrapper.indent_only: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

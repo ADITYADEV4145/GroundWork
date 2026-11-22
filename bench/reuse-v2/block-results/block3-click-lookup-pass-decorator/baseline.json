@@ -1,0 +1,128 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-click-lookup-pass-decorator",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "119f7f7839404b2ecbbc1c7d4ee8ac00615504b6",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/lookup_pass_decorator.py",
+          "symbol": "lookup_pass_decorator",
+          "line": 18
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "make_pass_decorator",
+          "line": 51
+        },
+        "probability": 0.7969305599144376,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8884376784763142
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of make_pass_decorator: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "a674265942533957f1e949b963f6b76f0cc5f35d",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/lookup_pass_decorator.py",
+          "symbol": "lookup_pass_decorator.decorator",
+          "line": 35
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "make_pass_decorator.decorator",
+          "line": 76
+        },
+        "probability": 0.757823794359788,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9658722980552695
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of make_pass_decorator.decorator: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "0f2b47fa7062edc31c1360fe3bafdd8a78710518",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/lookup_pass_decorator.py",
+          "symbol": "src/click/lookup_pass_decorator.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "src/click/decorators.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/lookup_pass_decorator.py; use src/click/decorators.py instead."
+      },
+      {
+        "id": "2a87e4bb2d65fc97ca81057a12ec433acff3b69f",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/lookup_pass_decorator.py",
+          "symbol": "lookup_pass_decorator.decorator.new_func",
+          "line": 36
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "make_pass_decorator",
+          "line": 51
+        },
+        "probability": 0.5166240330399745,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5823289500444825
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of make_pass_decorator: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

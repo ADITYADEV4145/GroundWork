@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-nullable-secondary-flag",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "37fd1a579671d82f832cc9f56e95e8e7c960900a",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/nullable_secondary_flag.py",
+          "symbol": "NullableSecondaryFlag",
+          "line": 8
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Option.add_to_parser",
+          "line": 2744
+        },
+        "probability": 0.4801427184862821,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8567681944338179
+          },
+          {
+            "name": "bindingExact",
+            "value": 0
+          }
+        ],
+        "fix": "Duplicate of Option.add_to_parser: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "5efe36dceb2b998db6dd6dfca1b4b3e3f09b5d46",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/nullable_secondary_flag.py",
+          "symbol": "NullableSecondaryFlag.add_to_parser",
+          "line": 11
+        },
+        "existing": {
+          "file": "src/click/parser.py",
+          "symbol": "_Option.process",
+          "line": 166
+        },
+        "probability": 0.8564513722075535,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5730748419632679
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _Option.process: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

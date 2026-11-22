@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block5-pytest-silent-legacy-hooks",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "6b1b4e9a06d7424a7deac05308357bf838ec9d37",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_silent_legacy_hooks.py",
+          "symbol": "src/standalone_silent_legacy_hooks.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/config/__init__.py",
+          "symbol": "src/_pytest/config/__init__.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_silent_legacy_hooks.py; use src/_pytest/config/__init__.py instead."
+      },
+      {
+        "id": "248b00ee6b8b41d7631c62cd817448615d33e220",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_silent_legacy_hooks.py",
+          "symbol": "silent_legacy_hook_marks",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/_pytest/config/__init__.py",
+          "symbol": "_get_legacy_hook_marks",
+          "line": 359
+        },
+        "probability": 0.49310057952422587,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6229800069285009
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _get_legacy_hook_marks: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

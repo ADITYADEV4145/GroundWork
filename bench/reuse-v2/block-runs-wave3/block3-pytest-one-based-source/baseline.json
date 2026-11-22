@@ -1,0 +1,9 @@
+{
+  "task_id": "block3-pytest-one-based-source",
+  "arm": "baseline",
+  "patch": "diff --git a/src/_pytest/one_based_source.py b/src/_pytest/one_based_source.py\nnew file mode 100644\nindex 000000000..e511794a3\n--- /dev/null\n+++ b/src/_pytest/one_based_source.py\n@@ -0,0 +1,21 @@\n+from __future__ import annotations\n+\n+from pathlib import Path\n+\n+from _pytest._code.code import getfslineno\n+\n+\n+def one_based_source(obj: object) -> tuple[str | Path, int]:\n+    \"\"\"Return source location (path, lineno) for the given object.\n+\n+    Works exactly like :func:`_pytest._code.code.getfslineno`, except that\n+    the line number is 1-based for consumers (such as source-link\n+    generation) that expect one-based locations. The -1 sentinel for an\n+    unknown line number is returned unchanged.\n+\n+    If the source cannot be determined return (\"\", -1).\n+    \"\"\"\n+    fspath, lineno = getfslineno(obj)\n+    if lineno >= 0:\n+        lineno += 1\n+    return fspath, lineno\n",
+  "decisions": [],
+  "notes": "Added src/_pytest/one_based_source.py which delegates to getfslineno and increments only nonnegative line numbers, preserving the -1 sentinel and all error paths; existing implementation untouched.\nAgent-reported tests_run (not independently verified): \"pip install -e . && python script asserting one_based_source(f) == getfslineno(f)+1 and one_based_source(obj) == ('', -1) for unresolvable objects \\u2014 all assertions passed.\"",
+  "session_id": "",
+  "acus": null
+}

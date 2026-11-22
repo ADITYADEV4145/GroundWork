@@ -1,0 +1,16 @@
+Reproduced from the exact patch in block-runs-wave4/block4-pytest-manifest-suffix-counts/baseline.json.
+Production callable: src/_pytest/manifest_suffix_counts.py:25.
+Test call: testing/test_manifest_suffix_counts.py:42.
+
+Grounding reproduction: actual patched test line 42 has arguments node generator_expression; pythonAdapter.extract records argCount=0, keywordArgs=[], hasSpread=false, no parse errors.
+{"caller":6,"calleeText":"manifest_suffix_counts","calleeName":"manifest_suffix_counts","line":42,"column":11,"argCount":0,"keywordArgs":[],"hasSpread":false,"isNew":false}
+CPython AST: actual patched test line 42 passes one positional GeneratorExp argument.
+Runtime reproduction: generator input {".py": 2}; empty generator {}; zero-argument control raises TypeError: manifest_suffix_counts() missing 1 required positional argument: 'names'
+
+Evidence chain:
+- The stored scorer result reports kind=grounding, kind=arity, blocking=true for the actual test call, with existing=null.
+- src/lang/python.ts:321 only accepts an argument_list node when constructing the call's argument list; generator_expression produces an empty list.
+- The actual patched test parsed through pythonAdapter.extract produces argCount=0 as shown above, despite CPython AST and execution showing one supplied argument.
+- src/grounding/verify.ts:529-534 marks the required names parameter missing when call.argCount is zero and emits the exact stored error.
+
+The runtime probe executes only the actual new callable with normal generator, empty generator and truly missing argument controls. This does not independently verify the agent's other tests or overall task success.

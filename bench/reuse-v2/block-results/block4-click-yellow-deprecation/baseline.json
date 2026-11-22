@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-yellow-deprecation",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "14add7ad810dcaf6f5c99153f7d5f1d41d984a00",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/yellow_deprecation.py",
+          "symbol": "YellowDeprecation.invoke",
+          "line": 17
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Command.invoke",
+          "line": 1212
+        },
+        "probability": 0.3964583244197322,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Command.invoke: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

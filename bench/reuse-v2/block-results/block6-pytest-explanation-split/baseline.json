@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-pytest-explanation-split",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "c48d90f78b663aa67e63726c45765cf46245257b",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_explanation_split.py",
+          "symbol": "src/standalone_wave6_explanation_split.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/assertion/util.py",
+          "symbol": "src/_pytest/assertion/util.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_explanation_split.py and update its 3 callers to use src/_pytest/assertion/util.py."
+      },
+      {
+        "id": "0139328ce470bcdb91403685e5904c8d60c30ff5",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_explanation_split.py",
+          "symbol": "vendored_explanation_split",
+          "line": 9
+        },
+        "existing": {
+          "file": "src/_pytest/assertion/util.py",
+          "symbol": "_split_explanation",
+          "line": 69
+        },
+        "probability": 0.9901753906252012,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9799350240734634
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _split_explanation: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

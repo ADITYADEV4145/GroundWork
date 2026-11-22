@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-wider-definition-minimum",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "031ec0469570d6627d62674532d9e6fad7c37d4e",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/wider_definition_minimum.py",
+          "symbol": "WiderDefinitionMinimum.write_dl",
+          "line": 17
+        },
+        "existing": {
+          "file": "src/click/formatting.py",
+          "symbol": "HelpFormatter",
+          "line": 104
+        },
+        "probability": 0.6688275644189514,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6773650388764094
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of HelpFormatter: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

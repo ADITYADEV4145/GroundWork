@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-quiet-eta-progressbar",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "d6e78172d3d4bc53c42c32e55cd49859ccad6a07",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/quiet_eta_progressbar.py",
+          "symbol": "src/click/quiet_eta_progressbar.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/termui.py",
+          "symbol": "src/click/termui.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/quiet_eta_progressbar.py; use src/click/termui.py instead."
+      },
+      {
+        "id": "74c5ac905dd069b03b3c793952cf58783d5d243a",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/quiet_eta_progressbar.py",
+          "symbol": "quiet_eta_progressbar",
+          "line": 53
+        },
+        "existing": {
+          "file": "src/click/termui.py",
+          "symbol": "progressbar",
+          "line": 328
+        },
+        "probability": 0.4903197962867151,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5327117181933991
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of progressbar: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

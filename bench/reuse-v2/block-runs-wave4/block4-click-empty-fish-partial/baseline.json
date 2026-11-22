@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-empty-fish-partial",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/empty_fish_partial.py b/src/click/empty_fish_partial.py\nnew file mode 100644\nindex 0000000..186c1d3\n--- /dev/null\n+++ b/src/click/empty_fish_partial.py\n@@ -0,0 +1,20 @@\n+from __future__ import annotations\n+\n+import os\n+\n+from .shell_completion import FishComplete\n+from .shell_completion import split_arg_string\n+\n+\n+class EmptyFishPartial(FishComplete):\n+    \"\"\"Fish completion that also removes an empty partial word.\"\"\"\n+\n+    def get_completion_args(self) -> tuple[list[str], str]:\n+        cwords = split_arg_string(os.environ[\"COMP_WORDS\"])\n+        incomplete = os.environ[\"COMP_CWORD\"]\n+        args = cwords[1:]\n+\n+        if args and args[-1] == incomplete:\n+            args.pop()\n+\n+        return args, incomplete\n",
+  "decisions": [],
+  "notes": "EmptyFishPartial inherits FishComplete and preserves its parsing, slicing, and return value, removing the final argument whenever it matches the partial word, including an empty match. No existing modules changed.\nAgent-reported tests_run (not independently verified): \"PYTHONPATH=src .venv/bin/python -m pytest -q --basetemp=.venv/pytest-tmp: pytest 9.2.0 hit a collection deprecation; locked pytest 8.4.0 passed (900 passed, 21 skipped, 1 xfailed); PYTHONPATH=src .venv/bin/python - (inline checks): 8 cases passed; .venv/bin/ruff check --no-fix and .venv/bin/ruff format --check on the new module, and git diff --cached --check: passed.\"",
+  "session_id": "",
+  "acus": null
+}

@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-pytest-at-sign-location",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "28c81141a6f6ad987f155bdf860aefa6fe5cc7ca",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/at_sign_location.py",
+          "symbol": "src/_pytest/at_sign_location.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/fixtures.py",
+          "symbol": "src/_pytest/fixtures.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/at_sign_location.py and update its 3 callers to use src/_pytest/fixtures.py."
+      },
+      {
+        "id": "e337e280b430c32566fd2a25607423f18cbc5e8e",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/at_sign_location.py",
+          "symbol": "at_sign_location",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/_pytest/fixtures.py",
+          "symbol": "_pretty_fixture_path",
+          "line": 1891
+        },
+        "probability": 0.4673043611758369,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.2650614536577464
+          }
+        ],
+        "fix": "Duplicate of _pretty_fixture_path: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,568 @@
+[
+  {
+    "task_id": "block5-got-defined-search-values",
+    "kind": "clone-prone",
+    "production_file": "source/standalone/defined-search-values.ts",
+    "requested_symbol": "validateDefinedSearchValues",
+    "production_lines": 15,
+    "files": [
+      "source/standalone/defined-search-values.ts",
+      "test/defined-search-values.ts"
+    ],
+    "patch_sha256": "acd76ed70ef1a02a60d647dd4f02e7495644bea553837de264c4cb6d0324a144",
+    "imports": [
+      "import is, {assert} from '@sindresorhus/is';"
+    ],
+    "agent_tests_unverified": "NODE_OPTIONS=--import=tsx/esm npx ava test/defined-search-values.ts (6 passed); npx xo on new files (clean); npx tsc --noEmit (no errors in new files; pre-existing errors elsewhere)"
+  },
+  {
+    "task_id": "block5-got-largest-http2-timeout",
+    "kind": "clone-prone",
+    "production_file": "source/standalone/largest-http2-timeout.ts",
+    "requested_symbol": "largestHttp2Timeout",
+    "production_lines": 23,
+    "files": [
+      "source/standalone/largest-http2-timeout.ts",
+      "test/largest-http2-timeout.ts"
+    ],
+    "patch_sha256": "012f467b76d3cdd60fe3c55f744cf696a587eb548a333f6f93bf507ef87d491b",
+    "imports": [],
+    "agent_tests_unverified": "npx xo source/standalone test/largest-http2-timeout.ts (clean); npx tsc --noEmit (no errors in new files; pre-existing errors in test/error.ts, test/hooks.ts); NODE_OPTIONS='--import=tsx/esm' npx ava test/largest-http2-timeout.ts (6 passed)"
+  },
+  {
+    "task_id": "block5-got-switching-response-ok",
+    "kind": "clone-prone",
+    "production_file": "source/standalone/switching-response-ok.ts",
+    "requested_symbol": "isSwitchingResponseOk",
+    "production_lines": 24,
+    "files": [
+      "source/standalone/switching-response-ok.ts",
+      "test/switching-response-ok.ts"
+    ],
+    "patch_sha256": "ef08fd8f247107f0e12bc081a2439e34ebd90cd844740cba831872e5ebed3dc3",
+    "imports": [],
+    "agent_tests_unverified": "NODE_OPTIONS=--import=tsx/esm npx ava test/switching-response-ok.ts (9 passed); npx xo on new files (clean); npx tsc --noEmit (no errors in new files; pre-existing errors in test/hooks.ts)"
+  },
+  {
+    "task_id": "block5-got-live-client-request",
+    "kind": "clone-prone",
+    "production_file": "source/standalone/live-client-request.ts",
+    "requested_symbol": "isLiveClientRequest",
+    "production_lines": 8,
+    "files": [
+      "source/standalone/live-client-request.ts",
+      "test/live-client-request.ts"
+    ],
+    "patch_sha256": "e482f0ea280981bfb33ab0083bcf2e77611ba5c1d2582640977297dcdcee0939",
+    "imports": [
+      "import type {Writable, Readable} from 'node:stream';",
+      "import type {ClientRequest} from 'node:http';"
+    ],
+    "agent_tests_unverified": "npx xo source/standalone/live-client-request.ts test/live-client-request.ts; npx tsc --noEmit; NODE_OPTIONS='--import=tsx/esm' npx ava test/live-client-request.ts (4 tests); git diff --cached --check \u2014 all passed."
+  },
+  {
+    "task_id": "block5-got-boundary-stream",
+    "kind": "clone-prone",
+    "production_file": "source/standalone/boundary-stream.ts",
+    "requested_symbol": "isBoundaryStream",
+    "production_lines": 16,
+    "files": [
+      "source/standalone/boundary-stream.ts",
+      "test/boundary-stream.ts"
+    ],
+    "patch_sha256": "c3a5e5e9cab6359ffe010300d1d5c6308f941ad23cbdc9c0ae542c15976deb3f",
+    "imports": [
+      "import type {Readable} from 'node:stream';",
+      "import is from '@sindresorhus/is';"
+    ],
+    "agent_tests_unverified": "NODE_OPTIONS='--import=tsx/esm' npx ava test/boundary-stream.ts (5 passed); npx xo on new files (clean); npx tsc --noEmit (no errors in new files; pre-existing test typing errors elsewhere)"
+  },
+  {
+    "task_id": "block5-got-local-socket-url",
+    "kind": "clone-prone",
+    "production_file": "source/standalone/local-socket-url.ts",
+    "requested_symbol": "isLocalSocketURL",
+    "production_lines": 4,
+    "files": [
+      "source/standalone/local-socket-url.ts",
+      "test/local-socket-url.ts"
+    ],
+    "patch_sha256": "0edf1eb65e506a9a348a82fb3c98cc8625d89f13c7b9809b241e2f775476dbec",
+    "imports": [],
+    "agent_tests_unverified": "NODE_OPTIONS='--import=tsx/esm' npx ava test/local-socket-url.ts (5 passed); npx xo on new files (clean); npx tsc --noEmit (no errors in new files; only pre-existing test/agent.ts errors)"
+  },
+  {
+    "task_id": "block5-click-context-last",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_context_last.py",
+    "requested_symbol": "pass_context_last",
+    "production_lines": 31,
+    "files": [
+      "src/standalone_context_last.py",
+      "tests/test_standalone_context_last.py"
+    ],
+    "patch_sha256": "b8e6f8e9acf6bfc520bf3c5922cce377ca1f4fbc5424fd65e69f44eedc99ce18",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t",
+      "from functools import update_wrapper"
+    ],
+    "agent_tests_unverified": "pytest tests/test_standalone_context_last.py: 9 passed; pytest tests (excluding test_basic.py, which fails collection on the base commit too under latest pytest): 850 passed, 21 skipped, 1 xfailed; pre-commit run on new files: all passed"
+  },
+  {
+    "task_id": "block5-click-object-last",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_object_last.py",
+    "requested_symbol": "pass_object_last",
+    "production_lines": 26,
+    "files": [
+      "src/standalone_object_last.py",
+      "tests/test_standalone_object_last.py"
+    ],
+    "patch_sha256": "fa3eda08b81bef9d33f592254c399b774996ae7998ecc74d163f70aa68d40883",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t",
+      "from functools import update_wrapper"
+    ],
+    "agent_tests_unverified": ".git/venv/bin/python -m pytest: 905 passed, 21 skipped, 1 xfailed with locked pytest 8.4.0 (pytest 9.2.0 failed collection on an upstream deprecation); .git/venv/bin/ruff check --no-fix src/standalone_object_last.py tests/test_standalone_object_last.py and .git/venv/bin/ruff format --check src/standalone_object_last.py tests/test_standalone_object_last.py: passed; python -I -S - (isolated import and call without Click): passed; git diff --cached --check: passed."
+  },
+  {
+    "task_id": "block5-click-command-keep-suffix",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_command_keep_suffix.py",
+    "requested_symbol": "command_keep_suffix",
+    "production_lines": 86,
+    "files": [
+      "src/standalone_command_keep_suffix.py",
+      "tests/test_standalone_command_keep_suffix.py"
+    ],
+    "patch_sha256": "026c2f0c7d445a46ff147fde66448cc149e6758ba21ed21c16c3c4b967205a01",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t"
+    ],
+    "agent_tests_unverified": "~/work/venv/bin/python -m pytest -q tests/test_standalone_command_keep_suffix.py tests/test_command_decorators.py -> 24 passed; pre-commit run on new files -> passed (ruff reformatted once)"
+  },
+  {
+    "task_id": "block5-click-group-invoke-empty",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_group_invoke_empty.py",
+    "requested_symbol": "group_invoke_empty",
+    "production_lines": 52,
+    "files": [
+      "src/standalone_group_invoke_empty.py",
+      "tests/test_standalone_group_invoke_empty.py"
+    ],
+    "patch_sha256": "fc35a6987e50f42128b6d641582a8f61a955c89e7326f371975212c6fff6d8f4",
+    "imports": [
+      "import typing as t"
+    ],
+    "agent_tests_unverified": ".venv/bin/python -m pytest -q: 910 passed, 21 skipped, 1 xfailed; .venv/bin/mypy: passed; .venv/bin/pre-commit run --files src/standalone_group_invoke_empty.py tests/test_standalone_group_invoke_empty.py: all applicable hooks passed; git diff --cached --check: passed."
+  },
+  {
+    "task_id": "block5-click-prepend-parameter",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_prepend_parameter.py",
+    "requested_symbol": "prepend_parameter",
+    "production_lines": 32,
+    "files": [
+      "src/standalone_prepend_parameter.py",
+      "tests/test_standalone_prepend_parameter.py"
+    ],
+    "patch_sha256": "c6067d39be7a1110acbae36867bbb4dc6c36e5518780e291ee4fa6ca59978db5",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t"
+    ],
+    "agent_tests_unverified": "pytest tests/test_standalone_prepend_parameter.py: 12 passed; pytest tests --ignore=tests/test_basic.py: 853 passed (test_basic.py fails collection on pytest 9 pre-existing); pre-commit on new files: passed"
+  },
+  {
+    "task_id": "block5-click-optional-argument",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_optional_argument.py",
+    "requested_symbol": "optional_argument",
+    "production_lines": 46,
+    "files": [
+      "src/standalone_optional_argument.py",
+      "tests/test_standalone_optional_argument.py"
+    ],
+    "patch_sha256": "672629a9a4609b681b6b8f5867ea2fa9060be597cb9da3035fe6aabc2a80531d",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t"
+    ],
+    "agent_tests_unverified": "python -m pytest -q tests/test_standalone_optional_argument.py: 9 passed; python -m pytest -q --ignore=tests/test_basic.py: 850 passed, 21 skipped, 1 xfailed (test_basic.py fails to collect from a pre-existing pytest deprecation, unrelated); ruff check/format clean."
+  },
+  {
+    "task_id": "block5-click-hidden-option",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_hidden_option.py",
+    "requested_symbol": "hidden_option",
+    "production_lines": 43,
+    "files": [
+      "src/standalone_hidden_option.py",
+      "tests/test_standalone_hidden_option.py"
+    ],
+    "patch_sha256": "e554f64b5dcfc4c1c018d4594d72df5fecbe135743a335ece2eab80a985047f9",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t"
+    ],
+    "agent_tests_unverified": "pytest tests/test_standalone_hidden_option.py: 8 passed; pre-commit (ruff, ruff format, hooks) on new files: passed"
+  },
+  {
+    "task_id": "block5-click-secret-option",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_secret_option.py",
+    "requested_symbol": "secret_option",
+    "production_lines": 34,
+    "files": [
+      "src/standalone_secret_option.py",
+      "tests/test_standalone_secret_option.py"
+    ],
+    "patch_sha256": "14215448a59c3f39e50d9ef01a27983dde4f10995b5434c15f3dfba07c05a28d",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t"
+    ],
+    "agent_tests_unverified": "pytest tests/test_standalone_secret_option.py (13 passed); pytest tests -W ignore::pytest.PytestRemovedIn10Warning (full suite passed; the warning filter is only needed because test_basic.py fails collection under the newly installed pytest, unrelated to this change); ruff check + ruff format on new files clean"
+  },
+  {
+    "task_id": "block5-click-error-secho",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_error_secho.py",
+    "requested_symbol": "error_secho",
+    "production_lines": 26,
+    "files": [
+      "src/standalone_error_secho.py",
+      "tests/test_standalone_error_secho.py"
+    ],
+    "patch_sha256": "bcb31c9b8e7a58852134e64ddb05ed26863149f0a787e81454a49dfdef936b20",
+    "imports": [
+      "import typing as t"
+    ],
+    "agent_tests_unverified": ".venv/bin/python -m pytest -q \u2014 911 passed, 21 skipped, 1 xfailed (passed on rerun after fixing the stream-capture test); .venv/bin/ruff check --no-fix src/standalone_error_secho.py tests/test_standalone_error_secho.py \u2014 passed; .venv/bin/ruff format --check src/standalone_error_secho.py tests/test_standalone_error_secho.py \u2014 passed; .venv/bin/mypy --cache-dir .git/mypy_cache src/standalone_error_secho.py \u2014 passed; .venv/bin/python -I -S -c 'import runpy, sys; error_secho = runpy.run_path(\"src/standalone_error_secho.py\")[\"error_secho\"]; assert error_secho(lambda message, **options: (message, options[\"err\"]), str, \"error\") == (\"error\", True); assert not any(name == \"click\" or name.startswith(\"click.\") for name in sys.modules)' \u2014 passed; git diff --cached --check \u2014 passed."
+  },
+  {
+    "task_id": "block5-click-triple-dash-option",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_triple_dash_option.py",
+    "requested_symbol": "split_triple_option",
+    "production_lines": 29,
+    "files": [
+      "src/standalone_triple_dash_option.py",
+      "tests/test_standalone_triple_dash_option.py"
+    ],
+    "patch_sha256": "203a869e19db650937fdce0377ef1042d6dcc5b4ca21ed47647d5edfca6a65ce",
+    "imports": [
+      "from __future__ import annotations"
+    ],
+    "agent_tests_unverified": "pytest tests/test_standalone_triple_dash_option.py tests/test_parser.py: 34 passed; pytest tests --ignore=tests/test_basic.py: 868 passed, 21 skipped, 1 xfailed (test_basic.py fails collection pre-existing due to newer pytest); ruff check/format clean."
+  },
+  {
+    "task_id": "block5-click-lower-option-name",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_lower_option_name.py",
+    "requested_symbol": "normalize_lower_option",
+    "production_lines": 25,
+    "files": [
+      "src/standalone_lower_option_name.py",
+      "tests/test_standalone_lower_option_name.py"
+    ],
+    "patch_sha256": "788d92f77f4a25ef5996dff2b7e428c2bd3409f70436b5b313907c43a76566ca",
+    "imports": [
+      "import typing as t"
+    ],
+    "agent_tests_unverified": "PYTHONPATH=src .tox/tools/bin/python -m pytest -q: 913 passed, 21 skipped, 1 xfailed; ruff check --no-fix and ruff format --check on both new files, and git diff --cached --check: passed."
+  },
+  {
+    "task_id": "block5-click-none-padded-rows",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_none_padded_rows.py",
+    "requested_symbol": "iter_none_padded_rows",
+    "production_lines": 15,
+    "files": [
+      "src/standalone_none_padded_rows.py",
+      "tests/test_standalone_none_padded_rows.py"
+    ],
+    "patch_sha256": "083ea228b750b3f9f9a12b0142ce20a7cdb2ffbeb722f2c280b729deb79a9836",
+    "imports": [
+      "from __future__ import annotations",
+      "import collections.abc as cabc"
+    ],
+    "agent_tests_unverified": "PYTHONPATH=src .tox/task-check/bin/python -m pytest -q: 910 passed, 21 skipped, 1 xfailed; .tox/task-check/bin/ruff check --no-fix src/standalone_none_padded_rows.py tests/test_standalone_none_padded_rows.py, .tox/task-check/bin/ruff format --check src/standalone_none_padded_rows.py tests/test_standalone_none_padded_rows.py, and git diff --cached --check: passed."
+  },
+  {
+    "task_id": "block5-pytest-quiet-yield-fixture",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_quiet_yield_fixture.py",
+    "requested_symbol": "quiet_yield_fixture",
+    "production_lines": 42,
+    "files": [
+      "src/standalone_quiet_yield_fixture.py",
+      "testing/test_standalone_quiet_yield_fixture.py"
+    ],
+    "patch_sha256": "d9296658473b6a4aa9a4cf356d9957b32185a35f63ddbc8b822e91ec29a1e3ce",
+    "imports": [
+      "from __future__ import annotations",
+      "from typing import Any",
+      "from typing import Callable"
+    ],
+    "agent_tests_unverified": "python -m pytest -q testing/test_standalone_quiet_yield_fixture.py (7 passed); ruff check/format (clean)"
+  },
+  {
+    "task_id": "block5-pytest-skip-empty-marks",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_skip_empty_marks.py",
+    "requested_symbol": "normalize_nonempty_marks",
+    "production_lines": 36,
+    "files": [
+      "src/standalone_skip_empty_marks.py",
+      "testing/test_standalone_skip_empty_marks.py"
+    ],
+    "patch_sha256": "9fbb2e67a01168ef3aef58dfde8d956c2ba6ea1bce9470eba6220f832f87349b",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Iterable",
+      "from collections.abc import Iterator",
+      "from typing import Any"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_skip_empty_marks.py testing/test_mark.py -q -> 113 passed, 1 xfailed; pre-commit run (ruff, mypy, etc.) on new files -> all passed"
+  },
+  {
+    "task_id": "block5-pytest-derived-first-marks",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_derived_first_marks.py",
+    "requested_symbol": "get_derived_first_marks",
+    "production_lines": 50,
+    "files": [
+      "src/standalone_derived_first_marks.py",
+      "testing/test_standalone_derived_first_marks.py"
+    ],
+    "patch_sha256": "d504785ad096380bcb0cc78c22db694552c00af44f77aee9fa4bbb903fcd3a51",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Callable",
+      "from collections.abc import Iterable",
+      "from typing import Any"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_derived_first_marks.py testing/test_mark.py -q -> 117 passed, 1 xfailed; pre-commit run on both new files (ruff, ruff-format, mypy, codespell, etc.) -> all passed"
+  },
+  {
+    "task_id": "block5-pytest-prepend-mark",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_prepend_mark.py",
+    "requested_symbol": "prepend_mark",
+    "production_lines": 36,
+    "files": [
+      "src/standalone_prepend_mark.py",
+      "testing/test_standalone_prepend_mark.py"
+    ],
+    "patch_sha256": "628d89722a7b24c86705e1afa01feb92a0265cd922d54a555dfa169c2a965bcc",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Callable",
+      "from typing import Any"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_prepend_mark.py -q (12 passed); pre-commit run on new files (all passed)"
+  },
+  {
+    "task_id": "block5-pytest-silent-legacy-hooks",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_silent_legacy_hooks.py",
+    "requested_symbol": "silent_legacy_hook_marks",
+    "production_lines": 37,
+    "files": [
+      "src/standalone_silent_legacy_hooks.py",
+      "testing/test_standalone_silent_legacy_hooks.py"
+    ],
+    "patch_sha256": "e151ef973fcd4941341b341182241416544afa0ac0e894c9118c7084e2a801e1",
+    "imports": [
+      "from __future__ import annotations",
+      "from typing import Any"
+    ],
+    "agent_tests_unverified": ".venv/bin/python -m pytest testing/test_standalone_silent_legacy_hooks.py -q -> 9 passed"
+  },
+  {
+    "task_id": "block5-pytest-return-optional-call",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_return_optional_call.py",
+    "requested_symbol": "call_with_optional_result",
+    "production_lines": 22,
+    "files": [
+      "src/standalone_return_optional_call.py",
+      "testing/test_standalone_return_optional_call.py"
+    ],
+    "patch_sha256": "9fdbd411a43e09dd8d62424516b98e58172a0b170706244816d6987c24b36f42",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Callable",
+      "import inspect",
+      "from typing import Any"
+    ],
+    "agent_tests_unverified": "pytest testing/test_standalone_return_optional_call.py (10 passed); ruff check/format and mypy on both new files: clean."
+  },
+  {
+    "task_id": "block5-pytest-runtime-empty-fixture",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_runtime_empty_fixture.py",
+    "requested_symbol": "call_standalone_fixture",
+    "production_lines": 38,
+    "files": [
+      "src/standalone_runtime_empty_fixture.py",
+      "testing/test_standalone_runtime_empty_fixture.py"
+    ],
+    "patch_sha256": "68299585e1b6b548373f423f7c99a9a7ee864e4350f18911e52a0df60e5e514f",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Callable",
+      "from collections.abc import Iterator",
+      "from collections.abc import Mapping",
+      "import functools",
+      "import inspect",
+      "from typing import cast",
+      "from typing import Protocol"
+    ],
+    "agent_tests_unverified": ".venv/bin/python -m pytest -q testing/test_standalone_runtime_empty_fixture.py testing/python/fixtures.py: 208 passed, 1 skipped, 1 xfailed; python -I -S - (isolated file-path import): passed; .venv/bin/ruff check, .venv/bin/ruff format --check, and .venv/bin/mypy --follow-imports=silent on both new files: passed; git diff --cached --check: passed."
+  },
+  {
+    "task_id": "block5-pytest-lookup-scope-error",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_lookup_scope_error.py",
+    "requested_symbol": "evaluate_standalone_scope",
+    "production_lines": 48,
+    "files": [
+      "src/standalone_lookup_scope_error.py",
+      "testing/test_standalone_lookup_scope_error.py"
+    ],
+    "patch_sha256": "0319a344a8bcb4424beb5bb22ca068bb48562d8fd32f0e35bb78c7cbadce0f2e",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Callable",
+      "from typing import Any",
+      "from typing import NoReturn"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_lookup_scope_error.py -q -> 11 passed; pre-commit run on new files -> all passed"
+  },
+  {
+    "task_id": "block5-pytest-deep-partial-function",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_deep_partial_function.py",
+    "requested_symbol": "get_deep_partial_func",
+    "production_lines": 28,
+    "files": [
+      "src/standalone_deep_partial_function.py",
+      "testing/test_standalone_deep_partial_function.py"
+    ],
+    "patch_sha256": "97b84cf634022f0c87bc87a067b466c3a14bec07c78816f64298d2297fba818f",
+    "imports": [
+      "from __future__ import annotations",
+      "import functools",
+      "import inspect",
+      "from typing import Any"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_deep_partial_function.py -q (10 passed); pre-commit run on new files (all hooks pass incl. ruff, mypy)"
+  },
+  {
+    "task_id": "block5-pytest-strict-coroutine-marker",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_strict_coroutine_marker.py",
+    "requested_symbol": "is_strict_coroutine_function",
+    "production_lines": 27,
+    "files": [
+      "src/standalone_strict_coroutine_marker.py",
+      "testing/test_standalone_strict_coroutine_marker.py"
+    ],
+    "patch_sha256": "be635f7398ea0ac5e7e7505afa23cacbb2a99998e441c8009ef7f052dd40c650",
+    "imports": [
+      "from __future__ import annotations",
+      "import inspect"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_strict_coroutine_marker.py testing/test_compat.py -q (all passed); pre-commit run on new files (all hooks passed)"
+  },
+  {
+    "task_id": "block5-pytest-trimmed-truth",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_trimmed_truth.py",
+    "requested_symbol": "strtobool_trimmed",
+    "production_lines": 22,
+    "files": [
+      "src/standalone_trimmed_truth.py",
+      "testing/test_standalone_trimmed_truth.py"
+    ],
+    "patch_sha256": "87f8c70311dda91b4a50d62c5686ffe219997f0c9d250a5a091c42c44717099a",
+    "imports": [
+      "from __future__ import annotations"
+    ],
+    "agent_tests_unverified": ".venv/bin/python -m pytest -q testing/test_standalone_trimmed_truth.py testing/test_config.py \u2014 229 passed, 1 xfailed; PRE_COMMIT_HOME=\"$PWD/.venv/pre-commit-cache\" .venv/bin/pre-commit run --files src/standalone_trimmed_truth.py testing/test_standalone_trimmed_truth.py \u2014 passed; git diff --cached --check 1b1375ff57b8c2f1d666306fee1fa81747156218 \u2014 passed."
+  },
+  {
+    "task_id": "block5-pytest-config-warning-priority",
+    "kind": "clone-prone",
+    "production_file": "src/standalone_config_warning_priority.py",
+    "requested_symbol": "apply_config_priority_filters",
+    "production_lines": 34,
+    "files": [
+      "src/standalone_config_warning_priority.py",
+      "testing/test_standalone_config_warning_priority.py"
+    ],
+    "patch_sha256": "1a5a63ce5eaf3154bd94eef4c7e8a05edaf81391aeb61d7732497e8715038c2c",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Callable",
+      "from collections.abc import Iterable",
+      "from typing import Any",
+      "import warnings"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_config_warning_priority.py -q (6 passed); pre-commit run on new files (all passed incl. ruff, mypy)"
+  },
+  {
+    "task_id": "block5-got-request-callable-fields",
+    "kind": "hard-negative",
+    "production_file": "source/standalone/request-callable-fields.ts",
+    "requested_symbol": "requestCallableFields",
+    "production_lines": 21,
+    "files": [
+      "source/standalone/request-callable-fields.ts",
+      "test/request-callable-fields.ts"
+    ],
+    "patch_sha256": "a10a4be07184d0c44bb6e5f2f99d4bf5231765b2d72125c8dd2d800e77ec620a",
+    "imports": [],
+    "agent_tests_unverified": "NODE_OPTIONS=--import=tsx/esm npx ava test/request-callable-fields.ts (6 passed); npx xo on new files (clean); npx tsc --noEmit (no errors in new files)"
+  },
+  {
+    "task_id": "block5-click-prompt-schema",
+    "kind": "hard-negative",
+    "production_file": "src/standalone_prompt_schema.py",
+    "requested_symbol": "build_prompt_schema",
+    "production_lines": 62,
+    "files": [
+      "src/standalone_prompt_schema.py",
+      "tests/test_standalone_prompt_schema.py"
+    ],
+    "patch_sha256": "7c4f909cab5ed380c8feebd0ba964a61e645f25e8ea60915ac1168dcff1a947d",
+    "imports": [
+      "from __future__ import annotations",
+      "import typing as t"
+    ],
+    "agent_tests_unverified": "pytest tests/test_standalone_prompt_schema.py: 19 passed; pytest tests --ignore tests/test_basic.py: 860 passed, 21 skipped, 1 xfailed (test_basic.py fails to collect on this pytest version even without the change); pre-commit run on the new files: ruff check and ruff format pass."
+  },
+  {
+    "task_id": "block5-pytest-name-frequencies",
+    "kind": "hard-negative",
+    "production_file": "src/standalone_name_frequencies.py",
+    "requested_symbol": "name_frequencies",
+    "production_lines": 25,
+    "files": [
+      "src/standalone_name_frequencies.py",
+      "testing/test_standalone_name_frequencies.py"
+    ],
+    "patch_sha256": "d302806db21eca4ec4e66d07174e23cc7713e289cd81e92d707d7ff901dd2af2",
+    "imports": [
+      "from __future__ import annotations",
+      "from collections.abc import Iterable"
+    ],
+    "agent_tests_unverified": "python -m pytest testing/test_standalone_name_frequencies.py -q (7 passed); ruff format/check and mypy on new files: clean"
+  }
+]

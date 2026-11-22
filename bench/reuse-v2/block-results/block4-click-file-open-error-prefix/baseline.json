@@ -1,0 +1,75 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-file-open-error-prefix",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "73e00a8d9da9fe9110a54a16b652db082cdcad56",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/file_open_error_prefix.py",
+          "symbol": "FileOpenErrorPrefix",
+          "line": 18
+        },
+        "existing": {
+          "file": "src/click/utils.py",
+          "symbol": "LazyFile.open",
+          "line": 151
+        },
+        "probability": 0.5118208650511729,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.45069491116172017
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of LazyFile.open: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "558a58dfebb91a6047addc1f40b17f7ebe8eb23a",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/file_open_error_prefix.py",
+          "symbol": "FileOpenErrorPrefix.convert",
+          "line": 23
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "File",
+          "line": 754
+        },
+        "probability": 0.4428890570997739,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5849012821488425
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6
+          }
+        ],
+        "fix": "Duplicate of File: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

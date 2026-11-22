@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-double-count-action",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/double_count_action.py b/src/click/double_count_action.py\nnew file mode 100644\nindex 0000000..150fa33\n--- /dev/null\n+++ b/src/click/double_count_action.py\n@@ -0,0 +1,13 @@\n+import typing as t\n+\n+from click.parser import _Option\n+from click.parser import _ParsingState\n+\n+\n+class DoubleCountAction(_Option):\n+    def process(self, value: t.Any, state: _ParsingState) -> None:\n+        if self.action == \"count\":\n+            state.opts[self.dest] = state.opts.get(self.dest, 0) + 2  # type: ignore\n+            state.order.append(self.obj)\n+        else:\n+            super().process(value, state)\n",
+  "decisions": [],
+  "notes": "Added DoubleCountAction subclassing _Option; for action='count' it mirrors _Option.process with +2 (including state.order append), all other actions delegate to super().process unchanged.\nAgent-reported tests_run (not independently verified): \"pip install -e .; inline python smoke test asserting two count calls yield 4 with order appended, and store action stores value via super() \\u2014 passed\"",
+  "session_id": "",
+  "acus": null
+}

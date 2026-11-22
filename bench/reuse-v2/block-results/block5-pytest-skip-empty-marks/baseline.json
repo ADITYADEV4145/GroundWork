@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block5-pytest-skip-empty-marks",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "5e8063860e4d677b47420b7e2e855f6d67188723",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_skip_empty_marks.py",
+          "symbol": "src/standalone_skip_empty_marks.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/nodes.py",
+          "symbol": "src/_pytest/nodes.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_skip_empty_marks.py; use src/_pytest/nodes.py instead."
+      },
+      {
+        "id": "9231e899501115a650a25e4ea7823d1149ebf76d",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_skip_empty_marks.py",
+          "symbol": "normalize_nonempty_marks",
+          "line": 17
+        },
+        "existing": {
+          "file": "src/_pytest/nodes.py",
+          "symbol": "Node.add_marker",
+          "line": 316
+        },
+        "probability": 0.5846169134378938,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.41300219685287026
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Node.add_marker: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

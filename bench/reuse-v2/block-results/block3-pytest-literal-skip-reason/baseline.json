@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-pytest-literal-skip-reason",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "7ab51bc4212b014fddf199d948205df36aee491c",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/literal_skip_reason.py",
+          "symbol": "src/_pytest/literal_skip_reason.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/terminal.py",
+          "symbol": "src/_pytest/terminal.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/_pytest/literal_skip_reason.py and update its 4 callers to use src/_pytest/terminal.py."
+      },
+      {
+        "id": "2c6d2889a50300f398a1894d1a3776e7de613cf6",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/_pytest/literal_skip_reason.py",
+          "symbol": "literal_skip_reason",
+          "line": 6
+        },
+        "existing": {
+          "file": "src/_pytest/terminal.py",
+          "symbol": "TerminalReporter.short_test_summary.show_skipped_unfolded",
+          "line": 1304
+        },
+        "probability": 0.42532329934019125,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.31051556398556973
+          }
+        ],
+        "fix": "Duplicate of TerminalReporter.short_test_summary.show_skipped_unfolded: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

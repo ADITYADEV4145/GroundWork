@@ -1,0 +1,9 @@
+{
+  "task_id": "block3-click-checked-binary-writer",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/checked_binary_writer.py b/src/click/checked_binary_writer.py\nnew file mode 100644\nindex 0000000..1819359\n--- /dev/null\n+++ b/src/click/checked_binary_writer.py\n@@ -0,0 +1,22 @@\n+\"\"\"Stream diagnostics for distinguishing unusable sinks.\"\"\"\n+\n+import typing as t\n+\n+\n+def checked_binary_writer(stream: t.IO[t.Any]) -> bool:\n+    \"\"\"Determine whether ``stream`` writes bytes.\n+\n+    Works like :func:`click._compat._is_binary_writer`, except that a\n+    :exc:`TypeError` is raised when both write probes fail instead of\n+    returning a default value.\n+    \"\"\"\n+    try:\n+        stream.write(b\"\")\n+    except Exception:\n+        try:\n+            stream.write(\"\")\n+            return False\n+        except Exception:\n+            pass\n+        raise TypeError(f\"{stream!r} is not usable as a binary or text writer\")\n+    return True\n",
+  "decisions": [],
+  "notes": "Created src/click/checked_binary_writer.py mirroring _is_binary_writer's two-probe logic exactly; the only change is raising TypeError when both probes fail (instead of returning a default). Existing _compat.py left untouched.\nAgent-reported tests_run (not independently verified): \"pip install -e . pytest; python inline checks: BytesIO\\u2192True, StringIO\\u2192False, object()/closed-like writer\\u2192TypeError \\u2014 all passed\"",
+  "session_id": "",
+  "acus": null
+}

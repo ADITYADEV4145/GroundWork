@@ -116,5 +116,4636 @@
     "verdict": "agree",
     "reviewer": "Devin lead review (agent, not Aditya)",
     "reasoning": "get_optional_fixture_names duplicates getfuncargnames' signature/fail/kind-filter/mock logic while selecting defaulted rather than required parameters."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "grounding",
+    "task_id": "block4-pytest-manifest-suffix-counts",
+    "arm": "baseline",
+    "added": {
+      "file": "testing/test_manifest_suffix_counts.py",
+      "symbol": "manifest_suffix_counts",
+      "line": 42
+    },
+    "existing": null,
+    "signals": [
+      {
+        "name": "groundingCheck",
+        "value": 1
+      },
+      {
+        "name": "definiteError",
+        "value": 1
+      }
+    ],
+    "verdict": "disagree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "This is a false-positive grounding BLOCK, not a duplicate pair (existing is null): test line 42 passes one generator argument to manifest_suffix_counts(names). CPython accepts it and returns {\".py\": 2}; the Python extractor incorrectly records zero arguments for generator_expression.",
+    "resolved_by": {
+      "commit": "ddd47cf6cb265940743a85c2081bd73b0154b8aa",
+      "note": "Count a bare generator expression as one positional argument. Exclude this historical false positive only when the current scored result no longer contains its BLOCK."
+    }
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block3-click-confirm-option",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/confirm_option.py",
+      "symbol": "src/click/confirm_option.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "src/click/decorators.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The confirm_option module duplicates confirmation_option with only the default flag changed."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block3-click-confirm-option",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/confirm_option.py",
+      "symbol": "confirm_option",
+      "line": 11
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "confirmation_option",
+      "line": 380
+    },
+    "probability": 0.8277897602398245,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.939036024353573
+      },
+      {
+        "name": "paramCount",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "confirm_option copies confirmation_option with only the default flag changed from --yes to --confirm."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block3-click-lookup-pass-decorator",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/lookup_pass_decorator.py",
+      "symbol": "lookup_pass_decorator",
+      "line": 18
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "make_pass_decorator",
+      "line": 51
+    },
+    "probability": 0.7969305599144376,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.8884376784763142
+      },
+      {
+        "name": "paramCount",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "lookup_pass_decorator copies make_pass_decorator with only the exception type changed to LookupError."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block3-click-lookup-pass-decorator",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/lookup_pass_decorator.py",
+      "symbol": "lookup_pass_decorator.decorator",
+      "line": 35
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "make_pass_decorator.decorator",
+      "line": 76
+    },
+    "probability": 0.757823794359788,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9658722980552695
+      },
+      {
+        "name": "paramCount",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The nested decorator copies make_pass_decorator.decorator with only the exception type changed."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block3-click-optional-meta-key",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/optional_meta_key.py",
+      "symbol": "optional_meta_key.decorator",
+      "line": 35
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "pass_obj",
+      "line": 39
+    },
+    "probability": 0.7712227060947163,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.6151231389641181
+      },
+      {
+        "name": "paramCount",
+        "value": 1
+      }
+    ],
+    "verdict": "disagree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added decorator follows pass_meta_key, but the BLOCK names pass_obj, whose one-line body has different behavior and suggests the wrong function."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block3-click-usage-option",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/usage_option.py",
+      "symbol": "src/click/usage_option.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "src/click/decorators.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The usage_option module duplicates help_option with renames and a changed default flag."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block3-click-usage-option",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/usage_option.py",
+      "symbol": "usage_option",
+      "line": 13
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "help_option",
+      "line": 527
+    },
+    "probability": 0.7797618552540597,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.8802388444339161
+      },
+      {
+        "name": "paramCount",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "usage_option copies help_option with renames and the default flag changed to --usage."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block3-click-usage-option",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/usage_option.py",
+      "symbol": "usage_option.show_usage",
+      "line": 23
+    },
+    "existing": {
+      "file": "src/click/decorators.py",
+      "symbol": "help_option.show_help",
+      "line": 536
+    },
+    "probability": 0.9943683369706037,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9743189873070984
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The nested show_usage callback copies help_option.show_help with only its name changed."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block4-click-command-decorator-type-error",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/command_decorator_type_error.py",
+      "symbol": "CommandDecoratorTypeError.command.decorator",
+      "line": 52
+    },
+    "existing": {
+      "file": "src/click/core.py",
+      "symbol": "Group.command.decorator",
+      "line": 1628
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The nested decorator exactly copies Group.command.decorator: construct command(*args, **kwargs)(f), register it with self.add_command, and return it; the enclosing exception-type change does not change this body."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block4-click-plain-child-group",
+    "arm": "baseline",
+    "added": {
+      "file": "src/click/plain_child_group.py",
+      "symbol": "PlainChildGroup.group.decorator",
+      "line": 51
+    },
+    "existing": {
+      "file": "src/click/core.py",
+      "symbol": "Group.group.decorator",
+      "line": 1680
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The nested decorator exactly copies Group.group.decorator: construct group(*args, **kwargs)(f), register it with self.add_command, and return it; the enclosing child-class selection change does not change this body."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block5-click-lower-option-name",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_lower_option_name.py",
+      "symbol": "_split_opt",
+      "line": 11
+    },
+    "existing": {
+      "file": "src/click/parser.py",
+      "symbol": "_split_opt",
+      "line": 112
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The matched _split_opt helper is an exact copy: signature and complete AST are identical at the pinned Click source, preserving alphanumeric, repeated-prefix and single-prefix branches. The public normalize_lower_option tweak lowercases the callback result outside this helper; it does not change the matched helper. The helper is actually called when a normalizer is configured. This is a duplicate of the named match, not merely a similar option-normalization function."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "src/standalone_wave6_ansi_stream.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "src/click/_compat.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/click/_compat.py, not merely a similar filename: 9 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include _FixupStream -> _FixupStream, _FixupStream.read1 -> _FixupStream.read1, _FixupStream.readable -> _FixupStream.readable, _FixupStream.writable -> _FixupStream.writable. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "_FixupStream",
+      "line": 45
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream",
+      "line": 82
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _FixupStream equals the actual named match _FixupStream at src/click/_compat.py:82, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, self._stream.seek, self._stream.tell, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "_FixupStream.read1",
+      "line": 68
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.read1",
+      "line": 105
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.read1 equals the actual named match _FixupStream.read1 at src/click/_compat.py:105, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "_FixupStream.readable",
+      "line": 76
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.readable",
+      "line": 113
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.readable equals the actual named match _FixupStream.readable at src/click/_compat.py:113, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.read, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "_FixupStream.writable",
+      "line": 88
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.writable",
+      "line": 125
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.writable equals the actual named match _FixupStream.writable at src/click/_compat.py:125, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 103
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 140
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.seekable equals the actual named match _FixupStream.seekable at src/click/_compat.py:140, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.seek, self._stream.tell, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "_is_jupyter_kernel_output",
+      "line": 114
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_jupyter_kernel_output",
+      "line": 492
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_jupyter_kernel_output equals the actual named match _is_jupyter_kernel_output at src/click/_compat.py:492, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include isinstance, stream.__class__.__module__.startswith. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "should_strip_ansi",
+      "line": 121
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "should_strip_ansi",
+      "line": 499
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of should_strip_ansi equals the actual named match should_strip_ansi at src/click/_compat.py:499, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_jupyter_kernel_output, isatty. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "vendored_ansi_stream",
+      "line": 141
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "auto_wrap_for_ansi",
+      "line": 522
+    },
+    "probability": 0.9871113830915021,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9737928356234665
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_ansi_stream equals the actual named match auto_wrap_for_ansi at src/click/_compat.py:522, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _ansi_stream_wrappers.get, _write, ansi_wrapper.reset_all, colorama.AnsiToWin32, should_strip_ansi, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-ansi-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_ansi_stream.py",
+      "symbol": "vendored_ansi_stream._safe_write",
+      "line": 160
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "auto_wrap_for_ansi._safe_write",
+      "line": 541
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_ansi_stream._safe_write equals the actual named match auto_wrap_for_ansi._safe_write at src/click/_compat.py:541, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _write, ansi_wrapper.reset_all. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-color-default",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_color_default.py",
+      "symbol": "get_current_context",
+      "line": 31
+    },
+    "existing": {
+      "file": "src/click/globals.py",
+      "symbol": "get_current_context",
+      "line": 20
+    },
+    "probability": 0.8305264601594614,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.6818358123455446
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_current_context equals the actual named match get_current_context at src/click/globals.py:20, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include RuntimeError, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-color-default",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_color_default.py",
+      "symbol": "push_context",
+      "line": 48
+    },
+    "existing": {
+      "file": "src/click/globals.py",
+      "symbol": "push_context",
+      "line": 44
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of push_context equals the actual named match push_context at src/click/globals.py:44, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _local.__dict__.setdefault, _local.__dict__.setdefault('stack', []).append. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-color-default",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_color_default.py",
+      "symbol": "vendored_color_default",
+      "line": 58
+    },
+    "existing": {
+      "file": "src/click/globals.py",
+      "symbol": "resolve_color_default",
+      "line": 54
+    },
+    "probability": 0.9733350852607185,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.962307824659207
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_color_default equals the actual named match resolve_color_default at src/click/globals.py:54, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include get_current_context. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-click-color-fragment",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_color_fragment.py",
+      "symbol": "src/standalone_wave6_color_fragment.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/click/termui.py",
+      "symbol": "src/click/termui.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/click/termui.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_color_fragment -> _interpret_color. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-color-fragment",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_color_fragment.py",
+      "symbol": "vendored_color_fragment",
+      "line": 28
+    },
+    "existing": {
+      "file": "src/click/termui.py",
+      "symbol": "_interpret_color",
+      "line": 501
+    },
+    "probability": 0.9728534779719781,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.8736916067776652
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_color_fragment equals the actual named match _interpret_color at src/click/termui.py:501, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include isinstance, str. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-probe",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_probe.py",
+      "symbol": "vendored_console_probe",
+      "line": 25
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_is_console",
+      "line": 263
+    },
+    "probability": 0.9817240091029221,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9515209716902242
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_console_probe equals the actual named match _is_console at src/click/_winconsole.py:263, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include DWORD, GetConsoleMode, bool, byref, f.fileno, hasattr, msvcrt.get_osfhandle. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-constant",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "MAX_BYTES_WRITTEN",
+      "line": 72
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "MAX_BYTES_WRITTEN",
+      "line": 69
+    },
+    "signals": [
+      {
+        "name": "literalMatch",
+        "value": 1
+      },
+      {
+        "name": "existingNamedConstant",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "MAX_BYTES_WRITTEN = 32767 is copied with its exact name and value from the pinned Windows-console module. Both modules also contain the same _WindowsConsoleWriter.write implementation, which uses min(bytes_to_be_written, MAX_BYTES_WRITTEN) // 2 before WriteConsoleW. Thus this is the same console-write cap in the same copied consumer context, not an unrelated occurrence of the number 32767."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "Py_buffer",
+      "line": 93
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "Py_buffer",
+      "line": 87
+    },
+    "probability": 0.9769851874184835,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of Py_buffer equals the actual named match Py_buffer at src/click/_winconsole.py:87, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. All return expressions and literal values are preserved. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "get_buffer",
+      "line": 111
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "get_buffer",
+      "line": 105
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_buffer equals the actual named match get_buffer at src/click/_winconsole.py:105, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include PyBuffer_Release, PyObject_GetBuffer, Py_buffer, buffer_type.from_address, byref, py_object. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_FixupStream",
+      "line": 150
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream",
+      "line": 82
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _FixupStream equals the actual named match _FixupStream at src/click/_compat.py:82, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, self._stream.seek, self._stream.tell, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_FixupStream.read1",
+      "line": 173
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.read1",
+      "line": 105
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.read1 equals the actual named match _FixupStream.read1 at src/click/_compat.py:105, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_FixupStream.readable",
+      "line": 181
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.readable",
+      "line": 113
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.readable equals the actual named match _FixupStream.readable at src/click/_compat.py:113, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.read, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_FixupStream.writable",
+      "line": 193
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.writable",
+      "line": 125
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.writable equals the actual named match _FixupStream.writable at src/click/_compat.py:125, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 208
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 140
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.seekable equals the actual named match _FixupStream.seekable at src/click/_compat.py:140, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.seek, self._stream.tell, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_WindowsConsoleReader",
+      "line": 228
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleReader",
+      "line": 127
+    },
+    "probability": 0.9769851874184835,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _WindowsConsoleReader equals the actual named match _WindowsConsoleReader at src/click/_winconsole.py:127, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, ReadConsoleW, ValueError, byref, c_ulong, get_buffer. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_WindowsConsoleReader.readinto",
+      "line": 232
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleReader.readinto",
+      "line": 131
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _WindowsConsoleReader.readinto equals the actual named match _WindowsConsoleReader.readinto at src/click/_winconsole.py:131, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, ReadConsoleW, ValueError, byref, c_ulong, get_buffer. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_WindowsConsoleWriter",
+      "line": 263
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleWriter",
+      "line": 162
+    },
+    "probability": 0.9769851874184835,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _WindowsConsoleWriter equals the actual named match _WindowsConsoleWriter at src/click/_winconsole.py:162, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, WriteConsoleW, byref, c_ulong, get_buffer, len. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_WindowsConsoleWriter._get_error_message",
+      "line": 267
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleWriter._get_error_message",
+      "line": 166
+    },
+    "probability": 0.9597808623512812,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _WindowsConsoleWriter._get_error_message equals the actual named match _WindowsConsoleWriter._get_error_message at src/click/_winconsole.py:166, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. All return expressions and literal values are preserved. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_WindowsConsoleWriter.write",
+      "line": 275
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleWriter.write",
+      "line": 174
+    },
+    "probability": 0.9656212964353162,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _WindowsConsoleWriter.write equals the actual named match _WindowsConsoleWriter.write at src/click/_winconsole.py:174, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, WriteConsoleW, byref, c_ulong, get_buffer, len. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "ConsoleStream",
+      "line": 295
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "ConsoleStream",
+      "line": 194
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of ConsoleStream equals the actual named match ConsoleStream at src/click/_winconsole.py:194, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, isinstance, self._text_stream.write, self.buffer.isatty, self.buffer.write, self.flush, self.write. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "ConsoleStream.write",
+      "line": 304
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "ConsoleStream.write",
+      "line": 203
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of ConsoleStream.write equals the actual named match ConsoleStream.write at src/click/_winconsole.py:203, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include isinstance, self._text_stream.write, self.buffer.write, self.flush. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_get_text_stdin",
+      "line": 327
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_get_text_stdin",
+      "line": 226
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _get_text_stdin equals the actual named match _get_text_stdin at src/click/_winconsole.py:226, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ConsoleStream, _NonClosingTextIOWrapper, _WindowsConsoleReader, io.BufferedReader, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_get_text_stdout",
+      "line": 337
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_get_text_stdout",
+      "line": 236
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _get_text_stdout equals the actual named match _get_text_stdout at src/click/_winconsole.py:236, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ConsoleStream, _NonClosingTextIOWrapper, _WindowsConsoleWriter, io.BufferedWriter, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_get_text_stderr",
+      "line": 347
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_get_text_stderr",
+      "line": 246
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _get_text_stderr equals the actual named match _get_text_stderr at src/click/_winconsole.py:246, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ConsoleStream, _NonClosingTextIOWrapper, _WindowsConsoleWriter, io.BufferedWriter, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "_is_console",
+      "line": 364
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_is_console",
+      "line": 263
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_console equals the actual named match _is_console at src/click/_winconsole.py:263, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include DWORD, GetConsoleMode, bool, byref, f.fileno, hasattr, msvcrt.get_osfhandle. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-console-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_console_stream.py",
+      "symbol": "vendored_console_stream",
+      "line": 377
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_get_windows_console_stream",
+      "line": 276
+    },
+    "probability": 0.9752588658781144,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9430553581632284
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_console_stream equals the actual named match _get_windows_console_stream at src/click/_winconsole.py:276, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_console, _stream_factories.get, f.fileno, func, getattr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_make_text_stream",
+      "line": 41
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_make_text_stream",
+      "line": 19
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _make_text_stream equals the actual named match _make_text_stream at src/click/_compat.py:19, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _NonClosingTextIOWrapper, get_best_encoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "is_ascii_encoding",
+      "line": 62
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "is_ascii_encoding",
+      "line": 40
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of is_ascii_encoding equals the actual named match is_ascii_encoding at src/click/_compat.py:40, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include codecs.lookup. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "get_best_encoding",
+      "line": 70
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "get_best_encoding",
+      "line": 48
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_best_encoding equals the actual named match get_best_encoding at src/click/_compat.py:48, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, is_ascii_encoding, sys.getdefaultencoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_FixupStream",
+      "line": 104
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream",
+      "line": 82
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _FixupStream equals the actual named match _FixupStream at src/click/_compat.py:82, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, self._stream.seek, self._stream.tell, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_FixupStream.read1",
+      "line": 127
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.read1",
+      "line": 105
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.read1 equals the actual named match _FixupStream.read1 at src/click/_compat.py:105, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_FixupStream.readable",
+      "line": 135
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.readable",
+      "line": 113
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.readable equals the actual named match _FixupStream.readable at src/click/_compat.py:113, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.read, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_FixupStream.writable",
+      "line": 147
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.writable",
+      "line": 125
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.writable equals the actual named match _FixupStream.writable at src/click/_compat.py:125, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 162
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 140
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.seekable equals the actual named match _FixupStream.seekable at src/click/_compat.py:140, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.seek, self._stream.tell, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_is_binary_reader",
+      "line": 173
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_binary_reader",
+      "line": 151
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_binary_reader equals the actual named match _is_binary_reader at src/click/_compat.py:151, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include isinstance, stream.read. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_is_binary_writer",
+      "line": 180
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_binary_writer",
+      "line": 160
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_binary_writer equals the actual named match _is_binary_writer at src/click/_compat.py:160, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include stream.write. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_find_binary_reader",
+      "line": 193
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_find_binary_reader",
+      "line": 173
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _find_binary_reader equals the actual named match _find_binary_reader at src/click/_compat.py:173, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_binary_reader, getattr, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_find_binary_writer",
+      "line": 211
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_find_binary_writer",
+      "line": 191
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _find_binary_writer equals the actual named match _find_binary_writer at src/click/_compat.py:191, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_binary_writer, getattr, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_stream_is_misconfigured",
+      "line": 229
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_stream_is_misconfigured",
+      "line": 209
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _stream_is_misconfigured equals the actual named match _stream_is_misconfigured at src/click/_compat.py:209, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, is_ascii_encoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_is_compat_stream_attr",
+      "line": 238
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_compat_stream_attr",
+      "line": 218
+    },
+    "probability": 0.99132362600262,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_compat_stream_attr equals the actual named match _is_compat_stream_attr at src/click/_compat.py:218, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_is_compatible_text_stream",
+      "line": 247
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_compatible_text_stream",
+      "line": 227
+    },
+    "probability": 0.99132362600262,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_compatible_text_stream equals the actual named match _is_compatible_text_stream at src/click/_compat.py:227, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_compat_stream_attr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_force_correct_text_stream",
+      "line": 258
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_force_correct_text_stream",
+      "line": 238
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _force_correct_text_stream equals the actual named match _force_correct_text_stream at src/click/_compat.py:238, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_compatible_text_stream, _make_text_stream, _stream_is_misconfigured, find_binary, is_binary, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_force_correct_text_reader",
+      "line": 304
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_force_correct_text_reader",
+      "line": 284
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _force_correct_text_reader equals the actual named match _force_correct_text_reader at src/click/_compat.py:284, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _force_correct_text_stream. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_force_correct_text_writer",
+      "line": 320
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_force_correct_text_writer",
+      "line": 300
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _force_correct_text_writer equals the actual named match _force_correct_text_writer at src/click/_compat.py:300, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _force_correct_text_stream. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "get_binary_stdin",
+      "line": 336
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "get_binary_stdin",
+      "line": 316
+    },
+    "probability": 0.9650683541579346,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_binary_stdin equals the actual named match get_binary_stdin at src/click/_compat.py:316, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include RuntimeError, _find_binary_reader. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "get_binary_stdout",
+      "line": 343
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "get_binary_stdout",
+      "line": 323
+    },
+    "probability": 0.9650683541579346,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_binary_stdout equals the actual named match get_binary_stdout at src/click/_compat.py:323, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include RuntimeError, _find_binary_writer. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-constant",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "MAX_BYTES_WRITTEN",
+      "line": 390
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "MAX_BYTES_WRITTEN",
+      "line": 69
+    },
+    "signals": [
+      {
+        "name": "literalMatch",
+        "value": 1
+      },
+      {
+        "name": "existingNamedConstant",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "MAX_BYTES_WRITTEN = 32767 is copied with its exact name and value from the pinned Windows-console module. Both modules also contain the same _WindowsConsoleWriter.write implementation, which uses min(bytes_to_be_written, MAX_BYTES_WRITTEN) // 2 before WriteConsoleW. Thus this is the same console-write cap in the same copied consumer context, not an unrelated occurrence of the number 32767."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "Py_buffer",
+      "line": 400
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "Py_buffer",
+      "line": 87
+    },
+    "probability": 0.9769851874184835,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of Py_buffer equals the actual named match Py_buffer at src/click/_winconsole.py:87, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. All return expressions and literal values are preserved. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "get_buffer",
+      "line": 418
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "get_buffer",
+      "line": 105
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_buffer equals the actual named match get_buffer at src/click/_winconsole.py:105, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include PyBuffer_Release, PyObject_GetBuffer, Py_buffer, buffer_type.from_address, byref, py_object. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_WindowsConsoleReader",
+      "line": 438
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleReader",
+      "line": 127
+    },
+    "probability": 0.9769851874184835,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _WindowsConsoleReader equals the actual named match _WindowsConsoleReader at src/click/_winconsole.py:127, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, ReadConsoleW, ValueError, byref, c_ulong, get_buffer. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_WindowsConsoleReader.readinto",
+      "line": 442
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleReader.readinto",
+      "line": 131
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _WindowsConsoleReader.readinto equals the actual named match _WindowsConsoleReader.readinto at src/click/_winconsole.py:131, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, ReadConsoleW, ValueError, byref, c_ulong, get_buffer. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_WindowsConsoleWriter",
+      "line": 472
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleWriter",
+      "line": 162
+    },
+    "probability": 0.9769851874184835,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _WindowsConsoleWriter equals the actual named match _WindowsConsoleWriter at src/click/_winconsole.py:162, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, WriteConsoleW, byref, c_ulong, get_buffer, len. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_WindowsConsoleWriter._get_error_message",
+      "line": 476
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleWriter._get_error_message",
+      "line": 166
+    },
+    "probability": 0.9597808623512812,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _WindowsConsoleWriter._get_error_message equals the actual named match _WindowsConsoleWriter._get_error_message at src/click/_winconsole.py:166, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. All return expressions and literal values are preserved. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_WindowsConsoleWriter.write",
+      "line": 484
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_WindowsConsoleWriter.write",
+      "line": 174
+    },
+    "probability": 0.9656212964353162,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _WindowsConsoleWriter.write equals the actual named match _WindowsConsoleWriter.write at src/click/_winconsole.py:174, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include GetLastError, HANDLE, OSError, WriteConsoleW, byref, c_ulong, get_buffer, len. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "ConsoleStream",
+      "line": 503
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "ConsoleStream",
+      "line": 194
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of ConsoleStream equals the actual named match ConsoleStream at src/click/_winconsole.py:194, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, isinstance, self._text_stream.write, self.buffer.isatty, self.buffer.write, self.flush, self.write. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "ConsoleStream.write",
+      "line": 512
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "ConsoleStream.write",
+      "line": 203
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of ConsoleStream.write equals the actual named match ConsoleStream.write at src/click/_winconsole.py:203, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include isinstance, self._text_stream.write, self.buffer.write, self.flush. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_get_text_stdin",
+      "line": 534
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_get_text_stdin",
+      "line": 226
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _get_text_stdin equals the actual named match _get_text_stdin at src/click/_winconsole.py:226, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ConsoleStream, _NonClosingTextIOWrapper, _WindowsConsoleReader, io.BufferedReader, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_get_text_stdout",
+      "line": 543
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_get_text_stdout",
+      "line": 236
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _get_text_stdout equals the actual named match _get_text_stdout at src/click/_winconsole.py:236, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ConsoleStream, _NonClosingTextIOWrapper, _WindowsConsoleWriter, io.BufferedWriter, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_get_text_stderr",
+      "line": 552
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_get_text_stderr",
+      "line": 246
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _get_text_stderr equals the actual named match _get_text_stderr at src/click/_winconsole.py:246, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ConsoleStream, _NonClosingTextIOWrapper, _WindowsConsoleWriter, io.BufferedWriter, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_is_console",
+      "line": 567
+    },
+    "existing": {
+      "file": "src/click/_winconsole.py",
+      "symbol": "_is_console",
+      "line": 263
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_console equals the actual named match _is_console at src/click/_winconsole.py:263, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include DWORD, GetConsoleMode, bool, byref, f.fileno, hasattr, msvcrt.get_osfhandle. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "get_text_stdin",
+      "line": 610
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "get_text_stdin",
+      "line": 337
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_text_stdin equals the actual named match get_text_stdin at src/click/_compat.py:337, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _force_correct_text_reader, _get_windows_console_stream. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "get_text_stdout",
+      "line": 617
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "get_text_stdout",
+      "line": 344
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_text_stdout equals the actual named match get_text_stdout at src/click/_compat.py:344, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _force_correct_text_writer, _get_windows_console_stream. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_wrap_io_open",
+      "line": 624
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_wrap_io_open",
+      "line": 358
+    },
+    "probability": 0.971238496782752,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _wrap_io_open equals the actual named match _wrap_io_open at src/click/_compat.py:358, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include open. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "open_stream",
+      "line": 637
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "open_stream",
+      "line": 371
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of open_stream equals the actual named match open_stream at src/click/_compat.py:371, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ValueError, _AtomicFile, _wrap_io_open, any, get_binary_stdin, get_binary_stdout, get_text_stdin, get_text_stdout. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_AtomicFile",
+      "line": 718
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_AtomicFile",
+      "line": 452
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _AtomicFile equals the actual named match _AtomicFile at src/click/_compat.py:452, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, os.replace, repr, self._f.close, self.close. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_AtomicFile.close",
+      "line": 729
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_AtomicFile.close",
+      "line": 463
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _AtomicFile.close equals the actual named match _AtomicFile.close at src/click/_compat.py:463, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include os.replace, self._f.close. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_make_cached_stream_func",
+      "line": 765
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_make_cached_stream_func",
+      "line": 579
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _make_cached_stream_func equals the actual named match _make_cached_stream_func at src/click/_compat.py:579, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include WeakKeyDictionary, cache.get, src_func, wrapper_func. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_make_cached_stream_func.func",
+      "line": 771
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_make_cached_stream_func.func",
+      "line": 585
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _make_cached_stream_func.func equals the actual named match _make_cached_stream_func.func at src/click/_compat.py:585, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include cache.get, src_func, wrapper_func. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "vendored_pager",
+      "line": 796
+    },
+    "existing": {
+      "file": "src/click/_termui_impl.py",
+      "symbol": "pager",
+      "line": 370
+    },
+    "probability": 0.9773729704743244,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9946795722966228
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_pager equals the actual named match pager at src/click/_termui_impl.py:370, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include StringIO, _default_text_stdout, _nullpager, _pipepager, _tempfilepager, isatty, os.close, os.environ.get. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_pipepager",
+      "line": 838
+    },
+    "existing": {
+      "file": "src/click/_termui_impl.py",
+      "symbol": "_pipepager",
+      "line": 412
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _pipepager equals the actual named match _pipepager at src/click/_termui_impl.py:412, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ' '.join, Path, Path(cmd_filepath).resolve, c.stdin.close, c.stdin.write, c.terminate, c.wait, dict. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_tempfilepager",
+      "line": 928
+    },
+    "existing": {
+      "file": "src/click/_termui_impl.py",
+      "symbol": "_tempfilepager",
+      "line": 502
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _tempfilepager equals the actual named match _tempfilepager at src/click/_termui_impl.py:502, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ''.join, Path, Path(cmd_filepath).resolve, f.write, get_best_encoding, open_stream, os.close, os.unlink. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-pager",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pager.py",
+      "symbol": "_nullpager",
+      "line": 970
+    },
+    "existing": {
+      "file": "src/click/_termui_impl.py",
+      "symbol": "_nullpager",
+      "line": 544
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _nullpager equals the actual named match _nullpager at src/click/_termui_impl.py:544, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include stream.write, strip_ansi. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-parameter-order",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_parameter_order.py",
+      "symbol": "vendored_parameter_order",
+      "line": 21
+    },
+    "existing": {
+      "file": "src/click/core.py",
+      "symbol": "iter_params_for_processing",
+      "line": 115
+    },
+    "probability": 0.9982454267989441,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9859630676694504
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_parameter_order equals the actual named match iter_params_for_processing at src/click/core.py:115, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include float, invocation_order.index, sorted. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-parameter-order",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_parameter_order.py",
+      "symbol": "vendored_parameter_order.sort_key",
+      "line": 37
+    },
+    "existing": {
+      "file": "src/click/core.py",
+      "symbol": "iter_params_for_processing.sort_key",
+      "line": 131
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_parameter_order.sort_key equals the actual named match iter_params_for_processing.sort_key at src/click/core.py:131, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include float, invocation_order.index. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-click-raw-terminal",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_raw_terminal.py",
+      "symbol": "src/standalone_wave6_raw_terminal.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/click/_termui_impl.py",
+      "symbol": "src/click/_termui_impl.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/click/_termui_impl.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_raw_terminal -> raw_terminal. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-raw-terminal",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_raw_terminal.py",
+      "symbol": "vendored_raw_terminal",
+      "line": 32
+    },
+    "existing": {
+      "file": "src/click/_termui_impl.py",
+      "symbol": "raw_terminal",
+      "line": 804
+    },
+    "probability": 0.9901393132620787,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9824015705263764
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_raw_terminal equals the actual named match raw_terminal at src/click/_termui_impl.py:804, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f.close, f.fileno, isatty, open, sys.stdin.fileno, sys.stdout.flush, termios.tcgetattr, termios.tcsetattr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-shell-expansion",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_shell_expansion.py",
+      "symbol": "vendored_shell_expansion",
+      "line": 16
+    },
+    "existing": {
+      "file": "src/click/utils.py",
+      "symbol": "_expand_args",
+      "line": 578
+    },
+    "probability": 0.9971819766451556,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9945635694816765
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_shell_expansion equals the actual named match _expand_args at src/click/utils.py:578, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include glob, os.path.expanduser, os.path.expandvars, out.append, out.extend. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "src/standalone_wave6_text_reader.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "src/click/_compat.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/click/_compat.py, not merely a similar filename: 15 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include _make_text_stream -> _make_text_stream, is_ascii_encoding -> is_ascii_encoding, get_best_encoding -> get_best_encoding, _FixupStream -> _FixupStream. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_make_text_stream",
+      "line": 13
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_make_text_stream",
+      "line": 19
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _make_text_stream equals the actual named match _make_text_stream at src/click/_compat.py:19, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _NonClosingTextIOWrapper, get_best_encoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "is_ascii_encoding",
+      "line": 34
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "is_ascii_encoding",
+      "line": 40
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of is_ascii_encoding equals the actual named match is_ascii_encoding at src/click/_compat.py:40, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include codecs.lookup. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "get_best_encoding",
+      "line": 42
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "get_best_encoding",
+      "line": 48
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_best_encoding equals the actual named match get_best_encoding at src/click/_compat.py:48, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, is_ascii_encoding, sys.getdefaultencoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_FixupStream",
+      "line": 76
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream",
+      "line": 82
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _FixupStream equals the actual named match _FixupStream at src/click/_compat.py:82, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, self._stream.seek, self._stream.tell, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_FixupStream.read1",
+      "line": 99
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.read1",
+      "line": 105
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.read1 equals the actual named match _FixupStream.read1 at src/click/_compat.py:105, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_FixupStream.readable",
+      "line": 107
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.readable",
+      "line": 113
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.readable equals the actual named match _FixupStream.readable at src/click/_compat.py:113, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.read, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_FixupStream.writable",
+      "line": 119
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.writable",
+      "line": 125
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.writable equals the actual named match _FixupStream.writable at src/click/_compat.py:125, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 134
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 140
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.seekable equals the actual named match _FixupStream.seekable at src/click/_compat.py:140, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.seek, self._stream.tell, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_is_binary_reader",
+      "line": 145
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_binary_reader",
+      "line": 151
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_binary_reader equals the actual named match _is_binary_reader at src/click/_compat.py:151, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include isinstance, stream.read. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_find_binary_reader",
+      "line": 154
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_find_binary_reader",
+      "line": 173
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _find_binary_reader equals the actual named match _find_binary_reader at src/click/_compat.py:173, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_binary_reader, getattr, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_stream_is_misconfigured",
+      "line": 172
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_stream_is_misconfigured",
+      "line": 209
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _stream_is_misconfigured equals the actual named match _stream_is_misconfigured at src/click/_compat.py:209, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, is_ascii_encoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_is_compat_stream_attr",
+      "line": 181
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_compat_stream_attr",
+      "line": 218
+    },
+    "probability": 0.99132362600262,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_compat_stream_attr equals the actual named match _is_compat_stream_attr at src/click/_compat.py:218, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_is_compatible_text_stream",
+      "line": 190
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_compatible_text_stream",
+      "line": 227
+    },
+    "probability": 0.99132362600262,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_compatible_text_stream equals the actual named match _is_compatible_text_stream at src/click/_compat.py:227, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_compat_stream_attr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "_force_correct_text_stream",
+      "line": 201
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_force_correct_text_stream",
+      "line": 238
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _force_correct_text_stream equals the actual named match _force_correct_text_stream at src/click/_compat.py:238, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_compatible_text_stream, _make_text_stream, _stream_is_misconfigured, find_binary, is_binary, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-reader",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_reader.py",
+      "symbol": "vendored_text_reader",
+      "line": 247
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_force_correct_text_reader",
+      "line": 284
+    },
+    "probability": 0.9956830647958316,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9484671765316637
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_text_reader equals the actual named match _force_correct_text_reader at src/click/_compat.py:284, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _force_correct_text_stream. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "src/standalone_wave6_text_writer.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "src/click/_compat.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/click/_compat.py, not merely a similar filename: 15 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include _make_text_stream -> _make_text_stream, is_ascii_encoding -> is_ascii_encoding, get_best_encoding -> get_best_encoding, _FixupStream -> _FixupStream. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_make_text_stream",
+      "line": 17
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_make_text_stream",
+      "line": 19
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _make_text_stream equals the actual named match _make_text_stream at src/click/_compat.py:19, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _NonClosingTextIOWrapper, get_best_encoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "is_ascii_encoding",
+      "line": 38
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "is_ascii_encoding",
+      "line": 40
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of is_ascii_encoding equals the actual named match is_ascii_encoding at src/click/_compat.py:40, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include codecs.lookup. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "get_best_encoding",
+      "line": 46
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "get_best_encoding",
+      "line": 48
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of get_best_encoding equals the actual named match get_best_encoding at src/click/_compat.py:48, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, is_ascii_encoding, sys.getdefaultencoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_FixupStream",
+      "line": 80
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream",
+      "line": 82
+    },
+    "probability": 0.9773539214447677,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable ClassDef AST of _FixupStream equals the actual named match _FixupStream at src/click/_compat.py:82, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, self._stream.seek, self._stream.tell, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_FixupStream.read1",
+      "line": 103
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.read1",
+      "line": 105
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.read1 equals the actual named match _FixupStream.read1 at src/click/_compat.py:105, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include f, getattr, self._stream.read, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_FixupStream.readable",
+      "line": 111
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.readable",
+      "line": 113
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.readable equals the actual named match _FixupStream.readable at src/click/_compat.py:113, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.read, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_FixupStream.writable",
+      "line": 123
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.writable",
+      "line": 125
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.writable equals the actual named match _FixupStream.writable at src/click/_compat.py:125, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.write, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 138
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_FixupStream.seekable",
+      "line": 140
+    },
+    "probability": 0.947448940157924,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _FixupStream.seekable equals the actual named match _FixupStream.seekable at src/click/_compat.py:140, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, self._stream.seek, self._stream.tell, t.cast, x. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_is_binary_writer",
+      "line": 149
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_binary_writer",
+      "line": 160
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_binary_writer equals the actual named match _is_binary_writer at src/click/_compat.py:160, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include stream.write. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_find_binary_writer",
+      "line": 162
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_find_binary_writer",
+      "line": 191
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _find_binary_writer equals the actual named match _find_binary_writer at src/click/_compat.py:191, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_binary_writer, getattr, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_stream_is_misconfigured",
+      "line": 180
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_stream_is_misconfigured",
+      "line": 209
+    },
+    "probability": 0.9905009670444577,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _stream_is_misconfigured equals the actual named match _stream_is_misconfigured at src/click/_compat.py:209, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr, is_ascii_encoding. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_is_compat_stream_attr",
+      "line": 189
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_compat_stream_attr",
+      "line": 218
+    },
+    "probability": 0.99132362600262,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_compat_stream_attr equals the actual named match _is_compat_stream_attr at src/click/_compat.py:218, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include getattr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_is_compatible_text_stream",
+      "line": 198
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_is_compatible_text_stream",
+      "line": 227
+    },
+    "probability": 0.99132362600262,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _is_compatible_text_stream equals the actual named match _is_compatible_text_stream at src/click/_compat.py:227, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_compat_stream_attr. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "_force_correct_text_stream",
+      "line": 209
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_force_correct_text_stream",
+      "line": 238
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _force_correct_text_stream equals the actual named match _force_correct_text_stream at src/click/_compat.py:238, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _is_compatible_text_stream, _make_text_stream, _stream_is_misconfigured, find_binary, is_binary, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-text-writer",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_text_writer.py",
+      "symbol": "vendored_text_writer",
+      "line": 255
+    },
+    "existing": {
+      "file": "src/click/_compat.py",
+      "symbol": "_force_correct_text_writer",
+      "line": 300
+    },
+    "probability": 0.9957419992524318,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9511218513441899
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_text_writer equals the actual named match _force_correct_text_writer at src/click/_compat.py:300, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _force_correct_text_stream. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-click-visible-commands",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_visible_commands.py",
+      "symbol": "vendored_visible_commands",
+      "line": 29
+    },
+    "existing": {
+      "file": "src/click/core.py",
+      "symbol": "_complete_visible_commands",
+      "line": 53
+    },
+    "probability": 0.9924542141298346,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9744049285431695
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_visible_commands equals the actual named match _complete_visible_commands at src/click/core.py:53, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include multi.get_command, multi.list_commands, name.startswith, t.cast. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-chunk-copy",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_chunk_copy.py",
+      "symbol": "src/standalone_wave6_chunk_copy.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/_py/path.py",
+      "symbol": "src/_pytest/_py/path.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/_py/path.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_chunk_copy -> copychunked. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-chunk-copy",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_chunk_copy.py",
+      "symbol": "vendored_chunk_copy",
+      "line": 26
+    },
+    "existing": {
+      "file": "src/_pytest/_py/path.py",
+      "symbol": "copychunked",
+      "line": 1452
+    },
+    "probability": 0.9923798119772258,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9228007056797659
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_chunk_copy equals the actual named match copychunked at src/_pytest/_py/path.py:1452, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include dest.open, fdest.close, fdest.write, fsrc.close, fsrc.read, src.open. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-default-equality",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_default_equality.py",
+      "symbol": "src/standalone_wave6_default_equality.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/util.py",
+      "symbol": "src/_pytest/assertion/util.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/assertion/util.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_default_equality -> has_default_eq. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-default-equality",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_default_equality.py",
+      "symbol": "vendored_default_equality",
+      "line": 19
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/util.py",
+      "symbol": "has_default_eq",
+      "line": 157
+    },
+    "probability": 0.9852417512787134,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.976303192506995
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_default_equality equals the actual named match has_default_eq at src/_pytest/assertion/util.py:157, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include hasattr, isattrs. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-explanation-lines",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_explanation_lines.py",
+      "symbol": "src/standalone_wave6_explanation_lines.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/util.py",
+      "symbol": "src/_pytest/assertion/util.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/assertion/util.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_explanation_lines -> _format_lines. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-explanation-lines",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_explanation_lines.py",
+      "symbol": "vendored_explanation_lines",
+      "line": 15
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/util.py",
+      "symbol": "_format_lines",
+      "line": 86
+    },
+    "probability": 0.9953443391636585,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9827459471846987
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_explanation_lines equals the actual named match _format_lines at src/_pytest/assertion/util.py:86, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include len, line.startswith, list, result.append, stack.append, stack.pop, stackcnt.append, stackcnt.pop. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-explanation-split",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_explanation_split.py",
+      "symbol": "src/standalone_wave6_explanation_split.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/util.py",
+      "symbol": "src/_pytest/assertion/util.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/assertion/util.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_explanation_split -> _split_explanation. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-explanation-split",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_explanation_split.py",
+      "symbol": "vendored_explanation_split",
+      "line": 9
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/util.py",
+      "symbol": "_split_explanation",
+      "line": 69
+    },
+    "probability": 0.9901753906252012,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9799350240734634
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_explanation_split equals the actual named match _split_explanation at src/_pytest/assertion/util.py:69, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include (explanation or '').split, lines.append. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-extended-path",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_extended_path.py",
+      "symbol": "src/standalone_wave6_extended_path.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/pathlib.py",
+      "symbol": "src/_pytest/pathlib.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/pathlib.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_extended_path -> get_extended_length_path_str. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-extended-path",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_extended_path.py",
+      "symbol": "vendored_extended_path",
+      "line": 12
+    },
+    "existing": {
+      "file": "src/_pytest/pathlib.py",
+      "symbol": "get_extended_length_path_str",
+      "line": 150
+    },
+    "probability": 0.9798949254412128,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9611800357127813
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_extended_path equals the actual named match get_extended_length_path_str at src/_pytest/pathlib.py:150, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include path.startswith. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-pyc-file",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pyc_file.py",
+      "symbol": "_write_pyc_fp",
+      "line": 22
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "symbol": "_write_pyc_fp",
+      "line": 309
+    },
+    "probability": 0.9841314380539381,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _write_pyc_fp equals the actual named match _write_pyc_fp at src/_pytest/assertion/rewrite.py:309, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include fp.write, int, marshal.dumps, struct.pack. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-pyc-file",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pyc_file.py",
+      "symbol": "vendored_pyc_file",
+      "line": 40
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "symbol": "_write_pyc",
+      "line": 327
+    },
+    "probability": 0.994419224643617,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9652937016819582
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_pyc_file equals the actual named match _write_pyc at src/_pytest/assertion/rewrite.py:327, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _write_pyc_fp, open, os.getpid, os.replace, state.trace. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-pyc-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pyc_stream.py",
+      "symbol": "src/standalone_wave6_pyc_stream.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "symbol": "src/_pytest/assertion/rewrite.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/assertion/rewrite.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_pyc_stream -> _write_pyc_fp. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-pyc-stream",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_pyc_stream.py",
+      "symbol": "vendored_pyc_stream",
+      "line": 16
+    },
+    "existing": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "symbol": "_write_pyc_fp",
+      "line": 309
+    },
+    "probability": 0.995286626250411,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.963349916437264
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_pyc_stream equals the actual named match _write_pyc_fp at src/_pytest/assertion/rewrite.py:309, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include fp.write, int, marshal.dumps, struct.pack. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-repr-exception",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_repr_exception.py",
+      "symbol": "src/standalone_wave6_repr_exception.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/_io/saferepr.py",
+      "symbol": "src/_pytest/_io/saferepr.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/_io/saferepr.py, not merely a similar filename: 2 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include _try_repr_or_str -> _try_repr_or_str, vendored_repr_exception -> _format_repr_exception. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-repr-exception",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_repr_exception.py",
+      "symbol": "_try_repr_or_str",
+      "line": 12
+    },
+    "existing": {
+      "file": "src/_pytest/_io/saferepr.py",
+      "symbol": "_try_repr_or_str",
+      "line": 7
+    },
+    "probability": 0.982638787530041,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of _try_repr_or_str equals the actual named match _try_repr_or_str at src/_pytest/_io/saferepr.py:7, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include repr, type. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-repr-exception",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_repr_exception.py",
+      "symbol": "vendored_repr_exception",
+      "line": 21
+    },
+    "existing": {
+      "file": "src/_pytest/_io/saferepr.py",
+      "symbol": "_format_repr_exception",
+      "line": 16
+    },
+    "probability": 0.9894822512625472,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9275505842459079
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_repr_exception equals the actual named match _format_repr_exception at src/_pytest/_io/saferepr.py:16, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include _try_repr_or_str, id, type. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-statement-range",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_statement_range.py",
+      "symbol": "vendored_statement_range",
+      "line": 16
+    },
+    "existing": {
+      "file": "src/_pytest/_code/source.py",
+      "symbol": "get_statement_startend2",
+      "line": 153
+    },
+    "probability": 0.99518516862557,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9654701412983496
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_statement_range equals the actual named match get_statement_startend2 at src/_pytest/_code/source.py:153, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include ast.walk, bisect_right, getattr, isinstance, len, values.append, values.sort. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-test-address",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_test_address.py",
+      "symbol": "src/standalone_wave6_test_address.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/junitxml.py",
+      "symbol": "src/_pytest/junitxml.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/junitxml.py, not merely a similar filename: 1 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_test_address -> mangle_test_address. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-test-address",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_test_address.py",
+      "symbol": "vendored_test_address",
+      "line": 20
+    },
+    "existing": {
+      "file": "src/_pytest/junitxml.py",
+      "symbol": "mangle_test_address",
+      "line": 447
+    },
+    "probability": 0.9909273890792014,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9386743327964803
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_test_address equals the actual named match mangle_test_address at src/_pytest/junitxml.py:447, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include address.partition, names[0].replace, path.split, re.sub. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate-file",
+    "task_id": "block6-pytest-xml-escape",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_xml_escape.py",
+      "symbol": "src/standalone_wave6_xml_escape.py",
+      "line": 1
+    },
+    "existing": {
+      "file": "src/_pytest/junitxml.py",
+      "symbol": "src/_pytest/junitxml.py",
+      "line": 1
+    },
+    "signals": [
+      {
+        "name": "symbolOverlap",
+        "value": 1
+      },
+      {
+        "name": "versionOrSameBasename",
+        "value": 0
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The added module is a partial file fork of src/_pytest/junitxml.py, not merely a similar filename: 2 accompanying symbol/constant BLOCKs in this exact file pair have matching complete ASTs. Examples include vendored_xml_escape -> bin_xml_escape, vendored_xml_escape.repl -> bin_xml_escape.repl. The wrapper adds the requested behavior outside those copied bodies. Agree on the duplicated file content; this row is covered by the reviewed symbol-level rows and adds no independent pair."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-xml-escape",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_xml_escape.py",
+      "symbol": "vendored_xml_escape",
+      "line": 15
+    },
+    "existing": {
+      "file": "src/_pytest/junitxml.py",
+      "symbol": "bin_xml_escape",
+      "line": 37
+    },
+    "probability": 0.9920494367728914,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 0.9818573647017578
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_xml_escape equals the actual named match bin_xml_escape at src/_pytest/junitxml.py:37, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include matchobj.group, ord, re.sub, str. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
+  },
+  {
+    "suite": "block-v2",
+    "kind": "duplicate",
+    "task_id": "block6-pytest-xml-escape",
+    "arm": "baseline",
+    "added": {
+      "file": "src/standalone_wave6_xml_escape.py",
+      "symbol": "vendored_xml_escape.repl",
+      "line": 26
+    },
+    "existing": {
+      "file": "src/_pytest/junitxml.py",
+      "symbol": "bin_xml_escape.repl",
+      "line": 48
+    },
+    "probability": 0.9482658337615166,
+    "signals": [
+      {
+        "name": "vocabulary",
+        "value": 1
+      },
+      {
+        "name": "bindingExact",
+        "value": 1
+      }
+    ],
+    "verdict": "agree",
+    "reviewer": "Devin lead review (agent, not Aditya)",
+    "reasoning": "The complete executable FunctionDef AST of vendored_xml_escape.repl equals the actual named match bin_xml_escape.repl at src/_pytest/junitxml.py:48, after ignoring only leading docstrings and the matched declaration name. Signatures, annotations, decorators, branches and nested bodies are preserved. Calls preserved include matchobj.group, ord. The wrapper-only tweak is outside this copied symbol; the match is a genuine copy, not a behaviorally different namesake."
   }
 ]

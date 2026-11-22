@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-click-strict-corrected-stream",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "eeb1a739cc90b4399cda836a7832038f84607aba",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/strict_corrected_stream.py",
+          "symbol": "src/click/strict_corrected_stream.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "src/click/_compat.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/strict_corrected_stream.py and update its 1 caller to use src/click/_compat.py."
+      },
+      {
+        "id": "0d232bbd346c9750edc9271638aba0f9f6ca2b88",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/strict_corrected_stream.py",
+          "symbol": "strict_corrected_stream",
+          "line": 10
+        },
+        "existing": {
+          "file": "src/click/_compat.py",
+          "symbol": "_force_correct_text_reader",
+          "line": 284
+        },
+        "probability": 0.7797384635200467,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6430750125339234
+          },
+          {
+            "name": "paramCount",
+            "value": 0.5714285714285714
+          }
+        ],
+        "fix": "Duplicate of _force_correct_text_reader: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

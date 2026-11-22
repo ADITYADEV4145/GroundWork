@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-probe-without-help",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/probe_without_help.py b/src/click/probe_without_help.py\nnew file mode 100644\nindex 0000000..0a7a4d6\n--- /dev/null\n+++ b/src/click/probe_without_help.py\n@@ -0,0 +1,21 @@\n+from __future__ import annotations\n+\n+from .core import Command\n+from .core import Context\n+from .core import Option\n+\n+\n+class ProbeWithoutHelp(Command):\n+    def get_help_option(self, ctx: Context) -> Option | None:\n+        \"\"\"Returns the help option object.\n+\n+        Skipped if :attr:`add_help_option` is ``False`` or during resilient\n+        parsing.\n+\n+        .. versionchanged:: 8.1.8\n+            The help option is now cached to avoid creating it multiple times.\n+        \"\"\"\n+        if ctx.resilient_parsing:\n+            return None\n+\n+        return super().get_help_option(ctx)\n",
+  "decisions": [],
+  "notes": "Added src/click/probe_without_help.py with ProbeWithoutHelp(Command); its get_help_option returns None immediately when ctx.resilient_parsing is true, then delegates to super().get_help_option(ctx), preserving the base caching/behavior, signature, and the super() parent-call target. No existing modules were modified.\nAgent-reported tests_run (not independently verified): \"pip install -e . && python -m pytest tests -q: 900 passed, 21 skipped, 1 xfailed; plus a manual sanity script asserting resilient_parsing short-circuits to None, help option is created/cached otherwise, and add_help_option=False returns None \\u2014 all passed.\"",
+  "session_id": "",
+  "acus": null
+}

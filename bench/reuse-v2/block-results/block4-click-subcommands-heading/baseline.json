@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-subcommands-heading",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "f738bb325d7de32a9b3022146d650dbe758ddd98",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/subcommands_heading.py",
+          "symbol": "src/click/subcommands_heading.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "src/click/core.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/subcommands_heading.py; use src/click/core.py instead."
+      },
+      {
+        "id": "5287ee8c00016a5acc1553a3f539cb0c5a864fa1",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/subcommands_heading.py",
+          "symbol": "SubcommandsHeading",
+          "line": 10
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Context.make_formatter",
+          "line": 557
+        },
+        "probability": 0.40399711400599453,
+        "signals": [
+          {
+            "name": "paramCount",
+            "value": 1
+          },
+          {
+            "name": "vocabulary",
+            "value": 0.27347744099601473
+          }
+        ],
+        "fix": "Duplicate of Context.make_formatter: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "9b37a9781d4418654e758ae3ff92d0e0f14c0b9d",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/subcommands_heading.py",
+          "symbol": "SubcommandsHeading.format_commands",
+          "line": 15
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Group.format_commands",
+          "line": 1754
+        },
+        "probability": 0.6896875381491337,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Group.format_commands: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

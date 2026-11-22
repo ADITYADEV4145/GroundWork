@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block3-click-usage-option",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "550e1030506de66d348c36fee331231001fdef9b",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/usage_option.py",
+          "symbol": "src/click/usage_option.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "src/click/decorators.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/usage_option.py and update its 5 callers to use src/click/decorators.py."
+      },
+      {
+        "id": "4d65d607a329412511dd616ef958b65849cd8c73",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/usage_option.py",
+          "symbol": "usage_option",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "help_option",
+          "line": 527
+        },
+        "probability": 0.7797618552540597,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.8802388444339161
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of help_option: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "c897d3dc992049e65b949b23d853477753d99b77",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/click/usage_option.py",
+          "symbol": "usage_option.show_usage",
+          "line": 23
+        },
+        "existing": {
+          "file": "src/click/decorators.py",
+          "symbol": "help_option.show_help",
+          "line": 536
+        },
+        "probability": 0.9943683369706037,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.9743189873070984
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of help_option.show_help: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "task_id": "block4-click-executable-path-metadata",
+  "arm": "baseline",
+  "patch": "diff --git a/src/click/executable_path_metadata.py b/src/click/executable_path_metadata.py\nnew file mode 100644\nindex 0000000..2d9c0a4\n--- /dev/null\n+++ b/src/click/executable_path_metadata.py\n@@ -0,0 +1,22 @@\n+from __future__ import annotations\n+\n+import typing as t\n+\n+from .types import Path\n+\n+\n+class ExecutablePathMetadata(Path):\n+    \"\"\"A path type that includes its executable check in its metadata.\"\"\"\n+\n+    def to_info_dict(self) -> dict[str, t.Any]:\n+        info_dict = super(Path, self).to_info_dict()\n+        info_dict.update(\n+            exists=self.exists,\n+            file_okay=self.file_okay,\n+            dir_okay=self.dir_okay,\n+            writable=self.writable,\n+            readable=self.readable,\n+            allow_dash=self.allow_dash,\n+            executable=self.executable,\n+        )\n+        return info_dict\n",
+  "decisions": [],
+  "notes": "Added ExecutablePathMetadata in a new module without touching existing files. The override keeps the original signature and parent lookup and appends the executable flag.\nAgent-reported tests_run (not independently verified): \"PYTHONPATH=src .tox/task/bin/python -m pytest -q --basetemp=.tox/task-pytest -o cache_dir=.tox/task-pytest-cache: 900 passed, 21 skipped, 1 xfailed; PYTHONPATH=src python3 (signature, metadata, and parent-lookup smoke check), Ruff check and format --check on the new file, and git diff --cached --check passed.\"",
+  "session_id": "",
+  "acus": null
+}

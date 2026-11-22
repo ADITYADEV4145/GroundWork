@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-semicolon-boolean-states",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "aa0a40e0dcf115fe66613f97eff511b8a1f03141",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/semicolon_boolean_states.py",
+          "symbol": "src/click/semicolon_boolean_states.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "src/click/types.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/semicolon_boolean_states.py and update its 3 callers to use src/click/types.py."
+      },
+      {
+        "id": "29aa1ad3fc6a1f7d8726a6c57dafae6f6a9af2e1",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/semicolon_boolean_states.py",
+          "symbol": "SemicolonBooleanStates",
+          "line": 13
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "BoolParamType",
+          "line": 661
+        },
+        "probability": 0.6708286196908425,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.7115981921522708
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of BoolParamType: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "21e0df4f42edf5cb3a8d201c826cdece91b7baac",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/semicolon_boolean_states.py",
+          "symbol": "SemicolonBooleanStates.convert",
+          "line": 18
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "BoolParamType.convert",
+          "line": 712
+        },
+        "probability": 0.7115942350402332,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of BoolParamType.convert: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

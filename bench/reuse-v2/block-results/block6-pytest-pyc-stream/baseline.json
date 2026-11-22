@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-pytest-pyc-stream",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "8b9e981b8a1ad1671e9164b5f24985789af98db8",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pyc_stream.py",
+          "symbol": "src/standalone_wave6_pyc_stream.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/assertion/rewrite.py",
+          "symbol": "src/_pytest/assertion/rewrite.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_pyc_stream.py and update its 1 caller to use src/_pytest/assertion/rewrite.py."
+      },
+      {
+        "id": "679b5ea9a9d9b7a5892cdad507239ab2cd99bfd8",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_pyc_stream.py",
+          "symbol": "vendored_pyc_stream",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/_pytest/assertion/rewrite.py",
+          "symbol": "_write_pyc_fp",
+          "line": 309
+        },
+        "probability": 0.995286626250411,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.963349916437264
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of _write_pyc_fp: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

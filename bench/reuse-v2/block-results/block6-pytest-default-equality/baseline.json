@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block6-pytest-default-equality",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "BLOCK",
+    "findings": [
+      {
+        "id": "c6b7f36bbf1d2fa77d9bf048c2221cb3183b63e4",
+        "kind": "duplicate-file",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_default_equality.py",
+          "symbol": "src/standalone_wave6_default_equality.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/_pytest/assertion/util.py",
+          "symbol": "src/_pytest/assertion/util.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_wave6_default_equality.py and update its 8 callers to use src/_pytest/assertion/util.py."
+      },
+      {
+        "id": "b36a0161a2596ad61b0550499a05795f70a4d527",
+        "kind": "duplicate",
+        "severity": "BLOCK",
+        "added": {
+          "file": "src/standalone_wave6_default_equality.py",
+          "symbol": "vendored_default_equality",
+          "line": 19
+        },
+        "existing": {
+          "file": "src/_pytest/assertion/util.py",
+          "symbol": "has_default_eq",
+          "line": 157
+        },
+        "probability": 0.9852417512787134,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.976303192506995
+          },
+          {
+            "name": "bindingExact",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of has_default_eq: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

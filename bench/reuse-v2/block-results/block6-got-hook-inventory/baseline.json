@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "hard-negative",
+  "task_id": "block6-got-hook-inventory",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "1b46503b6fc109012f1ddd3b6b6246f483384380",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "source/standalone/wave6-hook-inventory.ts",
+          "symbol": "source/standalone/wave6-hook-inventory.ts",
+          "line": 1
+        },
+        "existing": {
+          "file": "source/core/options.ts",
+          "symbol": "source/core/options.ts",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete source/standalone/wave6-hook-inventory.ts and update its 14 callers to use source/core/options.ts."
+      },
+      {
+        "id": "3f9decc18a39f67baa5c164d1aacabce270f289a",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "source/standalone/wave6-hook-inventory.ts",
+          "symbol": "vendored_hook_inventory_variant",
+          "line": 18
+        },
+        "existing": {
+          "file": "source/core/options.ts",
+          "symbol": "init",
+          "line": 962
+        },
+        "probability": 0.6183835678759103,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.6205767225607437
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6666666666666667
+          }
+        ],
+        "fix": "Duplicate of init: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

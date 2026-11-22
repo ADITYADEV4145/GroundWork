@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-five-option-suggestions",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "db2d3efd54d8d677ff3e3eb5400ec2ad997924bd",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/five_option_suggestions.py",
+          "symbol": "FiveOptionSuggestions._match_long_opt",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/click/parser.py",
+          "symbol": "_OptionParser._process_opts",
+          "line": 469
+        },
+        "probability": 0.7868056048717785,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.676394280097077
+          },
+          {
+            "name": "paramCount",
+            "value": 0.6666666666666667
+          }
+        ],
+        "fix": "Duplicate of _OptionParser._process_opts: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

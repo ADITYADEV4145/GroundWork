@@ -2,7 +2,7 @@
 
 | Arm | n | Duplicates / labeled | Duplicate rate (Wilson 95%) | Task success (Wilson 95%) | Mean ACUs (n) | GW BLOCK / WARN | GW unavailable |
 | --- | ---: | ---: | --- | --- | --- | ---: | ---: |
-| baseline | 20 | 14/20 | 70.0% [48.1%, 85.5%] | 17/20: 85.0% [64.0%, 94.8%] | n/a (0) | 0 / 24 | 0 |
+| baseline | 20 | 14/20 | 70.0% [48.1%, 85.5%] | 17/20: 85.0% [64.0%, 94.8%] | n/a (0) | 0 / 23 | 0 |
 | groundwork | 20 | 0/20 | 0.0% [0.0%, 16.1%] | 17/20: 85.0% [64.0%, 94.8%] | n/a (0) | 0 / 0 | 0 |
 
 Reviewed label overrides: baseline 20/20; groundwork 20/20. See labels.jsonl for attribution; agent review is not independent human review.

@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-tab-zsh-record",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "4002668c4878e340c86c470ee24cff2fce198494",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/tab_zsh_record.py",
+          "symbol": "TabZshRecord.format_completion",
+          "line": 10
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "ZshComplete.format_completion",
+          "line": 381
+        },
+        "probability": 0.6697915486360578,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 1
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of ZshComplete.format_completion: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

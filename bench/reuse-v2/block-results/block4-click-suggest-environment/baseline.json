@@ -1,0 +1,48 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-suggest-environment",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "a04fa4eb71df13cccc9b30b0f3cf1000c4e7b35d",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/suggest_environment.py",
+          "symbol": "SuggestEnvironment._main_shell_completion",
+          "line": 16
+        },
+        "existing": {
+          "file": "src/click/shell_completion.py",
+          "symbol": "ShellComplete",
+          "line": 200
+        },
+        "probability": 0.48520117004279195,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.5384072140349472
+          },
+          {
+            "name": "paramCount",
+            "value": 0.75
+          }
+        ],
+        "fix": "Duplicate of ShellComplete: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

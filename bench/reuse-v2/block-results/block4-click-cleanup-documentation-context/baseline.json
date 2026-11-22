@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-cleanup-documentation-context",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "22517236d0b1b242103910cc1a5bdb42139c1509",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/cleanup_documentation_context.py",
+          "symbol": "src/click/cleanup_documentation_context.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "src/click/types.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/cleanup_documentation_context.py; use src/click/types.py instead."
+      },
+      {
+        "id": "679327fef92d64736e775ddcbcb31718b2bb9a2c",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/cleanup_documentation_context.py",
+          "symbol": "CleanupDocumentationContext",
+          "line": 9
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "File.to_info_dict",
+          "line": 801
+        },
+        "probability": 0.5950781398491655,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.45988163841759994
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of File.to_info_dict: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "86828e357520872bdcbfd66c89b45b344a012d0a",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/cleanup_documentation_context.py",
+          "symbol": "CleanupDocumentationContext.to_info_dict",
+          "line": 12
+        },
+        "existing": {
+          "file": "src/click/types.py",
+          "symbol": "FuncParamType",
+          "line": 171
+        },
+        "probability": 0.5886039312207848,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.4266693157947787
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of FuncParamType: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

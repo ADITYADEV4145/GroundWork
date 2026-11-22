@@ -1,0 +1,74 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block5-click-none-padded-rows",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "5e402133885bc31707f61e07740516c4a3c2693e",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_none_padded_rows.py",
+          "symbol": "src/standalone_none_padded_rows.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/formatting.py",
+          "symbol": "src/click/formatting.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/standalone_none_padded_rows.py; use src/click/formatting.py instead."
+      },
+      {
+        "id": "cf20ed4d4df5d5d627e50455e1f3a9640ec7d004",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/standalone_none_padded_rows.py",
+          "symbol": "iter_none_padded_rows",
+          "line": 10
+        },
+        "existing": {
+          "file": "src/click/formatting.py",
+          "symbol": "iter_rows",
+          "line": 24
+        },
+        "probability": 0.5064761830612515,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.7406453371752789
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of iter_rows: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "suite": "block-v2",
+  "task_kind": "clone-prone",
+  "task_id": "block4-click-explicit-null-option",
+  "arm": "baseline",
+  "session_id": "",
+  "acus": null,
+  "status": "scored",
+  "success": null,
+  "acceptance": null,
+  "check": {
+    "status": "WARN",
+    "findings": [
+      {
+        "id": "d29026ed50d23ce8cf7a569335c6b07484e218d4",
+        "kind": "duplicate-file",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/explicit_null_option.py",
+          "symbol": "src/click/explicit_null_option.py",
+          "line": 1
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "src/click/core.py",
+          "line": 1
+        },
+        "signals": [
+          {
+            "name": "symbolOverlap",
+            "value": 1
+          },
+          {
+            "name": "versionOrSameBasename",
+            "value": 0
+          }
+        ],
+        "fix": "Delete src/click/explicit_null_option.py; use src/click/core.py instead."
+      },
+      {
+        "id": "f55234b7731c05dbd52879b1e3b66abfac12e0fc",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/explicit_null_option.py",
+          "symbol": "ExplicitNullOption",
+          "line": 11
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "ParameterSource",
+          "line": 142
+        },
+        "probability": 0.5656969134773765,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.3921713323507487
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of ParameterSource: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      },
+      {
+        "id": "cf4a0b424754e5d791433862a78df52a3baec89f",
+        "kind": "duplicate",
+        "severity": "WARN",
+        "added": {
+          "file": "src/click/explicit_null_option.py",
+          "symbol": "ExplicitNullOption.consume_value",
+          "line": 18
+        },
+        "existing": {
+          "file": "src/click/core.py",
+          "symbol": "Parameter.consume_value",
+          "line": 2268
+        },
+        "probability": 0.6474647784242198,
+        "signals": [
+          {
+            "name": "vocabulary",
+            "value": 0.984769259298098
+          },
+          {
+            "name": "paramCount",
+            "value": 1
+          }
+        ],
+        "fix": "Duplicate of Parameter.consume_value: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations."
+      }
+    ]
+  },
+  "reuse": {
+    "label": "unknown",
+    "reason": "Check-only suite; no reuse label or acceptance evaluation",
+    "source": "automated"
+  }
+}

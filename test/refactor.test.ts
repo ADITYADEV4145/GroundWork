@@ -95,6 +95,7 @@ describe('guarded symbol refactoring', () => {
     await expect(refactor({ symbol: 'calc', name: 'next' })).rejects.toThrow('Ambiguous');
     await expect(refactor({ symbol: 'first.ts:calc', body: '{ return 4; } export const injected = 3;' })).rejects.toThrow('exactly one function body');
     await expect(refactor({ symbol: 'first.ts:calc', body: '{ return "bad"; }' })).rejects.toThrow('caller.ts');
+    await expect(refactor({ symbol: 'first.ts:calc', body: '{ return z; }' })).rejects.toThrow(/TS2304/);
     await expect(refactor({ symbol: 'target', name: 'next' })).rejects.toThrow('No exact indexed symbol');
     expect(read('first.ts')).toBe('export function calc() { return 4; }\n');
   });

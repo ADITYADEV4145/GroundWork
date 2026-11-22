@@ -10,6 +10,8 @@ import { sha1 } from '../util/hash.js';
 import { readRepoFile, repoRelative } from '../util/repo-file.js';
 
 const scripts = /\.[cm]?[jt]sx?$/i;
+const compilerPath = (file: string) => path.resolve(file).split(path.sep).join('/');
+const fileKey = (file: string) => ts.sys.useCaseSensitiveFileNames ? compilerPath(file) : compilerPath(file).toLowerCase();
 export const MAX_BODY = 32_768;
 export const MAX_SITES = 1_000;
 
@@ -55,17 +57,17 @@ function resolve(ctx: ToolContext, ref: string): SymbolFact {
 }
 
 function projectConfig(root: string, absolute: string): string | undefined {
-  for (let dir = path.dirname(absolute); ; dir = path.dirname(dir)) {
+  for (let dir = path.dirname(path.resolve(absolute)); ; dir = path.dirname(dir)) {
     for (const name of ['tsconfig.json', 'jsconfig.json']) {
       const file = path.join(dir, name);
       if (existsSync(file)) return file;
     }
-    if (dir === root || path.dirname(dir) === dir) return undefined;
+    if (fileKey(dir) === fileKey(root) || path.dirname(dir) === dir) return undefined;
   }
 }
 
 function project(ctx: ToolContext, file: string) {
-  const absolute = path.join(ctx.root, file);
+  const absolute = compilerPath(path.join(ctx.root, file));
   const configFile = projectConfig(ctx.root, absolute);
   const files = discoverFiles(ctx.root, { ...ctx.config, index: { ...ctx.config.index, include: [], exclude: [] } })
     .filter((p) => scripts.test(p));
@@ -93,14 +95,15 @@ function project(ctx: ToolContext, file: string) {
   const host: ts.LanguageServiceHost = {
     getCompilationSettings: () => options,
     getScriptFileNames: () => roots,
-    getScriptVersion: (f) => changed.has(f) ? '1' : '0',
+    getScriptVersion: (f) => changed.has(fileKey(f)) ? '1' : '0',
     getScriptSnapshot(f) {
-      if (changed.has(f)) return ts.ScriptSnapshot.fromString(changed.get(f)!);
-      if (!snapshots.has(f)) {
+      const key = fileKey(f);
+      if (changed.has(key)) return ts.ScriptSnapshot.fromString(changed.get(key)!);
+      if (!snapshots.has(key)) {
         const text = ts.sys.readFile(f);
-        snapshots.set(f, text === undefined ? undefined : ts.ScriptSnapshot.fromString(text));
+        snapshots.set(key, text === undefined ? undefined : ts.ScriptSnapshot.fromString(text));
       }
-      return snapshots.get(f);
+      return snapshots.get(key);
     },
     getCurrentDirectory: () => ctx.root,
     getProjectReferences: () => references,
@@ -144,12 +147,12 @@ function locate(source: ts.SourceFile, fact: SymbolFact): Declaration {
   return hits[0]!;
 }
 
-const key = (file: string, start: number) => `${file}\0${start}`;
+const key = (file: string, start: number) => `${fileKey(file)}\0${start}`;
 const errorText = (diagnostic: ts.Diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ');
 
 function compilerErrors(service: ts.LanguageService, root: string): ts.Diagnostic[] {
   const files = service.getProgram()!.getSourceFiles().filter((s) =>
-    repoRelative(root, s.fileName) && !s.fileName.split(path.sep).includes('node_modules'));
+    repoRelative(root, s.fileName) && !compilerPath(s.fileName).split('/').includes('node_modules'));
   return files.flatMap((f) => [...service.getSyntacticDiagnostics(f.fileName), ...service.getSemanticDiagnostics(f.fileName)])
     .filter((d) => d.category === ts.DiagnosticCategory.Error);
 }
@@ -165,11 +168,11 @@ function originalPosition(edits: TextEdit[], start: number): number {
 }
 
 function assertNoNewErrors(ctx: ToolContext, service: ts.LanguageService, before: ts.Diagnostic[], edits: FileEdit[]) {
-  const byFile = new Map(edits.map((f) => [path.join(ctx.root, f.file), f.edits]));
-  const signature = (d: ts.Diagnostic, start = d.start ?? -1) => `${d.file?.fileName}\0${start}\0${d.code}\0${errorText(d)}`;
+  const byFile = new Map(edits.map((f) => [fileKey(path.join(ctx.root, f.file)), f.edits]));
+  const signature = (d: ts.Diagnostic, start = d.start ?? -1) => `${d.file ? key(d.file.fileName, start) : start}\0${d.code}\0${errorText(d)}`;
   const baseline = new Set(before.map((d) => signature(d)));
   for (const d of compilerErrors(service, ctx.root)) {
-    const changes = byFile.get(d.file?.fileName ?? '');
+    const changes = d.file && byFile.get(fileKey(d.file.fileName));
     const start = changes && d.start !== undefined ? originalPosition(changes, d.start) : d.start;
     if (baseline.has(signature(d, start))) continue;
     const line = d.file && d.start !== undefined ? d.file.getLineAndCharacterOfPosition(d.start).line + 1 : 1;
@@ -242,7 +245,7 @@ export function planEdits(ctx: ToolContext, request: RefactorRequest): { edits: 
       if (after === before) throw new Error('No changes.');
       return { file, before, after, edits: ordered };
     });
-    for (const f of edits) changed.set(path.join(ctx.root, f.file), f.after);
+    for (const f of edits) changed.set(fileKey(path.join(ctx.root, f.file)), f.after);
     if (rename !== undefined) {
       const renamed = newStart === undefined ? [] : service.findRenameLocations(absolute, newStart, false, false, true) ?? [];
       const actual = new Set(renamed.map((r) => key(r.fileName, r.textSpan.start)));

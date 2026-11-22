@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { GroundworkConfig } from '../config/schema.js';
 import { changedFromGit, type ChangedFile } from '../grounding/ranges.js';
@@ -43,17 +43,9 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
     report.evidenceKnown = evidence.known; report.commandsObserved = evidence.commandsObserved;
     const files = new Map(state.files.map((f) => [f.file, f]));
     const discovered = new Set(discoverFiles(root, options.config));
-    for (const file of discovered) {
-      check(); const indexed = files.get(file);
-      if (!indexed) { reasons.add(`unindexed file: ${file}`); continue; }
-      const text = readFileSync(path.join(root, file), 'utf8');
-      if (sha1(text) !== indexed.hash) reasons.add(`stale index: ${file}`);
-      if (indexed.status !== 'ok') reasons.add(`unparsed file: ${file}`);
-      if (DYNAMIC_TEXT.test(text)) reasons.add(`dynamic references: ${file}`);
-    }
-    for (const file of state.files) if (!discovered.has(file.file)) reasons.add(`stale or excluded index file: ${file.file}`);
-    if (state.calls.some((c) => !c.calleeId || c.confidence === 'name-only')) reasons.add('unresolved or name-only calls exist');
-    if (state.imports.some((i) => !i.target && i.unresolvedReason !== 'external')) reasons.add('unresolved local imports exist');
+    const involved = new Set([...paths].filter((file) => languageForPath(file)));
+    const names = new Set<string>();
+    const unresolvedImports = state.imports.filter((i) => !i.target && i.unresolvedReason !== 'external');
     await initParsers(); check();
     const selected: { symbol: typeof state.symbols[number]; deleted: boolean; signatureChanged: boolean }[] = [];
     for (const file of paths) {
@@ -83,6 +75,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
       if (discovered.has(file) && !files.has(file)) reasons.add(`changed file unindexed: ${file}`);
     }
     const selectedIds = new Set(selected.map((s) => s.symbol.id));
+    for (const { symbol } of selected) names.add(symbol.name.split('.').at(-1)!);
     const virtualFiles = state.files.map((f) => ({ id: f.id, path: f.file, language: languageForPath(f.file) }));
     for (const file of new Set(selected.filter((s) => s.deleted).map((s) => s.symbol.file))) {
       if (!files.has(file)) virtualFiles.push({ id: -(virtualFiles.length + 1), path: file, language: languageForPath(file) });
@@ -109,6 +102,8 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
         const next: typeof frontier = [];
         for (const target of frontier) for (const c of incoming(target)) {
           const caller = c.callerId ? byId.get(c.callerId) : undefined;
+          involved.add(c.file);
+          if (caller) names.add(caller.name.split('.').at(-1)!);
           if (!c.callerId || !selectedIds.has(c.callerId)) callers.set(`${c.file}:${c.line}`, {
             file: c.file, line: c.line, symbol: caller?.qualifiedName ?? '<module>', depth,
             confidence: c.calleeId === target.id ? c.confidence ?? 'unknown' : 'name-only', changedFile: paths.has(c.file), lookedAt: evidence.opened.has(c.file) || paths.has(c.file),
@@ -124,6 +119,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
         const next: string[] = [];
         for (const i of state.imports) if (i.target && importFrontier.includes(i.target) && !reached.has(i.file)) {
           reached.add(i.file); next.push(i.file);
+          involved.add(i.file);
           if (files.get(i.file)?.isTest || isTestPath(i.file)) tests.add(i.file);
         }
         importFrontier = next;
@@ -135,6 +131,17 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
       report.symbols.push({ id: s.id, name: s.qualifiedName, file: s.file, line: s.line, deleted, signatureChanged,
         risk: high ? 'high' : list.length ? 'medium' : 'low', callers: list, tests: [...tests].sort().map(test) });
     }
+    for (const file of involved) {
+      check(); const indexed = files.get(file);
+      if (!indexed) { if (existsSync(path.join(root, file))) reasons.add(`unindexed file: ${file}`); continue; }
+      if (!discovered.has(file)) { reasons.add(`stale or excluded index file: ${file}`); continue; }
+      const text = readFileSync(path.join(root, file), 'utf8');
+      if (sha1(text) !== indexed.hash) reasons.add(`stale index: ${file}`);
+      if (indexed.status !== 'ok') reasons.add(`unparsed file: ${file}`);
+      if (DYNAMIC_TEXT.test(text)) reasons.add(`dynamic references: ${file}`);
+    }
+    if (state.calls.some((c) => (!c.calleeId || c.confidence === 'name-only') && names.has(c.calleeText.split('.').at(-1)!))) reasons.add('unresolved or name-only calls exist');
+    if (unresolvedImports.some((i) => involved.has(i.file))) reasons.add('unresolved local imports exist');
     check();
     report.symbols.sort((a, b) => ({ high: 0, medium: 1, low: 2 }[a.risk] - { high: 0, medium: 1, low: 2 }[b.risk]) || a.file.localeCompare(b.file) || a.line - b.line);
   } catch (error) { reasons.add((error as Error).message); }

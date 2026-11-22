@@ -19,6 +19,21 @@ describe('impact preregistered harness', () => {
     } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 
+  it('freezes sixteen v2 mutations on new symbols and validates the separate hash', () => {
+    const v1 = registeredTasks().manifest;
+    const v2 = registeredTasks(undefined, 2).manifest;
+    expect(v2.version).toBe(2); expect(v2.tasks).toHaveLength(16);
+    for (const task of v2.tasks) expect(v1.tasks.some((old) => old.repo === task.repo && old.name === task.name)).toBe(false);
+    const dir = mkdtempSync(path.join(os.tmpdir(), 'gw-impact-v2-registration-'));
+    try {
+      writeFileSync(path.join(dir, 'PREREGISTRATION-v2.md'), readFileSync('bench/impact/PREREGISTRATION-v2.md'));
+      writeFileSync(path.join(dir, 'tasks-v2.json'), readFileSync('bench/impact/tasks-v2.json'));
+      expect(registeredTasks(dir, 2).sha256).toBe(registeredTasks(undefined, 2).sha256);
+      writeFileSync(path.join(dir, 'tasks-v2.json'), '{}\n');
+      expect(() => registeredTasks(dir, 2)).toThrow('SHA256 differs');
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
   it('computes static test import reachability independently and retains empty/error cases', () => {
     const root = mkdtempSync(path.join(os.tmpdir(), 'gw-impact-oracle-'));
     try {

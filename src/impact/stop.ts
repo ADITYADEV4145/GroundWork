@@ -17,7 +17,7 @@ export const impactStop: HookHandler = {
         const compiled = new URL('../impact/worker.js', import.meta.url);
         const source = new URL('../impact/worker.ts', import.meta.url);
         const js = existsSync(fileURLToPath(compiled));
-        const worker = fork(fileURLToPath(js ? compiled : source), [], { execArgv: js ? [] : ['--import', 'tsx'], stdio: ['ignore', 'ignore', 'ignore', 'ipc'] });
+        const worker = fork(fileURLToPath(js ? compiled : source), [], { execArgv: js ? [] : ['--import', 'tsx'], ...(js ? {} : { cwd: fileURLToPath(new URL('../..', import.meta.url)) }), stdio: ['ignore', 'ignore', 'ignore', 'ipc'] });
         const timer = setTimeout(() => { worker.kill(); reject(new Error('impact hook timeout')); }, config.impact.timeoutMs);
         worker.once('message', (value: ImpactReport & { error?: string }) => {
           clearTimeout(timer); worker.kill();

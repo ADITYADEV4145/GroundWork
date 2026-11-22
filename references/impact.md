@@ -22,10 +22,12 @@ are suggested only when pytest/vitest/jest can be inferred.
 
 `complete: true` means no further lookup changes the indexed static answer **for
 this snapshot and scope**, not that all runtime dependencies are known. It requires
-hash-fresh discovered/indexed files, parsed current/base files, no dynamic signals,
-no unresolved/name-only calls or local imports, no ambiguous declarations, and no
-truncated caller/import frontier. These checks are conservative across the indexed
-repository, so unrelated ambiguity can keep the flag false. A new edit invalidates
+hash-fresh parsed changed/reached caller/test files, parsed base files, no dynamic
+signals in involved files, no unresolved/name-only calls whose terminal names match
+selected symbols or traversed callers, no unresolved local imports in reached files,
+no ambiguous declarations, and no truncated caller/import frontier. Import
+intermediaries are also reached files. Unrelated ambiguity does not invalidate an
+impact answer; matching-name ambiguity anywhere in the indexed scope does. A new edit invalidates
 the answer. Budget-truncated text reports complete:false; JSON retains the full
 graph report. Missing index coverage and timeouts are listed as incomplete reasons.
 

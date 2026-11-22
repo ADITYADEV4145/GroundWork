@@ -20,12 +20,13 @@ interface Task { id: string; repo: string; file: string; name: string; operator:
 interface Manifest { version: number; sourceCommit: string; tasks: Task[] }
 interface Diagnostic { file: string; line: number; code: string | number; message: string }
 interface Row { task: Task; expectedCallers: string[]; expectedTests: string[]; listedCallers: string[]; listedTests: string[]; missingCallers: string[]; missingTests: string[]; falsePositiveCallers: string[]; baseline: Diagnostic[]; diagnostics: Diagnostic[]; newErrors: Diagnostic[]; impact: ImpactReport | null; highRisk: boolean; errors: string[]; ms: number; oracleMs: number }
-export function registeredTasks(directory = data): { manifest: Manifest; sha256: string } {
-  const expected = /Manifest SHA256: `([a-f0-9]{64})`/.exec(readFileSync(path.join(directory, 'PREREGISTRATION.md'), 'utf8'))?.[1];
-  const bytes = readFileSync(path.join(directory, 'tasks.json'));
+export function registeredTasks(directory = data, version: 1 | 2 = 1): { manifest: Manifest; sha256: string } {
+  const suffix = version === 2 ? '-v2' : '';
+  const expected = /Manifest SHA256: `([a-f0-9]{64})`/.exec(readFileSync(path.join(directory, `PREREGISTRATION${suffix}.md`), 'utf8'))?.[1];
+  const bytes = readFileSync(path.join(directory, `tasks${suffix}.json`));
   if (!expected || hash(bytes) !== expected) throw new Error('Refusing impact benchmark: task manifest SHA256 differs');
   const manifest = JSON.parse(bytes.toString()) as Manifest;
-  if (manifest.version !== 1 || manifest.tasks.length !== 16) throw new Error('Invalid registered impact tasks');
+  if (manifest.version !== version || manifest.tasks.length !== 16) throw new Error('Invalid registered impact tasks');
   return { manifest, sha256: expected };
 }
 const testPath = (file: string) => /(^|\/)(__tests__|tests?)(\/|$)|\.(test|spec)\.[^.]+$|(^|\/)test_[^/]*\.py$|_test\.py$/.test(file);
@@ -97,9 +98,9 @@ export function summarize(rows: Row[]) {
   return { status: !coverage ? 'INCOMPLETE' : Object.values(rules).every(Boolean) ? 'PASS' : 'FAIL', coverage, callerRecall, callersFound, expectedCallers, highRiskPrecision, highRiskCorrect: accurateHighs.length, highRiskPredictions: highs.length, testRecall, testsFound, expectedTests, completeAccuracy, accurateCompletes: accurateCompletes.length, completeAnswers: completes.length, p50: percentile(rows.map((r) => r.ms), .5), p95: percentile(rows.map((r) => r.ms), .95), gwP95, rules };
 }
 
-function markdown(result: { manifestSha256: string; checkerCommit: string; rows: Row[]; summary: ReturnType<typeof summarize>; environment: object }) {
+function markdown(result: { version: 1 | 2; manifestSha256: string; checkerCommit: string; rows: Row[]; summary: ReturnType<typeof summarize>; environment: object }) {
   const s = result.summary, rate = (value: number | null) => value === null ? 'undefined' : (value * 100).toFixed(2) + '%';
-  const out = ['# Change-impact gate results', '', '**Deterministic tool-level evaluation, NOT an agent run. The actual agent gate is pending and was NOT run.**', '', `Manifest SHA256: \`${result.manifestSha256}\`. Checker commit: \`${result.checkerCommit}\`.`, '', `## Summary: ${s.status}`, '', '| Metric | Result | Threshold | Rule |', '| --- | --- | --- | --- |',
+  const out = [`# Change-impact gate results${result.version === 2 ? ' v2' : ''}`, '', '**Deterministic tool-level evaluation, NOT an agent run. The actual agent gate is pending and was NOT run.**', '', `Manifest SHA256: \`${result.manifestSha256}\`. Checker commit: \`${result.checkerCommit}\`.`, '', `## Summary: ${s.status}`, '', '| Metric | Result | Threshold | Rule |', '| --- | --- | --- | --- |',
     `| Must-change caller-file recall | ${s.callersFound}/${s.expectedCallers} (${rate(s.callerRecall)}) | >=90% | ${s.rules.callerRecall ? 'PASS' : 'FAIL'} |`,
     `| High-risk task precision | ${s.highRiskCorrect}/${s.highRiskPredictions} (${rate(s.highRiskPrecision)}) | >=90% | ${s.rules.highRiskPrecision ? 'PASS' : 'FAIL'} |`,
     `| Affected-test-file recall | ${s.testsFound}/${s.expectedTests} (${rate(s.testRecall)}) | >=90% | ${s.rules.testRecall ? 'PASS' : 'FAIL'} |`,
@@ -110,11 +111,12 @@ function markdown(result: { manifestSha256: string; checkerCommit: string; rows:
   out.push('', '## Missing caller/test files and completeness reasons', '');
   for (const r of result.rows) out.push(`- **${r.task.id}**: missing callers: ${r.missingCallers.join(', ') || 'none'}; missing tests: ${r.missingTests.join(', ') || 'none'}. Incomplete because: ${r.impact?.incompleteBecause.join('; ') || 'none'}.`);
   out.push('', '## Limitations and deviations', '', '- No post-registration checker fixes after observing results. No tasks removed, no selective reruns or threshold changes.', '- Compiler error files are a must-change proxy, not proof of semantic exhaustiveness. High-risk precision is task-level, not per-symbol calibration. Test oracle uses only static imports within depth two plus compiler errors.', '- complete describes indexed static evidence in one snapshot, not arbitrary dynamic runtime reachability. Zero complete answers is undefined accuracy and fails the registered rule, not a vacuous pass.', '- Timing excludes refresh, oracle and process startup. Stop uses a hard time-boxed worker; this benchmark does not measure total hook dispatch or establish agent behavior.', '- The source anchor predates impact implementation. GroundWork oracle rows may include API/compiler skew against current development dependencies; raw baseline and post-edit diagnostics are retained.', `- Environment: ${JSON.stringify(result.environment)}.`, '- Raw findings, false-positive caller listings, baseline/new diagnostics and timings are in results.json. Agent gate remains pending in ../AGENT-PROTOCOL.md.', '');
+  if (result.version === 2) out.push('V2 preregistered the involved-file/matching-name completeness scope correction and source-worker cwd fix before evaluation; it uses new targets. V1 remains unchanged as FAIL in ../results/. No post-v2-result checker tuning or reruns.', '', 'Completeness is checked against the scoped static/compiler oracle, not arbitrary dynamic reachability. High-risk task precision on signature mutations does not establish precision on negative/no-impact changes.', '');
   return out.join('\n');
 }
 
-export async function runBenchmark() {
-  const { manifest, sha256 } = registeredTasks();
+export async function runBenchmark(version: 1 | 2 = 1) {
+  const { manifest, sha256 } = registeredTasks(data, version);
   git(project, 'merge-base', '--is-ancestor', manifest.sourceCommit, 'HEAD');
   const parent = path.join(os.homedir(), 'work');
   if (!existsSync(parent)) throw new Error('Persistent work parent absent');
@@ -177,8 +179,8 @@ export async function runBenchmark() {
     writeFileSync(path.join(work, 'progress.json'), JSON.stringify(rows, null, 2));
     console.log(`${task.id}: callers ${row.expectedCallers.length - row.missingCallers.length}/${row.expectedCallers.length}; tests ${row.expectedTests.length - row.missingTests.length}/${row.expectedTests.length}; complete=${row.impact?.complete}; ${row.ms} ms`);
   }
-  const result = { manifestSha256: sha256, checkerCommit: git(project, 'rev-parse', 'HEAD'), generatedAt: new Date().toISOString(), environment, work, rows, summary: summarize(rows) };
-  const out = path.join(data, 'results');
+  const result = { version, manifestSha256: sha256, checkerCommit: git(project, 'rev-parse', 'HEAD'), generatedAt: new Date().toISOString(), environment, work, rows, summary: summarize(rows) };
+  const out = path.join(data, version === 2 ? 'results-v2' : 'results');
   if (existsSync(path.join(out, 'results.json'))) {
     const archive = path.join(out, `previous-${Date.now()}`); mkdirSync(archive);
     for (const file of ['results.json', 'RESULTS.md']) cpSync(path.join(out, file), path.join(archive, file));
@@ -191,6 +193,6 @@ export async function runBenchmark() {
 }
 
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
-  try { if ((await runBenchmark()).summary.status !== 'PASS') process.exitCode = 1; }
+  try { if ((await runBenchmark(process.argv.includes('--v2') ? 2 : 1)).summary.status !== 'PASS') process.exitCode = 1; }
   catch (error) { console.error((error as Error).message); process.exitCode = 1; }
 }

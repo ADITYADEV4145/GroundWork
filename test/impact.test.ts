@@ -37,6 +37,25 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('ignores unrelated unresolved calls, imports, unparsed and dynamic files', async () => {
+    const root = fixture();
+    writeFileSync(path.join(root, 'unrelated.ts'), 'import { absent } from "./missing.js";\nexport function unrelated() { Object.assign({}, {}); return unknown.other(); }\n');
+    writeFileSync(path.join(root, 'broken.ts'), 'export function broken( {');
+    git(root, 'add', 'unrelated.ts', 'broken.ts'); git(root, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Unrelated ambiguity');
+    edit(root);
+    const report = await run(root);
+    expect(report.complete).toBe(true); expect(report.incompleteBecause).toEqual([]);
+  });
+
+  it('keeps name-only ambiguity for a traversed caller and unresolved imports in reached files', async () => {
+    const root = fixture(); edit(root);
+    writeFileSync(path.join(root, 'ambiguous.ts'), 'export function other() { return unknown.caller(); }\n');
+    expect((await run(root)).incompleteBecause).toContain('unresolved or name-only calls exist');
+    unlinkSync(path.join(root, 'ambiguous.ts'));
+    writeFileSync(path.join(root, 'caller.ts'), 'import { parse } from "./api.js";\nimport { missing } from "./missing.js";\nexport function caller() { return parse("a"); }\n');
+    expect((await run(root)).incompleteBecause).toContain('unresolved local imports exist');
+  });
+
   it('finds the planted unchanged caller and reaching tests with high risk and complete indexed evidence', async () => {
     const root = fixture(); edit(root);
     const report = await run(root);
@@ -117,5 +136,16 @@ describe('change impact', () => {
       const bad = await changeImpact(db, root, { base: 'does-not-exist', config: c });
       expect(bad.complete).toBe(false); expect(bad.incompleteBecause.length).toBeGreaterThan(0);
     } finally { db.close(); }
+  }, 30000);
+
+  it('resolves the source Stop worker tsx loader from the package when launched outside it', () => {
+    const root = fixture(); edit(root);
+    const script = `import { impactStop } from ${JSON.stringify(new URL('../src/impact/stop.ts', import.meta.url).href)};
+      import { defaultConfig } from ${JSON.stringify(new URL('../src/config/load.ts', import.meta.url).href)};
+      const root = process.cwd(), config = defaultConfig(); config.impact.timeoutMs = 10000;
+      console.log(JSON.stringify(await impactStop.run(${JSON.stringify(stopEvent(root, false, 'foreign-source'))}, { root, config })));`;
+    const result = JSON.parse(execFileSync(process.execPath, ['--import', import.meta.resolve('tsx'), '--input-type=module', '-e', script], { cwd: root, encoding: 'utf8', timeout: 20000 }));
+    expect(result).toMatchObject({ action: 'context' });
+    expect(result.message).toContain('caller.ts:2');
   }, 30000);
 });

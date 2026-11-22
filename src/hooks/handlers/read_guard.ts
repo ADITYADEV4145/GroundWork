@@ -1,5 +1,6 @@
 import { TextDecoder } from 'node:util';
 import * as z from 'zod';
+import { experimentalReadPathsEnabled } from '../../config/sections/navigation.js';
 import { sha1 } from '../../util/hash.js';
 import { log } from '../../util/log.js';
 import { readRepoFile, repoRelative } from '../../util/repo-file.js';
@@ -9,6 +10,7 @@ import type { HookHandler, HookResult } from '../types.js';
 
 const MAX_READ_BYTES = 1_000_000;
 const MAX_HISTORY = 256;
+export const LARGE_READ_MIN_BYTES = 2048;
 const safeId = z.string().regex(/^[A-Za-z0-9_-]{1,128}$/);
 const readInput = z.object({
   file_path: z.string().min(1),
@@ -29,7 +31,7 @@ const range = z.object({ file: z.string(), hash: z.string(), from: z.number(), t
 const read = range.extend({ step: z.number(), estimatedTokens: z.number() });
 const navigationState = z.object({
   reads: z.array(read).default([]),
-  pending: range.optional(),
+  pending: range.extend({ whole: z.boolean().optional() }).optional(),
   lastQuery: z.string().optional(),
   step: z.number().default(0),
   forcedReads: z.number().default(0),
@@ -129,9 +131,12 @@ export const readGuard: HookHandler = {
     let result: HookResult | null = null;
     let eventLog: { name: string; estimatedTokensSaved: number } | undefined;
     let recentQuery: string | undefined;
+    let forced = false;
     update((s) => {
       recentQuery = s.lastQuery;
-      if (s.pending && sameFile(s.pending, requested) && s.pending.from === from && s.pending.to === to) {
+      if (s.pending && sameFile(s.pending, requested) && s.pending.from === from && s.pending.to === to &&
+        (!s.pending.whole || (input.data.offset === undefined && input.data.limit === undefined))) {
+        forced = true;
         eventLog = { name: 'read_guard_forced', estimatedTokensSaved: 0 };
         return { ...s, pending: undefined, forcedReads: s.forcedReads + 1 };
       }
@@ -147,6 +152,20 @@ export const readGuard: HookHandler = {
     });
     if (eventLog) log(root, 'info', eventLog.name, { sessionId: id, file, from, to, estimatedTokensSaved: eventLog.estimatedTokensSaved, method: TOKEN_ESTIMATE_METHOD });
     if (result) return result;
+    if (forced) return null;
+    if (experimentalReadPathsEnabled(config) && input.data.offset === undefined && input.data.limit === undefined && buf.length >= LARGE_READ_MIN_BYTES) {
+      const { largeReadContext } = await import('../large-read.js');
+      const message = await largeReadContext(root, file, buf, config, recentQuery);
+      if (!message) return null;
+      const saved = Math.max(0, estimateTokens(buf.length) - estimateTokens(message));
+      update((s) => {
+        if (s.pending) return s;
+        result = { action: 'deny', message };
+        return { ...s, pending: { ...requested, whole: true }, blockedReads: s.blockedReads + 1, estimatedTokensSaved: s.estimatedTokensSaved + saved };
+      });
+      if (result) log(root, 'info', 'read_guard_compact', { sessionId: id, file, from, to, estimatedTokensSaved: saved, method: TOKEN_ESTIMATE_METHOD });
+      return result;
+    }
     if (input.data.offset === undefined && input.data.limit === undefined && lineCount > config.navigation.readGuard.largeFileLines) {
       return { action: 'context', message: await hint(root, file, lineCount, recentQuery) };
     }

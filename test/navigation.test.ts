@@ -15,6 +15,48 @@ import { initSqlBackend, openDb, sqliteBackendAvailable } from '../src/store/db.
 const config = defaultConfig();
 
 describe('MCP navigation', () => {
+  it('batches outlines under one budget, preserves cursors and reports empty or invalid inputs', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const files = ['src/utils/date.ts', 'src/main.ts', 'missing.ts', '../outside.ts'];
+      const batch = await runNavigationTool('outline', { files }, ctx);
+      expect(batch).toContain('formatDate');
+      expect(batch).toContain('src/main.ts:');
+      expect(batch).toContain('missing.ts: not indexed');
+      expect(batch).toContain('../outside.ts: not indexed');
+      expect(batch).not.toContain('formatDate(d:');
+      expect(Buffer.byteLength(batch)).toBeLessThanOrEqual(1600);
+      expect(await runNavigationTool('outline', {}, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('outline', { file: files[0], files }, ctx)).toContain('exactly one');
+      for (const files of [[], Array(21).fill('a.ts'), ['a'.repeat(901)]]) {
+        await expect(runNavigationTool('outline', { files }, ctx)).rejects.toThrow();
+      }
+      const many = Array(12).fill('src/utils/date.ts');
+      let args: Record<string, unknown> = { files: many, locations_only: false };
+      let count = 0;
+      for (let i = 0; i < 100; i++) {
+        const text = await runNavigationTool('outline', args, ctx);
+        expect(Buffer.byteLength(text)).toBeLessThanOrEqual(1600);
+        count += text.split('\n').filter((line) => line.startsWith('[')).length;
+        if (!text.includes('Next: outline(')) break;
+        const next = JSON.parse(text.split('Next: outline(')[1]!.slice(0, -1));
+        expect(next.offset).toBeGreaterThan(Number(args.offset ?? 0));
+        expect(next.files).toEqual(many);
+        expect(next.locations_only).toBe(false);
+        args = next;
+      }
+      const single = await runNavigationTool('outline', { file: many[0] }, ctx);
+      expect(count).toBe(12 * single.split('\n').filter((line) => line.startsWith('[')).length);
+    });
+    const root = tempDir('gw-empty-outline-');
+    try {
+      writeFileSync(path.join(root, 'empty.ts'), '// no definitions\n');
+      await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try { expect(await runNavigationTool('outline', { files: ['empty.ts'] }, { root, db, config })).toContain('no indexed symbols'); }
+      finally { db.close(); }
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
   it('matches the fixture goldens', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const output = Object.fromEntries(await Promise.all(FIXTURE_NAVIGATION.map(async ([name, args]) => {
@@ -97,6 +139,11 @@ describe('MCP navigation', () => {
         const exact = await runNavigationTool('find_code', { query: 'needle' }, ctx);
         expect(exact).toContain('Exact (2)');
         expect(exact).toContain('Lookalike.needle');
+        expect(await runNavigationTool('find_code', { query: 'needle', include_body: true }, ctx)).toBe(exact);
+        const explored = await runNavigationTool('explore', { symbol: 'needle', limit: 1 }, ctx);
+        const continuation = JSON.parse(/Next: explore\((.+)\)$/.exec(explored)![1]!);
+        expect(continuation.offset).toBe(1);
+        expect(await runNavigationTool('explore', continuation, ctx)).toContain('Lookalike.needle');
         const id = ambiguous.split('\n')[1]!.match(/\[(\w+)\]/)![1]!;
         let args: object = { symbol: id };
         let combined = '';
@@ -126,6 +173,90 @@ describe('MCP navigation', () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+
+  it('batches compact bodies and opts in to a unique exact body without changing default output', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const names = ['formatDate', 'pad'];
+      const batch = await runNavigationTool('read_symbol', { symbols: names }, ctx);
+      expect(batch).toContain('function formatDate');
+      expect(batch).toContain('function pad');
+      const separate = await Promise.all(names.map((symbol) => runNavigationTool('read_symbol', { symbol }, ctx)));
+      expect(Buffer.byteLength(batch)).toBeLessThan(separate.reduce((sum, body) => sum + Buffer.byteLength(body), 0));
+      const body = await runNavigationTool('find_code', { query: 'formatDate', include_body: true }, ctx);
+      expect(body).toContain('function formatDate');
+      expect(body).toContain('d.toISOString()');
+      expect(await runNavigationTool('find_code', { query: 'formatDate', breadth: 'all', include_body: true }, ctx)).toBe(body);
+      expect(await runNavigationTool('find_code', { query: 'formatDate' }, ctx)).not.toContain('d.toISOString()');
+      const query = { query: 'format date', limit: 1 };
+      const fuzzy = await runNavigationTool('find_code', query, ctx);
+      expect(fuzzy).not.toContain('include_body');
+      expect(await runNavigationTool('find_code', { query: 'nonexistentzz', include_body: true }, ctx)).toContain('No indexed matches');
+      expect(await runNavigationTool('read_symbol', {}, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('read_symbol', { symbol: 'pad', symbols: ['pad'] }, ctx)).toContain('exactly one');
+      await expect(runNavigationTool('read_symbol', { symbols: [] }, ctx)).rejects.toThrow();
+      await expect(runNavigationTool('read_symbol', { symbols: Array(21).fill('pad') }, ctx)).rejects.toThrow();
+      const unknown = await runNavigationTool('read_symbol', { symbols: ['notarealnamezz', 'formatDate'] }, ctx);
+      expect(unknown).toContain('No exact symbol match');
+      expect(unknown).toContain('function formatDate');
+      writeFileSync(path.join(root, 'src/utils/date.ts'), 'export function changed() {}');
+      expect(await runNavigationTool('find_code', { query: 'formatDate', include_body: true }, ctx)).toContain('changed after indexing');
+      expect(await runNavigationTool('read_symbol', { symbols: names }, ctx)).toContain('changed after indexing');
+    });
+  });
+
+  it('pages batched bodies and source continuations within a shared budget', async () => {
+    const root = tempDir('gw-nav-batch-');
+    try {
+      const names = Array.from({ length: 8 }, (_, i) => 'large' + i);
+      const literals = Array.from({ length: 90 }, () => `    '${'é😀'.repeat(20)}',`).join('\n');
+      writeFileSync(path.join(root, 'app.ts'), names.map((n) => `export function ${n}() {\n  return [\n${literals}\n  ].join('');\n}`).join('\n'));
+      await initSqlBackend(); await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const ctx = { root, db, config };
+        let args: object = { symbols: names, context_lines: 1 };
+        const seen: string[] = [];
+        for (let i = 0; i < 8; i++) {
+          const output = await runNavigationTool('read_symbol', args, ctx);
+          expect(output).not.toContain('\ufffd');
+          seen.push(...[...output.matchAll(/\] (large\d+) —/g)].map((match) => match[1]!));
+          const next = [...output.matchAll(/Next: read_symbol\(([^\n]+)\)/g)].map((match) => JSON.parse(match[1]!));
+          const source = next.find((a) => a.symbol);
+          expect(source.context_lines).toBe(1);
+          expect(source.offset).toBeGreaterThan(0);
+          expect(await runNavigationTool('read_symbol', source, ctx)).not.toContain('\ufffd');
+          const batch = next.find((a) => a.symbols);
+          if (!batch) break;
+          expect(batch.symbol_offset).toBeGreaterThan(0);
+          args = batch;
+        }
+        expect(seen).toEqual(names);
+        expect(await runNavigationTool('read_symbol', { symbols: names, offset: 1 }, ctx)).toContain('symbol_offset');
+      } finally { db.close(); }
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+
+  it('explores bodies, direct graph locations and files in one bounded payload', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const output = await runNavigationTool('explore', { symbol: 'ApiClient.get' }, ctx);
+      expect(output).toContain("this.request('GET'");
+      expect(output).toContain('callers (');
+      expect(output).toContain('callees (');
+      expect(output).toContain('Files (');
+      expect(output).toContain('ApiClient.request');
+      expect(output).toContain('src/services/api.ts:');
+      expect(output).toContain('call src/services/api.ts:');
+      expect(await runNavigationTool('explore', { query: 'formatDate' }, ctx)).toContain('d.toISOString()');
+      expect(await runNavigationTool('explore', { symbol: 'ApiClient.request' }, ctx)).toContain('unresolved');
+      expect(await runNavigationTool('explore', { query: 'notarealnamezz' }, ctx)).toContain('No indexed definitions');
+      expect(await runNavigationTool('explore', {}, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('explore', { query: 'pad', symbol: 'pad' }, ctx)).toContain('exactly one');
+      writeFileSync(path.join(root, 'src/utils/date.ts'), 'export function changed() {}');
+      expect(await runNavigationTool('explore', { symbol: 'formatDate' }, ctx)).toContain('changed after indexing');
+    });
   });
 
   it('serves the registered tools over stdio and refreshes before the next call', async () => {

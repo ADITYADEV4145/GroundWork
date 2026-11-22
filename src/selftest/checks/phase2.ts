@@ -10,6 +10,7 @@ import { refreshIndex } from '../../index/refresh.js';
 import { indexDbPath } from '../../index/store.js';
 import { initSqlBackend, openDb } from '../../store/db.js';
 import { estimateTokens } from '../../util/tokens.js';
+import { gwPath } from '../../util/paths.js';
 import { tempDir, withIndexedFixture } from '../fixtures.js';
 import type { Check } from '../registry.js';
 
@@ -73,9 +74,15 @@ export const PHASE2_CHECKS: Check[] = [
         await event('post_tool', 1, 20);
         await event('pre_compact');
         const after = await event('pre_tool', 1, 20);
+        const unindexed = await event('pre_tool');
+        writeFileSync(file, 'export function entry() { return 1; }\n' + '// source context\n'.repeat(401));
+        await initSqlBackend(); await refreshIndex(root);
+        const defaultLarge = await event('pre_tool');
+        writeFileSync(gwPath(root, 'config.json'), JSON.stringify({ navigation: { experimentalReadPaths: true } }));
         const large = await event('pre_tool');
-        const observed = [first, repeat, forced, changed, after, large].map((r) => r.action).join(', ');
-        return { ok: observed === 'allow, deny, allow, allow, allow, context', detail: observed };
+        const full = await event('pre_tool');
+        const observed = [first, repeat, forced, changed, after, unindexed, defaultLarge, large, full].map((r) => r.action).join(', ');
+        return { ok: observed === 'allow, deny, allow, allow, allow, context, context, deny, allow', detail: observed };
       } finally {
         rmSync(root, { recursive: true, force: true });
       }

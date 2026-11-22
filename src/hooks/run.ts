@@ -29,7 +29,7 @@ function toolName(agent: AgentName, name: string | undefined): string | null {
   return CURSOR_TOOLS[name] ?? name;
 }
 
-export function normalise(agent: AgentName, event: HookEventName, raw: unknown): HookEvent {
+export function normalise(agent: AgentName, event: HookEventName, raw: unknown, cwdOverride?: string): HookEvent {
   const p = payloadSchema.safeParse(raw);
   const d = p.success ? p.data : {};
   const roots = (raw as { workspace_roots?: unknown } | null)?.workspace_roots;
@@ -38,7 +38,7 @@ export function normalise(agent: AgentName, event: HookEventName, raw: unknown):
     agent,
     event,
     sessionId: d.session_id ?? d.conversation_id ?? null,
-    cwd: d.cwd ?? firstRoot ?? process.env.CURSOR_PROJECT_DIR ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd(),
+    cwd: cwdOverride ?? d.cwd ?? firstRoot ?? process.env.CURSOR_PROJECT_DIR ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd(),
     tool: toolName(agent, d.tool_name),
     input: d.tool_input ?? {},
     response: d.tool_response ?? d.tool_output ?? null,
@@ -124,11 +124,11 @@ async function readStdin(): Promise<string> {
 }
 
 /** Entry point for `gw hook`. Fails open: any error or timeout means "allow" and exit 0. */
-export async function runHook(agent: AgentName, event: HookEventName, timeoutMs = 2000, startup: Record<string, number> = {}): Promise<void> {
+export async function runHook(agent: AgentName, event: HookEventName, timeoutMs = 2000, startup: Record<string, number> = {}, input?: string): Promise<void> {
   for (const [name, ms] of Object.entries(startup)) hookTiming(name, ms);
   let root = process.cwd();
   try {
-    const text = await readStdin();
+    const text = input ?? await readStdin();
     const raw: unknown = text.trim() ? JSON.parse(text) : {};
     const ev = normalise(agent, event, raw);
     root = findRepoRoot(ev.cwd);

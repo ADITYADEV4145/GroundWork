@@ -11,7 +11,7 @@ const source = path.resolve(here, '..');
 const cli = path.join(source, 'dist/cli/main.js');
 const suite = process.env.GW_BENCH_SUITE ?? 'nav';
 if (!/^[a-z][a-z0-9-]*$/.test(suite)) throw new Error('Invalid suite name');
-const { revision, tasks, mcpTools = ['find_code', 'outline', 'read_symbol', 'callers', 'callees', 'where_used', 'repo_map'] } =
+const { revision, tasks, mcpTools = ['find_code', 'outline', 'read_symbol', 'explore', 'callers', 'callees', 'where_used', 'repo_map'] } =
   JSON.parse(readFileSync(path.join(here, suite, 'tasks.json'), 'utf8'));
 const MAX_RESPONSE_BYTES = 8_000;
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));

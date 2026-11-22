@@ -5,7 +5,7 @@ import { readRepoFile, repoRelative } from '../../util/repo-file.js';
 import { estimateTokens, fitToBudget } from '../../util/tokens.js';
 import { defineTool, type GwTool, type ToolContext } from '../registry.js';
 
-export const NAVIGATION_BUDGETS = { find_code: 600, outline: 400, read_symbol: 1200, callers: 600, callees: 600, where_used: 600, repo_map: 1200 } as const;
+export const NAVIGATION_BUDGETS = { find_code: 600, outline: 400, read_symbol: 1200, explore: 1800, callers: 600, callees: 600, where_used: 600, repo_map: 1200 } as const;
 
 const printable = (s: string) => !/[\u0000-\u001f\u007f]/u.test(s) && Buffer.from(s).toString('utf8') === s;
 const text = z.string().trim().min(1).max(256).refine(printable, 'Control characters are not supported');
@@ -61,26 +61,62 @@ const location = (s: NavigationSymbol) => compact(s.file, 160) + ':' + s.line;
 const choice = (s: NavigationSymbol) => `[${s.id}] ${compact(s.name, 70)} (${s.kind}) — ${location(s)}`;
 
 function oneSymbol<T extends { symbol: string; offset: number }>(
-  tool: keyof typeof NAVIGATION_BUDGETS, args: T, ctx: ToolContext,
+  tool: keyof typeof NAVIGATION_BUDGETS, args: T, ctx: ToolContext, budget: number = NAVIGATION_BUDGETS[tool],
 ): NavigationSymbol | string {
   const matches = navigationSymbols(ctx.db, args.symbol);
   if (matches.length === 0) return 'No exact symbol match. Try find_code with the name or a description.';
   if (matches.length === 1) return matches[0]!;
   return page({
     items: matches, title: 'Ambiguous symbol. Retry with a candidate ID in brackets.',
-    start: args.offset, budget: NAVIGATION_BUDGETS[tool], render: choice,
+    start: args.offset, budget, render: choice,
     next: (offset) => call(tool, { ...args, offset }),
   });
 }
 
+export function readSource(args: { symbol: string; context_lines: number; offset: number }, ctx: ToolContext, budget: number = NAVIGATION_BUDGETS.read_symbol, brief = false): string {
+  const s = oneSymbol('read_symbol', args, ctx, budget);
+  if (typeof s === 'string') return s;
+  const loc = sourceLocation(ctx.db, s.id);
+  let raw: Buffer | null;
+  try { raw = readRepoFile(ctx.root, s.file, ctx.config.index.maxFileBytes); }
+  catch { raw = null; }
+  if (!raw || !loc || sha1(raw) !== loc.hash) return 'Source is unavailable or changed after indexing. Retry read_symbol or use a ranged Read.';
+  const source = raw.toString('utf8');
+  let { start, end } = loc;
+  if (args.context_lines) {
+    let newline = start > 0 ? source.lastIndexOf('\n', start - 1) : -1;
+    for (let i = 0; i < args.context_lines && newline >= 0; i++) newline = newline > 0 ? source.lastIndexOf('\n', newline - 1) : -1;
+    start = newline + 1;
+    for (let i = 0; i <= args.context_lines && end < source.length; i++) {
+      const newline = source.indexOf('\n', i === 0 ? end : end + 1);
+      end = newline < 0 ? source.length : newline;
+    }
+  }
+  const snippet = source.slice(start, end);
+  if (args.offset >= snippet.length) return 'No source remains at that offset. To restart, omit offset.';
+  const remainder = snippet.slice(args.offset);
+  const title = brief ? `[${s.id}] ${compact(s.name, 70)} — ${location(s)}-${s.endLine}\n` :
+    `${choice(s)} (definition lines ${s.line}-${s.endLine}; source offset ${args.offset})\n`;
+  const next = (n: number) => `\n… ${remainder.length - n} more characters. Next: ${call('read_symbol', { ...args, symbol: s.id, offset: args.offset + n })}`;
+  const available = budget * 4 - Buffer.byteLength(title);
+  if (Buffer.byteLength(remainder) <= available) return title + remainder;
+  const chunk = prefixBytes(remainder, available - Buffer.byteLength(next(remainder.length)) - 24);
+  const newline = chunk.lastIndexOf('\n');
+  const part = newline > chunk.length / 2 ? chunk.slice(0, newline + 1) : chunk;
+  return title + part + next(part.length);
+}
+
 const findCodeTool = defineTool({
   name: 'find_code',
-  description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands to related results. Set locations_only: false for signatures/docs. Prefer rg for trivial literal text.',
-  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), offset },
-  handler(args, { db }) {
+  description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands results. Set include_body: true for source with exactly one exact match, otherwise locations stay the default. Set locations_only: false for signatures/docs. Prefer rg for trivial literals. Reuse unchanged evidence carried across continuing steps/sessions.',
+  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(false), offset },
+  handler(args, ctx) {
+    const { db } = ctx;
     const all = findCode(db, args.query, args.kind);
     const query = args.query.toLowerCase();
     const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
+    if (args.include_body && exact.length === 1 && args.offset === 0)
+      return readSource({ symbol: exact[0]!.id, context_lines: 0, offset: 0 }, ctx, NAVIGATION_BUDGETS.find_code);
     const narrowed = args.breadth !== 'all' && exact.length > 0;
     const items = narrowed ? exact : all;
     return page({
@@ -88,17 +124,33 @@ const findCodeTool = defineTool({
       start: args.offset, count: args.limit ?? (args.locations_only ? 3 : 8), budget: NAVIGATION_BUDGETS.find_code,
       render: (s) => args.locations_only ? choice(s) :
         `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
-      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, offset }),
+      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, include_body: args.include_body ? true : undefined, offset }),
     });
   },
 });
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List a file’s symbols and line ranges without reading bodies. Set locations_only: false for signatures. If the symbol is known, go straight to read_symbol.',
-  inputSchema: { file: pathInput, locations_only: locationsOnly, offset },
+  description: 'List symbols and ranges without bodies. Pass file or files for a budgeted batch, not both. Outline several files in one call, at most once per orientation. Set locations_only: false for signatures. Skip outline for known symbols; use batched read_symbol.',
+  inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, offset },
   handler(args, { root, db }) {
-    const file = repoRelative(root, args.file);
+    if (Boolean(args.file) === Boolean(args.files)) return 'Provide exactly one of file or files.';
+    if (args.files) {
+      const items = args.files.flatMap((input) => {
+        const file = repoRelative(root, input);
+        const entry = file ? fileOutline(db, file) : null;
+        const label = compact(file ?? input, 160);
+        if (!entry) return [`${label}: not indexed; use a ranged Read.`];
+        if (!entry.symbols.length) return [`${label}: no indexed symbols (${entry.status}).`];
+        return entry.symbols.map((s) => `[${s.id}] ${label}:${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind}; ${entry.status})${args.locations_only ? '' : ': ' + compact(s.signature)}`);
+      });
+      return page({
+        items, title: `Files (${args.files.length}; symbol locations):`, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
+        render: (item) => item,
+        next: (offset) => call('outline', { ...args, offset }),
+      });
+    }
+    const file = repoRelative(root, args.file!);
     const entry = file ? fileOutline(db, file) : null;
     if (!entry) return 'File is not indexed. For non-code or unsupported files, use a ranged Read.';
     const title = `${prefixBytes(compact(file!, 100), 250)} (${entry.lines} lines; ${entry.symbols.length} symbols${entry.status === 'ok' ? '' : `; ${entry.status}${entry.reason ? `: ${entry.reason}` : ''}`})`;
@@ -112,48 +164,72 @@ const outlineTool = defineTool({
 
 const readSymbolTool = defineTool({
   name: 'read_symbol',
-  description: 'Read exactly one symbol’s source (optional surrounding lines). If ambiguous, pick an ID from the returned candidates.',
-  inputSchema: { symbol, context_lines: z.number().int().min(0).max(20).default(0), offset },
+  description: 'Read known helpers instead of whole-file Read. Pass symbol for one or symbols for a budgeted batch (not both); optional context_lines. If ambiguous, pick an ID. Follow source/batch Next calls only if needed. Reuse unchanged evidence carried across continuing steps/sessions.',
+  inputSchema: {
+    symbol: symbol.optional(),
+    symbols: z.array(symbol).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter selectors or IDs for a batch.').optional(),
+    context_lines: z.number().int().min(0).max(20).default(0), offset, symbol_offset: offset,
+  },
   handler(args, ctx) {
-    const s = oneSymbol('read_symbol', args, ctx);
-    if (typeof s === 'string') return s;
-    const loc = sourceLocation(ctx.db, s.id);
-    let raw: Buffer | null;
-    try {
-      raw = readRepoFile(ctx.root, s.file, ctx.config.index.maxFileBytes);
-    } catch {
-      raw = null;
+    if (Boolean(args.symbol) === Boolean(args.symbols)) return 'Provide exactly one of symbol or symbols.';
+    if (args.symbols) {
+      if (args.offset) return 'Use symbol_offset to page a batch; use the individual Next calls for source offsets.';
+      return page({
+        items: args.symbols, title: `Symbols (${args.symbols.length}):`, start: args.symbol_offset, budget: NAVIGATION_BUDGETS.read_symbol,
+        render: (symbol) => readSource({ symbol, context_lines: args.context_lines, offset: 0 }, ctx, 400, true),
+        next: (symbol_offset) => call('read_symbol', { symbols: args.symbols, context_lines: args.context_lines, symbol_offset }),
+      });
     }
-    if (!raw || !loc || sha1(raw) !== loc.hash) return 'Source is unavailable or changed after indexing. Retry read_symbol or use a ranged Read.';
-    const source = raw.toString('utf8');
-    let { start, end } = loc;
-    if (args.context_lines) {
-      let newline = start > 0 ? source.lastIndexOf('\n', start - 1) : -1;
-      for (let i = 0; i < args.context_lines && newline >= 0; i++) newline = newline > 0 ? source.lastIndexOf('\n', newline - 1) : -1;
-      start = newline + 1;
-      for (let i = 0; i <= args.context_lines && end < source.length; i++) {
-        const newline = source.indexOf('\n', i === 0 ? end : end + 1);
-        end = newline < 0 ? source.length : newline;
-      }
+    return readSource({ symbol: args.symbol!, context_lines: args.context_lines, offset: args.offset }, ctx);
+  },
+});
+
+const exploreTool = defineTool({
+  name: 'explore',
+  description: 'Optional trace context: ranked definitions with bodies, direct callers/callees with confidence, definition/call-site locations and involved files in one budgeted payload. Answer directly when sufficient; follow source/edge Next calls only for missing details. Pass query or exact symbol/ID, not both. Not a complete runtime call graph.',
+  inputSchema: { query: text.optional(), symbol: symbol.optional(), limit: z.number().int().min(1).max(5).default(2), offset },
+  handler(args, ctx) {
+    if (Boolean(args.query) === Boolean(args.symbol)) return 'Provide exactly one of query or symbol.';
+    let matches: NavigationSymbol[];
+    if (args.symbol) matches = navigationSymbols(ctx.db, args.symbol);
+    else {
+      const all = findCode(ctx.db, args.query!);
+      const query = args.query!.toLowerCase();
+      const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
+      matches = exact.length ? exact : all;
     }
-    const snippet = source.slice(start, end);
-    if (args.offset >= snippet.length) return 'No source remains at that offset. To restart, omit offset.';
-    const remainder = snippet.slice(args.offset);
-    const title = `${choice(s)} (definition lines ${s.line}-${s.endLine}; source offset ${args.offset})\n`;
-    const next = (n: number) => `\n… ${remainder.length - n} more characters. Next: ${call('read_symbol', { ...args, symbol: s.id, offset: args.offset + n })}`;
-    const available = NAVIGATION_BUDGETS.read_symbol * 4 - Buffer.byteLength(title);
-    if (Buffer.byteLength(remainder) <= available) return title + remainder;
-    const chunk = prefixBytes(remainder, available - Buffer.byteLength(next(remainder.length)) - 24);
-    const newline = chunk.lastIndexOf('\n');
-    const part = newline > chunk.length / 2 ? chunk.slice(0, newline + 1) : chunk;
-    return title + part + next(part.length);
+    if (!matches.length) return 'No indexed definitions. Try another query or a ranged Read.';
+    return page({
+      items: matches, title: `Explore (${matches.length} ranked definitions; indexed direct edges, not a runtime graph):`,
+      start: args.offset, count: args.limit, budget: NAVIGATION_BUDGETS.explore,
+      render: (s) => {
+        const files = new Set([s.file]);
+        const edges = (direction: 'callers' | 'callees') => {
+          const rows = symbolCalls(ctx.db, s.id, direction);
+          return page({
+            items: rows, title: `${direction} (${rows.length}):`, start: 0, count: 4, budget: 120,
+            render: (edge) => {
+              files.add(edge.file);
+              if (edge.target) files.add(edge.target.file);
+              return `${edge.confidence}: ${compact(edge.name, 45)} — ${edge.target ? compact(edge.target.file, 90) + ':' + edge.target.line : 'definition unresolved'}; call ${compact(edge.file, 90)}:${edge.line}`;
+            },
+            next: (offset) => call(direction, { symbol: s.id, offset }),
+          });
+        };
+        const callers = edges('callers'), callees = edges('callees');
+        const paths = [...files].sort();
+        const { items: shown } = fitToBudget(paths, (file) => compact(file, 100), 90, 20);
+        return `${readSource({ symbol: s.id, context_lines: 0, offset: 0 }, ctx, 450, true)}\n${callers}\n${callees}\nFiles (selected direct edges${paths.length > shown.length ? '; +' + (paths.length - shown.length) + ' omitted' : ''}): ${prefixBytes(shown.map((file) => compact(file, 100)).join(', '), 300)}`;
+      },
+      next: (offset) => call('explore', { ...args, offset }),
+    });
   },
 });
 
 function callsTool(direction: 'callers' | 'callees') {
   return defineTool({
     name: direction,
-    description: direction === 'callers' ? 'List the indexed calls to a symbol, ordered by resolution confidence.' : 'List a symbol’s outgoing calls with resolution confidence, including unresolved calls.',
+    description: direction === 'callers' ? 'List indexed calls to a symbol, ordered by resolution confidence.' : 'List outgoing calls with resolution confidence, including unresolved calls. For traces chain callees/read_symbol (batch bodies), not outline+Read.',
     inputSchema: { symbol, limit: limit(8), offset },
     handler(args, ctx) {
       const s = oneSymbol(direction, args, ctx);
@@ -234,5 +310,5 @@ const repoMapTool = defineTool({
 });
 
 export const NAVIGATION_TOOLS = [
-  findCodeTool, outlineTool, readSymbolTool, callsTool('callers'), callsTool('callees'), whereUsedTool, repoMapTool,
+  findCodeTool, outlineTool, readSymbolTool, exploreTool, callsTool('callers'), callsTool('callees'), whereUsedTool, repoMapTool,
 ] as unknown as GwTool[];

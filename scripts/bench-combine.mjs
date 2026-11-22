@@ -47,8 +47,8 @@ export function planArchive(rows, directory, prefix) {
 }
 
 export function combine(config) {
-  const after = ['v2', 'v3'].includes(config.experiment);
-  if (config.experiment && !after) throw new Error('Unknown experiment; expected v2 or v3');
+  const after = ['v2', 'v3', 'v4', 'v5'].includes(config.experiment);
+  if (config.experiment && !after) throw new Error('Unknown experiment; expected v2, v3, v4 or v5');
   if (after && config.runs !== 8) throw new Error(`The ${config.experiment} comparison requires eight runs per arm`);
   const destination = after ? config.outputRoot ?? root : root;
   const suiteDir = (suite) => path.join(destination, 'bench', suite, ...(after ? [config.experiment] : []));
@@ -59,7 +59,7 @@ export function combine(config) {
     const expected = after ? config.captureRevision : pins[suite];
     if (!expected || revision !== expected) throw new Error(`Expected ${suite} build checkout ${expected}, got ${revision}`);
     const rows = validateCaptures(directory, suite, config.runs, expected);
-    const prefix = config.experiment === 'v3' ? (suite === 'nav' ? 'nav3' : 'lh3') : (suite === 'nav' ? 'nav' : 'lh2');
+    const prefix = ['v3', 'v4', 'v5'].includes(config.experiment) ? `${suite === 'nav' ? 'nav' : 'lh'}${config.experiment.slice(1)}` : (suite === 'nav' ? 'nav' : 'lh2');
     const copies = planArchive(rows, path.join(suiteDir(suite), 'observations'), prefix);
     const output = path.join(scratch, suite);
     const input = path.join(scratch, `${suite}-captures`);

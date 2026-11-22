@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { lstatSync, readFileSync, readdirSync, realpathSync, unlinkSync, writeFileSync } from 'node:fs';
+import { lstatSync, readFileSync, realpathSync, unlinkSync, writeFileSync } from 'node:fs';
 import { connect, type Socket } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -8,6 +8,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import { findRepoRoot } from '../util/paths.js';
 import { privateDirectory } from '../util/user-cache.js';
+import { runtimeFingerprint } from './fingerprint.js';
 
 export interface ServiceInfo { root: string; socket: string; version: string }
 
@@ -15,20 +16,12 @@ export function serviceInfo(root: string): ServiceInfo {
   if (process.platform === 'win32') throw new Error('Local sockets unavailable');
   root = realpathSync(root);
   const runtime = privateDirectory(process.env.GW_RUNTIME_DIR ?? path.join(tmpdir(), `groundwork-${process.getuid!()}`));
-  const hash = createHash('sha256').update('groundwork-mcp-1').update(process.version).update(process.execPath);
+  const hash = createHash('sha256').update('groundwork-mcp-3').update(process.version).update(process.execPath);
   const code = fileURLToPath(new URL('../', import.meta.url));
-  const visit = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-      const file = path.join(dir, entry.name);
-      if (entry.isDirectory()) visit(file);
-      else if (/\.(js|ts|cjs|json)$/.test(entry.name) && !entry.name.endsWith('.d.ts')) hash.update(file).update(readFileSync(file));
-    }
-  };
-  visit(code);
-  hash.update(readFileSync(new URL('../../package.json', import.meta.url)));
-  hash.update(JSON.stringify(Object.entries(process.env).filter(([key]) => /^(GW_|HF_|TRANSFORMERS_)/.test(key)).sort()));
+  hash.update(runtimeFingerprint(code, fileURLToPath(new URL('../../package.json', import.meta.url)), runtime));
+  hash.update(JSON.stringify(Object.entries(process.env).filter(([key]) => /^(GW_|HF_|TRANSFORMERS_)/.test(key) && !/^(GW_BENCH_|GW_HOOK_(?:TIMINGS|IN_PROCESS)$)/.test(key)).sort()));
   const version = hash.digest('hex');
-  const key = createHash('sha256').update(root).update(version).digest('hex').slice(0, 24);
+  const key = version.slice(0, 24);
   const socket = path.join(runtime, key + '.sock');
   if (Buffer.byteLength(socket) > 100) throw new Error('Local socket path too long');
   return { root, socket, version };
@@ -51,6 +44,7 @@ function openService(info: ServiceInfo): Promise<Socket> {
         socket.pause();
         cleanup();
         if (end + 1 < greeting.length) socket.unshift(greeting.subarray(end + 1));
+        socket.write(JSON.stringify({ groundworkRoot: info.root }) + '\n');
         resolve(socket);
       } catch (error) { fail(error as Error); }
     };

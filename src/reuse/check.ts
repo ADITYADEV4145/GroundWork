@@ -19,6 +19,9 @@ import { scoreSignals } from './model.js';
 import { pairSignals, type Signals } from './signals.js';
 import { canBlock } from './policy.js';
 import type { EmbedderFactory } from './embeddings.js';
+import { changedFromGit } from '../grounding/ranges.js';
+import type { TypeCheckResult } from '../types/index.js';
+import { log } from '../util/log.js';
 
 type IndexedSymbol = ReuseState['symbols'][number];
 type Literal = ReuseState['literals'][number] & { configish?: boolean };
@@ -41,8 +44,9 @@ export interface CheckReport {
   findings: CheckFinding[];
   allows: { file: string; symbol: string; reason: string }[];
   ms: number;
+  types?: TypeCheckResult;
 }
-export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number; embeddingFactory?: EmbedderFactory }
+export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number; embeddingFactory?: EmbedderFactory; stopHook?: boolean }
 
 const location = (s: IndexedSymbol): CheckLocation => ({ file: s.file, symbol: s.qualifiedName, line: s.line });
 const order = (s: { file: string; line: number }) => `${s.file}\0${String(s.line).padStart(10, '0')}`;
@@ -61,7 +65,7 @@ export function formatFinding(f: CheckFinding): string {
   const clean = (s: string) => s.replace(/[\x00-\x1f\x7f]/g, ' ');
   if (f.grounding) return [
     `${f.severity} grounding (${f.grounding.kind}): ${clean(f.added.file)}:${f.added.line}`,
-    `Why: ${clean(f.grounding.message)}`,
+    `Why: ${clean(f.grounding.message)}${f.grounding.typeConfirmed ? ' (type-confirmed)' : ''}`,
     `Fix: ${clean(f.fix)}`,
   ].join('\n');
   const ref = (s: CheckLocation) => f.kind === 'duplicate-file' ? `${clean(s.file)}:${s.line}` : `${clean(s.symbol)} (${clean(s.file)}:${s.line})`;
@@ -106,6 +110,30 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
   }
   finally { db.close(); }
+  let types: TypeCheckResult | undefined;
+  const collectTypes = async () => {
+    if (!config.types.enabled || (options.stopHook && !config.types.stopGate)) return;
+    const typeStart = Date.now();
+    const { typeCheck } = await import('../types/index.js');
+    types = await typeCheck(root, changedFromGit(root, commit), config, { base: commit, timeoutMs: options.stopHook ? config.types.timeoutMs : Math.max(1, Math.min(config.types.timeoutMs, deadline - Date.now())) });
+    if (options.stopHook) deadline += Date.now() - typeStart;
+    if (types.timedOut) log(root, 'warn', 'types_failed_open', { reason: 'timeout' });
+    for (const f of types.findings) {
+      const name = (value: string) => value.replace(/\(.*$/, '').split('.').at(-1);
+      const existing = groundingFindings.find((g) => g.file === f.file && g.line === f.line && name(g.name) === name(f.name));
+      if (existing) {
+        existing.typeConfirmed = true;
+        existing.typeBlocking ||= f.blocking;
+        existing.blocking ||= f.blocking;
+        const reported = findings.find((g) => g.grounding === existing);
+        if (reported) reported.severity = existing.blocking ? 'BLOCK' : 'WARN';
+      }
+      else add({ kind: 'grounding', severity: f.blocking ? 'BLOCK' : 'WARN',
+        added: { file: f.file, symbol: f.name, line: f.line }, existing: null,
+        signals: [{ name: 'typeCheck', value: 1 }], fix: `Correct the type error: ${f.message}`,
+        grounding: { ...f, kind: 'type', suggestions: [] } }, `${f.code}:${f.line}:${f.message}`);
+    }
+  };
   const oldFiles = new Map(base.state.files.map((f) => [f.file, f]));
   const changedFiles = new Set(state.files.filter((f) => f.hash !== oldFiles.get(f.file)?.hash).map((f) => f.file));
   const meaningStart = Date.now();
@@ -301,8 +329,9 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     }
   }
   checkDeadline();
+  await collectTypes();
   findings.sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'BLOCK' ? -1 : 1) || a.added.file.localeCompare(b.added.file) || a.added.line - b.added.line || a.kind.localeCompare(b.kind));
   const blocked = findings.some((f) => f.severity === 'BLOCK');
   checkDeadline();
-  return { status: blocked ? 'BLOCK' : findings.length ? 'WARN' : 'PASS', blocked, base: commit, findings, allows, ms: performance.now() - start };
+  return { status: blocked ? 'BLOCK' : findings.length ? 'WARN' : 'PASS', blocked, base: commit, findings, allows, ms: performance.now() - start, types };
 }

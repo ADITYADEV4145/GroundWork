@@ -2,8 +2,9 @@ import path from 'node:path';
 import { refreshIndex } from '../../index/refresh.js';
 import { toPosix } from '../../util/paths.js';
 import type { HookHandler } from '../types.js';
+import { EDIT_TOOLS } from '../edit-tools.js';
 
-export const EDIT_TOOLS = ['Edit', 'Write', 'MultiEdit', 'NotebookEdit', 'apply_patch', 'edit_file'];
+export { EDIT_TOOLS } from '../edit-tools.js';
 
 /** Keep the index current after the agent edits a file. */
 export const refreshOnEdit: HookHandler = {

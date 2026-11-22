@@ -193,6 +193,15 @@ export interface IndexStats {
   backend: string;
 }
 
+export function indexedLanguages(db: Db): import('../types.js').Language[] {
+  return db.prepare('SELECT DISTINCT language FROM files WHERE language IS NOT NULL').all().map((row) => String(row.language) as import('../types.js').Language);
+}
+
+export function indexGeneration(db: Db): string | null {
+  const row = db.prepare("SELECT value FROM meta WHERE key = 'generation'").get();
+  return row ? String(row.value) : null;
+}
+
 function groupCount(db: Db, sql: string): Record<string, number> {
   const out: Record<string, number> = {};
   for (const r of db.prepare(sql).all()) out[String(r.k ?? 'null')] = Number(r.n);

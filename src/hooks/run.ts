@@ -1,6 +1,5 @@
 import * as z from 'zod';
 import { loadConfig } from '../config/load.js';
-import { initSqlBackend } from '../store/db.js';
 import { log } from '../util/log.js';
 import { hookTiming, printHookTimings } from '../util/hook-timing.js';
 import { findRepoRoot } from '../util/paths.js';
@@ -133,9 +132,12 @@ export async function runHook(agent: AgentName, event: HookEventName, timeoutMs 
     const raw: unknown = text.trim() ? JSON.parse(text) : {};
     const ev = normalise(agent, event, raw);
     root = findRepoRoot(ev.cwd);
-    const sqlStart = performance.now();
-    await initSqlBackend();
-    hookTiming('sqlInitMs', performance.now() - sqlStart);
+    if (ev.tool !== 'Read' && ev.event !== 'pre_compact' && !/^mcp__(?:plugin_groundwork_)?groundwork__find_code$/.test(ev.tool ?? '')) {
+      const sqlStart = performance.now();
+      const { initSqlBackend } = await import('../store/db.js');
+      await initSqlBackend();
+      hookTiming('sqlInitMs', performance.now() - sqlStart);
+    }
     const timeout = new Promise<HookResult>((res) => setTimeout(() => res({ action: 'allow' }), timeoutMs).unref());
     const r = await Promise.race([dispatch(ev, root), timeout]);
     const renderStart = performance.now();

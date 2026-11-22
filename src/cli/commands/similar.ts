@@ -1,5 +1,5 @@
 import type { Command } from 'commander';
-import { CandidateIndex } from '../../reuse/candidates.js';
+import { cachedCandidates } from '../../reuse/candidate-cache.js';
 import { findSimilar, renderSimilar, similarInputSchema } from '../../reuse/similar.js';
 import { globalOpts, withIndex } from '../context.js';
 import { emit } from '../output.js';
@@ -15,7 +15,7 @@ export function register(program: Command): void {
       const opts = globalOpts(cmd);
       const input = similarInputSchema.parse({ description, name: options.name, signature: options.signature, code: options.code, language: options.language });
       await withIndex(opts, async ({ root, db, config }) => {
-        const index = new CandidateIndex(db, config.reuse.skipTests);
+        const index = await cachedCandidates(db, root, config);
         await index.prepareMeaning(root, config);
         const result = await findSimilar(index, input);
         emit(opts, result, () => renderSimilar(result));

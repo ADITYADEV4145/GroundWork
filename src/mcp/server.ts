@@ -1,7 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { loadConfig } from '../config/load.js';
-import { refreshIndex } from '../index/refresh.js';
 import { indexDbPath } from '../index/store.js';
 import { initSqlBackend, openDb } from '../store/db.js';
 import { log } from '../util/log.js';
@@ -15,7 +14,10 @@ export async function startMcpServer(root: string): Promise<void> {
     server.registerTool(tool.name, { description: tool.description, inputSchema: tool.inputSchema }, async (args: Record<string, unknown>) => {
       try {
         const config = loadConfig(root);
-        if (!tool.noRefresh) await refreshIndex(root, { config });
+        if (!tool.noRefresh) {
+          const { refreshIndex } = await import('../index/refresh.js');
+          await refreshIndex(root, { config });
+        }
         const db = openDb(indexDbPath(root), { readonly: true });
         try {
           const text = await tool.handler(args as never, { root, config, db });

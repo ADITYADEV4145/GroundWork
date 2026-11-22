@@ -1,8 +1,22 @@
 import type { HookHandler } from '../types.js';
-import { groundingOnEdit } from './grounding.js';
-import { refreshOnEdit } from './refresh_on_edit.js';
-import { wasteGuards } from './waste-guards.js';
+import { EDIT_TOOLS } from '../edit-tools.js';
 import { duplicateGate } from './duplicate_gate.js';
+
+const wasteGuards: HookHandler = {
+  name: 'waste_guards', events: ['pre_tool', 'post_tool', 'stop'],
+  async run(ev, ctx) {
+    if (ev.event === 'pre_tool' && ev.tool !== 'Bash') return null;
+    return (await import('./waste-guards.js')).wasteGuards.run(ev, ctx);
+  },
+};
+const refreshOnEdit: HookHandler = {
+  name: 'refresh_on_edit', events: ['post_tool'], tools: EDIT_TOOLS,
+  async run(ev, ctx) { return (await import('./refresh_on_edit.js')).refreshOnEdit.run(ev, ctx); },
+};
+const groundingOnEdit: HookHandler = {
+  name: 'grounding_on_edit', events: ['post_tool'], tools: EDIT_TOOLS,
+  async run(ev, ctx) { return (await import('./grounding.js')).groundingOnEdit.run(ev, ctx); },
+};
 
 const readGuard: HookHandler = {
   name: 'read_guard',

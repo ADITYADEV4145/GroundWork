@@ -1,16 +1,5 @@
 import { Command } from 'commander';
 import { VERSION } from '../util/version.js';
-import { register as agent } from './commands/agent.js';
-import { register as doctor } from './commands/doctor.js';
-import { register as indexCmds } from './commands/index-cmds.js';
-import { register as query } from './commands/query.js';
-import { register as selftest } from './commands/selftest.js';
-import { register as waste } from './commands/waste.js';
-import { register as setup } from './commands/setup.js';
-import { register as verify } from './commands/verify.js';
-import { register as similar } from './commands/similar.js';
-import { register as check } from './commands/check.js';
-import { register as bench } from './commands/bench.js';
 
 // Feature streams add a module under commands/ and one register() call below.
 const program = new Command()
@@ -20,7 +9,29 @@ const program = new Command()
   .option('--json', 'machine-readable output')
   .option('--root <dir>', 'repository root (default: git toplevel of cwd)');
 
-for (const register of [indexCmds, query, doctor, selftest, setup, agent, waste, verify, similar, check, bench]) register(program);
+const groups = [
+  { names: ['init', 'index', 'refresh', 'stats'], load: () => import('./commands/index-cmds.js') },
+  { names: ['symbols', 'show'], load: () => import('./commands/query.js') },
+  { names: ['doctor'], load: () => import('./commands/doctor.js') },
+  { names: ['selftest'], load: () => import('./commands/selftest.js') },
+  { names: ['setup'], load: () => import('./commands/setup.js') },
+  { names: ['mcp', 'hook'], load: () => import('./commands/agent.js') },
+  { names: ['run', 'report'], load: () => import('./commands/waste.js') },
+  { names: ['verify'], load: () => import('./commands/verify.js') },
+  { names: ['similar'], load: () => import('./commands/similar.js') },
+  { names: ['check'], load: () => import('./commands/check.js') },
+  { names: ['bench'], load: () => import('./commands/bench.js') },
+];
+let command: string | undefined;
+const args = process.argv.slice(2);
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--root') { i++; continue; }
+  if (args[i]!.startsWith('-')) continue;
+  command = args[i];
+  break;
+}
+const selected = groups.find((group) => group.names.includes(command ?? ''));
+for (const group of selected ? [selected] : groups) (await group.load()).register(program);
 
 program.parseAsync(process.argv).catch((e: unknown) => {
   process.stderr.write(`gw: ${(e as Error).message}\n`);

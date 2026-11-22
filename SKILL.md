@@ -18,7 +18,7 @@ Fall back to ordinary search and ranged reads for docs, logs, config, unsupporte
 
 ## 2. Reuse first: look before you write
 
-Before you write a new function, class, hook, component or constant:
+Before writing a new non-trivial helper/function (including a class, hook or component with new reusable logic), check for existing code. Skip `find_similar` for small edits, inline code and simple constants; reuse known symbols directly. Reuse earlier search evidence within the task while the relevant code is unchanged.
 
 1. Call `find_similar({ "description": "what it does", "name": "planned name", "signature": "planned signature" })`. Pass `code` once you have a draft.
 2. State your decision in one line:
@@ -27,11 +27,11 @@ Before you write a new function, class, hook, component or constant:
    - `NEW because <reason>`: nothing fits, and the reason says why.
 3. When you replace old code, delete the old version and move its callers over. Do not leave both behind.
 
-Constants and config keys count too. Reuse the existing `API_URL`; do not define a second one.
+Reuse existing constants and config keys such as `API_URL`; do not define a second one.
 
 ## 3. Respond to feedback
 
-**Grounding notes after an edit** ("these names/arguments do not match the code") list imports, calls, members or arguments in the lines you just changed that the index cannot find. Each note names the nearest real symbols with their signature and location. Fix the call to use one of them, or add the missing definition if you really meant to create it. To check a file yourself at any point, call `verify_calls({ "file": "src/x.ts", "lines": "10-40" })`.
+**Grounding notes after an edit** ("these names/arguments do not match the code") list imports, calls, members or arguments in the lines you just changed that the index cannot find. Each note names the nearest real symbols with their signature and location. Fix the call to use one of them, or add the missing definition if you really meant to create it. Once per task, verify all new cross-file calls together: `verify_calls({ "files": [{ "file": "src/x.ts", "lines": "10-40" }, { "file": "src/y.ts" }] })`. Skip the explicit call when there are no new cross-file calls. Fix findings and recheck affected ranges if needed; automatic grounding checks still run after edits.
 
 **The Stop gate** runs `gw check` over your uncommitted changes when you finish. Findings look like this:
 

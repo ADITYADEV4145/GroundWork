@@ -39,6 +39,16 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('restricts observed test discovery to runner directory and root options', () => {
+    const root = fixture();
+    for (const option of ['--dir', '--root', '--rootdir']) {
+      const command = `${option === '--rootdir' ? 'pytest' : 'vitest run'} ${option}=test/unit`;
+      recordImpactEvidence(root, { ...stopEvent(root, false, option), event: 'post_tool', tool: 'Bash', input: { command }, response: 'passed' });
+      const evidence = sessionEvidence(root, option);
+      expect(evidence.ran('test/api.test.ts')).toBe(false);
+      expect(evidence.ran('test/unit/example.test.ts')).toBe(true);
+    }
+  });
   it('separates runner options, positional selectors and excluded test paths', () => {
     const root = fixture();
     writeFileSync(path.join(root, 'package.json'), JSON.stringify({ scripts: { test: 'vitest run --coverage --config vitest.config.ts --project unit' } }));

@@ -87,9 +87,10 @@ export function sessionEvidence(root: string, sessionId?: string) {
       if (!selectors) return false;
       args = [...selectors, ...words.slice(words[1] === 'run' ? 3 : 2)];
     } else return false;
-    const selectors: string[] = [], exclusions: string[] = [];
+    const selectors: string[] = [], exclusions: string[] = [], discovery: string[] = [];
+    const discoveryOptions = new Set(['--dir', '--root', '--rootdir']);
     const flags = new Set(['--coverage', '--run', '--watch', '--silent', '--verbose', '--no-coverage', '--no-watch', '--passWithNoTests', '--ci', '--runInBand', '--watchAll', '--disable-warnings', '--no-header', '--no-summary', '-s', '-q', '-v', '-x']);
-    const values = new Set(['--ignore', '--deselect', '-k', '-m', '-t', '-c', '--config', '--project', '--selectProjects', '--workspace', '--root', '--dir', '--testNamePattern', '--reporter', '--outputFile', '--coverageDirectory', '--maxWorkers', '--minWorkers', '--pool', '--junitxml', '--maxfail', '-o', '--override-ini']);
+    const values = new Set([...discoveryOptions, '--ignore', '--deselect', '-k', '-m', '-t', '-c', '--config', '--project', '--selectProjects', '--workspace', '--testNamePattern', '--reporter', '--outputFile', '--coverageDirectory', '--maxWorkers', '--minWorkers', '--pool', '--junitxml', '--maxfail', '-o', '--override-ini']);
     for (let i = 0; i < args.length; i++) {
       const arg = args[i]!;
       if (arg === '--') continue;
@@ -99,6 +100,7 @@ export function sessionEvidence(root: string, sessionId?: string) {
       if (!values.has(flag)) return false;
       const value = equals < 0 ? args[++i] : arg.slice(equals + 1);
       if (!value || value.startsWith('-')) return false;
+      if (discoveryOptions.has(flag)) discovery.push(value);
       if (flag === '--ignore' || flag === '--deselect') exclusions.push(value);
     }
     const matches = (a: string) => {
@@ -106,6 +108,7 @@ export function sessionEvidence(root: string, sessionId?: string) {
       const selected = repoRelative(root, a.split('::')[0]!, cwd);
       return !!selected && (selected === file || file.startsWith(selected.replace(/\/$/, '') + '/'));
     };
+    if (!discovery.every(matches)) return false;
     if (exclusions.some(matches)) return false;
     return selectors.length ? selectors.some(matches) : path.resolve(root, file).startsWith(path.resolve(cwd) + path.sep);
   });

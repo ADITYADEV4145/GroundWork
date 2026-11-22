@@ -37,6 +37,14 @@ test('built page includes all install commands and accessible package manager ta
   }
   assert.match(html, /id="install-panel" role="tabpanel" tabindex="0" aria-labelledby="install-tab-npm"/);
   assert.match(html, /role="status" aria-live="polite"/);
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1];
+  const dialog = html.match(/<dialog id="install"[^>]*>([\s\S]*?)<\/dialog>/)[1];
+  assert.match(main, /id="install-picker"/);
+  assert.match(main, /role="tablist" aria-label="Package manager"/);
+  assert.match(main, /data-copy="install-code"/);
+  assert.match(main, /needs Yarn 1 \(Classic\)/);
+  assert.doesNotMatch(dialog, /install-picker|role="tab"|data-copy="install-code"/);
+  assert.equal([...html.matchAll(/id="install-picker"/g)].length, 1);
 });
 
 test('static server contains malformed targets and never exposes repository files', async t => {

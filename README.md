@@ -7,6 +7,17 @@
 
 <h1 align="center">Less searching. More building.</h1>
 
+### Search by intent
+
+Use `gw search "where do we retry failed requests" --limit 5` (or `--json`)
+and MCP `search_code` when you know what code does but not its name. Results
+include symbol IDs, locations, a short doc line and match evidence. Use
+`find_code` for known names; it is unchanged. Search normalizes English filler,
+inflections and a small code vocabulary. After explicit `gw init --embeddings`
+setup, installed local source embeddings augment lexical ranking; otherwise
+search silently stays lexical. Runtime never downloads models. The frozen
+retrieval evaluation and limitations live in `bench/search/`.
+
 <p align="center">
   A live, local map of your codebase for coding agents.<br>
   Find the right symbol. Reuse the right helper. Call code that actually exists.

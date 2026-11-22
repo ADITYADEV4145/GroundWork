@@ -9,6 +9,11 @@ Groundwork keeps a live local index of this repository (TypeScript, JavaScript, 
 
 ## 1. Navigate: use the cheapest sufficient evidence
 
+Use `search_code({ "query": "where do we retry failed requests", "limit": 5 })`
+for plain-English intent when the symbol name is unknown (`gw search "..." --json`
+in the CLI). Hits explain lexical/semantic evidence; semantic search only uses
+an already installed local model. Prefer unchanged `find_code` for known names.
+
 1. Use `rg` for a trivial literal or filename lookup. Use the index for symbol, behavior and structure questions: `find_code({ "query": "what you need" })`. Exact names return exact matches; use `breadth: "all"` only when broader results are needed. Set `locations_only: false` for signatures or docs. If you need the body with a unique exact-name lookup, use `include_body: true` in that same call. Defaults stay location-only. Stop when the requested location is resolved.
 2. For a known helper you need to recall, use `read_symbol({ "symbol": "exact name or ID" })` instead of a whole-file Read; batch several with `read_symbol({ "symbols": ["name or ID", "another name or ID"] })`. Pass either `symbol` or `symbols`, not both. If only files are known, outline several files in one call, at most once per orientation: `outline({ "files": ["src/a.ts", "src/b.ts"] })`. Keep `file` for one file. Choose symbols and read only needed bodies, not whole files. Skip outline when the symbol is known. Outline defaults to locations/ranges; set `locations_only: false` for signatures.
 3. Use `repo_map({ "depth": 1 })` once if you need orientation in an unfamiliar repo. Skip the map for a targeted lookup; go deeper by narrowing `path`.

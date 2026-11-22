@@ -7,6 +7,19 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_same_name_conditional_redefinitions_preserve_both_clone_sources(self):
+        first='\n'.join('    value = value + '+str(i) for i in range(30))+'\n    return value\n'
+        second='\n'.join('    if value:\n        value = not value' for _ in range(30))+'\n    return value\n'
+        source='def helper(value):\n'+first+'if available:\n    def helper(value):\n'+''.join('    '+line+'\n' for line in second.splitlines())
+        bodies=CodeGraph({'src/upstream.py':source}).bodies
+        self.assertEqual(len(bodies),2)
+        index=CloneIndex(bodies)
+        for body in [first,second]:
+            tokens=normalized(body)
+            self.assertEqual(index.coverage(tokens),set(range(len(tokens))))
+        shifted=CodeGraph({'src/upstream.py':'\n\n'+source}).bodies
+        self.assertEqual(bodies,shifted)
+
     def test_function_local_relative_imports_respect_package_initializers(self):
         for file, relative, helper in [('src/pkg/__init__.py','.helpers','src/pkg/helpers.py'),
                                        ('src/pkg/nested/__init__.py','..helpers','src/pkg/helpers.py'),

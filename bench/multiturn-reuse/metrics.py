@@ -268,6 +268,10 @@ def all_bodies(files):
             for node in nodes:
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     identity = scope + node.name
+                    occurrence = 2
+                    while (file, identity) in bodies:
+                        identity = scope + node.name + '#' + str(occurrence)
+                        occurrence += 1
                     bodies[(file, identity)] = body_tokens(node, source)
                     walk(node.body, identity + '.')
                 elif isinstance(node, ast.ClassDef):

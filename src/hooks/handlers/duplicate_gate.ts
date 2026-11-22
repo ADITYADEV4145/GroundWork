@@ -14,7 +14,14 @@ export const duplicateGate: HookHandler = {
     if (!config.reuse.duplicateGate || raw?.stop_hook_active === true) return { action: 'allow' };
     try {
       const { checkRepository, formatFinding } = await import('../../reuse/check.js');
-      const report = await checkRepository(root, { config, timeoutMs: 1500 });
+      let sessionWritten;
+      if (config.reuse.sessionMemory && ev.sessionId) {
+        try {
+          const { sessionMemory } = await import('../session-memory.js');
+          sessionWritten = sessionMemory(root, ev.sessionId).written;
+        } catch { /* A damaged ledger must not prevent the gate from running. */ }
+      }
+      const report = await checkRepository(root, { config, timeoutMs: 1500, sessionWritten });
       const blocks = report.findings.filter((f) => f.severity === 'BLOCK');
       if (!blocks.length) return { action: 'allow' };
       const findingSet = sha1(JSON.stringify(blocks.map((f) => f.id).sort()));

@@ -9,6 +9,13 @@ const wasteGuards: HookHandler = {
     return (await import('./waste-guards.js')).wasteGuards.run(ev, ctx);
   },
 };
+const sessionMemory: HookHandler = {
+  name: 'session_memory', events: ['prompt'],
+  async run(ev, ctx) {
+    if (!ctx.config.reuse.sessionMemory || !ev.sessionId) return null;
+    return (await import('./session_memory.js')).sessionMemoryPrompt.run(ev, ctx);
+  },
+};
 const refreshOnEdit: HookHandler = {
   name: 'refresh_on_edit', events: ['post_tool'], tools: EDIT_TOOLS,
   async run(ev, ctx) { return (await import('./refresh_on_edit.js')).refreshOnEdit.run(ev, ctx); },
@@ -28,4 +35,4 @@ const readGuard: HookHandler = {
 };
 
 // Register hook handlers here (one import + one entry). Order matters: the first 'deny' wins.
-export const HANDLERS: HookHandler[] = [wasteGuards, refreshOnEdit, readGuard, groundingOnEdit, duplicateGate];
+export const HANDLERS: HookHandler[] = [sessionMemory, wasteGuards, refreshOnEdit, readGuard, groundingOnEdit, duplicateGate];

@@ -3,6 +3,7 @@ import { refreshIndex } from '../../index/refresh.js';
 import { toPosix } from '../../util/paths.js';
 import type { HookHandler } from '../types.js';
 import { EDIT_TOOLS } from '../edit-tools.js';
+import { memorySymbols, recordWritten } from '../session-memory.js';
 
 export { EDIT_TOOLS } from '../edit-tools.js';
 
@@ -17,7 +18,14 @@ export const refreshOnEdit: HookHandler = {
     // Hooks run synchronously inside the agent's turn: never wait long for another writer (the
     // in-process timeout cannot fire while indexing blocks the event loop).
     const lockTimeoutMs = 300;
+    let before: ReturnType<typeof memorySymbols> | undefined;
+    if (config.reuse.sessionMemory && ev.sessionId) {
+      try { before = memorySymbols(root); } catch { /* Memory must not prevent refresh. */ }
+    }
     await refreshIndex(root, rel && !rel.startsWith('..') ? { config, paths: [rel], lockTimeoutMs } : { config, lockTimeoutMs });
+    if (before && ev.sessionId) {
+      try { recordWritten(root, ev.sessionId, before, memorySymbols(root)); } catch { /* Fail open. */ }
+    }
     return null;
   },
 };

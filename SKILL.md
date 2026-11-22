@@ -5,6 +5,8 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 # Groundwork
 
+Session reuse memory offers code you wrote in earlier turns before new work; disable it with `reuse.sessionMemory: false`.
+
 Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
 
 ## 1. Navigate: use the cheapest sufficient evidence

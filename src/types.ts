@@ -48,6 +48,7 @@ export interface Param {
 }
 
 export interface BodyFingerprint {
+  bodyHash?: string;
   /** Normalized token count of the body. */
   tokenCount: number;
   /** 128 MinHash values over k=4 shingles of the normalized token stream. */

@@ -2,6 +2,15 @@
 
 Groundwork stops two kinds of duplication: writing code that already exists under a new name, and adding new code next to old code instead of changing the old code.
 
+## Session reuse memory
+
+With `reuse.sessionMemory` enabled (the default), edit hooks remember new and changed
+non-test, non-generated symbols in the session ledger (up to 200 entries). Prompt
+hooks count turns and offer a short, recent-first list of code from earlier turns
+that is still indexed. The Stop duplicate gate treats earlier-turn code as existing
+regardless of file order and labels it with its turn. Set `reuse.sessionMemory: false`
+to disable recording, prompt reminders and session-aware gate ordering.
+
 ## Before writing: `find_similar`
 
 Call `find_similar` only for genuinely new non-trivial helpers/functions, not once per task or for every edit. Skip small edits, inline code, simple constants and already-confirmed helpers; reuse unchanged search evidence across continuing steps and sessions when carried into your current context. Repeat only if relevant code changed or evidence is missing. To recall a known helper, use `read_symbol` (batched with `symbols:[...]` for several), not a whole-file Read. Default results contain only actionable reuse/extend matches; use `detail:"full"` for related matches.

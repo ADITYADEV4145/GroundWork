@@ -4,6 +4,7 @@ import * as z from 'zod';
 export const reuseConfigSchema = z
   .object({
     duplicateGate: z.boolean().default(true),
+    sessionMemory: z.boolean().default(true),
     skipTests: z.boolean().default(true),
     embeddings: z.object({ enabled: z.boolean().default(false), model: z.string().optional() }).strict().default({ enabled: false }),
   })

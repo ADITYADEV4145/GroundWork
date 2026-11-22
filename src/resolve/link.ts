@@ -1,6 +1,7 @@
 import type { Db, Row } from '../store/db.js';
 import type { CallConfidence } from '../types.js';
 import { ImportResolver, type FileInfo } from './imports.js';
+import { ADDITIONAL_LANGUAGES, AdditionalResolver, type AdditionalSymbol } from './additional.js';
 
 // Second pass over the whole index: import specifiers -> files, call sites -> symbols. Only rows whose
 // answer changed are written, so a refresh with a few edits stays cheap.
@@ -43,6 +44,7 @@ export function linkIndex(db: Db, root: string, changed?: { files: number[]; nam
   const files = db.prepare('SELECT id, path, language FROM files').all() as unknown as FileInfo[];
   const fileById = new Map(files.map((f) => [f.id, f]));
   const resolver = new ImportResolver(root, files);
+  const additional = new AdditionalResolver(root, files);
   const changedFiles = changed ? new Set(changed.files) : null;
 
   // --- imports
@@ -60,9 +62,9 @@ export function linkIndex(db: Db, root: string, changed?: { files: number[]; nam
       reason: r.unresolved_reason === null ? null : String(r.unresolved_reason),
     }))
     .map((im) => {
-      if (changedFiles && !changedFiles.has(im.fileId)) return im;
       const from = fileById.get(im.fileId)!;
-      const res = from.language === 'python' ? resolver.resolvePy(from.path, im.module, im.kind === 'named' ? im.name : null) : resolver.resolveTs(from.path, im.module);
+      if (changedFiles && !changedFiles.has(im.fileId) && !ADDITIONAL_LANGUAGES.has(from.language ?? '')) return im;
+      const res = from.language === 'python' ? resolver.resolvePy(from.path, im.module, im.kind === 'named' ? im.name : null) : ['typescript', 'tsx', 'javascript'].includes(from.language ?? '') ? resolver.resolveTs(from.path, im.module) : additional.resolveImport(from, im);
       if (res.fileId !== im.resolvedFileId || res.reason !== im.reason)
         db.prepare('UPDATE imports SET resolved_file_id = ?, unresolved_reason = ? WHERE id = ?').run(res.fileId, res.reason, im.id);
       return { ...im, resolvedFileId: res.fileId, reason: res.reason };
@@ -205,7 +207,14 @@ export function linkIndex(db: Db, root: string, changed?: { files: number[]; nam
       (im) => im.resolvedFileId === null && (im.alias ?? (im.kind === 'module' ? im.module.split('.')[0]! : im.name)) === head,
     );
 
+  const additionalSymbols: AdditionalSymbol[] = files.some((f) => ADDITIONAL_LANGUAGES.has(f.language ?? ''))
+    ? db.prepare('SELECT id, file_id, name, qualified_name, kind, parent_id FROM symbols').all().map((r) => ({
+      id: String(r.id), fileId: Number(r.file_id), name: String(r.name), qualifiedName: String(r.qualified_name), kind: String(r.kind), parentId: r.parent_id === null ? null : String(r.parent_id),
+    })) : [];
+
   const resolveCall = (fileId: number, callerId: string | null, text: string, name: string): { id: string; conf: CallConfidence } | null => {
+    const from = fileById.get(fileId)!;
+    if (ADDITIONAL_LANGUAGES.has(from.language ?? '')) return additional.resolveCall(from, callerId, text, name, importsByFile.get(fileId) ?? [], additionalSymbols);
     ensureFile(fileId);
     const parts = text.replace(/\?\./g, '.').split('.');
     if (parts.length === 1) {
@@ -248,10 +257,10 @@ export function linkIndex(db: Db, root: string, changed?: { files: number[]; nam
       }
     }
     if (parts.length > 1 && boundExternally(fileId, parts[0]!)) return null;
-    const py = fileById.get(fileId)?.language === 'python';
+    const language = fileById.get(fileId)?.language;
     if (changed && !globalCandidates.has(name)) globalCandidates.set(name,
       db.prepare(`SELECT ${symbolColumns} FROM symbols WHERE name = ?`).all(name).map(toSym).filter((s) => CALLABLE.has(s.kind)));
-    const cands = (changed ? globalCandidates : globalByName).get(name)?.filter((s) => (fileById.get(s.fileId)?.language === 'python') === py);
+    const cands = (changed ? globalCandidates : globalByName).get(name)?.filter((s) => fileById.get(s.fileId)?.language === language);
     if (cands && cands.length === 1) return { id: cands[0]!.id, conf: 'name-only' };
     return null;
   };

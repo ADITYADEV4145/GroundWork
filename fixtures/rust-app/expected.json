@@ -1,0 +1,38 @@
+{
+  "symbols": [
+    "src/helpers.rs | trim_name | function | 1..1 | exported |  |  | pub fn trim_name(name: &str) -> &str",
+    "src/lib.rs | Store | class | 0..0 | exported |  |  | pub struct Store",
+    "src/lib.rs | Reader | interface | 0..0 | exported |  |  | pub trait Reader",
+    "src/lib.rs | Reader.list | method | 0..0 | local |  |  | fn list(&self) -> &[String]",
+    "src/lib.rs | Store.add | method | 1..1 | exported |  |  | pub fn add(&mut self, name: String)",
+    "src/lib.rs | Store.list | method | 0..0 | local |  |  | fn list(&self) -> &[String]",
+    "src/lib.rs | State | enum | 0..0 | exported |  |  | pub enum State",
+    "src/lib.rs | Key | type | 0..0 | exported |  |  | pub type Key = String",
+    "src/lib.rs | ENV_KEY | constant | 0..0 | exported |  |  | pub const ENV_KEY: &str = \"APP_STORE_KEY\"",
+    "src/lib.rs | ENDPOINT | constant | 0..0 | exported |  |  | pub static ENDPOINT: &str = \"https://example.com/store\"",
+    "src/lib.rs | normalize | function | 1..1 | exported |  |  | pub fn normalize(name: &str) -> String",
+    "src/lib.rs | clean_name | function | 1..1 | local |  |  | fn clean_name(value: &str) -> String",
+    "src/lib.rs | load | function | 0..0 | exported |  | async | pub async fn load() -> Store"
+  ],
+  "imports": [
+    "src/lib.rs | 1 | std::collections | HashMap | - | named | external",
+    "src/lib.rs | 1 | std::collections | HashSet | Names | named | external",
+    "src/lib.rs | 2 | crate::helpers | trim_name | - | named | src/helpers.rs"
+  ],
+  "calls": [
+    "src/helpers.rs | 2 | name.trim | 0 | [] | - | -",
+    "src/lib.rs | 14 | self.names.push | 1 | [] | - | -",
+    "src/lib.rs | 26 | name.trim().is_empty | 0 | [] | - | -",
+    "src/lib.rs | 26 | name.trim | 0 | [] | - | -",
+    "src/lib.rs | 26 | String::from | 1 | [] | - | -",
+    "src/lib.rs | 27 | trim_name(name).to_lowercase | 0 | [] | - | -",
+    "src/lib.rs | 27 | trim_name | 1 | [] | trim_name | import-resolved",
+    "src/lib.rs | 31 | value.trim().to_lowercase | 0 | [] | - | -",
+    "src/lib.rs | 31 | value.trim | 0 | [] | - | -",
+    "src/lib.rs | 34 | Store::default | 0 | [] | - | -"
+  ],
+  "literals": [
+    "src/lib.rs | 22 | env | APP_STORE_KEY | -",
+    "src/lib.rs | 23 | url | https://example.com/store | -"
+  ]
+}

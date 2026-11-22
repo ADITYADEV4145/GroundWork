@@ -1,0 +1,35 @@
+{
+  "symbols": [
+    "Store.cs | Store | class | 0..0 | exported |  |  | public class Store",
+    "Store.cs | Store.EnvKey | constant | 0..0 | exported |  |  | public const string EnvKey = \"APP_STORE_KEY\"",
+    "Store.cs | Store.Endpoint | constant | 0..0 | exported |  |  | public static readonly string Endpoint = \"https://example.com/store\"",
+    "Store.cs | Store.Store | method | 0..0 | exported |  |  | public Store()",
+    "Store.cs | Store.Add | method | 0..* | exported |  |  | [Obsolete]\n    public int Add(string prefix = \"\", params string[] values)",
+    "Store.cs | Store.Normalize | method | 1..1 | exported |  |  | public static string Normalize(string name)",
+    "Store.cs | Store.CleanName | method | 1..1 | local |  |  | private static string CleanName(string value)",
+    "Store.cs | Store.Entry | class | 0..0 | exported |  |  | public record Entry(string Name)",
+    "Store.cs | Store.Key | class | 0..0 | exported |  |  | public struct Key",
+    "Store.cs | Store.State | enum | 0..0 | exported |  |  | public enum State",
+    "Store.cs | IReader | interface | 0..0 | exported |  |  | public interface IReader",
+    "Store.cs | IReader.Read | method | 0..0 | local |  |  | string Read()"
+  ],
+  "imports": [
+    "Store.cs | 1 | System | System | - | namespace | external",
+    "Store.cs | 2 | System.Collections.Generic | Generic | - | namespace | external",
+    "Store.cs | 3 | System.String | String | Text | namespace | external",
+    "Store.cs | 4 | System.Math | Math | - | namespace | external"
+  ],
+  "calls": [
+    "Store.cs | 12 | List<string> | 0 | [] | - | -",
+    "Store.cs | 18 | names.Add | 1 | [] | - | -",
+    "Store.cs | 23 | name.Trim | 0 | [] | - | -",
+    "Store.cs | 24 | name.Trim().ToLowerInvariant | 0 | [] | - | -",
+    "Store.cs | 24 | name.Trim | 0 | [] | - | -",
+    "Store.cs | 28 | value.Trim().ToLowerInvariant | 0 | [] | - | -",
+    "Store.cs | 28 | value.Trim | 0 | [] | - | -"
+  ],
+  "literals": [
+    "Store.cs | 10 | env | APP_STORE_KEY | -",
+    "Store.cs | 11 | url | https://example.com/store | -"
+  ]
+}

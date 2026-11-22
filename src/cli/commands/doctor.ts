@@ -23,6 +23,11 @@ const SAMPLES: Record<Language, string> = {
   tsx: 'export const A = () => <div />',
   javascript: 'export function f(a) { return a }',
   python: 'def f(a):\n    return a\n',
+  go: 'package demo\nfunc f(a int) int { return a }\n',
+  rust: 'fn f(a: i32) -> i32 { a }',
+  java: 'class Demo { int f(int a) { return a; } }',
+  csharp: 'class Demo { int F(int a) { return a; } }',
+  ruby: 'def f(a)\n  a\nend\n',
 };
 
 export async function runDoctor(root: string): Promise<DoctorCheck[]> {

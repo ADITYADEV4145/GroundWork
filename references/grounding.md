@@ -1,5 +1,7 @@
 # Grounding checks
 
+Grounding call verification supports TypeScript, JavaScript and Python only. Go, Rust, Java, C# and Ruby support indexing, navigation, impact analysis and the reuse gate; their grounding results remain unchecked.
+
 Agents tend to predict plausible names instead of looking them up. Groundwork checks the lines you change against the index and reports:
 
 - imports of names a repo module does not export

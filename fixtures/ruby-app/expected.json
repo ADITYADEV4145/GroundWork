@@ -1,0 +1,39 @@
+{
+  "symbols": [
+    "lib/helpers.rb | Helpers | class | 0..0 | exported |  |  | module Helpers",
+    "lib/helpers.rb | Helpers.normalize | method | 1..1 | exported |  |  | def normalize(name)",
+    "lib/helpers.rb | display | function | 1..1 | exported |  |  | def display(name, label: 'Record')",
+    "lib/store.rb | Store | class | 0..0 | exported |  |  | class Store",
+    "lib/store.rb | Store.ENV_KEY | constant | 0..0 | exported |  |  | ENV_KEY = 'APP_STORE_KEY'",
+    "lib/store.rb | Store.initialize | method | 0..0 | exported |  |  | def initialize",
+    "lib/store.rb | Store.add | method | 0..* | exported |  |  | def add(prefix = '', *names, unique: false, **options)",
+    "lib/store.rb | Store.build | method | 0..0 | exported |  |  | def self.build",
+    "lib/store.rb | Store.normalize | method | 1..1 | local |  |  | def normalize(name)",
+    "lib/store.rb | Store.clean_name | method | 1..1 | local |  |  | def clean_name(value)"
+  ],
+  "imports": [
+    "lib/store.rb | 1 | json | json | - | module | external",
+    "lib/store.rb | 2 | helpers | helpers | - | module | lib/helpers.rb"
+  ],
+  "calls": [
+    "lib/helpers.rb | 3 | name.strip.empty? | 0 | [] | - | -",
+    "lib/helpers.rb | 3 | name.strip | 0 | [] | - | -",
+    "lib/helpers.rb | 4 | name.strip.downcase.gsub | 2 | [] | - | -",
+    "lib/helpers.rb | 4 | name.strip.downcase | 0 | [] | - | -",
+    "lib/helpers.rb | 4 | name.strip | 0 | [] | - | -",
+    "lib/helpers.rb | 9 | puts | 1 | [] | - | -",
+    "lib/store.rb | 1 | require | 1 | [] | - | -",
+    "lib/store.rb | 2 | require_relative | 1 | [] | - | -",
+    "lib/store.rb | 14 | names.each | 0 | [] | - | -",
+    "lib/store.rb | 14 | @names.push | 1 | [] | - | -",
+    "lib/store.rb | 15 | @names.length | 0 | [] | - | -",
+    "lib/store.rb | 19 | Store.new | 0 | [] | - | -",
+    "lib/store.rb | 25 | name.strip.downcase | 0 | [] | - | -",
+    "lib/store.rb | 25 | name.strip | 0 | [] | - | -",
+    "lib/store.rb | 31 | value.strip.downcase | 0 | [] | - | -",
+    "lib/store.rb | 31 | value.strip | 0 | [] | - | -"
+  ],
+  "literals": [
+    "lib/store.rb | 6 | env | APP_STORE_KEY | -"
+  ]
+}

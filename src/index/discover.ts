@@ -7,7 +7,7 @@ import type { GroundworkConfig } from '../config/schema.js';
 import { INDEXED_EXTENSIONS, languageForPath } from '../lang/parser.js';
 import { GW_DIR, toPosix } from '../util/paths.js';
 
-const ALWAYS_SKIP_DIRS = new Set(['node_modules', '.git', GW_DIR, 'dist', 'build', '.next', '__pycache__', '.venv', 'venv', '.tox', 'coverage']);
+const ALWAYS_SKIP_DIRS = new Set(['node_modules', 'bin', 'obj', 'target', 'out', '.gradle', 'vendor', '.git', GW_DIR, 'dist', 'build', '.next', '__pycache__', '.venv', 'venv', '.tox', 'coverage']);
 
 function gitFiles(root: string, paths?: string[]): string[] | null {
   if (!process.env.GIT_DIR) {

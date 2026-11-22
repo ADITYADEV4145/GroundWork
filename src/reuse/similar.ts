@@ -32,10 +32,14 @@ export async function findSimilar(index: CandidateIndex, input: SimilarInput): P
     const python = args.language === 'python';
     const signature = args.signature?.trim().replace(/[:;]$/, '') ?? '';
     const declaration = python ? (/^(async\s+)?def\s/.test(signature) ? signature : `def ${signature}`)
+      : args.language === 'rust' ? (/^(pub(?:\([^)]*\))?\s+)?(async\s+)?fn\s/.test(signature) ? signature : `fn ${signature}`)
+      : args.language === 'ruby' ? (/^def\s/.test(signature) ? signature : `def ${signature}`)
+      : ['java', 'csharp'].includes(args.language) ? signature
+      : args.language === 'go' ? (/^func\s/.test(signature) ? signature : `func ${signature}`)
       : (/^(export\s+)?(async\s+)?function\s/.test(signature) ? signature : `function ${signature}`);
-    const source = args.code ?? `${declaration}${python ? ':\n    pass' : ' {}'}`;
+    const source = args.code ?? (['java', 'csharp'].includes(args.language) ? `class Draft { ${declaration} {} }` : `${args.language === 'go' ? 'package draft\n' : ''}${declaration}${python ? ':\n    pass' : args.language === 'ruby' ? '\nend' : ' {}'}`);
     const extracted = extractReuseSource(source, args.language);
-    const symbol = extracted.symbols[0];
+    const symbol = ['java', 'csharp'].includes(args.language) && !args.code ? extracted.symbols.find((s) => s.kind === 'method') : extracted.symbols[0];
     if (extracted.hasErrors || !symbol) throw new Error('Draft must contain a valid symbol; set language for Python drafts.');
     embeddingText = args.code ? source.slice(symbol.startByte, symbol.endByte) : args.description;
     query = { ...symbol, name: args.name ?? symbol.name, fingerprint: args.code ? symbol.fingerprint : null,

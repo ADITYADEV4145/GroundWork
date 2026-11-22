@@ -5,7 +5,7 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 # Groundwork
 
-Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
+Groundwork keeps a live local index of this repository and exposes it as MCP tools. Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript, Python, Go, Rust, Java, C# and Ruby. Grounding call verification remains limited to TypeScript, JavaScript and Python.
 
 ## 1. Navigate: use the cheapest sufficient evidence
 

@@ -198,7 +198,8 @@ export function aggregateReview(results: Result[], previous: ReviewRow[], suite:
     const row: ReviewRow = { suite, kind: finding.kind, task_id: result.task_id, arm: result.arm, added: finding.added, existing: finding.existing,
       probability: finding.probability, signals: finding.signals, verdict: null, reviewer: null, reasoning: null };
     const key = reviewKey(row), prior = old.get(key) ?? legacy.get(reviewIdentity(row));
-    if (prior && prior.probability === row.probability && JSON.stringify(prior.signals) === JSON.stringify(row.signals)) {
+    if (prior && ((prior.resolved_by && prior.verdict === 'disagree') ||
+      (prior.probability === row.probability && JSON.stringify(prior.signals) === JSON.stringify(row.signals)))) {
       row.verdict = prior.verdict; row.reviewer = prior.reviewer; row.reasoning = prior.reasoning;
     }
     if (prior?.resolved_by) row.resolved_by = prior.resolved_by;

@@ -209,6 +209,27 @@ describe('suite-attributed shared BLOCK review', () => {
     expect(summarizeBlockReview([{ ...row, reviewer: null }], [clean]).resolvedRows).toBe(0);
     expect(summarizeBlockReview([], [clean])).toMatchObject({ reviewed: 0, resolvedRows: 0 });
   });
+  it.each(['probability', 'signals', 'both'])('retains a returning resolved disagreement when %s change', change => {
+    const row: ReviewRow = { ...reviewed(), suite: 'block-v2', task_id: result().task_id, verdict: 'disagree',
+      resolved_by: { commit: 'a'.repeat(40), note: 'Correct generator argument count' } };
+    const returned = { ...finding,
+      probability: change === 'signals' ? row.probability : 0.9,
+      signals: change === 'probability' ? row.signals : [{ name: 'bindingExact', value: 1 }] };
+    const scoring = { ...result(), check: { status: 'BLOCK', findings: [returned] } };
+    const rows = aggregateReview([scoring], [row], 'block-v2');
+    expect(rows).toEqual([{ ...row, probability: returned.probability, signals: returned.signals }]);
+    expect(summarizeBlockReview(rows, [scoring])).toMatchObject({ reviewed: 1, agree: 0, agreement: 0, pending: 0, resolvedRows: 0 });
+    expect(summarizeBlockReview(rows, [{ ...scoring, check: { status: 'PASS', findings: [] } }])).toMatchObject({ reviewed: 0, resolvedRows: 1 });
+    for (const different of [
+      { ...returned, kind: 'grounding' as const },
+      { ...returned, added: { ...returned.added, symbol: 'different' } },
+      { ...returned, existing: { ...returned.existing!, symbol: 'different' } },
+    ]) {
+      const changed = aggregateReview([{ ...scoring, check: { status: 'BLOCK', findings: [different] } }], [row], 'block-v2');
+      expect(changed).toHaveLength(2);
+      expect(changed[1]).toMatchObject({ verdict: null, reviewer: null });
+    }
+  });
   it('loads current resolution evidence conservatively, including missing and malformed results', () => {
     const dir = temp(), row: ReviewRow = { ...reviewed(), suite: 'block-v2', task_id: result().task_id, verdict: 'disagree',
       resolved_by: { commit: 'b'.repeat(40), note: 'Fixed' } };

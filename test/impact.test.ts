@@ -39,6 +39,14 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('does not treat the pytest rootdir option as a collection restriction', () => {
+    const root = fixture();
+    for (const [session, command] of [['default-root', 'pytest --rootdir=tests/unit'], ['explicit-path', 'pytest --rootdir tests/unit tests/integration']]) {
+      recordImpactEvidence(root, { ...stopEvent(root, false, session!), event: 'post_tool', tool: 'Bash', input: { command }, response: 'passed' });
+      expect(sessionEvidence(root, session!).ran('tests/integration/test_api.py')).toBe(true);
+    }
+    expect(sessionEvidence(root, 'explicit-path').ran('tests/unit/test_api.py')).toBe(false);
+  });
   it('only applies whole-path runner exclusions, not individual node ids', () => {
     const root = fixture();
     for (const option of ['--deselect', '--ignore']) {
@@ -61,8 +69,8 @@ describe('change impact', () => {
   });
   it('restricts observed test discovery to runner directory and root options', () => {
     const root = fixture();
-    for (const option of ['--dir', '--root', '--rootdir']) {
-      const command = `${option === '--rootdir' ? 'pytest' : 'vitest run'} ${option}=test/unit`;
+    for (const option of ['--dir', '--root']) {
+      const command = `vitest run ${option}=test/unit`;
       recordImpactEvidence(root, { ...stopEvent(root, false, option), event: 'post_tool', tool: 'Bash', input: { command }, response: 'passed' });
       const evidence = sessionEvidence(root, option);
       expect(evidence.ran('test/api.test.ts')).toBe(false);

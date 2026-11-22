@@ -88,10 +88,10 @@ export function sessionEvidence(root: string, sessionId?: string) {
       args = [...selectors, ...words.slice(words[1] === 'run' ? 3 : 2)];
     } else return false;
     const selectors: string[] = [], exclusions: string[] = [], discovery: string[] = [];
-    const discoveryOptions = new Set(['--dir', '--root', '--rootdir']);
+    const discoveryOptions = new Set(['--dir', '--root']);
     const nameFilters = new Set(['-k', '-m', '-t', '--testNamePattern', '--grep']);
     const flags = new Set(['--coverage', '--run', '--watch', '--silent', '--verbose', '--no-coverage', '--no-watch', '--passWithNoTests', '--ci', '--runInBand', '--watchAll', '--disable-warnings', '--no-header', '--no-summary', '-s', '-q', '-v', '-x']);
-    const values = new Set([...discoveryOptions, '--ignore', '--deselect', '-k', '-m', '-t', '-c', '--config', '--project', '--selectProjects', '--workspace', '--testNamePattern', '--reporter', '--outputFile', '--coverageDirectory', '--maxWorkers', '--minWorkers', '--pool', '--junitxml', '--maxfail', '-o', '--override-ini']);
+    const values = new Set([...discoveryOptions, '--rootdir', '--ignore', '--deselect', '-k', '-m', '-t', '-c', '--config', '--project', '--selectProjects', '--workspace', '--testNamePattern', '--reporter', '--outputFile', '--coverageDirectory', '--maxWorkers', '--minWorkers', '--pool', '--junitxml', '--maxfail', '-o', '--override-ini']);
     for (let i = 0; i < args.length; i++) {
       const arg = args[i]!;
       if (arg === '--') continue;

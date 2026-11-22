@@ -10,6 +10,32 @@ const stateSchema = z.object({
   commands: z.array(z.object({ command: z.string(), cwd: z.string() })).default([]),
 });
 
+function shellWords(command: string): string[] | null {
+  const words: string[] = [];
+  let word = '', quote = '', started = false;
+  for (let i = 0; i < command.length; i++) {
+    const c = command[i]!;
+    if (quote === "'") { if (c === "'") quote = ''; else word += c; continue; }
+    if (c === '\\') { const next = command[++i]; if (!next || /[\r\n]/.test(next)) return null; word += next; started = true; continue; }
+    if (quote === '"') { if (c === '"') quote = ''; else if (/[`$\r\n]/.test(c)) return null; else word += c; continue; }
+    if (/[;&|`$<>\r\n]/.test(c)) return null;
+    if (c === "'" || c === '"') { quote = c; started = true; }
+    else if (/\s/.test(c)) { if (started) words.push(word); word = ''; started = false; }
+    else { word += c; started = true; }
+  }
+  if (quote) return null;
+  if (started) words.push(word);
+  return words;
+}
+
+function originalCommand(command: string, root: string, sessionId: string): string {
+  if (!command.startsWith('GW_SESSION_ID=')) return command;
+  const words = shellWords(command);
+  if (!words || words[0] !== `GW_SESSION_ID=${sessionId}` || words[1] !== `GW_ROOT=${root}`) return '';
+  const separator = words.indexOf('run', 3);
+  return separator >= 3 && words[separator + 1] === '--' && words.length === separator + 3 ? words[separator + 2]! : '';
+}
+
 export function recordImpactEvidence(root: string, ev: HookEvent): void {
   if (!ev.sessionId || ev.event !== 'post_tool' || !ev.response || (ev.response as { is_error?: boolean }).is_error) return;
   const paths: string[] = [];
@@ -17,7 +43,8 @@ export function recordImpactEvidence(root: string, ev: HookEvent): void {
     const response = ev.response as { type?: string; file?: { filePath?: string; numLines?: number } };
     if (response.type === 'text' && response.file?.filePath && (response.file.numLines ?? 0) > 0) paths.push(response.file.filePath);
   } else if (['Edit', 'Write', 'MultiEdit'].includes(ev.tool ?? '') && typeof ev.input.file_path === 'string') paths.push(ev.input.file_path);
-  const rawCommand = ev.tool === 'Bash' && typeof ev.input.command === 'string' ? ev.input.command : '';
+  const inputCommand = ev.tool === 'Bash' && typeof ev.input.command === 'string' ? ev.input.command : '';
+  const rawCommand = inputCommand.length <= 4096 ? originalCommand(inputCommand, root, ev.sessionId) : '';
   const command = rawCommand.length <= 4096 && /^(?:(?:npx )?(?:vitest|jest|pytest)\b|python(?:3)? -m pytest\b|(?:npm|pnpm|yarn) (?:run )?test(?:\s|$))/.test(rawCommand.trim()) ? rawCommand : undefined;
   if (!paths.length && !command) return;
   updateSessionLedger(root, ev.sessionId, (ledger) => {

@@ -6,6 +6,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { defaultConfig } from '../src/config/load.js';
 import { changeImpact, renderImpact } from '../src/impact/index.js';
 import { recordImpactEvidence } from '../src/impact/evidence.js';
+import { sessionEvidence } from '../src/impact/evidence.js';
+import { shellQuote } from '../src/guards/trimmer.js';
 import { impactStop } from '../src/impact/stop.js';
 import { refreshIndex } from '../src/index/refresh.js';
 import { indexDbPath } from '../src/index/store.js';
@@ -37,6 +39,13 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('records test commands rewritten by the output-trimming wrapper', () => {
+    const root = fixture();
+    const command = `GW_SESSION_ID='wrapped' GW_ROOT=${shellQuote(root)} '/usr/bin/node' '--import' '/package/node_modules/tsx/dist/loader.mjs' '/package/src/cli/main.ts' run -- ${shellQuote("npx vitest run 'test/api.test.ts'")}`;
+    recordImpactEvidence(root, { ...stopEvent(root, false, 'wrapped'), event: 'post_tool', tool: 'Bash', input: { command }, response: 'passed' });
+    expect(sessionEvidence(root, 'wrapped').ran('test/api.test.ts')).toBe(true);
+    expect(sessionEvidence(root, 'wrapped').ran('test/other.test.ts')).toBe(false);
+  });
   it('reports importers broken by an export-alias-only rename or removal', async () => {
     for (const replacement of ['export { local as renamed };', 'export {};']) {
       const root = fixture();

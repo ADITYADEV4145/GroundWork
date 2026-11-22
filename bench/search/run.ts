@@ -35,6 +35,21 @@ export async function evaluateTask(db: ReturnType<typeof openDb>, task: Task, ar
   return { task: task.id, set: task.set, arm, rank: at < 0 ? 0 : at + 1, ids };
 }
 
+export function prepareBenchmarkEmbeddings(roots: string[], consent: boolean,
+  installed = (root: string) => hasLocalEmbeddings(root, DEFAULT_EMBEDDING_MODEL),
+  install = (root: string) => {
+    execFileSync(process.execPath,
+      ['--import', import.meta.resolve('tsx'), '--input-type=module', '-e',
+        `import { initializeEmbeddings } from ${JSON.stringify(path.join(REPO, 'src/reuse/embeddings.ts'))}; await initializeEmbeddings(${JSON.stringify(root)}, { consent: true });`],
+      { timeout: 90000, stdio: 'pipe' });
+  }): { semanticStatus: string; semanticReason: string } {
+  try {
+    if (consent) for (const root of roots) if (!installed(root)) install(root);
+    return roots.every(installed) ? { semanticStatus: 'RUN', semanticReason: '' }
+      : { semanticStatus: 'NOT RUN', semanticReason: 'Local model unavailable; installation requires explicit --embeddings consent.' };
+  } catch (error) { return { semanticStatus: 'NOT RUN', semanticReason: (error as Error).message }; }
+}
+
 async function run() {
   const frozen = manifest();
   execFileSync('git', ['merge-base', '--is-ancestor', frozen.anchor, 'HEAD'], { cwd: REPO });
@@ -58,14 +73,7 @@ async function run() {
       if (!task.expected.every((id) => ids.has(id))) throw new Error(`Missing frozen target: ${task.id} ${task.expected.join(',')}`);
     }
     if (process.argv.includes('--validate-only')) { console.log('All 50 frozen target IDs validated. No rankings evaluated.'); return; }
-    try {
-      // Setup is explicit and separate from runtime; the user requested attempting this optional arm.
-      for (const root of Object.values(roots)) execFileSync(process.execPath,
-        ['--import', import.meta.resolve('tsx'), '--input-type=module', '-e',
-          `import { initializeEmbeddings } from ${JSON.stringify(path.join(REPO, 'src/reuse/embeddings.ts'))}; await initializeEmbeddings(${JSON.stringify(root)}, { consent: true });`],
-        { timeout: 90000, stdio: 'pipe' });
-      if (Object.values(roots).every((root) => hasLocalEmbeddings(root, DEFAULT_EMBEDDING_MODEL))) semanticStatus = 'RUN';
-    } catch (error) { semanticReason = (error as Error).message; }
+    ({ semanticStatus, semanticReason } = prepareBenchmarkEmbeddings(Object.values(roots), process.argv.includes('--embeddings')));
     for (const task of frozen.tasks) for (const arm of ['baseline', 'lexical', ...(semanticStatus === 'RUN' ? ['hybrid'] : [])] as ('baseline' | 'lexical' | 'hybrid')[]) {
       rows.push(await evaluateTask(dbs[task.corpus]!, task, arm, roots[task.corpus as keyof typeof roots]));
     }

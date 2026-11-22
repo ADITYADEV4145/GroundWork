@@ -2,7 +2,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { evaluateTask, manifest, metrics } from '../bench/search/run.js';
+import { evaluateTask, manifest, metrics, prepareBenchmarkEmbeddings } from '../bench/search/run.js';
 import { defaultConfig } from '../src/config/load.js';
 import { findCode } from '../src/index/navigation.js';
 import { searchCodeTool } from '../src/mcp/tools/search_code.js';
@@ -14,6 +14,15 @@ import { withIndexedFixture } from '../src/selftest/fixtures.js';
 import { estimateTokens } from '../src/util/tokens.js';
 
 describe('plain-English search', () => {
+  it('requires explicit benchmark download consent and records unavailable or broken setup', () => {
+    const install = vi.fn();
+    expect(prepareBenchmarkEmbeddings(['a'], false, () => false, install).semanticStatus).toBe('NOT RUN');
+    expect(install).not.toHaveBeenCalled();
+    expect(prepareBenchmarkEmbeddings(['a'], false, () => true, install).semanticStatus).toBe('RUN');
+    let ready = false;
+    expect(prepareBenchmarkEmbeddings(['a'], true, () => ready, () => { ready = true; }).semanticStatus).toBe('RUN');
+    expect(prepareBenchmarkEmbeddings(['a'], true, () => false, () => { throw new Error('offline'); }).semanticReason).toBe('offline');
+  });
   it('drops English filler and splits code identifiers', () => {
     expect(terms('where do we find the code that retries failed HTTPRequests')).toEqual(['find', 'retry', 'fail', 'http', 'request']);
     expect(terms('how is the code that')).toEqual([]);

@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -10,7 +10,10 @@ const anchor = process.argv[2];
 if (!/^[a-f0-9]{40}$/.test(anchor ?? '')) throw new Error('Supply the frozen source commit');
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 }).trim();
 const sha = (text) => createHash('sha256').update(text).digest('hex');
-const seed = 17021991;
+const v2 = process.argv.includes('--v2');
+const seed = v2 ? 29061993 : 17021991;
+const mutationKey = (m) => JSON.stringify([m.repo, m.file, m.before, m.after]);
+const prior = new Set(v2 ? JSON.parse(readFileSync(path.join(root, 'bench/types/mutations.json'), 'utf8')).mutations.map(mutationKey) : []);
 const operators = ['unknown-export', 'arity', 'return-member', 'argument-type', 'annotated-property', 'non-callable'];
 const read = (file) => execFileSync('git', ['show', `${anchor}:${file}`], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 });
 const repos = ['customer-desk', 'parcel-ops', 'dispatch-desk', 'groundwork'];
@@ -28,6 +31,11 @@ const mutations = [];
 for (const repo of repos) {
   const candidates = [];
   const add = (file, operator, start, end, replacement) => {
+    if (v2) {
+      replacement = replacement.replace(/gw_missing_(export|member|property)/g, '$&_v2');
+      if (operator === 'argument-type') replacement = replacement === '"gw_wrong_type"' ? 'false' : '"gw_wrong_type_v2"';
+      if (operator === 'non-callable') replacement = replacement.replace(/\(\)$/, '(0)');
+    }
     const text = sources[repo][file];
     const line = text.slice(0, start).split('\n').length;
     if (text.slice(start, end).includes('\n') || replacement.includes('\n')) return;
@@ -35,7 +43,8 @@ for (const repo of repos) {
     const lineStart = text.lastIndexOf('\n', start - 1) + 1;
     const before = lines[line - 1];
     const after = before.slice(0, start - lineStart) + replacement + before.slice(end - lineStart);
-    if (before !== after) candidates.push({ repo, operator, file, line, before, after });
+    const candidate = { repo, operator, file, line, before, after };
+    if (before !== after && !prior.has(mutationKey(candidate))) candidates.push(candidate);
   };
   if (repo === 'dispatch-desk') {
     for (const [file, text] of Object.entries(sources[repo])) {
@@ -125,10 +134,27 @@ for (const repo of repos) {
     mutations.push(...unique.slice(0, 4));
   }
 }
-const cleanCommits = git('log', '-40', '--no-merges', '--format=%H %P', anchor, '--', '*.ts').split('\n').filter(Boolean).map((line) => { const [commit, parent] = line.split(' '); return { commit, parent }; });
-const manifest = { version: 1, seed, sourceCommit: anchor, compilers: { typescript: ts.version, pyright: 'PATH or project binary; record actual version in results' },
+let cleanCommits = git('log', ...(v2 ? [] : ['-40']), '--no-merges', '--format=%H %P', anchor, '--', '*.ts').split('\n').filter(Boolean).map((line) => { const [commit, parent] = line.split(' '); return { commit, parent }; });
+if (v2) {
+  cleanCommits = cleanCommits.map(({ commit, parent }) => {
+    const files = git('diff', '--no-renames', '--name-only', '--diff-filter=AM', parent, commit, '--', '*.ts').split('\n').filter(Boolean);
+    const excluded = [];
+    const eligible = files.filter((file) => {
+      const texts = [commit, parent].map((ref) => {
+        try { return execFileSync('git', ['show', `${ref}:${file}`], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); }
+        catch { return ''; }
+      });
+      const reason = file.split('/').some((part) => /^bad/i.test(part)) ? 'bad-prefixed path component' : texts.some((text) => /(?:\/\/|#)\s*expect:/.test(text)) ? 'expect annotation in parent or commit' : undefined;
+      if (reason) excluded.push({ file, reason });
+      return !reason;
+    });
+    eligible.sort((a, b) => sha(`${seed}:${commit}:${a}`).localeCompare(sha(`${seed}:${commit}:${b}`), 'en'));
+    return { commit, parent, files: eligible.slice(0, 4), excluded, eligibleFiles: eligible.length };
+  }).filter((row) => row.files.length).slice(0, 40);
+}
+const manifest = { version: v2 ? 2 : 1, seed, sourceCommit: anchor, compilers: { typescript: ts.version, pyright: 'PATH or project binary; record actual version in results' },
   cleanCommits, sourceHashes: Object.fromEntries(repos.map((repo) => [repo, Object.fromEntries(Object.entries(sources[repo]).map(([file, text]) => [file, sha(text)]))])),
   mutations: mutations.map((m, i) => ({ id: `type-${String(i + 1).padStart(3, '0')}`, ...m })) };
 const json = JSON.stringify(manifest, null, 2) + '\n';
-writeFileSync(path.join(root, 'bench/types/mutations.json'), json);
+writeFileSync(path.join(root, v2 ? 'bench/types/mutations-v2.json' : 'bench/types/mutations.json'), json);
 console.log(`Frozen ${mutations.length} mutations, ${cleanCommits.length} reachable clean commits; SHA256 ${sha(json)}`);

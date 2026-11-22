@@ -7,6 +7,12 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
 
+After API edits, use `change_impact` (or `gw impact --json`) for unchanged callers,
+reaching tests and session coverage. High/medium-risk Stop context is evidence,
+never a block. A `complete: true` answer needs no further impact lookup for that
+snapshot; edits invalidate it. Incomplete reasons and test commands guide follow-up.
+See [impact](references/impact.md). Tool-level benchmark results are not agent runs.
+
 ## 1. Navigate: use the cheapest sufficient evidence
 
 1. Use `rg` for a trivial literal or filename lookup. Use the index for symbol, behavior and structure questions: `find_code({ "query": "what you need" })`. Exact names return exact matches; use `breadth: "all"` only when broader results are needed. Set `locations_only: false` for signatures or docs. If you need the body with a unique exact-name lookup, use `include_body: true` in that same call. Defaults stay location-only. Stop when the requested location is resolved.

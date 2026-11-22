@@ -46,24 +46,32 @@ function captures() {
   }))));
 }
 test('synthetic complete exports produce all ten registered comparisons with guardrails', async () => {
-  const report = await analyze(captures(), suites);
+  const report = await analyze(captures(), suites, revision);
   expect(report.comparisons).toHaveLength(10);
   expect(report.comparisons[0].metrics.elapsedMsPerTask.reductionPct.adjustedLow).toBe(50);
   expect(report.comparisons[0].confirmatoryWin).toBe(true);
   expect(report.comparisons[0].metrics.emittedBytesPerSession.reductionPct).toBeNull();
 });
 test('rejects incomplete arms, mixed revisions and non-stable timing', async () => {
-  await expect(analyze(captures().slice(1), suites)).rejects.toThrow('Incomplete arm');
+  await expect(analyze(captures().slice(1), suites, revision)).rejects.toThrow('Incomplete arm');
   const mixed = captures(); mixed[0]!.captureRevision = 'b'.repeat(40);
-  await expect(analyze(mixed, suites)).rejects.toThrow('Mixed captureRevision');
+  await expect(analyze(mixed, suites, revision)).rejects.toThrow('Mixed captureRevision');
   const legacy = captures(); legacy[0]!.sessionStartBasis = 'first-captured-action';
-  await expect(analyze(legacy, suites)).rejects.toThrow('Non-stable');
+  await expect(analyze(legacy, suites, revision)).rejects.toThrow('Non-stable');
   const missing = captures(); delete (missing[0]!.observations[0] as { endedAt?: number }).endedAt;
-  await expect(analyze(missing, suites)).rejects.toThrow();
+  await expect(analyze(missing, suites, revision)).rejects.toThrow();
 });
 
 test.each(['agent', 'model', 'node'] as const)('rejects mixed %s across suites', async (field) => {
   const mixed = captures();
   Object.assign(mixed.at(-1)!, { [field]: 'different' });
-  await expect(analyze(mixed, suites)).rejects.toThrow('same agent, model and Node');
+  await expect(analyze(mixed, suites, revision)).rejects.toThrow('same agent, model and Node');
+});
+
+test('requires the shared capture revision to match the grader checkout HEAD', async () => {
+  await expect(analyze(captures(), suites, 'b'.repeat(40))).rejects.toThrow('match grader checkout HEAD');
+  await expect(analyze(captures(), suites)).rejects.toThrow('match grader checkout HEAD');
+  const head = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
+  const matching = captures().map((c) => ({ ...c, captureRevision: head }));
+  expect((await analyze(matching, suites)).comparisons).toHaveLength(10);
 });

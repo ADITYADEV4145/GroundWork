@@ -1,4 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { captureSchema, gradeSchema } from '../src/bench/schema.ts';
@@ -8,9 +9,11 @@ import { loadSuite, withPinnedWorkspace } from '../src/bench/runner.ts';
 export const arms = ['baseline', 'groundwork', 'serena', 'codebase-memory'];
 export const comparisons = [['baseline', 'groundwork'], ['baseline', 'serena'], ['baseline', 'codebase-memory'], ['serena', 'groundwork'], ['codebase-memory', 'groundwork']];
 
-export async function analyze(input, suites = ['nav', 'long-horizon'].map((name) => ({ name, ...loadSuite(name) }))) {
+export async function analyze(input, suites = ['nav', 'long-horizon'].map((name) => ({ name, ...loadSuite(name) })),
+  graderRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' }).trim()) {
   const captures = input.map((c) => captureSchema.parse(c));
   if (new Set(captures.map((c) => c.captureRevision)).size !== 1) throw new Error('Mixed captureRevision');
+  if (captures[0].captureRevision !== graderRevision) throw new Error('captureRevision must match grader checkout HEAD');
   if (captures.some((c) => c.agent !== captures[0].agent || c.model !== captures[0].model || c.node !== captures[0].node)) {
     throw new Error('Captures must use the same agent, model and Node');
   }

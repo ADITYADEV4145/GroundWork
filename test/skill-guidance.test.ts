@@ -6,6 +6,21 @@ import { verifyCallsTool } from '../src/mcp/tools/verify_calls.js';
 const read = (file: string) => readFileSync(new URL('../' + file, import.meta.url), 'utf8');
 
 describe('shipped task-aware guidance', () => {
+  it('trims continuing-work orientation and caps explicit verification without weakening automatic checks', () => {
+    for (const file of ['SKILL.md', 'references/navigation.md']) {
+      expect(read(file)).toContain('do one orientation step');
+      expect(read(file)).toContain('at most once per orientation');
+      expect(read(file)).toContain('Do not repeat a map/outline cycle per task');
+    }
+    for (const file of ['SKILL.md', 'references/grounding.md']) {
+      expect(read(file)).toContain('at most once per task');
+      expect(read(file)).toContain('only for new cross-file targets unconfirmed');
+      expect(read(file)).toContain('not another explicit verification pass');
+    }
+    expect(verifyCallsTool.description).toContain('at most once per task');
+    expect(read('references/reuse.md')).toContain('not once per task or for every edit');
+    expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'outline')!.description).toContain('at most once per orientation');
+  });
   it('reuses carried evidence across steps/sessions without treating other agents as context', () => {
     for (const file of ['SKILL.md', 'references/navigation.md', 'references/reuse.md', 'references/grounding.md']) {
       const text = read(file);

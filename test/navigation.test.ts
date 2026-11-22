@@ -40,7 +40,7 @@ describe('MCP navigation', () => {
         count += text.split('\n').filter((line) => line.startsWith('[')).length;
         if (!text.includes('Next: outline(')) break;
         const next = JSON.parse(text.split('Next: outline(')[1]!.slice(0, -1));
-        expect(next.offset).toBeGreaterThan(args.offset ?? 0);
+        expect(next.offset).toBeGreaterThan(Number(args.offset ?? 0));
         expect(next.files).toEqual(many);
         expect(next.locations_only).toBe(false);
         args = next;

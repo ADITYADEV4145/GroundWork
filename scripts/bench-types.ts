@@ -15,10 +15,11 @@ import { typeCheck, type TypeCheckResult } from '../src/types/index.js';
 const project = fileURLToPath(new URL('../', import.meta.url));
 const data = path.join(project, 'bench/types');
 const script = fileURLToPath(import.meta.url);
+const version = process.argv.includes('--v2') ? 2 : 1;
 const sha = (text: string | Buffer) => createHash('sha256').update(text).digest('hex');
 interface Mutation { id: string; repo: string; operator: string; file: string; line: number; before: string; after: string }
 interface Manifest {
-  version: number; seed: number; sourceCommit: string; cleanCommits: { commit: string; parent: string }[];
+  version: number; seed: number; sourceCommit: string; cleanCommits: { commit: string; parent: string; files?: string[]; excluded?: { file: string; reason: string }[]; eligibleFiles?: number }[];
   sourceHashes: Record<string, Record<string, string>>; mutations: Mutation[];
   compilers: { typescript: string; pyright: string };
 }
@@ -35,13 +36,13 @@ interface CleanRow extends Evaluation { id: string; commit?: string; parent?: st
 interface Timing { mode: 'cold' | 'warm'; ms: number; result: TypeCheckResult }
 interface Timings { samples: Timing[]; warmup: Timing | null; errors: string[] }
 
-export function registeredManifest(directory = data): { manifest: Manifest; hash: string } {
-  const registration = readFileSync(path.join(directory, 'PREREGISTRATION.md'), 'utf8');
+export function registeredManifest(directory = data, protocolVersion = version): { manifest: Manifest; hash: string } {
+  const registration = readFileSync(path.join(directory, protocolVersion === 2 ? 'PREREGISTRATION-v2.md' : 'PREREGISTRATION.md'), 'utf8');
   const expected = /Manifest SHA256: `([a-f0-9]{64})`/.exec(registration)?.[1];
-  const bytes = readFileSync(path.join(directory, 'mutations.json'));
+  const bytes = readFileSync(path.join(directory, protocolVersion === 2 ? 'mutations-v2.json' : 'mutations.json'));
   if (!expected || sha(bytes) !== expected) throw new Error('Refusing benchmark: mutations.json SHA256 differs from preregistration');
   const manifest = JSON.parse(bytes.toString()) as Manifest;
-  if (manifest.version !== 1 || manifest.mutations.length < 60 || manifest.mutations.length > 120) throw new Error('Invalid registered manifest');
+  if (manifest.version !== protocolVersion || manifest.mutations.length < 60 || manifest.mutations.length > 120) throw new Error('Invalid registered manifest');
   return { manifest, hash: expected };
 }
 
@@ -146,6 +147,7 @@ async function timingCalls(root: string, mode: 'cold' | 'warm', count: number): 
 }
 
 interface Results {
+  version: number;
   protocol: string; manifestSha256: string; sourceCommit: string; checkerCommit: string; checkerSourceSha256: string;
   generatedAt: string; environment: Record<string, unknown>; workDirectory: string;
   seeds: SeedRow[]; clean: CleanRow[]; timings: Timings;
@@ -195,12 +197,13 @@ export function markdown(results: Results): string {
   lines.push(...results.timings.errors.map((e) => `- timing: ${e}`));
   if (!incomplete.length && !results.timings.errors.length) lines.push('None.');
   lines.push('', '## Interpretation and limitations', '',
-    '- Only 32 reachable non-merge commits touch tracked TypeScript files; all 32 were frozen and evaluated, per the approved widened rule. No unmerged history was used.',
+    `- ${results.clean.filter((c) => c.commit).length} reachable non-merge history commits were frozen and evaluated. No unmerged history was used.`,
+    ...(results.version === 2 ? ['- V2 exists because v1 designated intentionally broken fixtures as clean. V2 excludes bad-prefixed path components and files with // expect: or # expect: annotations in either parent or commit. Up to four SHA-ranked eligible changed files per commit balance coverage; exact selections and exclusions are frozen in mutations-v2.json. This changes the evaluation, not the checker; do not pool v1 and v2 results.', '- V2 has seed 29061993 and no exact repo/file/before/after mutation overlap with v1. Sites and operator families may overlap; this is not an independent population sample.'] : []),
     '- Historical workspaces use their own source/config but the same currently installed development dependencies, not reconstructed historical installs. Dependency/compiler skew can create diagnostics; no such rows are removed.',
     '- This is a fixed seeded corpus and a designated-clean proxy, not a population precision estimate or agent success evaluation. A failure is published without tuning the checker.',
     '- Types remain Stop-only by default (`types.postToolHook: false`). No PostToolUse latency claim is made, and this evaluation does not authorize enabling that hook.',
     '- Post-registration checker fixes (requested after analysis of v1): files matching grounding\'s shared DYNAMIC_TEXT signal retain type diagnostics as info; TS 2307 is no longer blocking because grounding owns missing modules. These are general precision policies, not filename/corpus exceptions. Full v1 rerun uses the unchanged frozen manifest and original scoring rules; earlier runs remain archived.',
-    '- Runner-only correction after the initial run: explicitly validate anchor/history reachability and restrict reference changed-file metadata to its workflow target (excluding the unsupported dependency symlink). Both full runs are retained; checker policy, corpus and scoring are unchanged.',
+    '- Earlier v1 runner-only corrections validated anchor/history reachability and restricted reference changed-file metadata to its workflow target. Earlier runs are archived. V2 additionally consumes preregistered file selections and uses a separate hash-checked manifest and output directory.',
     `- Environment: ${JSON.stringify(results.environment)}.`,
     '- Raw per-mutation findings, availability, clean cases, warm-up and samples: `results.json`.', '');
   return lines.join('\n');
@@ -262,14 +265,15 @@ export async function runBenchmark(): Promise<Results> {
   for (const row of manifest.cleanCommits) {
     const root = path.join(work, `history-${row.commit.slice(0, 12)}`);
     checkout(root, row.commit);
-    const changed = changedFromGit(root, row.parent).filter((c) => c.file.endsWith('.ts'));
+    const changed = changedFromGit(root, row.parent).filter((c) => c.file.endsWith('.ts') && (!row.files || row.files.includes(c.file)));
+    if (row.files && row.files.some((file) => !changed.some((c) => c.file === file))) throw new Error(`Registered changed file absent: ${row.commit}`);
     clean.push({ id: `history/${row.commit}`, commit: row.commit, parent: row.parent, changed, ...await evaluate(root, changed, row.parent) });
     console.log(`history ${row.commit}: A=${clean.at(-1)!.A.length} B=${clean.at(-1)!.B.length} complete=${clean.at(-1)!.complete}`);
     checkpoint();
   }
   const timings: Timings = { samples: [], warmup: null, errors: [] };
   const sample = (mode: 'cold' | 'warm', count: number) => {
-    const output = execFileSync(process.execPath, ['--import', 'tsx', script, '--timing-child', anchor, mode, String(count)], { cwd: project, encoding: 'utf8', timeout: count * 6000 + 10000, maxBuffer: 16 << 20 });
+    const output = execFileSync(process.execPath, ['--import', 'tsx', script, '--timing-child', anchor, mode, String(count), ...(version === 2 ? ['--v2'] : [])], { cwd: project, encoding: 'utf8', timeout: count * 6000 + 10000, maxBuffer: 16 << 20 });
     return JSON.parse(output) as { samples: Timing[]; warmup: Timing | null };
   };
   for (let i = 0; i < 20; i++) {
@@ -284,10 +288,10 @@ export async function runBenchmark(): Promise<Results> {
   const seeded = { total: seeds.length, A: seeds.filter((r) => r.caughtA).length, B: seeds.filter((r) => r.caughtB).length };
   const falseBlocks = { A: clean.reduce((n, r) => n + r.A.length, 0), B: clean.reduce((n, r) => n + r.B.length, 0) };
   const rules = { moreSeededErrors: seeded.B > seeded.A, noMoreFalseBlocks: falseBlocks.B <= falseBlocks.A, stopBudget: p95 !== null && p95 <= 4000 };
-  const results: Results = { protocol: 'deterministic tool-level, not an agent run', manifestSha256: hash, sourceCommit: manifest.sourceCommit,
+  const results: Results = { version, protocol: 'deterministic tool-level, not an agent run', manifestSha256: hash, sourceCommit: manifest.sourceCommit,
     checkerCommit: git(project, 'rev-parse', 'HEAD'), checkerSourceSha256: sourceHash(), generatedAt: new Date().toISOString(), environment, workDirectory: work,
     seeds, clean, timings, summary: { seeded, falseBlocks, cleanCases: clean.length, complete, p50, p95, rules, status: !complete ? 'INCOMPLETE' : Object.values(rules).every(Boolean) ? 'PASS' : 'FAIL' } };
-  const out = path.join(data, 'results');
+  const out = path.join(data, version === 2 ? 'results-v2' : 'results');
   if (existsSync(path.join(out, 'results.json'))) {
     const archive = path.join(out, `previous-${Date.now()}`); mkdirSync(archive);
     cpSync(path.join(out, 'results.json'), path.join(archive, 'results.json'));

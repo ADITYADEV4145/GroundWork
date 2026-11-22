@@ -34,6 +34,24 @@ describe('preregistered type-checking benchmark', () => {
     expect(unionBlocks([], [])).toEqual([]);
   });
 
+  it('keeps v2 separately registered, mutation-disjoint and balanced across additional history', () => {
+    const v1 = registeredManifest().manifest;
+    const { manifest } = registeredManifest(undefined, 2);
+    const key = (m: { repo: string; file: string; before: string; after: string }) => JSON.stringify([m.repo, m.file, m.before, m.after]);
+    const old = new Set(v1.mutations.map(key));
+    expect(manifest.seed).not.toBe(v1.seed);
+    expect(manifest.mutations).toHaveLength(93);
+    expect(manifest.mutations.some((m) => old.has(key(m)))).toBe(false);
+    expect(manifest.cleanCommits).toHaveLength(35);
+    expect(manifest.cleanCommits.filter((c) => !v1.cleanCommits.some((old) => old.commit === c.commit))).toHaveLength(3);
+    for (const c of manifest.cleanCommits) {
+      expect(c.files!.length).toBeGreaterThan(0);
+      expect(c.files!.length).toBeLessThanOrEqual(4);
+      expect(c.files!.some((f) => f.split('/').some((part) => /^bad/i.test(part)))).toBe(false);
+      expect(c.files!.some((f) => c.excluded!.some((excluded) => excluded.file === f))).toBe(false);
+    }
+  });
+
   it('uses preregistered nearest-rank percentiles without discarding outliers', () => {
     expect(percentile([], 0.95)).toBeNull();
     expect(percentile([7], 0.95)).toBe(7);

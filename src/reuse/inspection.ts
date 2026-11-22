@@ -14,7 +14,7 @@ export function inspectSource(source: string, language: Language) {
   const plainReference = (n: Node | null): boolean => !!n && (['identifier', 'this', 'self'].includes(n.type) ||
     (['member_expression', 'attribute'].includes(n.type) && n.namedChildren.every((c) => !c || plainReference(c) || c.type === 'property_identifier')));
   const visit = (n: Node) => {
-    if (n.type === 'comment') { comments.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, text: n.text }); return; }
+    if (['comment', 'line_comment', 'block_comment'].includes(n.type)) { comments.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, text: n.text }); return; }
     const body = n.childForFieldName('body');
     const accessor = n.type === 'method_definition' && n.children.some((c) => c?.type === 'get' || c?.type === 'set');
     const property = n.type === 'function_definition' && n.parent?.type === 'decorated_definition' &&

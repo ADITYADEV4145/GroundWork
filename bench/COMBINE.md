@@ -1,5 +1,25 @@
 # Combining paired runs
 
+## Round 3 (v4)
+
+Round 3 pins both arms to `ff578514d78397faffd2ac1836fb3cbd03e62ee1`.
+The sessions still export `nav3-*` / `lh3-*` filenames; select v4 explicitly:
+
+```sh
+node scripts/bench-combine-v2.mjs --experiment v4 \
+  --nav-captures /path/to/v4-nav-exports \
+  --lh-captures /path/to/v4-lh-exports \
+  --build /path/to/built-ff57851-checkout
+```
+
+V4 writes only `bench/{nav,long-horizon}/v4/{observations,results}` evidence,
+archiving unchanged export bytes as `nav4-*` / `lh4-*`. Original/v2/v3 evidence
+is preserved. Tables and charts show four experiments per suite, without pooling.
+GroundWork prompts mirror explore-first traces, opt-in bodies, batched symbol
+reads, and carried unchanged evidence; LH uses batched verification instead of
+verification-only rereads. Baselines were re-collected at ff57851. These protocol
+and implementation changes cannot be separated by cross-round comparisons.
+
 ## Post-fix experiments (v2 and v3)
 
 The same entrypoint supports `--experiment v2` (the default, round 1 at

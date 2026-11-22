@@ -301,34 +301,38 @@ from compact navigation and not pooled with it. Raw exports and combination
 instructions are in [bench/COMBINE.md](bench/COMBINE.md). Historical tables follow.
 
 <!-- overhead-comparison:start -->
-### Original / round 1 / round 2 overhead experiments
+### Original / round 1 / round 2 / round 3 overhead experiments
 
 Each experiment contains eight fresh paired runs per task; experiments are not pooled.
 
-Round 1 (v2, e605fe9559cae088a2060a4ed53a27c32daa4df9): LH GroundWork used revised guidance (fewer required calls); navigation guidance was unchanged except the revision. Round 2 (v3, abafcba361f358b61e54fc906977209e494cf07a): the GroundWork arm prompts mirrored the new SKILL.md guidance: rg for trivial lookups, exact-first find_code, actionable-only find_similar, and verify_calls only for unconfirmed cross-file calls. Each round is a protocol change as well as a tool change; baselines were re-collected at that round’s commit. Do not attribute differences solely to implementation changes.
+Round 1 (v2, e605fe9559cae088a2060a4ed53a27c32daa4df9): LH GroundWork used revised guidance (fewer required calls); navigation guidance was unchanged except the revision. Round 2 (v3, abafcba361f358b61e54fc906977209e494cf07a): the GroundWork arm prompts mirrored the new SKILL.md guidance: rg for trivial lookups, exact-first find_code, actionable-only find_similar, and verify_calls only for unconfirmed cross-file calls. Round 3 (v4, ff578514d78397faffd2ac1836fb3cbd03e62ee1): GroundWork navigation prompts mirror explore-first traces, opt-in find_code bodies, batched read_symbol and carried unchanged evidence; long-horizon prompts mirror cross-step/session reuse and batched verify_calls instead of verification-only rereads. The navigation capture allowlist adds explore; graders are unchanged. Each round is a protocol change as well as a tool change; baselines were re-collected at that round’s commit in completed experiments. Round 3 also requires fresh baselines at its pinned commit. Do not attribute differences solely to implementation changes.
 
 V2 protocol deviations: LH groundwork-4 and baseline-7 were executed by the session’s sidekick subagent using the same wrappers. LH groundwork-3 and groundwork-7 skipped verify_calls despite new cross-file calls. These are recorded executions, not perfectly uniform protocol adherence. The merged code also includes a later verify_calls budget fix for many unchecked files; that fix was not part of the measured e605fe9 runs.
 
 V3 session notes: several GroundWork long-horizon runs skipped find_similar for small shared helpers and made no verify_calls because the targets had already been read, following the new guidance as written. A few sessions had early wrapper failures from incorrect working directories or environment variables; these were retried before work. One navigation GroundWork where_used validation error was not retried, and one navigation GroundWork session read a whole file using shell cat. These are recorded executions, not perfectly uniform tool use; wrapper failures and shell reads should not be silently treated as successful indexed navigation.
+
+V4 export limitations: the received exports contain no session notes or protocol-deviation annotations; this does not establish uniform protocol adherence. Full tool arguments and response text are not retained, so wrapper failures, shell-read commands and whether body requests were batched cannot be reconstructed from these files. Long-horizon shell writes still do not dispatch edit or Stop hooks. Only captured activity is graded; no unrecorded behavior is assumed successful.
 
 | Eight-run suite / experiment | Success, baseline / GroundWork | Estimated-output reduction, median [95% CI] | Mean wall time, baseline → GroundWork | Wall-time reduction, median [95% CI] |
 | --- | --- | --- | --- | --- |
 | Compact nav · original | 240/240 / 240/240 | -2.0% [-25.2, 16.4] | 5.58s → 7.44s | -31.3% [-55.4, -18.9] |
 | Compact nav · round 1 | 240/240 / 240/240 | 0.3% [-25.4, 26.8] | 5.23s → 6.61s | -32.4% [-40.8, -11.5] |
 | Compact nav · round 2 | 240/240 / 240/240 | 12.5% [-5.0, 27.2] | 5.18s → 6.06s | -12.4% [-27.2, -3.7] |
+| Compact nav · Round 3 at ff57851 | 240/240 / 240/240 | -0.7% [-47.6, 11.3] | 5.23s → 6.46s | -15.5% [-42.8, -7.4] |
 | Long-horizon · original | 80/80 / 80/80 | -63.2% [-86.1, -38.6] | 5.18s → 11.04s | -110.1% [-132.7, -91.5] |
 | Long-horizon · round 1 | 80/80 / 80/80 | -89.9% [-208.6, -46.8] | 8.07s → 9.50s | -22.6% [-46.2, -3.3] |
 | Long-horizon · round 2 | 80/80 / 80/80 | -59.7% [-119.4, -25.0] | 6.98s → 7.57s | -8.4% [-47.9, 8.0] |
+| Long-horizon · Round 3 at ff57851 | 80/80 / 80/80 | 1.6% [-23.3, 20.1] | 6.56s → 10.32s | -73.5% [-98.1, -35.4] |
 
-Compact nav · round 1: the estimated-output interval includes zero (no significant change under this analysis); the wall-time interval excludes zero toward slower execution. Compact nav · round 2: the estimated-output interval includes zero (no significant change under this analysis); the wall-time interval excludes zero toward slower execution. Long-horizon · round 1: the estimated-output interval excludes zero toward more output; the wall-time interval excludes zero toward slower execution. Long-horizon · round 2: the estimated-output interval excludes zero toward more output; the wall-time interval includes zero (no significant change under this analysis).
+Compact nav · round 1: the estimated-output interval includes zero (no significant change under this analysis); the wall-time interval excludes zero toward slower execution. Compact nav · round 2: the estimated-output interval includes zero (no significant change under this analysis); the wall-time interval excludes zero toward slower execution. Compact nav · Round 3 at ff57851: the estimated-output interval includes zero (no significant change under this analysis); the wall-time interval excludes zero toward slower execution. Long-horizon · round 1: the estimated-output interval excludes zero toward more output; the wall-time interval excludes zero toward slower execution. Long-horizon · round 2: the estimated-output interval excludes zero toward more output; the wall-time interval includes zero (no significant change under this analysis). Long-horizon · Round 3 at ff57851: the estimated-output interval includes zero (no significant change under this analysis); the wall-time interval excludes zero toward slower execution.
 
 Estimated output is bytes/4, not billed model tokens; no dollar savings are established. Positive reductions mean less output or faster execution; negative means more output or slower execution. Intervals resample paired tasks after summing repeats, not independent sessions. Mean times and median percentage reductions are different estimands. Separate intervals do not test the before/after difference; sequential LH tasks share context.
 
-![Estimated tool-output reductions across three experiments](docs/assets/bench/before-after-output.svg)
+![Estimated tool-output reductions across four experiments](docs/assets/bench/before-after-output.svg)
 
-![Mean wall times and paired-task reduction intervals across three experiments](docs/assets/bench/before-after-wall.svg)
+![Mean wall times and paired-task reduction intervals across four experiments](docs/assets/bench/before-after-wall.svg)
 
-![Baseline and GroundWork success across three experiments](docs/assets/bench/before-after-success.svg)
+![Baseline and GroundWork success across four experiments](docs/assets/bench/before-after-success.svg)
 <!-- overhead-comparison:end -->
 
 ## Long-horizon benchmark

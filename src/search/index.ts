@@ -1,7 +1,8 @@
 import type { GroundworkConfig } from '../config/schema.js';
 import { loadConfig } from '../config/load.js';
 import { findCode } from '../index/navigation.js';
-import { searchDocuments } from '../index/query.js';
+import { readFingerprintedSymbols, searchDocuments } from '../index/query.js';
+import { stem as fingerprintStem } from '../extract/fingerprint.js';
 import { DEFAULT_EMBEDDING_MODEL, embedSources, hasLocalEmbeddings } from '../reuse/embeddings.js';
 import { vectorCosine } from '../reuse/signals.js';
 import type { Db } from '../store/db.js';
@@ -30,8 +31,13 @@ export async function searchCode(db: Db, query: string, opts: CodeSearchOptions 
   const originals = findCode(db, q);
   const exact = originals.filter((s) => s.name.toLowerCase() === q.toLowerCase() || s.name.split('.').at(-1)?.toLowerCase() === q.toLowerCase());
   const prior = new Map(originals.map((s) => [s.id, s.score]));
-  const fields = docs.map((d) => [d.name, d.qualifiedName, d.doc, d.signature, d.file, d.body].map((f) => new Set(terms(f, false))));
-  const idf = new Map(words.map((w) => [w, Math.log(1 + docs.length / (1 + fields.filter((fs) => fs.some((f) => alternatives(w).some((a) => f.has(a)))).length))]));
+  const vocabulary = new Map(readFingerprintedSymbols(db).map((s) => [s.id, new Set(Object.keys(s.fingerprint.vocab).flatMap((w) => [...terms(w), w]))]));
+  const fields = docs.map((d) => [d.name, d.qualifiedName, d.doc, d.signature, d.file, d.body].map((f) => new Set(terms(f))));
+  const expanded = new Map(words.map((w) => [w, alternatives(w)]));
+  const matchesBody = (id: string, w: string) => expanded.get(w)!.some((a) => vocabulary.get(id)?.has(a) || vocabulary.get(id)?.has(fingerprintStem(a)));
+  const idf = new Map(words.map((w) => [w, Math.log(1 + docs.length / (1 + fields.filter((fs, i) => fs.some((f) => expanded.get(w)!.some((a) => f.has(a))) || matchesBody(docs[i]!.id, w)).length))]));
+  const weights = [6, 4, 7, 3, 2, 3];
+  const averages = weights.map((_, j) => fields.reduce((sum, fs) => sum + fs[j]!.size, 0) / Math.max(1, fields.length));
   const reasons = new Map<string, string>();
   const lexical = docs.map((d, i) => {
     const matched: string[] = [];
@@ -39,13 +45,14 @@ export async function searchCode(db: Db, query: string, opts: CodeSearchOptions 
     for (const w of words) {
       let best = 0;
       for (const [j, field] of fields[i]!.entries()) {
-        const weight = [8, 6, 4, 3, 2, 1][j]!;
+        const weight = weights[j]! / (0.65 + 0.35 * field.size / Math.max(1, averages[j]!));
         if (field.has(w)) best = Math.max(best, weight);
-        else if (alternatives(w).some((a) => field.has(a))) best = Math.max(best, weight * 0.65);
+        else if (expanded.get(w)!.some((a) => field.has(a))) best = Math.max(best, weight * 0.7);
       }
+      if (matchesBody(d.id, w)) best = Math.max(best, 2.5);
       if (best) { matched.push(w); score += best * idf.get(w)!; }
     }
-    score *= 0.5 + matched.length / words.length;
+    score *= 0.25 + (matched.length / words.length) ** 2;
     reasons.set(d.id, matched.length ? `terms: ${matched.join(', ')}` : 'find_code match');
     return { id: d.id, score };
   }).filter((s) => s.score > 0).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));

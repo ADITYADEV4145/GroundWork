@@ -6,6 +6,7 @@ import { evaluateTask, manifest, metrics, prepareBenchmarkEmbeddings } from '../
 import { defaultConfig } from '../src/config/load.js';
 import { findCode } from '../src/index/navigation.js';
 import { searchDocuments } from '../src/index/query.js';
+import * as queryApi from '../src/index/query.js';
 import { searchCodeTool } from '../src/mcp/tools/search_code.js';
 import { TOOLS } from '../src/mcp/tools/index.js';
 import * as embeddings from '../src/reuse/embeddings.js';
@@ -44,8 +45,10 @@ describe('plain-English search', () => {
   });
   it('lightly stems retry inflections and symmetrically expands curated vocabulary', () => {
     expect(['retries', 'retrying', 'retried'].map(stemTerm)).toEqual(['retry', 'retry', 'retry']);
-    expect(alternatives('remove')).toContain('delete');
-    expect(alternatives('delete')).toContain('remove');
+    expect(alternatives('remove')).toContain(stemTerm('delete'));
+    expect(alternatives('delete')).toContain(stemTerm('remove'));
+    expect(['parse', 'parsed', 'parsing'].map(stemTerm)).toEqual(['pars', 'pars', 'pars']);
+    expect(['delete', 'deleted', 'deleting'].map(stemTerm)).toEqual(['delet', 'delet', 'delet']);
     expect(alternatives('fetch')).toEqual(expect.arrayContaining(['get', 'load', 'request']));
     expect(alternatives('unknown')).toEqual(['unknown']);
   });
@@ -54,6 +57,24 @@ describe('plain-English search', () => {
     expect(result[0]!.id).toBe('b');
     expect(result[0]!.score).toBeCloseTo(1 / 62 + 1 / 61);
     expect(reciprocalRankFusion([])).toEqual([]);
+  });
+  it('ranks descriptive documentation and indexed local identifiers above incidental name overlap', async () => {
+    await withIndexedFixture('ts-app', async (db) => {
+      const document = searchDocuments(db)[0]!;
+      const docs = vi.spyOn(queryApi, 'searchDocuments').mockReturnValue([
+        { ...document, id: 'doc', name: 'execute', qualifiedName: 'execute', doc: 'Delete expired records from storage', body: '' },
+        { ...document, id: 'noise', name: 'record', qualifiedName: 'record', doc: '', body: '' },
+        { ...document, id: 'body', name: 'perform', qualifiedName: 'perform', doc: '', body: '' },
+      ]);
+      const symbols = vi.spyOn(queryApi, 'readFingerprintedSymbols').mockReturnValue([
+        { fingerprint: { vocab: { expir: 1, record: 2, delet: 1 } }, id: 'body' } as unknown as ReturnType<typeof queryApi.readFingerprintedSymbols>[number],
+      ]);
+      try {
+        const hits = await searchCode(db, 'remove expired records', { semantic: false });
+        expect(hits[0]!.id).toBe('doc');
+        expect(hits.findIndex((h) => h.id === 'body')).toBeLessThan(hits.findIndex((h) => h.id === 'noise'));
+      } finally { docs.mockRestore(); symbols.mockRestore(); }
+    });
   });
   it('retains exact find_code ranking and returns short evidence with silent missing-model fallback', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
@@ -113,6 +134,7 @@ describe('plain-English search', () => {
   });
   it('runs the benchmark harness on a tiny fixture subset', async () => {
     expect(manifest().tasks).toHaveLength(50);
+    expect(manifest(2).tasks).toHaveLength(50);
     expect(metrics([1, 2, 0])).toEqual({ tasks: 3, recall1: 1 / 3, recall5: 2 / 3, mrr: 0.5 });
     await withIndexedFixture('ts-app', async (db) => {
       const task = { id: 'tiny', set: 'exact', corpus: 'fixture', query: 'formatDate', expected: [findCode(db, 'formatDate')[0]!.id] };

@@ -16,10 +16,11 @@ import { openDb } from '../../src/store/db.js';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '../..');
 const MANIFEST_SHA = 'b692809e064e38238daaf5b05e81e403460a38592bb249d3004ef023426fd24b';
+const V2_MANIFEST_SHA = '7b7c8e7f9a0b322ff7aa4ace9f851e526ec5939c1089d52e3427a194b8b4e293';
 export interface Task { id: string; set: string; corpus: string; query: string; expected: string[] }
-export function manifest(): { anchor: string; tasks: Task[] } {
-  const raw = readFileSync(path.join(HERE, 'tasks.json'));
-  if (createHash('sha256').update(raw).digest('hex') !== MANIFEST_SHA) throw new Error('Frozen manifest SHA mismatch');
+export function manifest(version = 1): { anchor: string; tasks: Task[] } {
+  const raw = readFileSync(path.join(HERE, version === 2 ? 'tasks-v2-main.json' : 'tasks.json'));
+  if (createHash('sha256').update(raw).digest('hex') !== (version === 2 ? V2_MANIFEST_SHA : MANIFEST_SHA)) throw new Error('Frozen manifest SHA mismatch');
   return JSON.parse(raw.toString());
 }
 export function metrics(ranks: number[]) {
@@ -51,9 +52,11 @@ export function prepareBenchmarkEmbeddings(roots: string[], consent: boolean,
 }
 
 async function run() {
-  const frozen = manifest();
+  const version = process.argv.includes('--v2') ? 2 : 1;
+  const manifestSha = version === 2 ? V2_MANIFEST_SHA : MANIFEST_SHA;
+  const frozen = manifest(version);
   execFileSync('git', ['merge-base', '--is-ancestor', frozen.anchor, 'HEAD'], { cwd: REPO });
-  const workspace = path.join(os.homedir(), process.argv.includes('--validate-only') ? 'groundwork-search-validation-v1' : 'groundwork-search-evaluation-v1');
+  const workspace = path.join(os.homedir(), `groundwork-search-${process.argv.includes('--validate-only') ? 'validation' : 'evaluation'}-v${version}`);
   if (existsSync(workspace)) throw new Error(`Refusing to reuse benchmark workspace: ${workspace}`);
   mkdirSync(workspace);
   const archive = execFileSync('git', ['archive', frozen.anchor, 'src', 'fixtures/py-app/app'], { cwd: REPO, maxBuffer: 50 * 1024 * 1024 });
@@ -82,12 +85,12 @@ async function run() {
     const gain = get('lexical', 'paraphrase').recall5 - get('baseline', 'paraphrase').recall5;
     const controls = (['recall1', 'recall5', 'mrr'] as const).every((m) => get('lexical', 'exact')[m] >= get('baseline', 'exact')[m]);
     const pass = gain >= 0.15 && controls;
-    const result = { anchor: frozen.anchor, manifestSha256: MANIFEST_SHA, semanticStatus, semanticReason, summary, gain, controls, gate: pass ? 'PASS' : 'FAIL', rows };
-    const results = path.join(HERE, 'results');
+    const result = { anchor: frozen.anchor, manifestSha256: manifestSha, semanticStatus, semanticReason, summary, gain, controls, gate: pass ? 'PASS' : 'FAIL', rows };
+    const results = path.join(HERE, version === 2 ? 'results-v2' : 'results');
     mkdirSync(results, { recursive: true });
     writeFileSync(path.join(results, 'results.json'), JSON.stringify(result, null, 2) + '\n');
     const percent = (n: number) => (100 * n).toFixed(1) + '%';
-    const md = `# Natural-language search — frozen v1 results\n\nDeterministic retrieval only, not an agent evaluation. No speed, token or cost claims.\n\n| Arm | Set | N | Recall@1 | Recall@5 | MRR |\n| --- | --- | ---: | ---: | ---: | ---: |\n${summary.map((s) => `| ${s.arm} | ${s.set} | ${s.tasks} | ${percent(s.recall1)} | ${percent(s.recall5)} | ${s.mrr.toFixed(4)} |`).join('\n')}\n\n**Gate: ${result.gate}.** Paraphrase Recall@5 gain: ${(100 * gain).toFixed(1)} points (required ≥15). Exact controls no drop: ${controls ? 'PASS' : 'FAIL'}.\n\nEmbeddings: ${semanticStatus}. ${semanticReason}\n\nCorpus anchor: ${frozen.anchor}. Manifest SHA256: ${MANIFEST_SHA}.\nAll 50 target IDs validated. One full evaluation, no post-result tuning.\nMRR retrieval horizon: search API returns at most 100 hits; baseline uses its full result list.\nFull returned ID lists and per-task ranks are retained in results.json.\nLimitations: small author-written corpus; behavior paraphrases are not an independent user sample.\n`;
+    const md = `# Natural-language search — frozen v${version} results\n\nDeterministic retrieval only, not an agent evaluation. No speed, token or cost claims.\n\n| Arm | Set | N | Recall@1 | Recall@5 | MRR |\n| --- | --- | ---: | ---: | ---: | ---: |\n${summary.map((s) => `| ${s.arm} | ${s.set} | ${s.tasks} | ${percent(s.recall1)} | ${percent(s.recall5)} | ${s.mrr.toFixed(4)} |`).join('\n')}\n\n**Gate: ${result.gate}.** Paraphrase Recall@5 gain: ${(100 * gain).toFixed(1)} points (required ≥15). Exact controls no drop: ${controls ? 'PASS' : 'FAIL'}.\n\nEmbeddings: ${semanticStatus}. ${semanticReason}\n\nCorpus anchor: ${frozen.anchor}. Manifest SHA256: ${manifestSha}.\nAll 50 target IDs validated. One full evaluation, no post-result tuning.\nMRR retrieval horizon: search API returns at most 100 hits; baseline uses its full result list.\nFull returned ID lists and per-task ranks are retained in results.json.\nLimitations: small author-written corpus; behavior paraphrases are not an independent user sample.\n${version === 2 ? 'V1 remains FAIL. V2 ranking used v1 failures, not v2 outcomes. PREREGISTRATION-v2-main.md supersedes the unrun old-main anchor without query changes.\n' : ''}`;
     writeFileSync(path.join(results, 'RESULTS.md'), md);
     console.log(md);
   } finally { for (const db of Object.values(dbs)) db.close(); }

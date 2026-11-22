@@ -5,7 +5,7 @@ import { readRepoFile, repoRelative } from '../../util/repo-file.js';
 import { estimateTokens, fitToBudget } from '../../util/tokens.js';
 import { defineTool, type GwTool, type ToolContext } from '../registry.js';
 
-export const NAVIGATION_BUDGETS = { find_code: 600, outline: 400, read_symbol: 1200, callers: 600, callees: 600, where_used: 600, repo_map: 1200 } as const;
+export const NAVIGATION_BUDGETS = { find_code: 600, outline: 400, read_symbol: 1200, explore: 1800, callers: 600, callees: 600, where_used: 600, repo_map: 1200 } as const;
 
 const printable = (s: string) => !/[\u0000-\u001f\u007f]/u.test(s) && Buffer.from(s).toString('utf8') === s;
 const text = z.string().trim().min(1).max(256).refine(printable, 'Control characters are not supported');
@@ -73,7 +73,7 @@ function oneSymbol<T extends { symbol: string; offset: number }>(
   });
 }
 
-function readSource(args: { symbol: string; context_lines: number; offset: number }, ctx: ToolContext, budget: number = NAVIGATION_BUDGETS.read_symbol, brief = false): string {
+export function readSource(args: { symbol: string; context_lines: number; offset: number }, ctx: ToolContext, budget: number = NAVIGATION_BUDGETS.read_symbol, brief = false): string {
   const s = oneSymbol('read_symbol', args, ctx, budget);
   if (typeof s === 'string') return s;
   const loc = sourceLocation(ctx.db, s.id);
@@ -168,6 +168,48 @@ const readSymbolTool = defineTool({
   },
 });
 
+const exploreTool = defineTool({
+  name: 'explore',
+  description: 'Start trace/how-does-X-work questions here: ranked definitions with bodies, direct callers/callees with confidence, definition/call-site locations and involved files in one budgeted payload. Answer directly; follow source/edge Next calls only for missing details. Pass query or exact symbol/ID, not both. Not a complete runtime call graph.',
+  inputSchema: { query: text.optional(), symbol: symbol.optional(), limit: z.number().int().min(1).max(5).default(2), offset },
+  handler(args, ctx) {
+    if (Boolean(args.query) === Boolean(args.symbol)) return 'Provide exactly one of query or symbol.';
+    let matches: NavigationSymbol[];
+    if (args.symbol) matches = navigationSymbols(ctx.db, args.symbol);
+    else {
+      const all = findCode(ctx.db, args.query!);
+      const query = args.query!.toLowerCase();
+      const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
+      matches = exact.length ? exact : all;
+    }
+    if (!matches.length) return 'No indexed definitions. Try another query or a ranged Read.';
+    return page({
+      items: matches, title: `Explore (${matches.length} ranked definitions; indexed direct edges, not a runtime graph):`,
+      start: args.offset, count: args.limit, budget: NAVIGATION_BUDGETS.explore,
+      render: (s) => {
+        const files = new Set([s.file]);
+        const edges = (direction: 'callers' | 'callees') => {
+          const rows = symbolCalls(ctx.db, s.id, direction);
+          return page({
+            items: rows, title: `${direction} (${rows.length}):`, start: 0, count: 4, budget: 120,
+            render: (edge) => {
+              files.add(edge.file);
+              if (edge.target) files.add(edge.target.file);
+              return `${edge.confidence}: ${compact(edge.name, 45)} — ${edge.target ? compact(edge.target.file, 90) + ':' + edge.target.line : 'definition unresolved'}; call ${compact(edge.file, 90)}:${edge.line}`;
+            },
+            next: (offset) => call(direction, { symbol: s.id, offset }),
+          });
+        };
+        const callers = edges('callers'), callees = edges('callees');
+        const paths = [...files].sort();
+        const { items: shown } = fitToBudget(paths, (file) => compact(file, 100), 90, 20);
+        return `${readSource({ symbol: s.id, context_lines: 0, offset: 0 }, ctx, 450, true)}\n${callers}\n${callees}\nFiles (selected direct edges${paths.length > shown.length ? '; +' + (paths.length - shown.length) + ' omitted' : ''}): ${prefixBytes(shown.map((file) => compact(file, 100)).join(', '), 300)}`;
+      },
+      next: (offset) => call('explore', { ...args, offset }),
+    });
+  },
+});
+
 function callsTool(direction: 'callers' | 'callees') {
   return defineTool({
     name: direction,
@@ -252,5 +294,5 @@ const repoMapTool = defineTool({
 });
 
 export const NAVIGATION_TOOLS = [
-  findCodeTool, outlineTool, readSymbolTool, callsTool('callers'), callsTool('callees'), whereUsedTool, repoMapTool,
+  findCodeTool, outlineTool, readSymbolTool, exploreTool, callsTool('callers'), callsTool('callees'), whereUsedTool, repoMapTool,
 ] as unknown as GwTool[];

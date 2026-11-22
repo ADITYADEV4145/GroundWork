@@ -98,6 +98,10 @@ describe('MCP navigation', () => {
         expect(exact).toContain('Exact (2)');
         expect(exact).toContain('Lookalike.needle');
         expect(await runNavigationTool('find_code', { query: 'needle', include_body: true }, ctx)).toBe(exact);
+        const explored = await runNavigationTool('explore', { symbol: 'needle', limit: 1 }, ctx);
+        const continuation = JSON.parse(/Next: explore\((.+)\)$/.exec(explored)![1]!);
+        expect(continuation.offset).toBe(1);
+        expect(await runNavigationTool('explore', continuation, ctx)).toContain('Lookalike.needle');
         const id = ambiguous.split('\n')[1]!.match(/\[(\w+)\]/)![1]!;
         let args: object = { symbol: id };
         let combined = '';
@@ -190,6 +194,27 @@ describe('MCP navigation', () => {
         expect(await runNavigationTool('read_symbol', { symbols: names, offset: 1 }, ctx)).toContain('symbol_offset');
       } finally { db.close(); }
     } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+
+  it('explores bodies, direct graph locations and files in one bounded payload', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const output = await runNavigationTool('explore', { symbol: 'ApiClient.get' }, ctx);
+      expect(output).toContain("this.request('GET'");
+      expect(output).toContain('callers (');
+      expect(output).toContain('callees (');
+      expect(output).toContain('Files (');
+      expect(output).toContain('ApiClient.request');
+      expect(output).toContain('src/services/api.ts:');
+      expect(output).toContain('call src/services/api.ts:');
+      expect(await runNavigationTool('explore', { query: 'formatDate' }, ctx)).toContain('d.toISOString()');
+      expect(await runNavigationTool('explore', { symbol: 'ApiClient.request' }, ctx)).toContain('unresolved');
+      expect(await runNavigationTool('explore', { query: 'notarealnamezz' }, ctx)).toContain('No indexed definitions');
+      expect(await runNavigationTool('explore', {}, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('explore', { query: 'pad', symbol: 'pad' }, ctx)).toContain('exactly one');
+      writeFileSync(path.join(root, 'src/utils/date.ts'), 'export function changed() {}');
+      expect(await runNavigationTool('explore', { symbol: 'formatDate' }, ctx)).toContain('changed after indexing');
+    });
   });
 
   it('serves the registered tools over stdio and refreshes before the next call', async () => {

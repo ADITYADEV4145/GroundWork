@@ -167,8 +167,10 @@ export function sourceLocation(db: Db, id: string): { hash: string; start: numbe
 export function symbolCalls(db: Db, id: string, direction: 'callers' | 'callees') {
   const callers = direction === 'callers';
   const ref = callers ? 'caller' : 'callee';
-  return db.prepare(`SELECT f.path, c.line, other.qualified_name, c.callee_text, c.confidence
+  return db.prepare(`SELECT f.path, c.line, other.qualified_name, c.callee_text, c.confidence,
+      other.id other_id, other.start_line other_line, target.path other_path
     FROM calls c JOIN files f ON f.id = c.file_id LEFT JOIN symbols other ON other.id = c.${ref}_id
+      LEFT JOIN files target ON target.id = other.file_id
     WHERE c.${callers ? 'callee' : 'caller'}_id = ?
     ORDER BY CASE c.confidence WHEN 'exact' THEN 0 WHEN 'import-resolved' THEN 1 WHEN 'name-only' THEN 2 ELSE 3 END,
       f.is_test, f.path, c.line, c.col, c.id`).all(id).map((r) => ({
@@ -176,6 +178,7 @@ export function symbolCalls(db: Db, id: string, direction: 'callers' | 'callees'
     line: Number(r.line),
     name: String(r.qualified_name ?? (callers ? '<module>' : r.callee_text)),
     confidence: String(r.confidence ?? 'unresolved'),
+    target: r.other_id ? { id: String(r.other_id), file: String(r.other_path), line: Number(r.other_line) } : null,
   }));
 }
 

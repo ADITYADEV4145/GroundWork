@@ -30,5 +30,7 @@ describe('shipped task-aware guidance', () => {
     expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'read_symbol')!.description).toContain('symbols');
     expect(verifyCallsTool.description).toContain('Never re-read');
     expect(verifyCallsTool.description).toContain('one batched call instead of rereads');
+    expect(read('SKILL.md')).toContain('start with `explore(');
+    expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'explore')!.description).toContain('Answer directly');
   });
 });

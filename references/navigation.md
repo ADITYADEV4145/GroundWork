@@ -12,7 +12,7 @@ Run `gw mcp` as a local stdio MCP server rooted in the repository (set its worki
 
 ### Trace a change
 
-For trace tasks, chain `callees` and `read_symbol` (batched for multiple targets), not outline plus whole-file Read at every hop. Reuse definitions, signatures and source evidence across continuing steps and sessions when carried into your current context and the relevant code is unchanged. Another agent's reads are not your evidence; recheck after changes or if evidence was not carried forward.
+Start trace/"how does X work" questions with `explore({"query":"name or behavior"})`, or pass `symbol` for an exact name/ID (not both). Answer directly from its ranked definition bodies, direct callers/callees, locations, confidence and involved files when sufficient. Its shared 1,800-token budget may omit definitions/edges or truncate bodies; follow the returned source, callers/callees or explore continuations only for missing details. It is an indexed direct graph, not proof of runtime dispatch. For missing trace details, chain `callees` and `read_symbol` (batched for multiple targets), not outline plus whole-file Read at every hop. Reuse definitions, signatures and source evidence across continuing steps and sessions when carried into your current context and the relevant code is unchanged. Another agent's reads are not your evidence; recheck after changes or if evidence was not carried forward.
 
 - `callers({"symbol":"formatDate","limit":8})` shows indexed incoming calls and how they were resolved.
 - `callees({"symbol":"ApiClient.get"})` includes outgoing calls that the index could not resolve.

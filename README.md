@@ -255,33 +255,56 @@ Every command accepts `--json`.
 Recorded Devin-agent runs show **less copied code, not demonstrated token or
 money savings**. Reuse v2 copied-code rate fell from **14/20 (70%) to 0/20 (0%)**.
 Task success was identical in each suite; grounding v3 had zero wrong calls in
-both arms. Estimated tool-output reductions were not statistically significant
-(all 95% intervals cross zero), and GroundWork was slower in the timed suites.
+both arms. Across eight paired runs per task, compact navigation showed no
+statistically significant estimated-output change; long-horizon output increased
+significantly under the paired-task bootstrap (its reduction interval is entirely
+below zero). GroundWork was significantly slower in both timed suites under the
+same task-bootstrap analysis.
 These small task sets do not establish performance on other agents or projects.
 
-![Estimated tool-output reductions with 95% task-bootstrap intervals, all crossing zero](docs/assets/bench/token-reduction.svg)
+| Eight-run suite | Success, baseline / GroundWork | Estimated-output reduction, median [95% CI] | Mean wall time, baseline → GroundWork | Wall-time reduction, median [95% CI] |
+| --- | --- | --- | --- | --- |
+| Compact navigation: 30 tasks × 8 runs/arm | 240/240 / 240/240 | -2.0% [-25.2, 16.4] | 5.58s → 7.44s | -31.3% [-55.4, -18.9] |
+| Long-horizon: 10 sequential tasks × 8 runs/arm | 80/80 / 80/80 | -63.2% [-86.1, -38.6] | 5.18s → 11.04s | -110.1% [-132.7, -91.5] |
+
+![Estimated tool-output reductions: navigation crosses zero; long-horizon is entirely negative](docs/assets/bench/token-reduction.svg)
 
 Positive reduction means less output; negative means more. Intervals bootstrap
 paired tasks after summing repeats, not independent sessions. Long-horizon
 tasks share conversation context. This is bytes/4, **not billed model tokens**;
-provider usage and dollar savings are unavailable.
+provider usage is unavailable and no dollar savings can be established. Statistical
+significance here means the reported 95% task-bootstrap interval excludes zero,
+not that results generalize across sessions, agents or projects. Wall-time means
+and median paired-task percentage reductions are different estimands: the
+reduction intervals are not confidence intervals around the mean bars.
+
+Methodology: protocol deviations were noted per session. Some sessions wrote
+files via the shell wrapper rather than the read wrapper; one long-horizon
+agent's first `find_similar` call failed validation. These are not perfectly
+uniform protocol executions. Work outside wrappers or task timers is not measured.
 
 ![Reuse v2 copied-code rates with 95% Wilson intervals](docs/assets/bench/copied-code.svg)
 
 Reviewed copied-code labels in reuse v2 are distinct from long-horizon raw
-`duplicatesAdded` scorer findings (25 baseline vs 24 GroundWork).
+`duplicatesAdded` scorer findings (58 baseline vs 62 GroundWork in the eight-run set).
 
 ![Task success counts for all four benchmarks, with both navigation versions shown separately](docs/assets/bench/success.svg)
 
-![Mean task wall time: GroundWork slower for compact navigation and long-horizon](docs/assets/bench/wall-time.svg)
+![Mean task wall time and 95% paired-task reduction intervals: GroundWork slower in both suites](docs/assets/bench/wall-time.svg)
 
 Sources: navigation [initial](bench/nav/evidence-initial.json) and
-[compact](bench/nav/evidence.json), [long-horizon](bench/long-horizon/results/2026-11-21T21-44-09-424Z-long-horizon.json),
+[compact combined](bench/nav/results/combined.json), [long-horizon combined](bench/long-horizon/results/combined.json),
 [reuse v2](bench/reuse-v2/report.json), and [grounding v3](bench/grounding/results/report.json).
 Regenerate the static charts with `npm run bench:charts` (no dependencies or network).
-Navigation versions are separate runs, not pooled. Detailed tables follow.
+Navigation initial remains the original three-run set (90/90 per arm), separate
+from compact navigation and not pooled with it. Raw exports and combination
+instructions are in [bench/COMBINE.md](bench/COMBINE.md). Historical tables follow.
 
 ## Long-horizon benchmark
+
+The table below preserves the **original three-run collection**, not the current
+eight-run result above. See the [eight-run report](bench/long-horizon/results/combined.md)
+for current numbers; the original collection is included there, not added again.
 
 **Devin-agent results (6 sessions: 3 baseline, 3 Groundwork; 10 sequential tasks each); tokens are estimated tool-output tokens (bytes/4), not model tokens**
 
@@ -322,7 +345,7 @@ The first, pre-19 run reported estimated-output reduction -76.8%
 (95% interval [-49.0, -10.5]%). It remains separately verifiable as historical
 evidence; the two sets are not pooled.
 
-See the [current full report](bench/long-horizon/results/2026-11-21T21-44-09-424Z-long-horizon.md),
+See the [original three-run report](bench/long-horizon/results/2026-11-21T21-44-09-424Z-long-horizon.md),
 [raw observations](bench/long-horizon/observations/) and
 [methodology and offline reproduction](bench/long-horizon/README.md), including
 self-reported collection deviations: shell README reads, externally staged

@@ -20,6 +20,12 @@ if (command === 'hook' && process.argv.length === 5 &&
     if (agent === 'cursor' && event === 'pre_tool') process.stdout.write('{"permission":"allow"}\n');
   }
   process.exitCode = 0;
+} else if (command === 'mcp' && process.argv.length === 3) {
+  const { runMcp } = await import('../mcp/relay.js');
+  await runMcp();
+} else if (command === '__mcp_service' && process.argv.length === 4) {
+  const { runService } = await import('../mcp/daemon.js');
+  await runService(agent!);
 } else {
   await import('./program.js');
 }

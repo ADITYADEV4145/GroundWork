@@ -4,8 +4,9 @@ Run `gw mcp` as a local stdio MCP server rooted in the repository (set its worki
 
 ### Find a definition and inspect its neighborhood
 
-- `find_code({"query":"format date","kind":"function","locations_only":true})` returns the top three matching locations and IDs. Omit `locations_only` to include signatures, first doc lines, and scores.
-- `outline({"file":"src/utils/date.ts","locations_only":true})` shows symbol names and ranges without signatures or bodies.
+- Use `rg` for trivial literal/filename lookups; use the index for symbol, behavior and structure questions. Stop once the requested location is resolved.
+- `find_code({"query":"formatDate","kind":"function"})` returns exact matches first. Use `breadth:"all"` to expand; without an exact hit, results are ranked broadly. Set `locations_only:false` to include signatures, docs and scores.
+- `outline({"file":"src/utils/date.ts"})` shows symbol names and ranges without signatures or bodies. Set `locations_only:false` for signatures. Skip outline when you already know which symbol to read.
 - `read_symbol({"symbol":"src/utils/date.ts:formatDate","context_lines":1})` reads the body. If multiple declarations match, pass a candidate ID instead. With zero context, only the indexed declaration is returned.
 - `repo_map({"depth":1})` gives an overview when you don't know where to start. Narrow with `path` to explore a folder; maps default to 12 rows per page.
 
@@ -30,3 +31,9 @@ Wire the following commands into Claude Code hooks if not already installed by y
 The guard records only successful, verified text ranges. It intercepts a repeated range only if the file is unchanged and the earlier read covered the entire requested range. Repeat the exact Read once to force it; normal Claude permissions still apply. Compaction clears the read history. An unranged large read is allowed with a hint; change the threshold or disable the guard via `navigation.readGuard` in the Groundwork config.
 
 The local session ledger and intervention log record estimated content tokens (UTF-8 bytes divided by four, rounded up), not model-token measurements or net savings.
+
+### Local runtime and caches
+
+`gw mcp` uses a small stdio relay to an automatically started, per-user/per-repository local service. Its private Unix socket is in the OS temporary directory; no network listener or download is used. Runtime code, Node version and relevant environment settings identify the service version. Every request still checks configuration and index freshness. The service exits after 30 seconds without clients. Unsupported platforms, startup/version errors and service disconnection fall back to an in-process server; a disconnected session replays only initialization and unfinished requests. Set `GW_MCP_IN_PROCESS=1` to bypass the service.
+
+Parsed extraction products are shared across workspace roots in `$XDG_CACHE_HOME/groundwork` (default `~/.cache/groundwork`), keyed by source hash, language and extractor version. File IDs, paths, imports and configuration-dependent exclusions are recomputed in each repository. Cache entries are private, checksummed and atomically written; unavailable/corrupt entries are ignored. Deleting this disposable cache only makes subsequent indexing colder. `GW_CACHE_DIR` and `GW_RUNTIME_DIR` override the cache and socket directories; both must be private and owned by the current user. `GW_MCP_IDLE_MS` sets the idle timeout (100–300,000 ms).

@@ -6,5 +6,6 @@ export const similarInputSchema = z.object({
   signature: z.string().max(10000).optional(),
   code: z.string().max(100000).optional(),
   language: z.enum(['typescript', 'tsx', 'javascript', 'python']).default('typescript'),
+  detail: z.enum(['compact', 'full']).optional().describe('Compact returns actionable reuse/extend matches only; full includes related matches.'),
 }).strict();
 export type SimilarInput = z.input<typeof similarInputSchema>;

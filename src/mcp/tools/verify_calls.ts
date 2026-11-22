@@ -6,7 +6,7 @@ import { defineTool } from '../registry.js';
 export const verifyCallsTool = defineTool({
   name: 'verify_calls',
   description:
-    'Once per task, check all new cross-file calls in one request using files: [{file, lines?}]. Checks imports, repo functions/members, argument counts and keywords; findings name real symbols. A single file is also accepted. Clean: ok.',
+    'Check new cross-file calls to symbols not already read/confirmed in this task. Batch remaining calls once using files: [{file, lines?}]; skip if none. Checks imports, repo functions/members, argument counts and keywords. A single file is also accepted. Clean: ok.',
   inputSchema: {
     file: z.string().min(1).optional().describe('single file, relative to the repo root'),
     lines: z.string().optional().describe('only these lines, e.g. "10-40,52"'),

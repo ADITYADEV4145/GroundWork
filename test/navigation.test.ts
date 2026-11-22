@@ -18,14 +18,14 @@ describe('MCP navigation', () => {
   it('matches the fixture goldens', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const output = Object.fromEntries(await Promise.all(FIXTURE_NAVIGATION.map(async ([name, args]) => {
-        const value = await runNavigationTool(name, args, { root, db, config });
+        const value = await runNavigationTool(name, name === 'find_code' || name === 'outline' ? { ...args, locations_only: false } : args, { root, db, config });
         return [name, value.replace(/ · \d+(?:\.\d+)?/g, ' · <score>')];
       })));
       expect(output).toMatchSnapshot();
     });
     await withIndexedFixture('py-app', async (db, root) => {
       const ctx = { root, db, config };
-      expect(await runNavigationTool('find_code', { query: 'including tax' }, ctx)).toContain('Charge an invoice including tax.');
+      expect(await runNavigationTool('find_code', { query: 'including tax', locations_only: false }, ctx)).toContain('Charge an invoice including tax.');
       expect(await runNavigationTool('read_symbol', { symbol: 'charge' }, ctx)).toMatchSnapshot();
     });
   });
@@ -34,8 +34,12 @@ describe('MCP navigation', () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const ctx = { root, db, config };
       const query = { query: 'format date', kind: 'function' };
-      const full = await runNavigationTool('find_code', query, ctx);
+      const full = await runNavigationTool('find_code', { ...query, locations_only: false }, ctx);
       expect(full).toContain('formatDate(d: Date');
+      const fullPage = await runNavigationTool('find_code', { ...query, locations_only: false, limit: 1 }, ctx);
+      const fullCursor = JSON.parse(fullPage.split('Next: find_code(')[1]!.slice(0, -1));
+      expect(fullCursor.locations_only).toBe(false);
+      expect(await runNavigationTool('find_code', fullCursor, ctx)).toContain('pad(n: number');
       const locations = await runNavigationTool('find_code', { ...query, locations_only: true }, ctx);
       expect(locations).toContain('formatDate (function) — src/utils/date.ts:4');
       expect(locations).not.toContain('formatDate(d: Date');
@@ -49,6 +53,24 @@ describe('MCP navigation', () => {
       const cursor = JSON.parse(map.split('Next: repo_map(')[1]!.slice(0, -1));
       expect(cursor).toMatchObject({ limit: 1, offset: 1 });
       expect(await runNavigationTool('repo_map', cursor, ctx)).not.toBe(map);
+    });
+  });
+
+  it('defaults to exact locations, preserves broad opt-in, and rejects invalid breadth', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const exact = await runNavigationTool('find_code', { query: 'formatDate' }, ctx);
+      expect(exact).toContain('Exact (1)');
+      expect(exact).toContain('breadth="all"');
+      expect(exact).not.toContain('pad (');
+      expect(exact).not.toContain('formatDate(d:');
+      const broad = await runNavigationTool('find_code', { query: 'formatDate', breadth: 'all' }, ctx);
+      expect(broad).toContain('pad (');
+      expect(broad).toContain('Next:');
+      expect(await runNavigationTool('find_code', { query: 'get' }, ctx)).toContain('ApiClient.get');
+      expect(await runNavigationTool('outline', { file: 'src/utils/date.ts' }, ctx)).not.toContain('formatDate(d:');
+      expect(await runNavigationTool('find_code', { query: 'notarealsymbolzz' }, ctx)).toContain('No indexed matches');
+      await expect(runNavigationTool('find_code', { query: 'formatDate', breadth: 'invalid' }, ctx)).rejects.toThrow();
     });
   });
 
@@ -72,6 +94,9 @@ describe('MCP navigation', () => {
         expect(ambiguous).toContain('Ambiguous symbol');
         expect(ambiguous).toContain('Lookalike.needle');
         expect(ambiguous).not.toContain('return');
+        const exact = await runNavigationTool('find_code', { query: 'needle' }, ctx);
+        expect(exact).toContain('Exact (2)');
+        expect(exact).toContain('Lookalike.needle');
         const id = ambiguous.split('\n')[1]!.match(/\[(\w+)\]/)![1]!;
         let args: object = { symbol: id };
         let combined = '';
@@ -86,7 +111,7 @@ describe('MCP navigation', () => {
         expect(combined).toBe(target.slice('export '.length));
         expect(await runNavigationTool('read_symbol', { symbol: id, context_lines: 1 }, ctx)).toContain('// before\n/*é😀*/ export function needle');
         for (const [name, input] of [
-          ['find_code', { query: 'needle', limit: 100 }], ['outline', { file }], ['repo_map', {}],
+          ['find_code', { query: 'needle', limit: 100, breadth: 'all' }], ['outline', { file }], ['repo_map', {}],
           ['where_used', { name: 'needle' }], ['callers', { symbol: id }], ['callees', { symbol: 'needleMany' }],
         ] as const) {
           const result = await runNavigationTool(name, input, ctx);
@@ -138,7 +163,7 @@ describe('MCP navigation', () => {
       await refreshIndex(root);
       const db = openDb(indexDbPath(root), { readonly: true });
       try {
-        expect(await runNavigationTool('find_code', { query: 'deliv' }, { root, db, config })).toContain('Deliver the message.');
+        expect(await runNavigationTool('find_code', { query: 'deliv', locations_only: false }, { root, db, config })).toContain('Deliver the message.');
       } finally {
         db.close();
       }
@@ -196,7 +221,7 @@ describe('MCP navigation', () => {
       await refreshIndex(root);
       const db = openDb(indexDbPath(root), { readonly: true });
       try {
-        const result = await runNavigationTool('find_code', { query: 'HTTP2' }, { root, db, config });
+        const result = await runNavigationTool('find_code', { query: 'HTTP2', limit: 8 }, { root, db, config });
         expect(result).toContain('negotiate (function)');
         expect(result).toContain('multiplex (function)');
         expect(result).toContain('transport (function)');

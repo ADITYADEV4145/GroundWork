@@ -47,10 +47,11 @@ export function planArchive(rows, directory, prefix) {
 }
 
 export function combine(config) {
-  const after = config.experiment === 'v2';
-  if (after && config.runs !== 8) throw new Error('The v2 comparison requires eight runs per arm');
+  const after = ['v2', 'v3'].includes(config.experiment);
+  if (config.experiment && !after) throw new Error('Unknown experiment; expected v2 or v3');
+  if (after && config.runs !== 8) throw new Error(`The ${config.experiment} comparison requires eight runs per arm`);
   const destination = after ? config.outputRoot ?? root : root;
-  const suiteDir = (suite) => path.join(destination, 'bench', suite, ...(after ? ['v2'] : []));
+  const suiteDir = (suite) => path.join(destination, 'bench', suite, ...(after ? [config.experiment] : []));
   const scratch = mkdtempSync(path.join(os.homedir(), 'bench-combine-'));
   const reports = [];
   for (const [suite, directory, build] of [['nav', config.navCaptures, config.navBuild], ['long-horizon', config.lhCaptures, config.lhBuild]]) {
@@ -58,7 +59,8 @@ export function combine(config) {
     const expected = after ? config.captureRevision : pins[suite];
     if (!expected || revision !== expected) throw new Error(`Expected ${suite} build checkout ${expected}, got ${revision}`);
     const rows = validateCaptures(directory, suite, config.runs, expected);
-    const copies = planArchive(rows, path.join(suiteDir(suite), 'observations'), suite === 'nav' ? 'nav' : 'lh2');
+    const prefix = config.experiment === 'v3' ? (suite === 'nav' ? 'nav3' : 'lh3') : (suite === 'nav' ? 'nav' : 'lh2');
+    const copies = planArchive(rows, path.join(suiteDir(suite), 'observations'), prefix);
     const output = path.join(scratch, suite);
     const input = path.join(scratch, `${suite}-captures`);
     mkdirSync(input);
@@ -83,7 +85,7 @@ export function combine(config) {
     writeFileSync(path.join(dir, 'results/combined.json'), JSON.stringify([report], null, 2) + '\n');
     writeFileSync(path.join(dir, 'results/combined.md'), markdown);
   }
-  if (after) generateComparison(destination, config.captureRevision);
+  if (after) generateComparison(destination);
   else generate();
   console.log(`Combined evidence, reports, raw exports and charts updated. Grader scratch: ${scratch}`);
 }

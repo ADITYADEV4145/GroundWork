@@ -15,7 +15,7 @@ const symbol = text.describe('Exact symbol name, repo-relative file:qualifiedNam
 const pageSize = z.number().int().min(1).max(100);
 const limit = (n: number) => pageSize.default(n);
 const kinds = z.enum(['function', 'method', 'class', 'interface', 'type', 'enum', 'constant', 'variable', 'component', 'dataclass']);
-const locationsOnly = z.boolean().default(false).describe('Return only symbol locations and IDs, without signatures or documentation.');
+const locationsOnly = z.boolean().default(true).describe('Return symbol locations and IDs; set false for signatures and documentation.');
 
 function compact(s: string, length = 180): string {
   const val = s.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -75,23 +75,27 @@ function oneSymbol<T extends { symbol: string; offset: number }>(
 
 const findCodeTool = defineTool({
   name: 'find_code',
-  description: 'Find code by name, signature, documentation or path. Use locations_only for a short ranked list when locating definitions.',
-  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, offset },
+  description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands to related results. Set locations_only: false for signatures/docs. Prefer rg for trivial literal text.',
+  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), offset },
   handler(args, { db }) {
-    const items = findCode(db, args.query, args.kind);
+    const all = findCode(db, args.query, args.kind);
+    const query = args.query.toLowerCase();
+    const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
+    const narrowed = args.breadth !== 'all' && exact.length > 0;
+    const items = narrowed ? exact : all;
     return page({
-      items, title: items.length ? `Code matches (${items.length}):` : 'No indexed matches. Try a different name or search plain text with your normal tools.',
+      items, title: narrowed ? `Exact (${items.length})${all.length > exact.length ? '; more: breadth="all"' : ''}` : items.length ? `Code matches (${items.length}):` : 'No indexed matches. Try a different name or search plain text with your normal tools.',
       start: args.offset, count: args.limit ?? (args.locations_only ? 3 : 8), budget: NAVIGATION_BUDGETS.find_code,
       render: (s) => args.locations_only ? choice(s) :
         `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
-      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only || undefined, offset }),
+      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, offset }),
     });
   },
 });
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List a file’s symbols and line ranges without reading bodies. Use locations_only to omit signatures.',
+  description: 'List a file’s symbols and line ranges without reading bodies. Set locations_only: false for signatures. If the symbol is known, go straight to read_symbol.',
   inputSchema: { file: pathInput, locations_only: locationsOnly, offset },
   handler(args, { root, db }) {
     const file = repoRelative(root, args.file);
@@ -101,7 +105,7 @@ const outlineTool = defineTool({
     return page({
       items: entry.symbols, title, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
       render: (s) => `[${s.id}] ${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind})${args.locations_only ? '' : ': ' + compact(s.signature)}`,
-      next: (offset) => call('outline', { ...args, locations_only: args.locations_only || undefined, offset }),
+      next: (offset) => call('outline', { ...args, locations_only: args.locations_only ? undefined : false, offset }),
     });
   },
 });
@@ -150,13 +154,13 @@ function callsTool(direction: 'callers' | 'callees') {
   return defineTool({
     name: direction,
     description: direction === 'callers' ? 'List the indexed calls to a symbol, ordered by resolution confidence.' : 'List a symbol’s outgoing calls with resolution confidence, including unresolved calls.',
-    inputSchema: { symbol, limit: limit(20), offset },
+    inputSchema: { symbol, limit: limit(8), offset },
     handler(args, ctx) {
       const s = oneSymbol(direction, args, ctx);
       if (typeof s === 'string') return s;
       const items = symbolCalls(ctx.db, s.id, direction);
       return page({
-        items, title: `${choice(s)} — ${items.length} indexed ${direction}`, start: args.offset,
+        items, title: `${compact(s.name, 70)}: ${items.length} indexed ${direction}`, start: args.offset,
         count: args.limit, budget: NAVIGATION_BUDGETS[direction],
         render: (c) => `${compact(c.file, 170)}:${c.line} ${compact(c.name, 80)} [${c.confidence}]`,
         next: (offset) => call(direction, { ...args, symbol: s.id, offset }),

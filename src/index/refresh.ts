@@ -5,6 +5,7 @@ import type { GroundworkConfig } from '../config/schema.js';
 import { loadConfig } from '../config/load.js';
 import { adapterFor, languageForPath } from '../lang/index.js';
 import { initParsersFor } from '../lang/parser.js';
+import type { ExtractResult } from '../lang/adapter.js';
 import type { Language } from '../types.js';
 import { loadTsPaths } from '../resolve/imports.js';
 import { linkIndex, type LinkStats } from '../resolve/link.js';
@@ -16,6 +17,7 @@ import { discoverFiles, looksGenerated, makeTestMatcher } from './discover.js';
 import { withWriteLock } from './lock.js';
 import { openIndex } from './store.js';
 import { deleteFile, upsertFile, writeExtraction, type FileMeta } from './write.js';
+import { cacheExtraction, extractionKey, readExtraction } from './extraction-cache.js';
 
 export interface RefreshResult {
   files: number;
@@ -44,6 +46,13 @@ export interface RefreshOptions {
 export async function refreshIndex(root: string, opts: RefreshOptions = {}): Promise<RefreshResult> {
   const config = opts.config ?? loadConfig(root);
   const ready = new Set<Language>();
+  const extractions = new Map<string, ExtractResult | null>();
+  const cached = (hash: string, lang: Language) => {
+    if (opts.full) return null;
+    const key = extractionKey(hash, lang);
+    if (!extractions.has(key)) extractions.set(key, readExtraction(key));
+    return extractions.get(key);
+  };
   let rebuiltForScope = false;
   let rebuiltDuringLoad = false;
   const refresh = () => withWriteLock(root, () => {
@@ -143,7 +152,12 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
           } else if (lang) {
             const extractStart = performance.now();
             try {
-              extraction = adapterFor(lang).extract(content, lang);
+              extraction = cached(hash!, lang) ?? adapterFor(lang).extract(content, lang);
+              if (!cached(hash!, lang)) {
+                const key = extractionKey(hash!, lang);
+                cacheExtraction(key, extraction);
+                extractions.set(key, extraction);
+              }
               if (extraction.hasErrors) meta.status = 'partial';
             } catch (err) {
               meta.status = 'skipped';

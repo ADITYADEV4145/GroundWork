@@ -1,6 +1,29 @@
 # Combining paired runs
 
-## Post-fix experiment (v2)
+## Post-fix experiments (v2 and v3)
+
+The same entrypoint supports `--experiment v2` (the default, round 1 at
+`e605fe9559cae088a2060a4ed53a27c32daa4df9`) and `--experiment v3` (round 2 at
+`abafcba361f358b61e54fc906977209e494cf07a`). No grading semantics change.
+For the incoming `nav3-*` / `lh3-*` exports, use a built checkout at abafcba:
+
+```sh
+node scripts/bench-combine-v2.mjs --experiment v3 \
+  --nav-captures /path/to/nav3-captures \
+  --lh-captures /path/to/lh3-captures \
+  --build /path/to/built-abafcba-checkout
+```
+
+V3 writes only `bench/{nav,long-horizon}/v3/{observations,results}` evidence;
+raw archives are named `nav3-{arm}-{run}.json` and `lh3-{arm}-{run}.json`.
+Original and v2 evidence are preserved. Comparison tables/charts have three
+rows per suite: original, round 1, round 2. Each new experiment stays Pending
+until both suite reports are present; a partial pair is an error. Round 2's
+GroundWork arm prompts mirrored the new SKILL.md guidance (rg for trivial
+lookups, exact-first find_code, actionable-only find_similar, verify only for
+unconfirmed cross-file calls); baselines were re-collected at abafcba.
+
+### Replaying round 1
 
 The fresh paired experiment pins both arms and suites to collector/tool revision
 `e605fe9559cae088a2060a4ed53a27c32daa4df9`. Its GroundWork LH arm uses revised
@@ -33,7 +56,7 @@ Both suites must grade successfully before either suite is archived. Identical
 archive replays are allowed; differing bytes cannot replace existing captures.
 
 To regenerate just the comparison from saved reports:
-`node scripts/bench-comparison.mjs`. With neither after report present, after
+`node scripts/bench-comparison.mjs`. With neither report for a new experiment present, its
 rows/charts say Pending. One missing report or inconsistent statistics/revisions
 is an error, never silently presented as a completed comparison. Synthetic test
 fixtures must stay outside the repository; do not publish old data as new results.

@@ -7,6 +7,13 @@ const EMPTY_LOCK_STALE_MS = 5_000;
 function pidAlive(pid: number): boolean {
   try {
     process.kill(pid, 0);
+    if (process.platform === 'linux') {
+      try {
+        const stat = readFileSync(`/proc/${pid}/stat`, 'utf8');
+        // Defunct children pass kill(pid, 0) until their parent reaps them.
+        if (stat.slice(stat.lastIndexOf(')') + 2).startsWith('Z ')) return false;
+      } catch { /* Preserve the portable liveness check when procfs is unavailable. */ }
+    }
     return true;
   } catch (e) {
     return (e as NodeJS.ErrnoException).code === 'EPERM';

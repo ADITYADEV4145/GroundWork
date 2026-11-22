@@ -3,7 +3,7 @@ import { defineTool } from '../registry.js';
 
 export const findSimilarTool = defineTool({
   name: 'find_similar',
-  description: 'Before a new non-trivial helper/function, find existing code to reuse. Skip small edits and inline code. State REUSE <symbol> / EXTEND <symbol> / NEW because <reason>. Reuse unchanged evidence within a task.',
+  description: 'Before a genuinely new non-trivial helper/function, find code to reuse. Skip small edits, inline code and already-confirmed helpers. Returns actionable matches; detail: full includes related matches. State REUSE <symbol> / EXTEND <symbol> / NEW because <reason>. Reuse unchanged evidence within a task.',
   inputSchema: similarInputSchema.shape,
   async handler(args, { root, db, config }) {
     const { cachedCandidates } = await import('../../reuse/candidate-cache.js');

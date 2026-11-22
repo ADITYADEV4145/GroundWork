@@ -17,11 +17,12 @@ const data = path.join(project, 'bench/impact');
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 const git = (root: string, ...args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 128 << 20, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 interface Task { id: string; repo: string; file: string; name: string; operator: string; before: string; after: string }
-interface Manifest { version: number; sourceCommit: string; tasks: Task[] }
+type Version = 1 | 2 | 3;
+interface Manifest { version: number; sourceCommit: string; checkerCommit?: string; tasks: Task[] }
 interface Diagnostic { file: string; line: number; code: string | number; message: string }
 interface Row { task: Task; expectedCallers: string[]; expectedTests: string[]; listedCallers: string[]; listedTests: string[]; missingCallers: string[]; missingTests: string[]; falsePositiveCallers: string[]; baseline: Diagnostic[]; diagnostics: Diagnostic[]; newErrors: Diagnostic[]; impact: ImpactReport | null; highRisk: boolean; errors: string[]; ms: number; oracleMs: number }
-export function registeredTasks(directory = data, version: 1 | 2 = 1): { manifest: Manifest; sha256: string } {
-  const suffix = version === 2 ? '-v2' : '';
+export function registeredTasks(directory = data, version: Version = 1): { manifest: Manifest; sha256: string } {
+  const suffix = version === 1 ? '' : `-v${version}`;
   const expected = /Manifest SHA256: `([a-f0-9]{64})`/.exec(readFileSync(path.join(directory, `PREREGISTRATION${suffix}.md`), 'utf8'))?.[1];
   const bytes = readFileSync(path.join(directory, `tasks${suffix}.json`));
   if (!expected || hash(bytes) !== expected) throw new Error('Refusing impact benchmark: task manifest SHA256 differs');
@@ -34,7 +35,11 @@ const identity = (d: Diagnostic) => JSON.stringify([d.file, d.code, d.message.re
 const distinct = (files: string[]) => [...new Set(files)].sort();
 const percentile = (values: number[], p: number) => values.length ? [...values].sort((a, b) => a - b)[Math.ceil(values.length * p) - 1]! : null;
 
-function diagnostics(root: string, files: string[], ts: typeof TS): Diagnostic[] {
+export function oracleFiles(files: string[], repo: string, version: Version): string[] {
+  return files.filter((f) => repo === 'dispatch-desk' ? f.endsWith('.py') : (version === 3 ? /\.(tsx?|[cm]?js)$/ : /\.tsx?$/).test(f));
+}
+
+export function diagnostics(root: string, files: string[], ts: typeof TS, version: Version = 1): Diagnostic[] {
   const python = files.filter((f) => f.endsWith('.py'));
   if (python.length) {
     let output: string;
@@ -48,7 +53,8 @@ function diagnostics(root: string, files: string[], ts: typeof TS): Diagnostic[]
   }
   const config = ts.findConfigFile(root, ts.sys.fileExists);
   const parsed = config ? ts.parseJsonConfigFileContent(ts.readConfigFile(config, ts.sys.readFile).config, ts.sys, root) : null;
-  const program = ts.createProgram(files.filter((f) => /\.tsx?$/.test(f)).map((f) => path.join(root, f)), parsed?.options ?? { strict: true, target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, skipLibCheck: true });
+  const options = parsed?.options ?? { strict: true, target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, skipLibCheck: true };
+  const program = ts.createProgram(oracleFiles(files, 'typescript', version).map((f) => path.join(root, f)), version === 3 ? { ...options, allowJs: true, checkJs: true, noEmit: true } : options);
   const scope = new Set(files);
   return ts.getPreEmitDiagnostics(program).filter((d) => d.file && d.start !== undefined && d.category === ts.DiagnosticCategory.Error && scope.has(path.relative(root, d.file.fileName))).map((d) => ({
     file: path.relative(root, d.file!.fileName), line: d.file!.getLineAndCharacterOfPosition(d.start!).line + 1,
@@ -98,9 +104,9 @@ export function summarize(rows: Row[]) {
   return { status: !coverage ? 'INCOMPLETE' : Object.values(rules).every(Boolean) ? 'PASS' : 'FAIL', coverage, callerRecall, callersFound, expectedCallers, highRiskPrecision, highRiskCorrect: accurateHighs.length, highRiskPredictions: highs.length, testRecall, testsFound, expectedTests, completeAccuracy, accurateCompletes: accurateCompletes.length, completeAnswers: completes.length, p50: percentile(rows.map((r) => r.ms), .5), p95: percentile(rows.map((r) => r.ms), .95), gwP95, rules };
 }
 
-function markdown(result: { version: 1 | 2; manifestSha256: string; checkerCommit: string; rows: Row[]; summary: ReturnType<typeof summarize>; environment: object }) {
+function markdown(result: { version: Version; manifestSha256: string; checkerCommit: string; runnerCommit: string; rows: Row[]; summary: ReturnType<typeof summarize>; environment: object }) {
   const s = result.summary, rate = (value: number | null) => value === null ? 'undefined' : (value * 100).toFixed(2) + '%';
-  const out = [`# Change-impact gate results${result.version === 2 ? ' v2' : ''}`, '', '**Deterministic tool-level evaluation, NOT an agent run. The actual agent gate is pending and was NOT run.**', '', `Manifest SHA256: \`${result.manifestSha256}\`. Checker commit: \`${result.checkerCommit}\`.`, '', `## Summary: ${s.status}`, '', '| Metric | Result | Threshold | Rule |', '| --- | --- | --- | --- |',
+  const out = [`# Change-impact gate results${result.version === 1 ? '' : ` v${result.version}`}`, '', '**Deterministic tool-level evaluation, NOT an agent run. The actual agent gate is pending and was NOT run.**', '', `Manifest SHA256: \`${result.manifestSha256}\`. Checker commit: \`${result.checkerCommit}\`. Runner commit: \`${result.runnerCommit}\`.`, '', `## Summary: ${s.status}`, '', '| Metric | Result | Threshold | Rule |', '| --- | --- | --- | --- |',
     `| Must-change caller-file recall | ${s.callersFound}/${s.expectedCallers} (${rate(s.callerRecall)}) | >=90% | ${s.rules.callerRecall ? 'PASS' : 'FAIL'} |`,
     `| High-risk task precision | ${s.highRiskCorrect}/${s.highRiskPredictions} (${rate(s.highRiskPrecision)}) | >=90% | ${s.rules.highRiskPrecision ? 'PASS' : 'FAIL'} |`,
     `| Affected-test-file recall | ${s.testsFound}/${s.expectedTests} (${rate(s.testRecall)}) | >=90% | ${s.rules.testRecall ? 'PASS' : 'FAIL'} |`,
@@ -112,12 +118,17 @@ function markdown(result: { version: 1 | 2; manifestSha256: string; checkerCommi
   for (const r of result.rows) out.push(`- **${r.task.id}**: missing callers: ${r.missingCallers.join(', ') || 'none'}; missing tests: ${r.missingTests.join(', ') || 'none'}. Incomplete because: ${r.impact?.incompleteBecause.join('; ') || 'none'}.`);
   out.push('', '## Limitations and deviations', '', '- No post-registration checker fixes after observing results. No tasks removed, no selective reruns or threshold changes.', '- Compiler error files are a must-change proxy, not proof of semantic exhaustiveness. High-risk precision is task-level, not per-symbol calibration. Test oracle uses only static imports within depth two plus compiler errors.', '- complete describes indexed static evidence in one snapshot, not arbitrary dynamic runtime reachability. Zero complete answers is undefined accuracy and fails the registered rule, not a vacuous pass.', '- Timing excludes refresh, oracle and process startup. Stop uses a hard time-boxed worker; this benchmark does not measure total hook dispatch or establish agent behavior.', '- The source anchor predates impact implementation. GroundWork oracle rows may include API/compiler skew against current development dependencies; raw baseline and post-edit diagnostics are retained.', `- Environment: ${JSON.stringify(result.environment)}.`, '- Raw findings, false-positive caller listings, baseline/new diagnostics and timings are in results.json. Agent gate remains pending in ../AGENT-PROTOCOL.md.', '');
   if (result.version === 2) out.push('V2 preregistered the involved-file/matching-name completeness scope correction and source-worker cwd fix before evaluation; it uses new targets. V1 remains unchanged as FAIL in ../results/. No post-v2-result checker tuning or reruns.', '', 'Completeness is checked against the scoped static/compiler oracle, not arbitrary dynamic reachability. High-risk task precision on signature mutations does not establish precision on negative/no-impact changes.', '');
+  if (result.version === 3) out.push('V3 uses the separately registered new seed/targets and includes tracked .js/.mjs/.cjs in the TS and static-test oracles, with allowJs/checkJs/noEmit. No new runtime/checker policy is based on these results. V1/v2 remain published FAIL, not rescored.', '', 'The fixed checker is 386539e (all seven reviewed fixes). No sessionId is passed by the benchmark. Any subsequent session-evidence-only fixes are outside this run and cannot affect its caller/risk/test/completeness metrics.', '', 'The v2 evidence established three JS oracle gaps and one genuine false high-risk return-shape rating; this experiment does not erase that counterexample. Precision is task-level and compiler-based, not universal risk calibration.', '');
   return out.join('\n');
 }
 
-export async function runBenchmark(version: 1 | 2 = 1) {
+export async function runBenchmark(version: Version = 1) {
   const { manifest, sha256 } = registeredTasks(data, version);
   git(project, 'merge-base', '--is-ancestor', manifest.sourceCommit, 'HEAD');
+  if (version === 3) {
+    if (!manifest.checkerCommit) throw new Error('V3 checker commit missing');
+    git(project, 'diff', '--exit-code', manifest.checkerCommit, '--', 'src');
+  }
   const parent = path.join(os.homedir(), 'work');
   if (!existsSync(parent)) throw new Error('Persistent work parent absent');
   const work = mkdtempSync(path.join(parent, 'gw-impact-gate-'));
@@ -142,9 +153,9 @@ export async function runBenchmark(version: 1 | 2 = 1) {
       git(target, '-c', 'user.name=Benchmark', '-c', 'user.email=benchmark@localhost', 'commit', '--quiet', '-m', 'Frozen reference baseline');
     }
     symlinkSync(path.join(project, 'node_modules'), path.join(target, 'node_modules'), 'dir');
-    const files = git(target, 'ls-files').split('\n').filter((f) => repo === 'dispatch-desk' ? f.endsWith('.py') : /\.tsx?$/.test(f));
+    const files = oracleFiles(git(target, 'ls-files').split('\n'), repo, version);
     const ts = createRequire(path.join(target, 'package.json'))('typescript') as typeof TS;
-    roots.set(repo, { root: target, files, baseline: diagnostics(target, files, ts), ts });
+    roots.set(repo, { root: target, files, baseline: diagnostics(target, files, ts, version), ts });
   }
   for (const task of manifest.tasks) {
     const { root, files, baseline, ts } = roots.get(task.repo)!;
@@ -154,7 +165,7 @@ export async function runBenchmark(version: 1 | 2 = 1) {
     writeFileSync(file, original.replace(task.before, task.after));
     try {
       const oracleStart = performance.now();
-      row.diagnostics = diagnostics(root, files, ts);
+      row.diagnostics = diagnostics(root, files, ts, version);
       row.oracleMs = performance.now() - oracleStart;
       if (row.oracleMs > 30000) row.errors.push('compiler oracle exceeded 30-second budget');
       const prior = new Set(baseline.map(identity));
@@ -179,8 +190,8 @@ export async function runBenchmark(version: 1 | 2 = 1) {
     writeFileSync(path.join(work, 'progress.json'), JSON.stringify(rows, null, 2));
     console.log(`${task.id}: callers ${row.expectedCallers.length - row.missingCallers.length}/${row.expectedCallers.length}; tests ${row.expectedTests.length - row.missingTests.length}/${row.expectedTests.length}; complete=${row.impact?.complete}; ${row.ms} ms`);
   }
-  const result = { version, manifestSha256: sha256, checkerCommit: git(project, 'rev-parse', 'HEAD'), generatedAt: new Date().toISOString(), environment, work, rows, summary: summarize(rows) };
-  const out = path.join(data, version === 2 ? 'results-v2' : 'results');
+  const result = { version, manifestSha256: sha256, checkerCommit: manifest.checkerCommit ?? git(project, 'rev-parse', 'HEAD'), runnerCommit: git(project, 'rev-parse', 'HEAD'), generatedAt: new Date().toISOString(), environment, work, rows, summary: summarize(rows) };
+  const out = path.join(data, version === 1 ? 'results' : `results-v${version}`);
   if (existsSync(path.join(out, 'results.json'))) {
     const archive = path.join(out, `previous-${Date.now()}`); mkdirSync(archive);
     for (const file of ['results.json', 'RESULTS.md']) cpSync(path.join(out, file), path.join(archive, file));
@@ -193,6 +204,6 @@ export async function runBenchmark(version: 1 | 2 = 1) {
 }
 
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
-  try { if ((await runBenchmark(process.argv.includes('--v2') ? 2 : 1)).summary.status !== 'PASS') process.exitCode = 1; }
+  try { if ((await runBenchmark(process.argv.includes('--v3') ? 3 : process.argv.includes('--v2') ? 2 : 1)).summary.status !== 'PASS') process.exitCode = 1; }
   catch (error) { console.error((error as Error).message); process.exitCode = 1; }
 }

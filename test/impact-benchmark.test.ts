@@ -3,9 +3,29 @@ import os from 'node:os';
 import path from 'node:path';
 import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
-import { affectedTests, registeredTasks, summarize } from '../scripts/bench-impact.js';
+import { affectedTests, diagnostics, oracleFiles, registeredTasks, summarize } from '../scripts/bench-impact.js';
 
 describe('impact preregistered harness', () => {
+  it('validates the separate v3 hash and only broadens the registered JavaScript oracle scope', () => {
+    const v3 = registeredTasks(undefined, 3);
+    expect(v3.manifest.version).toBe(3); expect(v3.manifest.tasks).toHaveLength(16);
+    expect(v3.manifest.checkerCommit).toBe('386539ebc8714791c7cf73e7ecb9951a9b66ef7c');
+    const old = [registeredTasks().manifest, registeredTasks(undefined, 2).manifest].flatMap((m) => m.tasks);
+    for (const task of v3.manifest.tasks) expect(old.some((t) => t.repo === task.repo && t.name === task.name)).toBe(false);
+    const files = ['api.ts', 'api.test.mjs', 'a.cjs', 'b.js', 'excluded.jsx', 'excluded.py'];
+    expect(oracleFiles(files, 'typescript', 3)).toEqual(files.slice(0, 4));
+    expect(oracleFiles(files, 'typescript', 2)).toEqual(['api.ts']);
+    const root = mkdtempSync(path.join(os.tmpdir(), 'gw-impact-js-oracle-'));
+    try {
+      writeFileSync(path.join(root, 'api.ts'), 'export function api(value: string): string { return value; }');
+      writeFileSync(path.join(root, 'api.test.mjs'), 'import { api } from "./api.js"; api(123);');
+      expect(diagnostics(root, ['api.ts'], ts, 2)).toEqual([]);
+      expect(diagnostics(root, ['api.ts', 'api.test.mjs'], ts, 3)).toEqual(expect.arrayContaining([expect.objectContaining({ file: 'api.test.mjs', code: 2345 })]));
+      writeFileSync(path.join(root, 'PREREGISTRATION-v3.md'), readFileSync('bench/impact/PREREGISTRATION-v3.md'));
+      writeFileSync(path.join(root, 'tasks-v3.json'), '{}');
+      expect(() => registeredTasks(root, 3)).toThrow('SHA256 differs');
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
   it('accepts the frozen manifest and refuses any changed bytes before evaluation', () => {
     expect(registeredTasks().manifest.tasks).toHaveLength(16);
     const dir = mkdtempSync(path.join(os.tmpdir(), 'gw-impact-registration-'));

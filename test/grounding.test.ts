@@ -2,7 +2,8 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { changedFromGit, changedFromToolInput, parseLineSpec, verifyChanged } from '../src/grounding/index.js';
+import { changedFromGit, changedFromToolInput, parseLineSpec, renderResults, verifyChanged, type VerifyResult } from '../src/grounding/index.js';
+import { estimateTokens } from '../src/util/tokens.js';
 import { changedFromApplyPatch, locate } from '../src/grounding/ranges.js';
 import { nameSimilarity, suggest } from '../src/grounding/suggest.js';
 import { inRanges } from '../src/grounding/verify.js';
@@ -17,6 +18,22 @@ const MAIN = path.resolve(__dirname, '../src/cli/main.ts');
 const TSX = import.meta.resolve('tsx');
 
 describe('grounding', () => {
+  it('budgets unchecked batches, findings, headers and omission counts together', () => {
+    const unchecked: VerifyResult[] = Array.from({ length: 100 }, (_, i) => ({ file: `src/${'長い名前'.repeat(12)}/${i}.ts`, unchecked: 'not indexed', findings: [] }));
+    const text = renderResults(unchecked, 800, { showUnchecked: true });
+    expect(estimateTokens(text)).toBeLessThanOrEqual(800);
+    const omitted = Number(text.match(/\+(\d+) more unchecked/)![1]);
+    expect(text.match(/not checked/g)!.length + omitted).toBe(100);
+    const finding: VerifyResult = { file: 'bad.ts', unchecked: null, findings: [{ file: 'bad.ts', line: 1, kind: 'arity', name: 'wrong', message: 'wrong call', blocking: true, suggestions: [] }] };
+    const mixed = renderResults([finding, ...unchecked], 800, { showUnchecked: true, header: '{n} issues' });
+    expect(mixed).toContain('bad.ts:1 arity: wrong call');
+    expect(mixed).toContain('1 issues');
+    expect(estimateTokens(mixed)).toBeLessThanOrEqual(800);
+    expect(renderResults(unchecked.slice(0, 1), 800, { showUnchecked: true })).toBe(`${unchecked[0]!.file}: not checked (not indexed)`);
+    expect(renderResults(unchecked, 1, { showUnchecked: true })).toBe('…');
+    expect(renderResults([], 800, { showUnchecked: true })).toBe('');
+    expect(renderResults([{ file: 'clean.ts', unchecked: null, findings: [] }], 800, { showClean: true })).toBe('no grounding issues in 1 file');
+  });
   it('counts bare generators once while retaining keyword-only, splat and real arity errors', async () => {
     await withIndexedFixture('grounding-py', (db, dir) => {
       const source = readFileSync(path.join(dir, 'app/generator_calls.py'), 'utf8');

@@ -11,6 +11,9 @@ export const comparisons = [['baseline', 'groundwork'], ['baseline', 'serena'], 
 export async function analyze(input, suites = ['nav', 'long-horizon'].map((name) => ({ name, ...loadSuite(name) }))) {
   const captures = input.map((c) => captureSchema.parse(c));
   if (new Set(captures.map((c) => c.captureRevision)).size !== 1) throw new Error('Mixed captureRevision');
+  if (captures.some((c) => c.agent !== captures[0].agent || c.model !== captures[0].model || c.node !== captures[0].node)) {
+    throw new Error('Captures must use the same agent, model and Node');
+  }
   if (captures.some((c) => !suites.some((s) => s.name === c.suite))) throw new Error('Unexpected suite');
   const output = [];
   for (const { name, suite, grader } of suites) {

@@ -61,3 +61,9 @@ test('rejects incomplete arms, mixed revisions and non-stable timing', async () 
   const missing = captures(); delete (missing[0]!.observations[0] as { endedAt?: number }).endedAt;
   await expect(analyze(missing, suites)).rejects.toThrow();
 });
+
+test.each(['agent', 'model', 'node'] as const)('rejects mixed %s across suites', async (field) => {
+  const mixed = captures();
+  Object.assign(mixed.at(-1)!, { [field]: 'different' });
+  await expect(analyze(mixed, suites)).rejects.toThrow('same agent, model and Node');
+});

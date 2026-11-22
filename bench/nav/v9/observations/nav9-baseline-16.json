@@ -1,0 +1,767 @@
+{
+  "suite": "nav",
+  "revision": "e0709ce62f2e8766080ec753c90a46fc96620610",
+  "condition": "baseline",
+  "run": 16,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795341146315,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "36f54a0845fe2bf4184549cf5cef8f216a8957ab",
+  "sessionEndedAt": 1795341319681,
+  "observations": [
+    {
+      "task": "gw-01",
+      "startedAt": 1795341151243,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 983,
+          "startedAt": 1795341151402,
+          "endedAt": 1795341151423,
+          "durationMs": 19.828170999999998
+        },
+        {
+          "action": "shell",
+          "bytes": 105,
+          "startedAt": 1795341154231,
+          "endedAt": 1795341154236,
+          "durationMs": 4.847841000000017
+        }
+      ],
+      "endedAt": 1795341157538,
+      "wallMs": 6295,
+      "answer": [
+        "src/index/refresh.ts:refreshIndex"
+      ]
+    },
+    {
+      "task": "gw-02",
+      "startedAt": 1795341157884,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 1007,
+          "startedAt": 1795341158043,
+          "endedAt": 1795341158052,
+          "durationMs": 7.860883000000001
+        },
+        {
+          "action": "shell",
+          "bytes": 316,
+          "startedAt": 1795341160647,
+          "endedAt": 1795341160657,
+          "durationMs": 8.654009000000002
+        },
+        {
+          "action": "read",
+          "bytes": 493,
+          "file": "src/index/store.ts",
+          "readBytes": 492,
+          "startedAt": 1795341163124,
+          "endedAt": 1795341163125,
+          "durationMs": 0.37457699999998795
+        }
+      ],
+      "endedAt": 1795341166158,
+      "wallMs": 8274,
+      "answer": [
+        "src/store/schema.ts:ensureSchema",
+        "src/index/store.ts:openIndex"
+      ]
+    },
+    {
+      "task": "gw-03",
+      "startedAt": 1795341166507,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 84,
+          "startedAt": 1795341166668,
+          "endedAt": 1795341166679,
+          "durationMs": 10.76934
+        },
+        {
+          "action": "read",
+          "bytes": 490,
+          "file": "src/lang/parser.ts",
+          "readBytes": 489,
+          "startedAt": 1795341169205,
+          "endedAt": 1795341169206,
+          "durationMs": 0.39162600000000225
+        }
+      ],
+      "endedAt": 1795341172155,
+      "wallMs": 5648,
+      "answer": [
+        "src/lang/parser.ts:languageForPath"
+      ]
+    },
+    {
+      "task": "gw-04",
+      "startedAt": 1795341172526,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 383,
+          "startedAt": 1795341172686,
+          "endedAt": 1795341172695,
+          "durationMs": 8.729040000000026
+        },
+        {
+          "action": "read",
+          "bytes": 1537,
+          "file": "src/mcp/server.ts",
+          "readBytes": 1536,
+          "startedAt": 1795341176209,
+          "endedAt": 1795341176211,
+          "durationMs": 0.5084349999999915
+        }
+      ],
+      "endedAt": 1795341179240,
+      "wallMs": 6714,
+      "answer": [
+        "src/mcp/server.ts:startMcpServer",
+        "src/index/refresh.ts:refreshIndex"
+      ]
+    },
+    {
+      "task": "gw-05",
+      "startedAt": 1795341179589,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 145,
+          "startedAt": 1795341179746,
+          "endedAt": 1795341179754,
+          "durationMs": 7.491363000000007
+        }
+      ],
+      "endedAt": 1795341182763,
+      "wallMs": 3174,
+      "answer": [
+        "src/util/tokens.ts:fitToBudget"
+      ]
+    },
+    {
+      "task": "gw-06",
+      "startedAt": 1795341183110,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 1163,
+          "startedAt": 1795341183266,
+          "endedAt": 1795341183275,
+          "durationMs": 8.42166499999999
+        },
+        {
+          "action": "read",
+          "bytes": 953,
+          "file": "src/hooks/run.ts",
+          "readBytes": 952,
+          "startedAt": 1795341186199,
+          "endedAt": 1795341186200,
+          "durationMs": 0.44962699999999245
+        },
+        {
+          "action": "read",
+          "bytes": 1131,
+          "file": "src/hooks/run.ts",
+          "readBytes": 1130,
+          "startedAt": 1795341186368,
+          "endedAt": 1795341186369,
+          "durationMs": 0.4100259999999878
+        },
+        {
+          "action": "shell",
+          "bytes": 542,
+          "startedAt": 1795341189175,
+          "endedAt": 1795341189180,
+          "durationMs": 4.809099000000003
+        }
+      ],
+      "endedAt": 1795341192408,
+      "wallMs": 9298,
+      "answer": [
+        "src/util/paths.ts:findRepoRoot",
+        "src/hooks/run.ts:runHook"
+      ]
+    },
+    {
+      "task": "gw-07",
+      "startedAt": 1795341192766,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 777,
+          "startedAt": 1795341192929,
+          "endedAt": 1795341192939,
+          "durationMs": 8.752965000000017
+        },
+        {
+          "action": "shell",
+          "bytes": 1422,
+          "startedAt": 1795341196402,
+          "endedAt": 1795341196410,
+          "durationMs": 7.316935999999998
+        }
+      ],
+      "endedAt": 1795341199423,
+      "wallMs": 6657,
+      "answer": [
+        "src/hooks/handlers/read_guard.ts:readGuard"
+      ]
+    },
+    {
+      "task": "gw-08",
+      "startedAt": 1795341199760,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 281,
+          "startedAt": 1795341199918,
+          "endedAt": 1795341199928,
+          "durationMs": 9.242360999999988
+        },
+        {
+          "action": "read",
+          "bytes": 390,
+          "file": "src/store/db.ts",
+          "readBytes": 389,
+          "startedAt": 1795341202498,
+          "endedAt": 1795341202500,
+          "durationMs": 0.38516400000000317
+        }
+      ],
+      "endedAt": 1795341205191,
+      "wallMs": 5431,
+      "answer": [
+        "src/store/db.ts:openDb"
+      ]
+    },
+    {
+      "task": "gw-09",
+      "startedAt": 1795341205527,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 650,
+          "startedAt": 1795341205687,
+          "endedAt": 1795341205697,
+          "durationMs": 8.688485000000014
+        },
+        {
+          "action": "read",
+          "bytes": 2198,
+          "file": "src/setup/apply.ts",
+          "readBytes": 2197,
+          "startedAt": 1795341208443,
+          "endedAt": 1795341208444,
+          "durationMs": 0.4032620000000122
+        }
+      ],
+      "endedAt": 1795341211309,
+      "wallMs": 5782,
+      "answer": [
+        "src/setup/apply.ts:applySetup",
+        "src/setup/apply.ts:planSetup"
+      ]
+    },
+    {
+      "task": "gw-10",
+      "startedAt": 1795341211830,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 1768,
+          "startedAt": 1795341211997,
+          "endedAt": 1795341212007,
+          "durationMs": 9.229104999999976
+        }
+      ],
+      "endedAt": 1795341215690,
+      "wallMs": 3860,
+      "answer": [
+        "src/util/zod.ts:formatZodError"
+      ]
+    },
+    {
+      "task": "ts-01",
+      "startedAt": 1795341215869,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 174,
+          "startedAt": 1795341216022,
+          "endedAt": 1795341216029,
+          "durationMs": 6.583453999999989
+        },
+        {
+          "action": "read",
+          "bytes": 677,
+          "file": "src/utils/date.ts",
+          "readBytes": 676,
+          "startedAt": 1795341218802,
+          "endedAt": 1795341218803,
+          "durationMs": 0.3424270000000149
+        },
+        {
+          "action": "read",
+          "bytes": 109,
+          "file": "src/utils/index.ts",
+          "readBytes": 108,
+          "startedAt": 1795341218964,
+          "endedAt": 1795341218965,
+          "durationMs": 0.34160700000001043
+        }
+      ],
+      "endedAt": 1795341222048,
+      "wallMs": 6179,
+      "answer": [
+        "src/utils/date.ts:formatDate"
+      ]
+    },
+    {
+      "task": "ts-02",
+      "startedAt": 1795341222238,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 470,
+          "file": "src/main.ts",
+          "readBytes": 469,
+          "startedAt": 1795341222401,
+          "endedAt": 1795341222402,
+          "durationMs": 0.31992299999998863
+        },
+        {
+          "action": "read",
+          "bytes": 858,
+          "file": "src/services/api.ts",
+          "readBytes": 857,
+          "startedAt": 1795341222560,
+          "endedAt": 1795341222562,
+          "durationMs": 0.3354550000000245
+        }
+      ],
+      "endedAt": 1795341225527,
+      "wallMs": 3289,
+      "answer": [
+        "src/main.ts:main",
+        "src/services/api.ts:ApiClient.get",
+        "src/services/api.ts:ApiClient.request"
+      ]
+    },
+    {
+      "task": "ts-03",
+      "startedAt": 1795341225710,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 498,
+          "file": "src/components/Button.tsx",
+          "readBytes": 497,
+          "startedAt": 1795341225870,
+          "endedAt": 1795341225871,
+          "durationMs": 0.3493649999999775
+        },
+        {
+          "action": "read",
+          "bytes": 290,
+          "file": "src/utils/text.ts",
+          "readBytes": 289,
+          "startedAt": 1795341226064,
+          "endedAt": 1795341226065,
+          "durationMs": 0.34799300000000244
+        }
+      ],
+      "endedAt": 1795341230196,
+      "wallMs": 4486,
+      "answer": [
+        "src/components/Button.tsx:Button",
+        "src/utils/text.ts:slug"
+      ]
+    },
+    {
+      "task": "ts-04",
+      "startedAt": 1795341230392,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 331,
+          "startedAt": 1795341230560,
+          "endedAt": 1795341230568,
+          "durationMs": 7.604730999999987
+        }
+      ],
+      "endedAt": 1795341234191,
+      "wallMs": 3799,
+      "answer": [
+        "src/utils/date.ts:joinParts"
+      ]
+    },
+    {
+      "task": "ts-05",
+      "startedAt": 1795341234419,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 185,
+          "file": "src/legacy.js",
+          "readBytes": 184,
+          "startedAt": 1795341234593,
+          "endedAt": 1795341234594,
+          "durationMs": 0.3362359999999853
+        }
+      ],
+      "endedAt": 1795341237591,
+      "wallMs": 3172,
+      "answer": [
+        "src/legacy.js:legacyPath",
+        "src/utils/text.ts:slug"
+      ]
+    },
+    {
+      "task": "ts-06",
+      "startedAt": 1795341237786,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 75,
+          "startedAt": 1795341237962,
+          "endedAt": 1795341237971,
+          "durationMs": 8.266084999999975
+        }
+      ],
+      "endedAt": 1795341240893,
+      "wallMs": 3107,
+      "answer": [
+        "src/services/api.ts:API_URL"
+      ]
+    },
+    {
+      "task": "ts-07",
+      "startedAt": 1795341241071,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 228,
+          "startedAt": 1795341241237,
+          "endedAt": 1795341241245,
+          "durationMs": 7.273156999999998
+        }
+      ],
+      "endedAt": 1795341244498,
+      "wallMs": 3427,
+      "answer": [
+        "src/main.ts:main",
+        "src/utils/date.ts:pad"
+      ]
+    },
+    {
+      "task": "py-01",
+      "startedAt": 1795341244677,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 146,
+          "startedAt": 1795341244838,
+          "endedAt": 1795341244846,
+          "durationMs": 7.282369999999986
+        },
+        {
+          "action": "shell",
+          "bytes": 667,
+          "startedAt": 1795341247907,
+          "endedAt": 1795341247912,
+          "durationMs": 4.752909999999986
+        },
+        {
+          "action": "read",
+          "bytes": 641,
+          "file": "app/models.py",
+          "readBytes": 640,
+          "startedAt": 1795341250731,
+          "endedAt": 1795341250732,
+          "durationMs": 0.32294500000000426
+        }
+      ],
+      "endedAt": 1795341253580,
+      "wallMs": 8903,
+      "answer": [
+        "app/models.py:Invoice.total"
+      ]
+    },
+    {
+      "task": "py-02",
+      "startedAt": 1795341253753,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 321,
+          "file": "app/cli.py",
+          "readBytes": 320,
+          "startedAt": 1795341253911,
+          "endedAt": 1795341253912,
+          "durationMs": 0.3443849999999884
+        },
+        {
+          "action": "read",
+          "bytes": 394,
+          "file": "app/services/billing.py",
+          "readBytes": 393,
+          "startedAt": 1795341254069,
+          "endedAt": 1795341254070,
+          "durationMs": 0.3370830000000069
+        },
+        {
+          "action": "read",
+          "bytes": 205,
+          "file": "app/services/tax.py",
+          "readBytes": 204,
+          "startedAt": 1795341254224,
+          "endedAt": 1795341254225,
+          "durationMs": 0.33202499999998736
+        }
+      ],
+      "endedAt": 1795341257308,
+      "wallMs": 3555,
+      "answer": [
+        "app/cli.py:main",
+        "app/services/billing.py:charge",
+        "app/services/tax.py:rate"
+      ]
+    },
+    {
+      "task": "py-03",
+      "startedAt": 1795341257496,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 66,
+          "startedAt": 1795341257665,
+          "endedAt": 1795341257671,
+          "durationMs": 4.791851000000008
+        }
+      ],
+      "endedAt": 1795341260912,
+      "wallMs": 3416,
+      "answer": [
+        "app/services/tax.py:fetch_rates"
+      ]
+    },
+    {
+      "task": "py-04",
+      "startedAt": 1795341261123,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 127,
+          "startedAt": 1795341261281,
+          "endedAt": 1795341261286,
+          "durationMs": 4.616980000000012
+        }
+      ],
+      "endedAt": 1795341264426,
+      "wallMs": 3303,
+      "answer": [
+        "app/models.py:Customer.display"
+      ]
+    },
+    {
+      "task": "py-05",
+      "startedAt": 1795341264604,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 137,
+          "file": "tests/test_billing.py",
+          "readBytes": 136,
+          "startedAt": 1795341264766,
+          "endedAt": 1795341264767,
+          "durationMs": 0.3136080000000163
+        },
+        {
+          "action": "shell",
+          "bytes": 61,
+          "startedAt": 1795341267891,
+          "endedAt": 1795341267896,
+          "durationMs": 4.190313000000003
+        }
+      ],
+      "endedAt": 1795341268052,
+      "wallMs": 3448,
+      "answer": [
+        "tests/test_billing.py:test_charge",
+        "app/services/billing.py:charge"
+      ]
+    },
+    {
+      "task": "py-06",
+      "startedAt": 1795341268228,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 128,
+          "startedAt": 1795341268385,
+          "endedAt": 1795341268390,
+          "durationMs": 4.609172000000001
+        }
+      ],
+      "endedAt": 1795341271298,
+      "wallMs": 3070,
+      "answer": [
+        "app/services/tax.py:TAX_RATE_ENV"
+      ]
+    },
+    {
+      "task": "py-07",
+      "startedAt": 1795341271474,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 396,
+          "startedAt": 1795341271628,
+          "endedAt": 1795341271634,
+          "durationMs": 5.103766999999976
+        }
+      ],
+      "endedAt": 1795341274697,
+      "wallMs": 3223,
+      "answer": [
+        "app/cli.py:main",
+        "app/models.py:Customer.parse"
+      ]
+    },
+    {
+      "task": "edit-01",
+      "startedAt": 1795341274876,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 923,
+          "startedAt": 1795341275028,
+          "endedAt": 1795341275035,
+          "durationMs": 6.63497799999999
+        },
+        {
+          "action": "shell",
+          "bytes": 104,
+          "startedAt": 1795341278744,
+          "endedAt": 1795341278902,
+          "durationMs": 157.36063
+        }
+      ],
+      "endedAt": 1795341282629,
+      "wallMs": 7753,
+      "patch": "diff --git a/src/utils/text.ts b/src/utils/text.ts\nindex dacdcc3..13d6918 100644\n--- a/src/utils/text.ts\n+++ b/src/utils/text.ts\n@@ -1,5 +1,5 @@\n export function slug(text: string): string {\n-  return text.toLowerCase().replace(/\\s+/g, '-');\n+  return text.trim().toLowerCase().replace(/\\s+/g, '-');\n }\n \n export type Casing = 'upper' | 'lower';\n"
+    },
+    {
+      "task": "edit-02",
+      "startedAt": 1795341282814,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 321,
+          "file": "app/cli.py",
+          "readBytes": 320,
+          "startedAt": 1795341283075,
+          "endedAt": 1795341283076,
+          "durationMs": 0.34956499999998414
+        },
+        {
+          "action": "shell",
+          "bytes": 523,
+          "startedAt": 1795341289128,
+          "endedAt": 1795341289438,
+          "durationMs": 308.622271
+        }
+      ],
+      "endedAt": 1795341294420,
+      "wallMs": 11606,
+      "patch": "diff --git a/app/cli.py b/app/cli.py\nindex d03b5bd..764d3be 100644\n--- a/app/cli.py\n+++ b/app/cli.py\n@@ -7,7 +7,13 @@ from app.services import tax\n def main(argv=None):\n     inv = m.Invoice(\"c1\", [1.0, 2.0])\n     print(charge(inv, region=\"us\"), tax.rate(\"us\"))\n-    cust = m.Customer.parse(argv or sys.argv[1])\n+    if argv is None:\n+        raw = sys.argv[1]\n+    elif isinstance(argv, (list, tuple)):\n+        raw = argv[0] if argv else sys.argv[1]\n+    else:\n+        raw = argv\n+    cust = m.Customer.parse(raw)\n     return cust\n \n \n"
+    },
+    {
+      "task": "edit-03",
+      "startedAt": 1795341294604,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 369,
+          "startedAt": 1795341294772,
+          "endedAt": 1795341294907,
+          "durationMs": 133.66589900000002
+        }
+      ],
+      "endedAt": 1795341298286,
+      "wallMs": 3682,
+      "patch": "diff --git a/src/utils/date.ts b/src/utils/date.ts\nindex 1e18c6e..4f78439 100644\n--- a/src/utils/date.ts\n+++ b/src/utils/date.ts\n@@ -16,7 +16,12 @@ function pad(n: number, width = 2): string {\n }\n \n export function joinParts(sep: string, ...parts: string[]): string {\n-  return parts.map((p) => pad(Number(p))).join(sep);\n+  return parts\n+    .map((p) => {\n+      const n = Number(p);\n+      return p.trim() !== '' && !Number.isNaN(n) ? pad(n) : p;\n+    })\n+    .join(sep);\n }\n \n export { pad as padNumber };\n"
+    },
+    {
+      "task": "edit-04",
+      "startedAt": 1795341298527,
+      "tools": [
+        {
+          "action": "read",
+          "bytes": 328,
+          "file": "app/models.py",
+          "readBytes": 328,
+          "startedAt": 1795341298759,
+          "endedAt": 1795341298761,
+          "durationMs": 0.4500150000000076
+        },
+        {
+          "action": "shell",
+          "bytes": 184,
+          "startedAt": 1795341299129,
+          "endedAt": 1795341299134,
+          "durationMs": 4.8402189999999905
+        },
+        {
+          "action": "shell",
+          "bytes": 287,
+          "startedAt": 1795341303318,
+          "endedAt": 1795341303614,
+          "durationMs": 295.48012700000004
+        }
+      ],
+      "endedAt": 1795341308866,
+      "wallMs": 10339,
+      "patch": "diff --git a/app/models.py b/app/models.py\nindex 46231f4..7e4e40f 100644\n--- a/app/models.py\n+++ b/app/models.py\n@@ -11,9 +11,10 @@ class Invoice:\n     customer_id: str\n     amounts: List[float] = field(default_factory=list)\n     currency: str = DEFAULT_CURRENCY\n+    discount: float = 0.0\n \n     def total(self) -> float:\n-        return sum(self.amounts)\n+        return sum(self.amounts) - self.discount\n \n \n class Customer:\n"
+    },
+    {
+      "task": "edit-05",
+      "startedAt": 1795341309056,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 809,
+          "startedAt": 1795341309213,
+          "endedAt": 1795341309350,
+          "durationMs": 136.515651
+        }
+      ],
+      "endedAt": 1795341314407,
+      "wallMs": 5351,
+      "patch": "diff --git a/src/services/api.ts b/src/services/api.ts\nindex 75dd31b..28ce98d 100644\n--- a/src/services/api.ts\n+++ b/src/services/api.ts\n@@ -7,7 +7,7 @@ const CONFIG_KEY = 'services.api.timeout';\n export class ApiClient {\n   private token: string | null = null;\n \n-  constructor(private readonly base: string, timeout?: number) {}\n+  constructor(private readonly base: string, private readonly timeout?: number) {}\n \n   static create(): ApiClient {\n     return new ApiClient(API_URL);\n@@ -20,7 +20,9 @@ export class ApiClient {\n \n   private request(method: string, url: string, body?: unknown): Promise<string> {\n     const key = process.env.API_TOKEN ?? '';\n-    return fetch(url, { method, headers: { key, cfg: CONFIG_KEY } }).then((r) => r.text());\n+    const init: RequestInit = { method, headers: { key, cfg: CONFIG_KEY } };\n+    if (this.timeout !== undefined) init.signal = AbortSignal.timeout(this.timeout);\n+    return fetch(url, init).then((r) => r.text());\n   }\n \n   label(name: string): string {\n"
+    },
+    {
+      "task": "edit-06",
+      "startedAt": 1795341314588,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 307,
+          "startedAt": 1795341314748,
+          "endedAt": 1795341315083,
+          "durationMs": 334.211193
+        }
+      ],
+      "endedAt": 1795341319673,
+      "wallMs": 5085,
+      "patch": "diff --git a/app/services/tax.py b/app/services/tax.py\nindex 0a636a6..ca46ffd 100644\n--- a/app/services/tax.py\n+++ b/app/services/tax.py\n@@ -8,4 +8,6 @@ def rate(region, default=0.2):\n \n \n async def fetch_rates(*regions, **opts):\n+    if \"default\" in opts:\n+        return [rate(r, opts[\"default\"]) for r in regions]\n     return [rate(r) for r in regions]\n"
+    }
+  ]
+}

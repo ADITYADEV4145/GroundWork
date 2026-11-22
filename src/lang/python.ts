@@ -318,7 +318,8 @@ function visit(ctx: Ctx, node: Node, parent: number | null, scope: number | null
       const args = node.childForFieldName('arguments');
       if (fn && (fn.type === 'identifier' || fn.type === 'attribute')) {
         const name = fn.type === 'identifier' ? fn.text : (fn.childForFieldName('attribute')?.text ?? fn.text);
-        const list = args?.type === 'argument_list' ? args.namedChildren.filter((c) => c && c.type !== 'comment') : [];
+        const list = args?.type === 'generator_expression' ? [args]
+          : args?.type === 'argument_list' ? args.namedChildren.filter((c) => c && c.type !== 'comment') : [];
         const kw = list.filter((c) => c!.type === 'keyword_argument').map((c) => c!.childForFieldName('name')?.text ?? '');
         let text = fn.text.replace(/\s+/g, '');
         if (text.length > 120) text = `…${text.slice(-60)}`;

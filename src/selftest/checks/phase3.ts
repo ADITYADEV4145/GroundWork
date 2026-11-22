@@ -50,7 +50,7 @@ export const PHASE3_CHECKS: Check[] = [{
   },
 }, {
   phase: 3,
-  name: 'real-repo BLOCK agreement >= 90% on >=10 reviewed findings',
+  name: 'real-repo BLOCK agreement >= 90% on >=10 independent reviewed pairs (agent review accepted)',
   async run() {
     return evaluateRealRepoReview(fileURLToPath(new URL('../../../bench/reuse-v2/', import.meta.url)));
   },

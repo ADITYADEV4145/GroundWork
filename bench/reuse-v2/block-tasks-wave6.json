@@ -1,0 +1,434 @@
+[
+  {
+    "id": "block6-click-text-reader",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor _force_correct_text_reader from src/click/_compat.py into a new module src/standalone_wave6_text_reader.py under the new name vendored_text_reader, so that module has no dependency on click._compat (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_text_reader and vendored_text_reader_variant. Wrapper-only change: Default force_readable to True in the wrapper instead of False; explicitly supplied values still win. Support dependencies: Copy the local text-stream correction helper and its reader detection, encoding, wrapper-class and stream-attribute dependency closure from _compat.py; use only standard-library I/O and codec support. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_force_correct_text_reader"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Default force_readable to True in the wrapper instead of False; explicitly supplied values still win.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-text-writer",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor _force_correct_text_writer from src/click/_compat.py into a new module src/standalone_wave6_text_writer.py under the new name vendored_text_writer, so that module has no dependency on click._compat (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_text_writer and vendored_text_writer_variant. Wrapper-only change: Default force_writable to True in the wrapper instead of False; explicitly supplied values still win. Support dependencies: Copy the local text-stream correction helper and its writer detection, encoding, wrapper-class and stream-attribute dependency closure from _compat.py; use only standard-library I/O and codec support. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_force_correct_text_writer"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Default force_writable to True in the wrapper instead of False; explicitly supplied values still win.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-ansi-stream",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor auto_wrap_for_ansi from src/click/_compat.py into a new module src/standalone_wave6_ansi_stream.py under the new name vendored_ansi_stream, so that module has no dependency on click._compat (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_ansi_stream and vendored_ansi_stream_variant. Wrapper-only change: Default color to False in the wrapper rather than None, forwarding explicit values unchanged. Support dependencies: Use the Windows-branch definition, which has no enclosing function or class. Copy the weak-key wrapper cache and ANSI/TTY/Jupyter stream predicates, with their local supporting classes; retain the lazy colorama import and cache/error behavior. Tests can provide a fake colorama module. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "auto_wrap_for_ansi"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Default color to False in the wrapper rather than None, forwarding explicit values unchanged.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-pager",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor pager from src/click/_termui_impl.py into a new module src/standalone_wave6_pager.py under the new name vendored_pager, so that module has no dependency on click._termui_impl (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_pager and vendored_pager_variant. Wrapper-only change: Default color to True in the wrapper rather than None, forwarding explicit values unchanged. Support dependencies: Copy _nullpager, _pipepager and _tempfilepager and the stdout/TTY/encoding/ANSI dependency closure locally; preserve the WIN flag and standard-library subprocess, shlex, StringIO and environment behavior. Tests must mock pager execution, not launch a pager. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/_termui_impl.py",
+      "name": "pager"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Default color to True in the wrapper rather than None, forwarding explicit values unchanged.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-console-probe",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor _is_console from src/click/_winconsole.py into a new module src/standalone_wave6_console_probe.py under the new name vendored_console_probe, so that module has no dependency on click._winconsole (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_console_probe and vendored_console_probe_variant. Wrapper-only change: Have the wrapper return False immediately when f.closed is True; otherwise call the vendored function unchanged. Support dependencies: Keep io, typing, msvcrt.get_osfhandle and the ctypes GetConsoleMode/byref/DWORD binding setup local; guard Windows-only setup outside the unchanged function and mock native bindings in tests. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/_winconsole.py",
+      "name": "_is_console"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Have the wrapper return False immediately when f.closed is True; otherwise call the vendored function unchanged.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-console-stream",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor _get_windows_console_stream from src/click/_winconsole.py into a new module src/standalone_wave6_console_stream.py under the new name vendored_console_stream, so that module has no dependency on click._winconsole (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_console_stream and vendored_console_stream_variant. Wrapper-only change: Lowercase a non-None encoding string in the wrapper before forwarding it, so UTF-16-LE is accepted like utf-16-le. Support dependencies: Copy get_buffer, _is_console, the stream-factory mapping, supporting console stream classes and native binding setup locally, preserving platform guards and disabled-buffer behavior. Tests can mock Windows APIs and factories without a Windows host. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/_winconsole.py",
+      "name": "_get_windows_console_stream"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Lowercase a non-None encoding string in the wrapper before forwarding it, so UTF-16-LE is accepted like utf-16-le.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-visible-commands",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor _complete_visible_commands from src/click/core.py into a new module src/standalone_wave6_visible_commands.py under the new name vendored_visible_commands, so that module has no dependency on click.core (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_visible_commands and vendored_visible_commands_variant. Wrapper-only change: Yield the resulting (name, command) pairs in lexicographically sorted name order in the wrapper instead of discovery order. Support dependencies: Use structural local Context, Group and Command protocols for the existing list_commands/get_command/is_eager-style attribute interface; typing.cast(Group, ...) must still work. No concrete Click classes are needed for this duck-typed lookup. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "_complete_visible_commands"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Yield the resulting (name, command) pairs in lexicographically sorted name order in the wrapper instead of discovery order.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-parameter-order",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor iter_params_for_processing from src/click/core.py into a new module src/standalone_wave6_parameter_order.py under the new name vendored_parameter_order, so that module has no dependency on click.core (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_parameter_order and vendored_parameter_order_variant. Wrapper-only change: Return the reversed result list in the wrapper; keep the vendored eagerness/invocation-order sorting untouched. Support dependencies: Only collections.abc, typing and a local structural Parameter protocol exposing is_eager are needed; the nested sort_key retains its enclosing invocation_order unchanged. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "iter_params_for_processing"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Return the reversed result list in the wrapper; keep the vendored eagerness/invocation-order sorting untouched.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-color-default",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor resolve_color_default from src/click/globals.py into a new module src/standalone_wave6_color_default.py under the new name vendored_color_default, so that module has no dependency on click.globals (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_color_default and vendored_color_default_variant. Wrapper-only change: Map only a None result to False in the wrapper, leaving existing True and False results unchanged. Support dependencies: Copy get_current_context and its threading.local context-stack state locally, retaining the silent=True behavior and error paths; local contexts need only expose color. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/globals.py",
+      "name": "resolve_color_default"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Map only a None result to False in the wrapper, leaving existing True and False results unchanged.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-color-fragment",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor _interpret_color from src/click/termui.py into a new module src/standalone_wave6_color_fragment.py under the new name vendored_color_fragment, so that module has no dependency on click.termui (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_color_fragment and vendored_color_fragment_variant. Wrapper-only change: Wrap the returned SGR fragment in ESC+[ and a trailing m in the wrapper to produce a complete ANSI escape. Support dependencies: Copy the _ansi_colors mapping locally; tuple/list, numeric, offset and invalid-name behavior in the target must remain untouched. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "_interpret_color"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Wrap the returned SGR fragment in ESC+[ and a trailing m in the wrapper to produce a complete ANSI escape.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-shell-expansion",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor _expand_args from src/click/utils.py into a new module src/standalone_wave6_shell_expansion.py under the new name vendored_shell_expansion, so that module has no dependency on click.utils (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_shell_expansion and vendored_shell_expansion_variant. Wrapper-only change: Remove duplicate strings from the expanded result in the wrapper, preserving first occurrence order. Support dependencies: Only standard-library os, re, collections.abc and glob are needed; preserve the target local glob import and keyword defaults. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/utils.py",
+      "name": "_expand_args"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Remove duplicate strings from the expanded result in the wrapper, preserving first occurrence order.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-click-raw-terminal",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Vendor raw_terminal from src/click/_termui_impl.py into a new module src/standalone_wave6_raw_terminal.py under the new name vendored_raw_terminal, so that module has no dependency on click._termui_impl (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_raw_terminal and vendored_raw_terminal_variant. Wrapper-only change: Make the wrapper a context manager that yields (fd, \"raw\") instead of just fd, preserving entry/exit and exception behavior. Support dependencies: Select the POSIX-branch implementation, not the Windows yield -1 implementation. It is module-level inside a platform conditional, with no enclosing function or receiver. Copy isatty and use standard-library contextlib, os, sys, termios and tty with platform guards; tests must mock terminal operations. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/click/_termui_impl.py",
+      "name": "raw_terminal"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Make the wrapper a context manager that yields (fd, \"raw\") instead of just fd, preserving entry/exit and exception behavior.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-raw-code",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor getrawcode from src/_pytest/_code/source.py into a new module src/standalone_wave6_raw_code.py under the new name vendored_raw_code, so that module has no dependency on _pytest._code.source (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_raw_code and vendored_raw_code_variant. Wrapper-only change: Return the resulting code object's co_name string in the wrapper instead of returning the code object. Support dependencies: Use standard-library types and preserve recursion by binding getrawcode locally to the renamed function; preserve the trycall flag and TypeError behavior. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/source.py",
+      "name": "getrawcode"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Return the resulting code object's co_name string in the wrapper instead of returning the code object.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-statement-range",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor get_statement_startend2 from src/_pytest/_code/source.py into a new module src/standalone_wave6_statement_range.py under the new name vendored_statement_range, so that module has no dependency on _pytest._code.source (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_statement_range and vendored_statement_range_variant. Wrapper-only change: Replace only a None end value with -1 in the wrapper, retaining the start value. Support dependencies: Only standard-library ast and bisect_right are needed, with the exact existing decorator/exception/finally/orelse line handling. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/source.py",
+      "name": "get_statement_startend2"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Replace only a None end value with -1 in the wrapper, retaining the start value.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-repr-exception",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor _format_repr_exception from src/_pytest/_io/saferepr.py into a new module src/standalone_wave6_repr_exception.py under the new name vendored_repr_exception, so that module has no dependency on _pytest._io.saferepr (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_repr_exception and vendored_repr_exception_variant. Wrapper-only change: Append exactly one newline to the returned diagnostic string in the wrapper. Support dependencies: Copy _try_repr_or_str locally with its KeyboardInterrupt/SystemExit propagation; all remaining dependencies are builtins. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/_io/saferepr.py",
+      "name": "_format_repr_exception"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Append exactly one newline to the returned diagnostic string in the wrapper.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-chunk-copy",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor copychunked from src/_pytest/_py/path.py into a new module src/standalone_wave6_chunk_copy.py under the new name vendored_chunk_copy, so that module has no dependency on _pytest._py.path (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_chunk_copy and vendored_chunk_copy_variant. Wrapper-only change: Return dest after a successful copy in the wrapper rather than None; do not change copying or close/error handling. Support dependencies: Inputs expose open; no pytest types or registry are needed, and the fixed chunk size stays inside the unchanged function. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/_py/path.py",
+      "name": "copychunked"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Return dest after a successful copy in the wrapper rather than None; do not change copying or close/error handling.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-pyc-stream",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor _write_pyc_fp from src/_pytest/assertion/rewrite.py into a new module src/standalone_wave6_pyc_stream.py under the new name vendored_pyc_stream, so that module has no dependency on _pytest.assertion.rewrite (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_pyc_stream and vendored_pyc_stream_variant. Wrapper-only change: Flush fp once after successful writing in the wrapper; do not flush on failure. Support dependencies: Use standard-library importlib.util, struct, marshal, os and types, with local typing.IO annotations; preserve magic/header masking and marshaling. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "name": "_write_pyc_fp"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Flush fp once after successful writing in the wrapper; do not flush on failure.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-pyc-file",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor _write_pyc from src/_pytest/assertion/rewrite.py into a new module src/standalone_wave6_pyc_file.py under the new name vendored_pyc_file, so that module has no dependency on _pytest.assertion.rewrite (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_pyc_file and vendored_pyc_file_variant. Wrapper-only change: Raise OSError(\"bytecode cache write failed\") in the wrapper when the vendored function returns False, otherwise return True. Support dependencies: Copy _write_pyc_fp locally plus its standard-library dependencies. AssertionState is only a structural object exposing trace; do not import assertion rewriting or its registry. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "name": "_write_pyc"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Raise OSError(\"bytecode cache write failed\") in the wrapper when the vendored function returns False, otherwise return True.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-explanation-split",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor _split_explanation from src/_pytest/assertion/util.py into a new module src/standalone_wave6_explanation_split.py under the new name vendored_explanation_split, so that module has no dependency on _pytest.assertion.util (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_explanation_split and vendored_explanation_split_variant. Wrapper-only change: Return a tuple of the result lines in the wrapper rather than a list, with identical line contents. Support dependencies: No supporting globals are needed; preserve None/empty handling and all four control markers. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/util.py",
+      "name": "_split_explanation"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Return a tuple of the result lines in the wrapper rather than a list, with identical line contents.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-explanation-lines",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor _format_lines from src/_pytest/assertion/util.py into a new module src/standalone_wave6_explanation_lines.py under the new name vendored_explanation_lines, so that module has no dependency on _pytest.assertion.util (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_explanation_lines and vendored_explanation_lines_variant. Wrapper-only change: Append one newline to each returned line in the wrapper, keeping ordering and indentation unchanged. Support dependencies: Only a typing or collections.abc Sequence annotation is needed; preserve the stack assertions and control-marker handling. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/util.py",
+      "name": "_format_lines"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Append one newline to each returned line in the wrapper, keeping ordering and indentation unchanged.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-default-equality",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor has_default_eq from src/_pytest/assertion/util.py into a new module src/standalone_wave6_default_equality.py under the new name vendored_default_equality, so that module has no dependency on _pytest.assertion.util (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_default_equality and vendored_default_equality_variant. Wrapper-only change: Return the boolean negation of the vendored result in the wrapper. Support dependencies: Copy the tiny isattrs helper locally; all runtime operations otherwise use builtins and code-object metadata. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/util.py",
+      "name": "has_default_eq"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Return the boolean negation of the vendored result in the wrapper.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-xml-escape",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor bin_xml_escape from src/_pytest/junitxml.py into a new module src/standalone_wave6_xml_escape.py under the new name vendored_xml_escape, so that module has no dependency on _pytest.junitxml (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_xml_escape and vendored_xml_escape_variant. Wrapper-only change: Prefix the escaped output with \"xml:\" in the wrapper. Support dependencies: Only standard-library re is needed; preserve the nested repl and the exact illegal_xml_re literal and code-point formatting. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/junitxml.py",
+      "name": "bin_xml_escape"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Prefix the escaped output with \"xml:\" in the wrapper.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-test-address",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor mangle_test_address from src/_pytest/junitxml.py into a new module src/standalone_wave6_test_address.py under the new name vendored_test_address, so that module has no dependency on _pytest.junitxml (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_test_address and vendored_test_address_variant. Wrapper-only change: Return a tuple of address components in the wrapper instead of a list. Support dependencies: Copy the nodes.SEP constant value from src/_pytest/nodes.py into a local nodes namespace so the body remains unchanged; use standard-library re and keep bracket/parameter handling. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/junitxml.py",
+      "name": "mangle_test_address"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Return a tuple of address components in the wrapper instead of a list.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-pytest-extended-path",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Vendor get_extended_length_path_str from src/_pytest/pathlib.py into a new module src/standalone_wave6_extended_path.py under the new name vendored_extended_path, so that module has no dependency on _pytest.pathlib (reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization). Keep the vendored function's body as-is; put the one requested behavior change in a separate small wrapper function in the same module. Export both vendored_extended_path and vendored_extended_path_variant. Wrapper-only change: Replace forward slashes in the input with backslashes in the wrapper before calling the vendored function. Support dependencies: Only builtins are needed; keep already-prefixed and UNC logic byte-for-byte inside the vendored function. Preserve the target's decorators and parameter defaults. Renaming the definition is allowed, but do not rename identifiers, change control flow, or adapt statements inside its body; preserve any original recursive name through a local alias to the renamed function. Vendor supporting private functions, classes, constants and state locally with their original names and behavior, preserving platform guards, rather than injecting replacements or importing them from the original package. Standard-library imports and the reference's lazy optional third-party dependencies are allowed; no Click or pytest imports. Type-only references may use postponed annotations and local structural protocols; do not alter runtime semantics. Do not import, subclass or call the original target, including through aliases. Do not edit existing modules. Add focused direct-file-import tests for the unchanged vendored function and the wrapper, covering normal, empty and error cases; mock platform APIs rather than requiring a live terminal or Windows host.",
+    "reference_symbol": {
+      "file": "src/_pytest/pathlib.py",
+      "name": "get_extended_length_path_str"
+    },
+    "why": "Verbatim vendor with wrapper-only change: Replace forward slashes in the input with backslashes in the wrapper before calling the vendored function.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": true
+  },
+  {
+    "id": "block6-got-hook-inventory",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "hard-negative",
+    "prompt": "Add source/standalone/wave6-hook-inventory.ts, a new standalone module exporting vendored_hook_inventory_variant. Compare the surface shape against source/core/options.ts::init, but this is a hard negative: no vendoring and do not copy the reference body or supporting implementations. Required behavioral difference: Return an array of init-hook names, using \"<anonymous>\" for empty names, in source order without invoking any hook or mutating either options record. Return [] if hooks.init is absent. Accept a structural options object. Reject a present non-array hooks.init and any non-callable element with TypeError. The reference invokes hooks and returns void; this inventory must do neither. This module must have no dependency on core.options; reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization. Do not import, subclass or call the original target. Do not edit existing modules. Add focused tests for normal, empty and error cases and cases that distinguish this behavior from the reference.",
+    "reference_symbol": {
+      "file": "source/core/options.ts",
+      "name": "init"
+    },
+    "why": "Behavioral negative: Return an array of init-hook names, using \"<anonymous>\" for empty names, in source order without invoking any hook or mutating either options record. Return [] if hooks.init is absent.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": false
+  },
+  {
+    "id": "block6-click-alias-schema",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "hard-negative",
+    "prompt": "Add src/standalone_wave6_alias_schema.py, a new standalone module exporting vendored_alias_schema_variant. Compare the surface shape against src/click/core.py::__getattr__, but this is a hard negative: no vendoring and do not copy the reference body or supporting implementations. Required behavioral difference: Return {\"name\": name, \"replacement\": \"Command\"} for BaseCommand, the analogous Group mapping for MultiCommand, and None for unknown names. Never return a class, emit a warning or raise AttributeError for an unknown string. Reject non-string names with TypeError. This is a schema lookup, not dynamic attribute resolution. This module must have no dependency on click.core; reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization. Do not import, subclass or call the original target. Do not edit existing modules. Add focused tests for normal, empty and error cases and cases that distinguish this behavior from the reference.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "__getattr__"
+    },
+    "why": "Behavioral negative: Return {\"name\": name, \"replacement\": \"Command\"} for BaseCommand, the analogous Group mapping for MultiCommand, and None for unknown names. Never return a class, emit a warning or raise AttributeError for an unknown string.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": false
+  },
+  {
+    "id": "block6-pytest-source-status",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add src/standalone_wave6_source_status.py, a new standalone module exporting vendored_source_status_variant. Compare the surface shape against src/_pytest/_code/source.py::findsource, but this is a hard negative: no vendoring and do not copy the reference body or supporting implementations. Required behavioral difference: Return {\"available\": bool, \"line_count\": int} using inspect.getsourcelines(obj); catch OSError and TypeError as unavailable with zero lines, but propagate other exceptions. Do not return a Source instance, source lines or a line-number tuple. Use only standard-library inspect. Include a mocked RuntimeError case to distinguish the reference broad exception suppression. This module must have no dependency on _pytest._code.source; reason: the offline inspection tool must remain importable by file path without loading the original package or its runtime initialization. Do not import, subclass or call the original target. Do not edit existing modules. Add focused tests for normal, empty and error cases and cases that distinguish this behavior from the reference.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/source.py",
+      "name": "findsource"
+    },
+    "why": "Behavioral negative: Return {\"available\": bool, \"line_count\": int} using inspect.getsourcelines(obj); catch OSError and TypeError as unavailable with zero lines, but propagate other exceptions. Do not return a Source instance, source lines or a line-number tuple.",
+    "wave": 6,
+    "copy_inviting": true,
+    "vendoring": false
+  }
+]

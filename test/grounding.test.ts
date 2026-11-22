@@ -11,11 +11,29 @@ import { FIXTURES_DIR, tempDir, withIndexedFixture } from '../src/selftest/fixtu
 import { refreshIndex } from '../src/index/refresh.js';
 import { indexDbPath } from '../src/index/store.js';
 import { initSqlBackend, openDb } from '../src/store/db.js';
+import { pythonAdapter } from '../src/lang/python.js';
 
 const MAIN = path.resolve(__dirname, '../src/cli/main.ts');
 const TSX = import.meta.resolve('tsx');
 
 describe('grounding', () => {
+  it('counts bare generators once while retaining keyword-only, splat and real arity errors', async () => {
+    await withIndexedFixture('grounding-py', (db, dir) => {
+      const source = readFileSync(path.join(dir, 'app/generator_calls.py'), 'utf8');
+      const facts = pythonAdapter.extract(source, 'python');
+      expect(facts.hasErrors).toBe(false);
+      expect(facts.calls.filter(c => ['consume', 'consume_pair', 'keyword_only'].includes(c.calleeText))
+        .map(c => [c.calleeText, c.argCount, c.keywordArgs, c.hasSpread])).toEqual([
+        ['consume', 1, [], false], ['consume', 1, [], false], ['consume', 1, [], false],
+        ['consume', 0, ['values'], false], ['keyword_only', 0, ['values'], false],
+        ['consume', 1, [], true], ['consume', 0, [], true], ['consume', 1, [], true],
+        ['consume_pair', 1, [], false], ['consume', 0, [], false], ['consume', 2, [], false],
+        ['keyword_only', 1, [], false],
+      ]);
+      expect(groundAll(db, dir).filter(f => f.file === 'app/generator_calls.py').map(f => [f.line, f.kind]))
+        .toEqual([[21, 'arity'], [22, 'arity'], [23, 'arity'], [24, 'arity']]);
+    });
+  });
   for (const fx of ['grounding-ts', 'grounding-py']) {
     it(`${fx}: every planted error is caught and nothing else fires`, async () => {
       const r = await withIndexedFixture(fx, (db, dir) => plantedReport(dir, groundAll(db, dir)));

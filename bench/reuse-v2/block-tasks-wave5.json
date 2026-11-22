@@ -1,0 +1,497 @@
+[
+  {
+    "id": "block5-got-defined-search-values",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/standalone/defined-search-values.ts, a new standalone module exporting validateDefinedSearchValues(searchParameters). Use source/core/options.ts::validateSearchParameters as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like validateSearchParameters except the single tweak below. Retain the record iteration and assertion-based scalar validation, including inherited enumerable entries. Use structural TypeScript input types; the existing @sindresorhus/is assertion dependency is allowed. Single tweak: reject undefined values instead of accepting them; strings, numbers, booleans and null retain the reference rules. The new module must not import, subclass, or call the original validateSearchParameters, including through an alias or wrapper, and must not import its defining module. Reason: the offline query editor must stay importable without loading Options and its HTTP/cache dependencies. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "source/core/options.ts",
+      "name": "validateSearchParameters"
+    },
+    "why": "Single behavioral change: reject undefined values instead of accepting them; strings, numbers, booleans and null retain the reference rules. Standalone isolation: the offline query editor must stay importable without loading Options and its HTTP/cache dependencies.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-got-largest-http2-timeout",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/standalone/largest-http2-timeout.ts, a new standalone module exporting largestHttp2Timeout(internals). Use source/core/options.ts::getHttp2TimeoutOption as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like getHttp2TimeoutOption except the single tweak below. Read the same socket, connect, lookup, request and secureConnect timeout entries, retaining only numbers and returning undefined for no numeric entries. Define a local structural timeout-record type rather than importing defaultInternals or Options. Single tweak: return the maximum numeric delay instead of the minimum. The new module must not import, subclass, or call the original getHttp2TimeoutOption, including through an alias or wrapper, and must not import its defining module. Reason: the timeout inspector must stay importable without loading the Options implementation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "source/core/options.ts",
+      "name": "getHttp2TimeoutOption"
+    },
+    "why": "Single behavioral change: return the maximum numeric delay instead of the minimum. Standalone isolation: the timeout inspector must stay importable without loading the Options implementation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-got-switching-response-ok",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/standalone/switching-response-ok.ts, a new standalone module exporting isSwitchingResponseOk(response). Use source/core/response.ts::isResponseOk as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like isResponseOk except the single tweak below. Keep the status-code range and boolean-or-callback followRedirect evaluation, including the existing 304 exception. Describe the needed response/request/options fields with local structural types. Single tweak: also accept status code 101 regardless of the followRedirect result. The new module must not import, subclass, or call the original isResponseOk, including through an alias or wrapper, and must not import its defining module. Reason: the protocol-upgrade inspector must stay importable without the response parser and Request machinery. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "source/core/response.ts",
+      "name": "isResponseOk"
+    },
+    "why": "Single behavioral change: also accept status code 101 regardless of the followRedirect result. Standalone isolation: the protocol-upgrade inspector must stay importable without the response parser and Request machinery.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-got-live-client-request",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/standalone/live-client-request.ts, a new standalone module exporting isLiveClientRequest(clientRequest). Use source/core/utils/is-client-request.ts::isClientRequest as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like isClientRequest except the single tweak below. Preserve the writable and writableEnded checks and their evaluation order. Node stream types or equivalent local structural types are allowed. Single tweak: also require that destroyed is falsy. The new module must not import, subclass, or call the original isClientRequest, including through an alias or wrapper, and must not import its defining module. Reason: the stream inspector must stay importable without got request-detection helpers. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "source/core/utils/is-client-request.ts",
+      "name": "isClientRequest"
+    },
+    "why": "Single behavioral change: also require that destroyed is falsy. Standalone isolation: the stream inspector must stay importable without got request-detection helpers.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-got-boundary-stream",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/standalone/boundary-stream.ts, a new standalone module exporting isBoundaryStream(body). Use source/core/utils/is-form-data.ts::isFormData as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like isFormData except the single tweak below. Keep the node-stream prerequisite and short-circuiting shape. The existing @sindresorhus/is package is allowed; do not change its nodeStream semantics. Single tweak: accept a string-valued getBoundary property as well as a callable getBoundary property. The new module must not import, subclass, or call the original isFormData, including through an alias or wrapper, and must not import its defining module. Reason: the upload preview must stay importable without loading the original form-data helper. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "source/core/utils/is-form-data.ts",
+      "name": "isFormData"
+    },
+    "why": "Single behavioral change: accept a string-valued getBoundary property as well as a callable getBoundary property. Standalone isolation: the upload preview must stay importable without loading the original form-data helper.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-got-local-socket-url",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/standalone/local-socket-url.ts, a new standalone module exporting isLocalSocketURL(url). Use source/core/utils/is-unix-socket-url.ts::isUnixSocketURL as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like isUnixSocketURL except the single tweak below. Accept a URL and preserve the unix: protocol and unix hostname alternatives. Single tweak: also accept hostname local. The new module must not import, subclass, or call the original isUnixSocketURL, including through an alias or wrapper, and must not import its defining module. Reason: the URL classifier must stay importable without the original got socket helper. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "source/core/utils/is-unix-socket-url.ts",
+      "name": "isUnixSocketURL"
+    },
+    "why": "Single behavioral change: also accept hostname local. Standalone isolation: the URL classifier must stay importable without the original got socket helper.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-context-last",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_context_last.py, a new standalone module exporting pass_context_last(get_current_context, f). Use src/click/decorators.py::pass_context as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like pass_context except the single tweak below. Build a metadata-preserving callback decorator, obtaining the context at call time. The context getter is an injected zero-argument callable; functools.update_wrapper is available from the standard library. Single tweak: append the current context after user positional arguments instead of prepending it; forward keyword arguments unchanged. The new module must not import, subclass, or call the original pass_context, including through an alias or wrapper, and must not import its defining module. Reason: this callback bridge must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "pass_context"
+    },
+    "why": "Single behavioral change: append the current context after user positional arguments instead of prepending it; forward keyword arguments unchanged. Standalone isolation: this callback bridge must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-object-last",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_object_last.py, a new standalone module exporting pass_object_last(get_current_context, f). Use src/click/decorators.py::pass_obj as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like pass_obj except the single tweak below. Build the same metadata-preserving nested callback wrapper, reading context.obj at invocation time. Receive the context getter from the caller and use only standard-library imports. Single tweak: append context.obj after user positional arguments instead of prepending it; forward keywords unchanged. The new module must not import, subclass, or call the original pass_obj, including through an alias or wrapper, and must not import its defining module. Reason: this object bridge must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "pass_obj"
+    },
+    "why": "Single behavioral change: append context.obj after user positional arguments instead of prepending it; forward keywords unchanged. Standalone isolation: this object bridge must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-command-keep-suffix",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_command_keep_suffix.py, a new standalone module exporting command_keep_suffix(Command, name=None, cls=None, **attrs). Use src/click/decorators.py::command as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like command except the single tweak below. Preserve bare-decorator and configured-decorator forms, double-conversion errors, parameter extraction/reversal, help derivation, constructor forwarding and callback metadata. Command is an injected default constructor and isinstance target, not a base class to subclass; cls remains the optional constructor override. Use local typing aliases if needed. Single tweak: do not remove the final command, cmd, group or grp suffix from an inferred command name; still lowercase and replace underscores with dashes. The new module must not import, subclass, or call the original command, including through an alias or wrapper, and must not import its defining module. Reason: the build-time command descriptor generator must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "command"
+    },
+    "why": "Single behavioral change: do not remove the final command, cmd, group or grp suffix from an inferred command name; still lowercase and replace underscores with dashes. Standalone isolation: the build-time command descriptor generator must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-group-invoke-empty",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_group_invoke_empty.py, a new standalone module exporting group_invoke_empty(command_factory, Group, name=None, cls=None, **attrs). Use src/click/decorators.py::group as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like group except the single tweak below. Keep default class selection and both bare-callback and named/configured dispatch paths. Inject command_factory and Group; the factory is a caller-supplied generic command builder, never the original group function. Single tweak: set invoke_without_command=True only when the caller omitted it. The new module must not import, subclass, or call the original group, including through an alias or wrapper, and must not import its defining module. Reason: the build-time group factory must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "group"
+    },
+    "why": "Single behavioral change: set invoke_without_command=True only when the caller omitted it. Standalone isolation: the build-time group factory must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-prepend-parameter",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_prepend_parameter.py, a new standalone module exporting prepend_parameter(Command, f, param). Use src/click/decorators.py::_param_memo as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like _param_memo except the single tweak below. Keep separate branches for a constructed Command versus callback metadata, creating __click_params__ only if absent. Command is an injected isinstance target; do not subclass it. Single tweak: insert the parameter at index zero instead of appending it in either branch. The new module must not import, subclass, or call the original _param_memo, including through an alias or wrapper, and must not import its defining module. Reason: the metadata builder must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "_param_memo"
+    },
+    "why": "Single behavioral change: insert the parameter at index zero instead of appending it in either branch. Standalone isolation: the metadata builder must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-optional-argument",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_optional_argument.py, a new standalone module exporting optional_argument(Argument, attach_parameter, *param_decls, cls=None, **attrs). Use src/click/decorators.py::argument as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like argument except the single tweak below. Retain default/override class selection and a decorator that constructs the parameter, attaches it and returns the same callback. Inject the default Argument constructor and attach_parameter callable; they are support dependencies, not the original argument decorator. Single tweak: default required to False without overriding an explicitly provided required value. The new module must not import, subclass, or call the original argument, including through an alias or wrapper, and must not import its defining module. Reason: the parameter-spec compiler must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "argument"
+    },
+    "why": "Single behavioral change: default required to False without overriding an explicitly provided required value. Standalone isolation: the parameter-spec compiler must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-hidden-option",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_hidden_option.py, a new standalone module exporting hidden_option(Option, attach_parameter, *param_decls, cls=None, **attrs). Use src/click/decorators.py::option as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like option except the single tweak below. Retain the nested decorator, default/override class handling, parameter construction and callback identity. Inject the default Option constructor and attach_parameter support callable rather than importing Click. Single tweak: default hidden to True without overriding an explicit hidden setting. The new module must not import, subclass, or call the original option, including through an alias or wrapper, and must not import its defining module. Reason: the parameter-spec compiler must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "option"
+    },
+    "why": "Single behavioral change: default hidden to True without overriding an explicit hidden setting. Standalone isolation: the parameter-spec compiler must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-secret-option",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_secret_option.py, a new standalone module exporting secret_option(option_factory, *param_decls, **kwargs). Use src/click/decorators.py::password_option as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like password_option except the single tweak below. Keep the option-factory defaults for prompting, hidden input, confirmation and caller overrides. option_factory is injected and records or builds option declarations; it is not password_option. Single tweak: use --secret as the fallback declaration instead of --password. The new module must not import, subclass, or call the original password_option, including through an alias or wrapper, and must not import its defining module. Reason: the secret-input spec generator must stay importable without click.decorators or a Click installation. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "password_option"
+    },
+    "why": "Single behavioral change: use --secret as the fallback declaration instead of --password. Standalone isolation: the secret-input spec generator must stay importable without click.decorators or a Click installation.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-error-secho",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_error_secho.py, a new standalone module exporting error_secho(echo, style, message=None, file=None, nl=True, err=True, color=None, **styles). Use src/click/termui.py::secho as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like secho except the single tweak below. Retain bytes bypass, text styling, explicit stream forwarding, newline and color behavior. echo and style are injected support callables. Single tweak: change the default err argument to True while preserving an explicit False. The new module must not import, subclass, or call the original secho, including through an alias or wrapper, and must not import its defining module. Reason: the standalone log adapter must stay importable without Click terminal implementations. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "secho"
+    },
+    "why": "Single behavioral change: change the default err argument to True while preserving an explicit False. Standalone isolation: the standalone log adapter must stay importable without Click terminal implementations.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-triple-dash-option",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_triple_dash_option.py, a new standalone module exporting split_triple_option(opt). Use src/click/parser.py::_split_opt as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like _split_opt except the single tweak below. Preserve empty input, alphanumeric-leading input and the original one/two-prefix cases. Single tweak: for a non-alphanumeric prefix repeated three times at the start, consume all three prefix characters rather than two. The new module must not import, subclass, or call the original _split_opt, including through an alias or wrapper, and must not import its defining module. Reason: the completion metadata parser must stay importable without the deprecated click.parser module. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_split_opt"
+    },
+    "why": "Single behavioral change: for a non-alphanumeric prefix repeated three times at the start, consume all three prefix characters rather than two. Standalone isolation: the completion metadata parser must stay importable without the deprecated click.parser module.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-lower-option-name",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_lower_option_name.py, a new standalone module exporting normalize_lower_option(opt, ctx). Use src/click/parser.py::_normalize_opt as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like _normalize_opt except the single tweak below. Keep the ctx/token_normalize_func early return and prefix splitting before callback normalization. Implement prefix splitting locally; ctx is a structural object exposing token_normalize_func. Single tweak: lowercase the suffix returned by token_normalize_func before recombining it with its unchanged prefix. The new module must not import, subclass, or call the original _normalize_opt, including through an alias or wrapper, and must not import its defining module. Reason: the completion metadata parser must stay importable without the deprecated click.parser module. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/parser.py",
+      "name": "_normalize_opt"
+    },
+    "why": "Single behavioral change: lowercase the suffix returned by token_normalize_func before recombining it with its unchanged prefix. Standalone isolation: the completion metadata parser must stay importable without the deprecated click.parser module.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-none-padded-rows",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_none_padded_rows.py, a new standalone module exporting iter_none_padded_rows(rows, col_count). Use src/click/formatting.py::iter_rows as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like iter_rows except the single tweak below. Retain the generator and row tuple construction, including no truncation of rows already wider than col_count. Single tweak: pad missing columns with None instead of empty strings. The new module must not import, subclass, or call the original iter_rows, including through an alias or wrapper, and must not import its defining module. Reason: the standalone table exporter must stay importable without click.formatting and the terminal stack. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/click/formatting.py",
+      "name": "iter_rows"
+    },
+    "why": "Single behavioral change: pad missing columns with None instead of empty strings. Standalone isolation: the standalone table exporter must stay importable without click.formatting and the terminal stack.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-quiet-yield-fixture",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_quiet_yield_fixture.py, a new standalone module exporting quiet_yield_fixture(fixture_factory, fixture_function=None, *args, scope=\"function\", params=None, autouse=False, ids=None, name=None). Use src/_pytest/fixtures.py::yield_fixture as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like yield_fixture except the single tweak below. Retain the fixture-decorator forwarding signature and both direct and configured forms. fixture_factory is an injected support builder, never yield_fixture; use no pytest imports. Single tweak: omit the deprecation warning while forwarding every argument unchanged. The new module must not import, subclass, or call the original yield_fixture, including through an alias or wrapper, and must not import its defining module. Reason: the fixture declaration exporter must stay importable without pytest or its fixture registry. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/fixtures.py",
+      "name": "yield_fixture"
+    },
+    "why": "Single behavioral change: omit the deprecation warning while forwarding every argument unchanged. Standalone isolation: the fixture declaration exporter must stay importable without pytest or its fixture registry.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-skip-empty-marks",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_skip_empty_marks.py, a new standalone module exporting normalize_nonempty_marks(Mark, mark_list). Use src/_pytest/mark/structures.py::normalize_mark_list as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like normalize_mark_list except the single tweak below. Keep generator-based mark attribute extraction, Mark isinstance validation and the same TypeError for other invalid inputs. Mark is an injected isinstance target, not a class to subclass. Single tweak: skip literal None entries before extracting or validating a mark. The new module must not import, subclass, or call the original normalize_mark_list, including through an alias or wrapper, and must not import its defining module. Reason: the mark exporter must stay importable without pytest or its mark registry. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/mark/structures.py",
+      "name": "normalize_mark_list"
+    },
+    "why": "Single behavioral change: skip literal None entries before extracting or validating a mark. Standalone isolation: the mark exporter must stay importable without pytest or its mark registry.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-derived-first-marks",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_derived_first_marks.py, a new standalone module exporting get_derived_first_marks(normalize_mark_list, obj, *, consider_mro=True). Use src/_pytest/mark/structures.py::get_unpacked_marks as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like get_unpacked_marks except the single tweak below. Preserve class versus instance paths, direct-only mode, list/scalar handling and final normalization. The normalizer is supplied by the caller and is not get_unpacked_marks; do not import any pytest module. Single tweak: when consider_mro=True, visit obj.__mro__ in forward order rather than reversed order. The new module must not import, subclass, or call the original get_unpacked_marks, including through an alias or wrapper, and must not import its defining module. Reason: the mark exporter must stay importable without pytest or its mark registry. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/mark/structures.py",
+      "name": "get_unpacked_marks"
+    },
+    "why": "Single behavioral change: when consider_mro=True, visit obj.__mro__ in forward order rather than reversed order. Standalone isolation: the mark exporter must stay importable without pytest or its mark registry.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-prepend-mark",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_prepend_mark.py, a new standalone module exporting prepend_mark(Mark, getfixturemarker, get_unpacked_marks, warn, warning_message, obj, mark, *, stacklevel=2). Use src/_pytest/mark/structures.py::store_mark as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like store_mark except the single tweak below. Preserve the assertion, fixture-marker warning with stacklevel, direct-only unpacking and fresh-list reassignment. Inject the Mark type, marker lookup, mark unpacker, warning callable and message as explicit support dependencies; never subclass Mark. Single tweak: put the new mark before the existing direct marks rather than after them. The new module must not import, subclass, or call the original store_mark, including through an alias or wrapper, and must not import its defining module. Reason: the decorator metadata editor must stay importable without pytest fixtures or marks. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/mark/structures.py",
+      "name": "store_mark"
+    },
+    "why": "Single behavioral change: put the new mark before the existing direct marks rather than after them. Standalone isolation: the decorator metadata editor must stay importable without pytest fixtures or marks.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-silent-legacy-hooks",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_silent_legacy_hooks.py, a new standalone module exporting silent_legacy_hook_marks(method, hook_type, opt_names). Use src/_pytest/config/__init__.py::_get_legacy_hook_marks as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like _get_legacy_hook_marks except the single tweak below. Retain pytestmark-name discovery, legacy attribute precedence and option dictionary construction, including an existing false-valued legacy attribute mapping to True. Only standard-library imports are allowed. Single tweak: emit no legacy-marking warning. The new module must not import, subclass, or call the original _get_legacy_hook_marks, including through an alias or wrapper, and must not import its defining module. Reason: the plugin metadata inspector must stay importable without pytest configuration or its warning infrastructure. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/__init__.py",
+      "name": "_get_legacy_hook_marks"
+    },
+    "why": "Single behavioral change: emit no legacy-marking warning. Standalone isolation: the plugin metadata inspector must stay importable without pytest configuration or its warning infrastructure.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-return-optional-call",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_return_optional_call.py, a new standalone module exporting call_with_optional_result(func, arg). Use src/_pytest/python.py::_call_with_optional_argument as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like _call_with_optional_argument except the single tweak below. Retain positional argument-count inspection, bound-method adjustment and zero/one-argument dispatch. Use the standard-library inspect module. Single tweak: return the invoked callable result instead of discarding it. The new module must not import, subclass, or call the original _call_with_optional_argument, including through an alias or wrapper, and must not import its defining module. Reason: the callback inspector must stay importable without pytest collection machinery. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/python.py",
+      "name": "_call_with_optional_argument"
+    },
+    "why": "Single behavioral change: return the invoked callable result instead of discarding it. Standalone isolation: the callback inspector must stay importable without pytest collection machinery.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-runtime-empty-fixture",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_runtime_empty_fixture.py, a new standalone module exporting call_standalone_fixture(teardown_yield_fixture, fixturefunc, request, kwargs). Use src/_pytest/fixtures.py::call_fixture_func as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like call_fixture_func except the single tweak below. Retain normal versus generator fixture dispatch, first-yield retrieval, deferred teardown via request.addfinalizer and finalizer registration timing. Inject the teardown support callable; inspect and functools are standard-library dependencies. Single tweak: raise RuntimeError rather than ValueError when a generator does not yield, retaining the same message and suppressed cause. The new module must not import, subclass, or call the original call_fixture_func, including through an alias or wrapper, and must not import its defining module. Reason: the fixture preview runner must stay importable without pytest or its fixture registry. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/fixtures.py",
+      "name": "call_fixture_func"
+    },
+    "why": "Single behavioral change: raise RuntimeError rather than ValueError when a generator does not yield, retaining the same message and suppressed cause. Standalone isolation: the fixture preview runner must stay importable without pytest or its fixture registry.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-lookup-scope-error",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_lookup_scope_error.py, a new standalone module exporting evaluate_standalone_scope(fail, scope_callable, fixture_name, config). Use src/_pytest/fixtures.py::_eval_scope_callable as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like _eval_scope_callable except the single tweak below. Retain keyword invocation, exception chaining and signature-hint text, string-result validation, fail(..., pytrace=False) and the valid result return. fail is an injected support callable; no pytest imports are allowed. Single tweak: wrap an exception from the scope callable in LookupError instead of TypeError. The new module must not import, subclass, or call the original _eval_scope_callable, including through an alias or wrapper, and must not import its defining module. Reason: the scope preview tool must stay importable without pytest configuration and fixtures. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/fixtures.py",
+      "name": "_eval_scope_callable"
+    },
+    "why": "Single behavioral change: wrap an exception from the scope callable in LookupError instead of TypeError. Standalone isolation: the scope preview tool must stay importable without pytest configuration and fixtures.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-deep-partial-function",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_deep_partial_function.py, a new standalone module exporting get_deep_partial_func(obj). Use src/_pytest/compat.py::get_real_func as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like get_real_func except the single tweak below. Keep inspect.unwrap first and preserve its errors, then process functools.partial wrappers; test nested partials retained because the inner partial has custom attributes. Only standard-library inspect and functools imports are needed. Single tweak: peel every nested partial layer rather than only one. The new module must not import, subclass, or call the original get_real_func, including through an alias or wrapper, and must not import its defining module. Reason: the callable inspector must stay importable without pytest compatibility code. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/compat.py",
+      "name": "get_real_func"
+    },
+    "why": "Single behavioral change: peel every nested partial layer rather than only one. Standalone isolation: the callable inspector must stay importable without pytest compatibility code.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-strict-coroutine-marker",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_strict_coroutine_marker.py, a new standalone module exporting is_strict_coroutine_function(func). Use src/_pytest/compat.py::iscoroutinefunction as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like iscoroutinefunction except the single tweak below. Keep inspect.iscoroutinefunction as the first short-circuit branch and use no asyncio import. The standard-library inspect module is allowed. Single tweak: accept the legacy _is_coroutine marker only when it is literally True, returning a boolean rather than an arbitrary truthy marker. The new module must not import, subclass, or call the original iscoroutinefunction, including through an alias or wrapper, and must not import its defining module. Reason: the callable inspector must stay importable without pytest or asyncio logging side effects. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/compat.py",
+      "name": "iscoroutinefunction"
+    },
+    "why": "Single behavioral change: accept the legacy _is_coroutine marker only when it is literally True, returning a boolean rather than an arbitrary truthy marker. Standalone isolation: the callable inspector must stay importable without pytest or asyncio logging side effects.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-trimmed-truth",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_trimmed_truth.py, a new standalone module exporting strtobool_trimmed(val). Use src/_pytest/config/__init__.py::_strtobool as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like _strtobool except the single tweak below. Retain the true/false token groups, case-insensitive matching and invalid-token ValueError text. Single tweak: strip leading and trailing whitespace before lowercasing and matching. The new module must not import, subclass, or call the original _strtobool, including through an alias or wrapper, and must not import its defining module. Reason: the config preview parser must stay importable without pytest configuration and plugin startup. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/__init__.py",
+      "name": "_strtobool"
+    },
+    "why": "Single behavioral change: strip leading and trailing whitespace before lowercasing and matching. Standalone isolation: the config preview parser must stay importable without pytest configuration and plugin startup.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-config-warning-priority",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/standalone_config_warning_priority.py, a new standalone module exporting apply_config_priority_filters(parse_warning_filter, config_filters, cmdline_filters). Use src/_pytest/config/__init__.py::apply_warning_filters as the named behavior to compare against. Copy and adapt the reference control flow into a standalone variant; keep all behavior exactly like apply_warning_filters except the single tweak below. Retain per-source item order, warning filter parsing with escape=False for config and escape=True for command-line filters, and warnings.filterwarnings forwarding. Inject the parser and use the standard-library warnings module. Single tweak: apply command-line filters before config filters, reversing the reference source priority. The new module must not import, subclass, or call the original apply_warning_filters, including through an alias or wrapper, and must not import its defining module. Reason: the warnings preview tool must stay importable without pytest configuration and plugin startup. Do not edit existing modules; tests may import the new module directly by file path. Retain the reference handling of empty inputs and error cases unless the stated tweak changes it; add focused tests.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/__init__.py",
+      "name": "apply_warning_filters"
+    },
+    "why": "Single behavioral change: apply command-line filters before config filters, reversing the reference source priority. Standalone isolation: the warnings preview tool must stay importable without pytest configuration and plugin startup.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-got-request-callable-fields",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "hard-negative",
+    "prompt": "Add source/standalone/request-callable-fields.ts, a new standalone module exporting requestCallableFields(value). Use source/core/errors.ts::isRequest as the named behavior to compare against. This is a hard negative: the surface resemblance is intentional, but do not reproduce its behavior. This resembles the request-shape guard only at the level of inspecting an object. Use local structural types and standard JavaScript object operations. Required behavioral difference: return sorted own enumerable string keys whose values are callable, not a request/non-request boolean; return [] for null, primitives or arrays, ignore inherited members, and give _onResponse no special meaning. The new module must not import, subclass, or call the original isRequest, including through an alias or wrapper, and must not import its defining module. Reason: the offline manifest inspector must stay importable without got errors, Options or Request. Do not edit existing modules; tests may import the new module directly by file path. Exercise cases that distinguish the two behaviors.",
+    "reference_symbol": {
+      "file": "source/core/errors.ts",
+      "name": "isRequest"
+    },
+    "why": "Behavioral negative: return sorted own enumerable string keys whose values are callable, not a request/non-request boolean; return [] for null, primitives or arrays, ignore inherited members, and give _onResponse no special meaning. Standalone isolation: the offline manifest inspector must stay importable without got errors, Options or Request.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-click-prompt-schema",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "hard-negative",
+    "prompt": "Add src/standalone_prompt_schema.py, a new standalone module exporting build_prompt_schema(text, suffix, show_default=False, default=None, show_choices=True, type=None). Use src/click/termui.py::_build_prompt as the named behavior to compare against. This is a hard negative: the surface resemblance is intentional, but do not reproduce its behavior. This is a prompt-description exporter, not a human-readable interactive prompt renderer; callers provide a JSON-compatible default value. Only standard-library imports are allowed; missing choices is not an error. Required behavioral difference: return a JSON-serializable dict with text, suffix, default and choices fields; text and suffix are separate unmodified strings, default is the raw default only when show_default is true (otherwise None), and choices is a list of str(choice) from type.choices only when show_choices is true and choices exist (otherwise []); never interpolate a bracketed prompt or read input. The new module must not import, subclass, or call the original _build_prompt, including through an alias or wrapper, and must not import its defining module. Reason: the documentation exporter must stay importable without Click prompt/terminal code. Do not edit existing modules; tests may import the new module directly by file path. Exercise cases that distinguish the two behaviors.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "_build_prompt"
+    },
+    "why": "Behavioral negative: return a JSON-serializable dict with text, suffix, default and choices fields; text and suffix are separate unmodified strings, default is the raw default only when show_default is true (otherwise None), and choices is a list of str(choice) from type.choices only when show_choices is true and choices exist (otherwise []); never interpolate a bracketed prompt or read input. Standalone isolation: the documentation exporter must stay importable without Click prompt/terminal code.",
+    "wave": 5,
+    "copy_inviting": true
+  },
+  {
+    "id": "block5-pytest-name-frequencies",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add src/standalone_name_frequencies.py, a new standalone module exporting name_frequencies(*seqs). Use src/_pytest/fixtures.py::deduplicate_names as the named behavior to compare against. This is a hard negative: the surface resemblance is intentional, but do not reproduce its behavior. This superficially resembles stable name de-duplication but is a multiplicity report. Only standard-library imports are allowed. Required behavioral difference: return an insertion-ordered dict mapping each encountered name to its total occurrence count across all input sequences, not a tuple of unique names; preserve first encounter order, count empty-string names normally, accept generators and return {} for no input. The new module must not import, subclass, or call the original deduplicate_names, including through an alias or wrapper, and must not import its defining module. Reason: the inventory exporter must stay importable without pytest or its fixture registry. Do not edit existing modules; tests may import the new module directly by file path. Exercise cases that distinguish the two behaviors.",
+    "reference_symbol": {
+      "file": "src/_pytest/fixtures.py",
+      "name": "deduplicate_names"
+    },
+    "why": "Behavioral negative: return an insertion-ordered dict mapping each encountered name to its total occurrence count across all input sequences, not a tuple of unique names; preserve first encounter order, count empty-string names normally, accept generators and return {} for no input. Standalone isolation: the inventory exporter must stay importable without pytest or its fixture registry.",
+    "wave": 5,
+    "copy_inviting": true
+  }
+]

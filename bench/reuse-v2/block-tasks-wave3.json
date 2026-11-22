@@ -1,0 +1,786 @@
+[
+  {
+    "id": "block3-got-snapshot-internals",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/snapshot-internals.ts exporting snapshotInternals for diagnostic snapshots with shared request context. It must work exactly like cloneInternals in source/core/options.ts, except preserve the context object by identity instead of spreading that one field into a fresh object. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "source/core/options.ts",
+      "name": "cloneInternals"
+    },
+    "why": "A self-contained sibling for diagnostic snapshots with shared request context; the sole behavioral difference is to preserve the context object by identity instead of spreading that one field into a fresh object.",
+    "wave": 3
+  },
+  {
+    "id": "block3-got-nullable-json-body",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/nullable-json-body.ts exporting nullableJsonBody for an API client with nullable empty payloads. It must work exactly like parseBody in source/core/response.ts, except return null rather than an empty string for an empty JSON body. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "source/core/response.ts",
+      "name": "parseBody"
+    },
+    "why": "A self-contained sibling for an API client with nullable empty payloads; the sole behavioral difference is to return null rather than an empty string for an empty JSON body.",
+    "wave": 3
+  },
+  {
+    "id": "block3-got-previous-page",
+    "repo": "got",
+    "url": "https://github.com/sindresorhus/got.git",
+    "commit": "383a3ff4ff88d4059519efe8b3d6b27e9a6a8066",
+    "kind": "clone-prone",
+    "prompt": "Add source/previous-page.ts exporting previousPage for a history browser navigating backwards. It must work exactly like defaultInternals.pagination.paginate in source/core/options.ts, except select the prev Link relation instead of next, including the quoted spelling. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "source/core/options.ts",
+      "name": "defaultInternals.pagination.paginate"
+    },
+    "why": "A self-contained sibling for a history browser navigating backwards; the sole behavioral difference is to select the prev Link relation instead of next, including the quoted spelling.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-strict-text-stream",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/strict_text_stream.py defining strict_text_stream for strict configuration decoding. It must work exactly like _make_text_stream in src/click/_compat.py, except default errors to \"strict\" rather than \"replace\" when errors is None. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_make_text_stream"
+    },
+    "why": "A self-contained sibling for strict configuration decoding; the sole behavioral difference is to default errors to \"strict\" rather than \"replace\" when errors is None.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-checked-binary-writer",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/checked_binary_writer.py defining checked_binary_writer for stream diagnostics distinguishing unusable sinks. It must work exactly like _is_binary_writer in src/click/_compat.py, except raise TypeError when both write probes fail instead of returning default. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_is_binary_writer"
+    },
+    "why": "A self-contained sibling for stream diagnostics distinguishing unusable sinks; the sole behavioral difference is to raise TypeError when both write probes fail instead of returning default.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-open-binary-reader",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/open_binary_reader.py defining open_binary_reader for an import preview requiring open buffers. It must work exactly like _find_binary_reader in src/click/_compat.py, except return None for a closed fallback buffer instead of accepting that buffer. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_find_binary_reader"
+    },
+    "why": "A self-contained sibling for an import preview requiring open buffers; the sole behavioral difference is to return None for a closed fallback buffer instead of accepting that buffer.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-required-binary-writer",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/required_binary_writer.py defining required_binary_writer for an export path requiring a usable sink. It must work exactly like _find_binary_writer in src/click/_compat.py, except raise TypeError instead of returning None when no binary writer is found. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_find_binary_writer"
+    },
+    "why": "A self-contained sibling for an export path requiring a usable sink; the sole behavioral difference is to raise TypeError instead of returning None when no binary writer is found.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-strict-corrected-stream",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/strict_corrected_stream.py defining strict_corrected_stream for a strict data import adapter. It must work exactly like _force_correct_text_stream in src/click/_compat.py, except default unspecified errors to \"strict\" instead of \"replace\" in the final wrapping branch. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_force_correct_text_stream"
+    },
+    "why": "A self-contained sibling for a strict data import adapter; the sole behavioral difference is to default unspecified errors to \"strict\" instead of \"replace\" in the final wrapping branch.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-live-cached-stream",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/live_cached_stream.py defining live_cached_stream for a console adapter whose wrappers may be closed by consumers. It must work exactly like _make_cached_stream_func in src/click/_compat.py, except treat a cached wrapper whose closed attribute is true as a cache miss. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_compat.py",
+      "name": "_make_cached_stream_func"
+    },
+    "why": "A self-contained sibling for a console adapter whose wrappers may be closed by consumers; the sole behavioral difference is to treat a cached wrapper whose closed attribute is true as a cache miss.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-explicit-color-pager",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/explicit_color_pager.py defining explicit_color_pager for a pager preserving unspecified color policy. It must work exactly like _tempfilepager in src/click/_termui_impl.py, except strip ANSI sequences only when color is explicitly False rather than also when it is None. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_termui_impl.py",
+      "name": "_tempfilepager"
+    },
+    "why": "A self-contained sibling for a pager preserving unspecified color policy; the sole behavioral difference is to strip ANSI sequences only when color is explicitly False rather than also when it is None.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-eof-control-key",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/eof_control_key.py defining eof_control_key for a terminal session treating cancellation as end of input. It must work exactly like _translate_ch_to_exc in src/click/_termui_impl.py, except raise EOFError instead of KeyboardInterrupt for Ctrl+C. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/_termui_impl.py",
+      "name": "_translate_ch_to_exc"
+    },
+    "why": "A self-contained sibling for a terminal session treating cancellation as end of input; the sole behavioral difference is to raise EOFError instead of KeyboardInterrupt for Ctrl+C.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-chain-value-error",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/chain_value_error.py defining chain_value_error for a command-schema input validator. It must work exactly like _check_nested_chain in src/click/core.py, except raise ValueError instead of RuntimeError for invalid nesting. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "_check_nested_chain"
+    },
+    "why": "A self-contained sibling for a command-schema input validator; the sole behavioral difference is to raise ValueError instead of RuntimeError for invalid nesting.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-current-usage-context",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/current_usage_context.py defining current_usage_context for a forwarding command attributing errors to its current invocation. It must work exactly like augment_usage_errors in src/click/core.py, except always attach the supplied ctx to caught usage errors, even if they already have a context. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/core.py",
+      "name": "augment_usage_errors"
+    },
+    "why": "A self-contained sibling for a forwarding command attributing errors to its current invocation; the sole behavioral difference is to always attach the supplied ctx to caught usage errors, even if they already have a context.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-lookup-pass-decorator",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/lookup_pass_decorator.py defining lookup_pass_decorator for a plugin dispatcher distinguishing missing context. It must work exactly like make_pass_decorator in src/click/decorators.py, except raise LookupError instead of RuntimeError when the context object is absent. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "make_pass_decorator"
+    },
+    "why": "A self-contained sibling for a plugin dispatcher distinguishing missing context; the sole behavioral difference is to raise LookupError instead of RuntimeError when the context object is absent.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-optional-meta-key",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/optional_meta_key.py defining optional_meta_key for an optional tracing decorator. It must work exactly like pass_meta_key in src/click/decorators.py, except pass None for an absent metadata key instead of raising KeyError. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "pass_meta_key"
+    },
+    "why": "A self-contained sibling for an optional tracing decorator; the sole behavioral difference is to pass None for an absent metadata key instead of raising KeyError.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-confirm-option",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/confirm_option.py defining confirm_option for a destructive-operation CLI with standard flag spelling. It must work exactly like confirmation_option in src/click/decorators.py, except use --confirm instead of --yes as the default option declaration. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "confirmation_option"
+    },
+    "why": "A self-contained sibling for a destructive-operation CLI with standard flag spelling; the sole behavioral difference is to use --confirm instead of --yes as the default option declaration.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-usage-option",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/usage_option.py defining usage_option for a legacy command exposing its usage page. It must work exactly like help_option in src/click/decorators.py, except use --usage instead of --help as the default option declaration. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/decorators.py",
+      "name": "help_option"
+    },
+    "why": "A self-contained sibling for a legacy command exposing its usage page; the sole behavioral difference is to use --usage instead of --help as the default option declaration.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-strict-completion-status",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/strict_completion_status.py defining strict_completion_status for a shell bridge distinguishing bad instructions from unknown shells. It must work exactly like shell_complete in src/click/shell_completion.py, except return status 2 instead of 1 for an unrecognized instruction on a recognized shell. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/shell_completion.py",
+      "name": "shell_complete"
+    },
+    "why": "A self-contained sibling for a shell bridge distinguishing bad instructions from unknown shells; the sole behavioral difference is to return status 2 instead of 1 for an unrecognized instruction on a recognized shell.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-none-incomplete-argument",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/none_incomplete_argument.py defining none_incomplete_argument for an interactive form requiring a nonempty value. It must work exactly like _is_incomplete_argument in src/click/shell_completion.py, except also regard a resolved value of None as incomplete even when its source is COMMANDLINE. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/shell_completion.py",
+      "name": "_is_incomplete_argument"
+    },
+    "why": "A self-contained sibling for an interactive form requiring a nonempty value; the sole behavioral difference is to also regard a resolved value of None as incomplete even when its source is COMMANDLINE.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-secondary-incomplete-option",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/secondary_incomplete_option.py defining secondary_incomplete_option for completion for value-taking options with secondary spellings. It must work exactly like _is_incomplete_option in src/click/shell_completion.py, except match the last option token against param.secondary_opts as well as param.opts. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/shell_completion.py",
+      "name": "_is_incomplete_option"
+    },
+    "why": "A self-contained sibling for completion for value-taking options with secondary spellings; the sole behavioral difference is to match the last option token against param.secondary_opts as well as param.opts.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-nonmutating-completion",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/nonmutating_completion.py defining nonmutating_completion for a completion preview preceding a later parse. It must work exactly like _resolve_incomplete in src/click/shell_completion.py, except leave the caller-provided args list unchanged when splitting an option=value token. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/shell_completion.py",
+      "name": "_resolve_incomplete"
+    },
+    "why": "A self-contained sibling for a completion preview preceding a later parse; the sole behavioral difference is to leave the caller-provided args list unchanged when splitting an option=value token.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-okay-confirm",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/okay_confirm.py defining okay_confirm for a deployment prompt accepting team shorthand. It must work exactly like confirm in src/click/termui.py, except accept \"ok\" as an affirmative response in addition to \"y\" and \"yes\". Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "confirm"
+    },
+    "why": "A self-contained sibling for a deployment prompt accepting team shorthand; the sole behavioral difference is to accept \"ok\" as an affirmative response in addition to \"y\" and \"yes\".",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-exact-pager-text",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/exact_pager_text.py defining exact_pager_text for a viewer preserving end-of-file newline state. It must work exactly like echo_via_pager in src/click/termui.py, except do not append the extra trailing newline to the normalized text generator. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "echo_via_pager"
+    },
+    "why": "A self-contained sibling for a viewer preserving end-of-file newline state; the sole behavioral difference is to do not append the extra trailing newline to the normalized text generator.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-style-value-error",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/style_value_error.py defining style_value_error for a theme editor classifying invalid values. It must work exactly like style in src/click/termui.py, except raise ValueError instead of TypeError for unknown foreground or background color names. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "style"
+    },
+    "why": "A self-contained sibling for a theme editor classifying invalid values; the sole behavioral difference is to raise ValueError instead of TypeError for unknown foreground or background color names.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-file-edit-result",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/file_edit_result.py defining file_edit_result for a document launcher needing a launch result. It must work exactly like edit in src/click/termui.py, except return True instead of None after invoking file editing in the filename branch. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "edit"
+    },
+    "why": "A self-contained sibling for a document launcher needing a launch result; the sole behavioral difference is to return True instead of None after invoking file editing in the filename branch.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-stderr-pause",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "clone-prone",
+    "prompt": "Add src/click/stderr_pause.py defining stderr_pause for a pipeline keeping prompts off standard output. It must work exactly like pause in src/click/termui.py, except default err to True instead of False. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/click/termui.py",
+      "name": "pause"
+    },
+    "why": "A self-contained sibling for a pipeline keeping prompts off standard output; the sole behavioral difference is to default err to True instead of False.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-input-byte-count",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "hard-negative",
+    "prompt": "Add src/click/input_byte_count.py defining input_byte_count(input, charset=\"utf-8\") for a transcript budget. Use make_input_stream in src/click/testing.py as the input-shape reference, but return encoded byte counts, not streams. None is zero; strings are encoded with charset; bytes are measured directly; readable inputs are consumed and measured; unsupported objects raise TypeError. Never construct BytesIO or return a handle.",
+    "reference_symbol": {
+      "file": "src/click/testing.py",
+      "name": "make_input_stream"
+    },
+    "why": "The stream/string/None branches now account for bytes rather than adapting input streams.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-file-open-plan",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "hard-negative",
+    "prompt": "Add src/click/file_open_plan.py defining file_open_plan(filename, mode=\"r\", lazy=False, atomic=False) for dry runs. Use open_file in src/click/utils.py as the filename/mode/lazy/atomic vocabulary reference, but return a dictionary describing standard-stream use, deferred opening, and atomic-write requirements. Never open a file or return a file object. Reject atomic read modes with ValueError.",
+    "reference_symbol": {
+      "file": "src/click/utils.py",
+      "name": "open_file"
+    },
+    "why": "Similar standard-stream and lazy/atomic branches describe a plan rather than opening or wrapping files.",
+    "wave": 3
+  },
+  {
+    "id": "block3-click-invocation-kind",
+    "repo": "click",
+    "url": "https://github.com/pallets/click.git",
+    "commit": "528fd7a798abe0077060c5720e13791a34167f66",
+    "kind": "hard-negative",
+    "prompt": "Add src/click/invocation_kind.py defining invocation_kind(path=None, _main=None) for launch telemetry. Use _detect_program_name in src/click/utils.py as the reference for distinguishing direct scripts, ordinary module execution, and package __main__ execution, but return only \"script\", \"module\", or \"package\" respectively. Do not construct a display name or return a path. Keep all inspection read-only.",
+    "reference_symbol": {
+      "file": "src/click/utils.py",
+      "name": "_detect_program_name"
+    },
+    "why": "The path/package decision tree classifies invocation type instead of constructing command names.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-lenient-char-width",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/lenient_char_width.py defining lenient_char_width for a log renderer ignoring control characters. It must work exactly like wcwidth in src/_pytest/_io/wcwidth.py, except return zero instead of -1 for category Cc control characters. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/_io/wcwidth.py",
+      "name": "wcwidth"
+    },
+    "why": "A self-contained sibling for a log renderer ignoring control characters; the sole behavioral difference is to return zero instead of -1 for category Cc control characters.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-inline-exception",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/inline_exception.py defining inline_exception for a single-line event record. It must work exactly like stringify_exception in src/_pytest/_code/code.py, except join the message and notes with \"; \" instead of newline characters. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/code.py",
+      "name": "stringify_exception"
+    },
+    "why": "A self-contained sibling for a single-line event record; the sole behavioral difference is to join the message and notes with \"; \" instead of newline characters.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-one-based-source",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/one_based_source.py defining one_based_source for a source-link consumer using one-based locations. It must work exactly like getfslineno in src/_pytest/_code/code.py, except add one to any nonnegative returned line number, leaving the unknown -1 sentinel unchanged. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/code.py",
+      "name": "getfslineno"
+    },
+    "why": "A self-contained sibling for a source-link consumer using one-based locations; the sole behavioral difference is to add one to any nonnegative returned line number, leaving the unknown -1 sentinel unchanged.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-plugin-traceback",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/plugin_traceback.py defining plugin_traceback for a plugin debugger showing dispatch frames. It must work exactly like filter_traceback in src/_pytest/_code/code.py, except allow frames under _PLUGGY_DIR while still excluding generated and pytest-internal frames. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/_code/code.py",
+      "name": "filter_traceback"
+    },
+    "why": "A self-contained sibling for a plugin debugger showing dispatch frames; the sole behavioral difference is to allow frames under _PLUGGY_DIR while still excluding generated and pytest-internal frames.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-eight-byte-repr",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/eight_byte_repr.py defining eight_byte_repr for binary diagnostics aligned to eight-byte words. It must work exactly like _wrap_bytes_repr in src/_pytest/_io/pprint.py, except process eight-byte chunks instead of four-byte chunks throughout the chunk-boundary calculation. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/_io/pprint.py",
+      "name": "_wrap_bytes_repr"
+    },
+    "why": "A self-contained sibling for binary diagnostics aligned to eight-byte words; the sole behavioral difference is to process eight-byte chunks instead of four-byte chunks throughout the chunk-boundary calculation.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-no-color-first",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/no_color_first.py defining no_color_first for a terminal respecting explicit no-color preferences. It must work exactly like should_do_markup in src/_pytest/_io/terminalwriter.py, except give a nonempty NO_COLOR environment variable precedence over PY_COLORS=1. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/_io/terminalwriter.py",
+      "name": "should_do_markup"
+    },
+    "why": "A self-contained sibling for a terminal respecting explicit no-color preferences; the sole behavioral difference is to give a nonempty NO_COLOR environment variable precedence over PY_COLORS=1.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-newline-char-budget",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/newline_char_budget.py defining newline_char_budget for a serialized assertion preview budgeting separators. It must work exactly like _truncate_by_char_count in src/_pytest/assertion/truncate.py, except count one newline after each complete input line against the character budget. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/truncate.py",
+      "name": "_truncate_by_char_count"
+    },
+    "why": "A self-contained sibling for a serialized assertion preview budgeting separators; the sole behavioral difference is to count one newline after each complete input line against the character budget.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-semicolon-plugin-specs",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/semicolon_plugin_specs.py defining semicolon_plugin_specs for a launcher using semicolon-delimited plugin settings. It must work exactly like _get_plugin_specs_as_list in src/_pytest/config/__init__.py, except split string specifications on semicolons instead of commas. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/__init__.py",
+      "name": "_get_plugin_specs_as_list"
+    },
+    "why": "A self-contained sibling for a launcher using semicolon-delimited plugin settings; the sole behavioral difference is to split string specifications on semicolons instead of commas.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-setup-module-discovery",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/setup_module_discovery.py defining setup_module_discovery for a packaging diagnostic including setup modules. It must work exactly like _iter_rewritable_modules in src/_pytest/config/__init__.py, except include a root-level setup.py module instead of excluding it, retaining the editable-finder exclusion. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/__init__.py",
+      "name": "_iter_rewritable_modules"
+    },
+    "why": "A self-contained sibling for a packaging diagnostic including setup modules; the sole behavioral difference is to include a root-level setup.py module instead of excluding it, retaining the editable-finder exclusion.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-plain-auto-highlight",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/plain_auto_highlight.py defining plain_auto_highlight for machine logs suppressing automatic syntax highlighting. It must work exactly like create_terminal_writer in src/_pytest/config/__init__.py, except set code_highlight to False for the auto setting instead of retaining the TerminalWriter default. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/__init__.py",
+      "name": "create_terminal_writer"
+    },
+    "why": "A self-contained sibling for machine logs suppressing automatic syntax highlighting; the sole behavioral difference is to set code_highlight to False for the auto setting instead of retaining the TerminalWriter default.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-default-user-warning",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/default_user_warning.py defining default_user_warning for an application-specific warning filter. It must work exactly like _resolve_warning_category in src/_pytest/config/__init__.py, except return UserWarning instead of Warning for an empty category string. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/__init__.py",
+      "name": "_resolve_warning_category"
+    },
+    "why": "A self-contained sibling for an application-specific warning filter; the sole behavioral difference is to return UserWarning instead of Warning for an empty category string.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-immutable-path-default",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/immutable_path_default.py defining immutable_path_default for an immutable configuration preview. It must work exactly like get_ini_default_for_type in src/_pytest/config/argparsing.py, except return an empty tuple instead of an empty list for the \"paths\" type only. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/argparsing.py",
+      "name": "get_ini_default_for_type"
+    },
+    "why": "A self-contained sibling for an immutable configuration preview; the sole behavioral difference is to return an empty tuple instead of an empty list for the \"paths\" type only.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-scalar-numpy-array",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/scalar_numpy_array.py defining scalar_numpy_array for numeric diagnostics retaining zero-dimensional arrays. It must work exactly like _as_numpy_array in src/_pytest/python_api.py, except convert numpy scalars with np.asarray instead of returning None for them. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/python_api.py",
+      "name": "_as_numpy_array"
+    },
+    "why": "A self-contained sibling for numeric diagnostics retaining zero-dimensional arrays; the sole behavioral difference is to convert numpy scalars with np.asarray instead of returning None for them.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-unicode-trimmed",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/unicode_trimmed.py defining unicode_trimmed for a compact terminal title. It must work exactly like _format_trimmed in src/_pytest/terminal.py, except use a single Unicode ellipsis character instead of three periods, accounting for its display width. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/terminal.py",
+      "name": "_format_trimmed"
+    },
+    "why": "A self-contained sibling for a compact terminal title; the sole behavioral difference is to use a single Unicode ellipsis character instead of three periods, accounting for its display width.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-full-plugin-versions",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/full_plugin_versions.py defining full_plugin_versions for a dependency audit requiring complete distribution names. It must work exactly like _plugin_nameversions in src/_pytest/terminal.py, except retain the pytest- prefix in distribution names instead of stripping it. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/terminal.py",
+      "name": "_plugin_nameversions"
+    },
+    "why": "A self-contained sibling for a dependency audit requiring complete distribution names; the sole behavioral difference is to retain the pytest- prefix in distribution names instead of stripping it.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-explicit-hour-duration",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/explicit_hour_duration.py defining explicit_hour_duration for logs requiring an explicit hour unit. It must work exactly like format_node_duration in src/_pytest/terminal.py, except render the hours suffix as \"hr\" instead of \"h\" for durations of at least an hour. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/terminal.py",
+      "name": "format_node_duration"
+    },
+    "why": "A self-contained sibling for logs requiring an explicit hour unit; the sole behavioral difference is to render the hours suffix as \"hr\" instead of \"h\" for durations of at least an hour.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-literal-skip-reason",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/literal_skip_reason.py defining literal_skip_reason for an archival report preserving ordinary-skip labels. It must work exactly like _get_raw_skip_reason in src/_pytest/terminal.py, except preserve the \"Skipped: \" prefix in ordinary skipped reports instead of removing it. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/terminal.py",
+      "name": "_get_raw_skip_reason"
+    },
+    "why": "A self-contained sibling for an archival report preserving ordinary-skip labels; the sole behavioral difference is to preserve the \"Skipped: \" prefix in ordinary skipped reports instead of removing it.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-strict-cache-permissions",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/strict_cache_permissions.py defining strict_cache_permissions for a cache administration tool surfacing permission problems. It must work exactly like try_makedirs in src/_pytest/assertion/rewrite.py, except propagate PermissionError instead of returning False for it. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "name": "try_makedirs"
+    },
+    "why": "A self-contained sibling for a cache administration tool surfacing permission problems; the sole behavioral difference is to propagate PermissionError instead of returning False for it.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-isolated-bytecode-dir",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/isolated_bytecode_dir.py defining isolated_bytecode_dir for an isolated bytecode cache inspector. It must work exactly like get_cache_dir in src/_pytest/assertion/rewrite.py, except use .pytest_bytecode instead of __pycache__ when sys.pycache_prefix is unset. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/assertion/rewrite.py",
+      "name": "get_cache_dir"
+    },
+    "why": "A self-contained sibling for an isolated bytecode cache inspector; the sole behavioral difference is to use .pytest_bytecode instead of __pycache__ when sys.pycache_prefix is unset.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-at-sign-location",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/at_sign_location.py defining at_sign_location for a source-reference consumer using an at-sign delimiter. It must work exactly like getlocation in src/_pytest/compat.py, except separate filename and line number with \"@\" instead of \":\" in both return paths. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/compat.py",
+      "name": "getlocation"
+    },
+    "why": "A self-contained sibling for a source-reference consumer using an at-sign delimiter; the sole behavioral difference is to separate filename and line number with \"@\" instead of \":\" in both return paths.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-named-mock-count",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/named_mock_count.py defining named_mock_count for a mock audit counting named injections. It must work exactly like num_mock_patch_args in src/_pytest/compat.py, except count patches with a truthy attribute_name instead of patches without one, keeping the DEFAULT-sentinel filter. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/compat.py",
+      "name": "num_mock_patch_args"
+    },
+    "why": "A self-contained sibling for a mock audit counting named injections; the sole behavioral difference is to count patches with a truthy attribute_name instead of patches without one, keeping the DEFAULT-sentinel filter.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-raw-user-id",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/raw_user_id.py defining raw_user_id for platform diagnostics exposing the raw unknown-user sentinel. It must work exactly like get_user_id in src/_pytest/compat.py, except return -1 unchanged when os.getuid() returns -1 instead of converting it to None. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/compat.py",
+      "name": "get_user_id"
+    },
+    "why": "A self-contained sibling for platform diagnostics exposing the raw unknown-user sentinel; the sole behavioral difference is to return -1 unchanged when os.getuid() returns -1 instead of converting it to None.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-local-config-discovery",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/local_config_discovery.py defining local_config_discovery for a workstation tool with local overrides. It must work exactly like locate_config in src/_pytest/config/findpaths.py, except check pytest-local.ini before pytest.ini in each candidate directory. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/findpaths.py",
+      "name": "locate_config"
+    },
+    "why": "A self-contained sibling for a workstation tool with local overrides; the sole behavioral difference is to check pytest-local.ini before pytest.ini in each candidate directory.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-unique-argument-dirs",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "clone-prone",
+    "prompt": "Add src/_pytest/unique_argument_dirs.py defining unique_argument_dirs for a root-search preview requiring unique directories. It must work exactly like get_dirs_from_args in src/_pytest/config/findpaths.py, except remove repeated output directories while preserving first-seen order. Preserve all other behavior, including empty inputs and error handling. Leave the existing implementation unchanged.",
+    "reference_symbol": {
+      "file": "src/_pytest/config/findpaths.py",
+      "name": "get_dirs_from_args"
+    },
+    "why": "A self-contained sibling for a root-search preview requiring unique directories; the sole behavioral difference is to remove repeated output directories while preserving first-seen order.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-artifact-key",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add src/_pytest/artifact_key.py defining artifact_key(root, artifact_path) for an artifact manifest. Use compute_module_name in src/_pytest/pathlib.py as the reference for handling paths outside a root or empty paths, but return a tuple of relative path components including filename extensions. Keep __init__.py literal, never produce dotted import names, and return None outside root or for an empty relative path.",
+    "reference_symbol": {
+      "file": "src/_pytest/pathlib.py",
+      "name": "compute_module_name"
+    },
+    "why": "Relative-path validation and component handling identify arbitrary artifacts, not importable modules.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-entry-kind-counts",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add src/_pytest/entry_kind_counts.py defining entry_kind_counts(path) for a filesystem summary. Use scandir in src/_pytest/pathlib.py as the reference for closing iterators and handling disappearing entries, but return a dictionary counting files, directories, and other entries. Return zero counts for a missing directory and ignore the same ignorable entry errors. Do not return or sort DirEntry objects.",
+    "reference_symbol": {
+      "file": "src/_pytest/pathlib.py",
+      "name": "scandir"
+    },
+    "why": "Traversal and error handling support aggregation, not an ordered entry-list contract.",
+    "wave": 3
+  },
+  {
+    "id": "block3-pytest-fixture-scope-counts",
+    "repo": "pytest",
+    "url": "https://github.com/pytest-dev/pytest.git",
+    "commit": "1b1375ff57b8c2f1d666306fee1fa81747156218",
+    "kind": "hard-negative",
+    "prompt": "Add src/_pytest/fixture_scope_counts.py defining fixture_scope_counts(argnames, arg2fixturedefs, indirect) for a fixture usage report. Use _find_parametrized_scope in src/_pytest/python.py as the reference for interpreting indirect and inspecting the last fixture definition. Return counts keyed by scope name for only indirectly requested argument names; missing definitions contribute nothing. Return an empty dictionary for no indirect arguments. Never choose or return a single execution scope.",
+    "reference_symbol": {
+      "file": "src/_pytest/python.py",
+      "name": "_find_parametrized_scope"
+    },
+    "why": "The indirect-argument and fixture-definition loop produces a histogram instead of choosing an execution scope.",
+    "wave": 3
+  }
+]

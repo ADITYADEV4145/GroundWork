@@ -18,6 +18,8 @@ const limit = (n: number) => pageSize.default(n);
 const kinds = z.enum(['function', 'method', 'class', 'interface', 'type', 'enum', 'constant', 'variable', 'component', 'dataclass']);
 const locationsOnly = z.boolean().default(true).describe('Return symbol locations and IDs; set false for signatures and documentation.');
 
+const printableSource = (s: string) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(s);
+
 function compact(s: string, length = 180): string {
   const val = s.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
   const chars = [...val];
@@ -154,9 +156,9 @@ const findCodeTool = defineTool({
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List symbols and ranges without bodies. Pass file or files for a budgeted batch, not both. Outline several files in one call, at most once per orientation. Set locations_only: false for signatures. Skip outline for known symbols; use batched read_symbol.',
-  inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, offset },
-  handler(args, { root, db }) {
+  description: 'List symbols and ranges. A single file small enough for the budget comes back whole, so no follow-up read is needed (include_body: false for the list only). Pass file or files for a budgeted batch, not both. Outline several files in one call, at most once per orientation. Set locations_only: false for signatures. Skip outline for known symbols; use batched read_symbol.',
+  inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, include_body: z.boolean().default(true), offset },
+  handler(args, { root, db, config }) {
     if (Boolean(args.file) === Boolean(args.files)) return 'Provide exactly one of file or files.';
     if (args.files) {
       const items = args.files.flatMap((input) => {
@@ -170,17 +172,24 @@ const outlineTool = defineTool({
       return page({
         items, title: `Files (${args.files.length}; symbol locations):`, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
         render: (item) => item,
-        next: (offset) => call('outline', { ...args, offset }),
+        next: (offset) => call('outline', { ...args, include_body: undefined, offset }),
       });
     }
     const file = repoRelative(root, args.file!);
     const entry = file ? fileOutline(db, file) : null;
     if (!entry) return 'File is not indexed. For non-code or unsupported files, use a ranged Read.';
     const title = `${prefixBytes(compact(file!, 100), 250)} (${entry.lines} lines; ${entry.symbols.length} symbols${entry.status === 'ok' ? '' : `; ${entry.status}${entry.reason ? `: ${entry.reason}` : ''}`})`;
+    if (args.include_body && !args.offset && entry.symbols.length) {
+      let raw: Buffer | null;
+      try { raw = readRepoFile(root, file!, config.index.maxFileBytes); }
+      catch { raw = null; }
+      const whole = raw && sha1(raw) === sourceLocation(db, entry.symbols[0]!.id)?.hash ? `${title}; whole file:\n${raw.toString('utf8').trimEnd()}` : '';
+      if (whole && printableSource(whole) && estimateTokens(whole) <= NAVIGATION_BUDGETS.outline) return whole;
+    }
     return page({
       items: entry.symbols, title, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
       render: (s) => `[${s.id}] ${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind})${args.locations_only ? '' : ': ' + compact(s.signature)}`,
-      next: (offset) => call('outline', { ...args, locations_only: args.locations_only ? undefined : false, offset }),
+      next: (offset) => call('outline', { ...args, locations_only: args.locations_only ? undefined : false, include_body: args.include_body ? undefined : false, offset }),
     });
   },
 });

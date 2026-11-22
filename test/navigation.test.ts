@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { rmSync, writeFileSync } from 'node:fs';
+import { rmSync, writeFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -46,7 +46,7 @@ describe('MCP navigation', () => {
         expect(next.locations_only).toBe(false);
         args = next;
       }
-      const single = await runNavigationTool('outline', { file: many[0] }, ctx);
+      const single = await runNavigationTool('outline', { file: many[0], include_body: false }, ctx);
       expect(count).toBe(12 * single.split('\n').filter((line) => line.startsWith('[')).length);
     });
     const root = tempDir('gw-empty-outline-');
@@ -61,7 +61,7 @@ describe('MCP navigation', () => {
   it('matches the fixture goldens', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const output = Object.fromEntries(await Promise.all(FIXTURE_NAVIGATION.map(async ([name, args]) => {
-        const value = await runNavigationTool(name, name === 'find_code' ? { ...args, locations_only: false, include_body: false } : name === 'outline' ? { ...args, locations_only: false } : args, { root, db, config });
+        const value = await runNavigationTool(name, name === 'find_code' ? { ...args, locations_only: false, include_body: false } : name === 'outline' ? { ...args, locations_only: false, include_body: false } : args, { root, db, config });
         return [name, value.replace(/ · \d+(?:\.\d+)?/g, ' · <score>')];
       })));
       expect(output).toMatchSnapshot();
@@ -89,7 +89,7 @@ describe('MCP navigation', () => {
       expect(locations.split('\n').filter((row) => row.startsWith('['))).toHaveLength(3);
       const next = JSON.parse(locations.split('Next: find_code(')[1]!.slice(0, -1));
       expect(await runNavigationTool('find_code', next, ctx)).toMatch(/joinParts \(function\).*date\.ts:18$/);
-      const outline = await runNavigationTool('outline', { file: 'src/utils/date.ts', locations_only: true }, ctx);
+      const outline = await runNavigationTool('outline', { file: 'src/utils/date.ts', locations_only: true, include_body: false }, ctx);
       expect(outline).toContain('4-6 formatDate (function)');
       expect(outline).not.toContain('formatDate(d: Date');
       const map = await runNavigationTool('repo_map', { limit: 1 }, ctx);
@@ -129,8 +129,16 @@ describe('MCP navigation', () => {
       expect(await runNavigationTool('find_code', { queries: ['pad'], offset: 3 }, ctx)).toContain('no offset');
       await expect(runNavigationTool('find_code', { queries: [] }, ctx)).rejects.toThrow();
       await expect(runNavigationTool('find_code', { queries: Array(9).fill('pad') }, ctx)).rejects.toThrow();
+      const whole = await runNavigationTool('outline', { file: 'src/utils/date.ts' }, ctx);
+      expect(whole).toContain('symbols); whole file:\n');
+      expect(whole).toContain(readFileSync(path.join(root, 'src/utils/date.ts'), 'utf8').trimEnd());
+      expect(estimateTokens(whole)).toBeLessThanOrEqual(400);
+      expect(await runNavigationTool('outline', { file: 'src/utils/date.ts', include_body: false }, ctx)).not.toContain('whole file');
       writeFileSync(path.join(root, 'src/utils/date.ts'), 'export function changed() {}');
       const stale = await runNavigationTool('find_code', { queries: ['formatDate'] }, ctx);
+      const changed = await runNavigationTool('outline', { file: 'src/utils/date.ts' }, ctx);
+      expect(changed).toContain('formatDate (function)');
+      expect(changed).not.toContain('whole file');
       expect(stale).toContain('formatDate (function)');
       expect(stale).not.toContain('d.toISOString()');
     });
@@ -148,7 +156,7 @@ describe('MCP navigation', () => {
       expect(broad).toContain('pad (');
       expect(broad).toContain('Next:');
       expect(await runNavigationTool('find_code', { query: 'get' }, ctx)).toContain('ApiClient.get');
-      expect(await runNavigationTool('outline', { file: 'src/utils/date.ts' }, ctx)).not.toContain('formatDate(d:');
+      expect(await runNavigationTool('outline', { file: 'src/utils/date.ts', include_body: false }, ctx)).not.toContain('formatDate(d:');
       expect(await runNavigationTool('find_code', { query: 'notarealsymbolzz' }, ctx)).toContain('No indexed matches');
       await expect(runNavigationTool('find_code', { query: 'formatDate', breadth: 'invalid' }, ctx)).rejects.toThrow();
     });

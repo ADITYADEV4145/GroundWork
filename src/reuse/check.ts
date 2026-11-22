@@ -7,7 +7,7 @@ import { looksGenerated } from '../index/discover.js';
 import { readReuseState, type ReuseState } from '../index/query.js';
 import { refreshIndex } from '../index/refresh.js';
 import { indexDbPath } from '../index/store.js';
-import { languageForPath } from '../lang/index.js';
+import { initParsers, languageForPath } from '../lang/index.js';
 import { initSqlBackend, openDb } from '../store/db.js';
 import { sha1 } from '../util/hash.js';
 import { ensureGwDir } from '../util/paths.js';
@@ -95,6 +95,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   await initSqlBackend();
   await refreshIndex(root, { config, lockTimeoutMs: Math.max(0, Math.min(100, deadline - Date.now())) });
   checkDeadline();
+  await initParsers();
   const base = readBase(root, commit, config, deadline);
   const db = openDb(indexDbPath(root), { readonly: true });
   let state: ReuseState, candidates: CandidateIndex;

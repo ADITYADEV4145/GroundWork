@@ -7,7 +7,7 @@ import { findSimilarTool } from '../src/mcp/tools/find_similar.js';
 import { TOOLS } from '../src/mcp/tools/index.js';
 import { CandidateIndex } from '../src/reuse/candidates.js';
 import { model, probability } from '../src/reuse/model.js';
-import { findSimilar, renderSimilar, REMINDER } from '../src/reuse/similar.js';
+import { findSimilar, renderSimilar } from '../src/reuse/similar.js';
 import { buildIdf, pairSignals, type ComparableSymbol, type Signals } from '../src/reuse/signals.js';
 import { withIndexedFixture } from '../src/selftest/fixtures.js';
 import { estimateTokens } from '../src/util/tokens.js';
@@ -64,7 +64,7 @@ describe('find_similar', () => {
       const result = await findSimilar(index, { description });
       expect(['parseDateString', 'dateFromParts', 'parse_date_string', 'read_calendar']).toContain(result.matches[0]?.symbol);
       expect(result.matches.every((m) => m.symbol !== 'countValidOrders')).toBe(true);
-      expect(result.reminder).toBe(REMINDER);
+      expect(renderSimilar(result)).not.toContain('State REUSE');
       expect(estimateTokens(renderSimilar(result))).toBeLessThanOrEqual(500);
       expect(estimateTokens(JSON.stringify(result))).toBeLessThanOrEqual(500);
       const draft = 'function another(value: string): Date { const date = new Date(value); if (Number.isNaN(date.getTime())) throw new Error("Invalid"); return date; }';
@@ -85,12 +85,12 @@ describe('find_similar', () => {
     });
   });
 
-  it('returns a decision reminder on no results and rejects invalid drafts and input', async () => {
+  it('returns a minimal no-match result and rejects invalid drafts and input', async () => {
     await withIndexedFixture('reuse-app', async (db) => {
       const index = new CandidateIndex(db);
       const none = await findSimilar(index, { description: 'quuxxyzzy' });
       expect(none.matches).toEqual([]);
-      expect(renderSimilar(none)).toContain(REMINDER);
+      expect(renderSimilar(none)).toBe('No matches.');
       await expect(findSimilar(index, { description: '' })).rejects.toThrow();
       await expect(findSimilar(index, { description, code: 'function {' })).rejects.toThrow('Draft');
       await expect(findSimilar(index, { description, code: 'const x = 1;', language: 'python' })).rejects.toThrow('Draft');

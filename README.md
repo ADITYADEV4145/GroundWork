@@ -252,7 +252,7 @@ Every command accepts `--json`.
 
 ## Benchmark results
 
-Recorded Devin-agent runs show **less copied code, not demonstrated token or
+Recorded pre-fix Devin-agent runs show **less copied code, not demonstrated token or
 money savings**. Reuse v2 copied-code rate fell from **14/20 (70%) to 0/20 (0%)**.
 Task success was identical in each suite; grounding v3 had zero wrong calls in
 both arms. Across eight paired runs per task, compact navigation showed no
@@ -262,7 +262,7 @@ below zero). GroundWork was significantly slower in both timed suites under the
 same task-bootstrap analysis.
 These small task sets do not establish performance on other agents or projects.
 
-| Eight-run suite | Success, baseline / GroundWork | Estimated-output reduction, median [95% CI] | Mean wall time, baseline → GroundWork | Wall-time reduction, median [95% CI] |
+| Pre-fix eight-run suite | Success, baseline / GroundWork | Estimated-output reduction, median [95% CI] | Mean wall time, baseline → GroundWork | Wall-time reduction, median [95% CI] |
 | --- | --- | --- | --- | --- |
 | Compact navigation: 30 tasks × 8 runs/arm | 240/240 / 240/240 | -2.0% [-25.2, 16.4] | 5.58s → 7.44s | -31.3% [-55.4, -18.9] |
 | Long-horizon: 10 sequential tasks × 8 runs/arm | 80/80 / 80/80 | -63.2% [-86.1, -38.6] | 5.18s → 11.04s | -110.1% [-132.7, -91.5] |
@@ -299,6 +299,34 @@ Regenerate the static charts with `npm run bench:charts` (no dependencies or net
 Navigation initial remains the original three-run set (90/90 per arm), separate
 from compact navigation and not pooled with it. Raw exports and combination
 instructions are in [bench/COMBINE.md](bench/COMBINE.md). Historical tables follow.
+
+<!-- overhead-comparison:start -->
+### Before / after overhead fixes
+
+Each experiment contains eight fresh paired runs per task; before and after are not pooled.
+
+After LH GroundWork used revised guidance (fewer required calls): this is a protocol change as well as a tool change. Baselines were re-collected at the new commit. Do not attribute before/after differences solely to implementation changes.
+Collector/tool revision for after: `e605fe9559cae088a2060a4ed53a27c32daa4df9`. Navigation guidance is unchanged except the revision.
+
+V2 protocol deviations: LH groundwork-4 and baseline-7 were executed by the session’s sidekick subagent using the same wrappers. LH groundwork-3 and groundwork-7 skipped verify_calls despite new cross-file calls. These are recorded executions, not perfectly uniform protocol adherence. The merged code also includes a later verify_calls budget fix for many unchecked files; that fix was not part of the measured e605fe9 runs.
+
+| Eight-run suite / experiment | Success, baseline / GroundWork | Estimated-output reduction, median [95% CI] | Mean wall time, baseline → GroundWork | Wall-time reduction, median [95% CI] |
+| --- | --- | --- | --- | --- |
+| Compact navigation · before | 240/240 / 240/240 | -2.0% [-25.2, 16.4] | 5.58s → 7.44s | -31.3% [-55.4, -18.9] |
+| Compact navigation · after | 240/240 / 240/240 | 0.3% [-25.4, 26.8] | 5.23s → 6.61s | -32.4% [-40.8, -11.5] |
+| Long-horizon · before | 80/80 / 80/80 | -63.2% [-86.1, -38.6] | 5.18s → 11.04s | -110.1% [-132.7, -91.5] |
+| Long-horizon · after | 80/80 / 80/80 | -89.9% [-208.6, -46.8] | 8.07s → 9.50s | -22.6% [-46.2, -3.3] |
+
+After compact navigation: the estimated-output interval includes zero (no significant change under this analysis); the wall-time interval excludes zero toward slower execution. After long-horizon: the estimated-output interval excludes zero toward more output; the wall-time interval excludes zero toward slower execution.
+
+Estimated output is bytes/4, not billed model tokens; no dollar savings are established. Positive reductions mean less output or faster execution; negative means more output or slower execution. Intervals resample paired tasks after summing repeats, not independent sessions. Mean times and median percentage reductions are different estimands. Separate intervals do not test the before/after difference; sequential LH tasks share context.
+
+![Estimated tool-output reductions before and after](docs/assets/bench/before-after-output.svg)
+
+![Mean wall times and paired-task reduction intervals before and after](docs/assets/bench/before-after-wall.svg)
+
+![Baseline and GroundWork success before and after](docs/assets/bench/before-after-success.svg)
+<!-- overhead-comparison:end -->
 
 ## Long-horizon benchmark
 

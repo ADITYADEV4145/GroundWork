@@ -1,11 +1,8 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import type { Command } from 'commander';
-import { loadConfig } from '../config/load.js';
 import type { GroundworkConfig } from '../config/schema.js';
-import { refreshIndex } from '../index/refresh.js';
-import { indexDbPath } from '../index/store.js';
-import { initSqlBackend, openDb, type Db } from '../store/db.js';
+import type { Db } from '../store/db.js';
 import { findRepoRoot } from '../util/paths.js';
 import type { GlobalOpts } from './output.js';
 
@@ -26,6 +23,10 @@ export interface ReadContext {
 
 /** Bring the index up to date (cheap when nothing changed), then open it for reading. */
 export async function withIndex<T>(opts: GlobalOpts & { refresh?: boolean }, fn: (ctx: ReadContext) => T | Promise<T>): Promise<T> {
+  const { loadConfig } = await import('../config/load.js');
+  const { refreshIndex } = await import('../index/refresh.js');
+  const { indexDbPath } = await import('../index/store.js');
+  const { initSqlBackend, openDb } = await import('../store/db.js');
   const root = repoRoot(opts);
   const config = loadConfig(root);
   await initSqlBackend();

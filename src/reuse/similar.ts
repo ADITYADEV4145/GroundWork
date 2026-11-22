@@ -1,22 +1,14 @@
-import * as z from 'zod';
 import { vocabulary } from '../extract/fingerprint.js';
-import { initParsers } from '../lang/index.js';
+import { initParsersFor } from '../lang/parser.js';
 import { estimateTokens, fitToBudget } from '../util/tokens.js';
 import { CandidateIndex } from './candidates.js';
 import { scoreSignals } from './model.js';
 import { pairSignals, type ComparableSymbol } from './signals.js';
 import { extractReuseSource } from './source.js';
+import { similarInputSchema, type SimilarInput } from './similar-input.js';
 
-export const similarInputSchema = z.object({
-  description: z.string().trim().min(1).max(10000),
-  name: z.string().max(300).optional(),
-  signature: z.string().max(10000).optional(),
-  code: z.string().max(100000).optional(),
-  language: z.enum(['typescript', 'tsx', 'javascript', 'python']).default('typescript'),
-}).strict();
-export type SimilarInput = z.input<typeof similarInputSchema>;
+export { similarInputSchema, type SimilarInput } from './similar-input.js';
 
-export const REMINDER = 'State REUSE <symbol> / EXTEND <symbol> / NEW because <reason>.';
 export interface SimilarMatch {
   symbol: string;
   file: string;
@@ -25,10 +17,10 @@ export interface SimilarMatch {
   verdict: 'reuse as-is' | 'extend' | 'related';
   why: string;
 }
-export interface SimilarResult { matches: SimilarMatch[]; reminder: string }
+export interface SimilarResult { matches: SimilarMatch[] }
 
 export function renderSimilar(result: SimilarResult): string {
-  return [...(result.matches.length ? result.matches.map((m) => `${m.verdict}: ${m.symbol} (${m.file}:${m.line}) — ${m.why}`) : ['No similar symbols found.']), result.reminder].join('\n');
+  return result.matches.length ? result.matches.map((m) => `${m.verdict}: ${m.symbol} (${m.file}:${m.line}) — ${m.why}`).join('\n') : 'No matches.';
 }
 
 export async function findSimilar(index: CandidateIndex, input: SimilarInput): Promise<SimilarResult> {
@@ -36,7 +28,7 @@ export async function findSimilar(index: CandidateIndex, input: SimilarInput): P
   let query: ComparableSymbol = { name: args.name ?? '', fingerprint: null, params: null, returnType: null, docstring: args.description };
   let embeddingText = args.description;
   if (args.code || args.signature) {
-    await initParsers();
+    await initParsersFor([args.language]);
     const python = args.language === 'python';
     const signature = args.signature?.trim().replace(/[:;]$/, '') ?? '';
     const declaration = python ? (/^(async\s+)?def\s/.test(signature) ? signature : `def ${signature}`)
@@ -63,6 +55,6 @@ export async function findSimilar(index: CandidateIndex, input: SimilarInput): P
   }).sort((a, b) => b.probability - a.probability || a.file.localeCompare(b.file) || a.line - b.line).slice(0, 5);
   const render = (m: SimilarMatch) => JSON.stringify(m);
   const safe = matches.filter((m) => estimateTokens(render(m)) < 400);
-  const kept = fitToBudget(safe, render, 500, estimateTokens(JSON.stringify({ matches: [], reminder: REMINDER })) + 10).items;
-  return { matches: kept, reminder: REMINDER };
+  const kept = fitToBudget(safe, render, 500, estimateTokens(JSON.stringify({ matches: [] })) + 10).items;
+  return { matches: kept };
 }

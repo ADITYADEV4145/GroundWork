@@ -1,8 +1,5 @@
 import { TextDecoder } from 'node:util';
 import * as z from 'zod';
-import { fileOutline, findCode } from '../../index/navigation.js';
-import { indexDbPath } from '../../index/store.js';
-import { openDb } from '../../store/db.js';
 import { sha1 } from '../../util/hash.js';
 import { log } from '../../util/log.js';
 import { readRepoFile, repoRelative } from '../../util/repo-file.js';
@@ -44,11 +41,15 @@ function sameFile(a: z.infer<typeof range>, b: z.infer<typeof range>): boolean {
   return a.file === b.file && a.hash === b.hash;
 }
 
-function hint(root: string, file: string, lines: number, query?: string): string {
+async function hint(root: string, file: string, lines: number, query?: string): Promise<string> {
   const label = JSON.stringify(file);
   const base = `Large read allowed (${lines} lines). Next time, use outline({"file":${label}}) then read_symbol, or request a line range.`;
   // The read hook never waits for a writer or refreshes the index for a non-blocking hint.
   try {
+    const { fileOutline, findCode } = await import('../../index/navigation.js');
+    const { indexDbPath } = await import('../../index/store.js');
+    const { initSqlBackend, openDb } = await import('../../store/db.js');
+    await initSqlBackend();
     const db = openDb(indexDbPath(root), { readonly: true });
     try {
       const ni = fileOutline(db, file);
@@ -68,7 +69,7 @@ function hint(root: string, file: string, lines: number, query?: string): string
 export const readGuard: HookHandler = {
   name: 'read_guard',
   events: ['pre_tool', 'post_tool', 'pre_compact'],
-  run(ev, { root, config }) {
+  async run(ev, { root, config }) {
     if (ev.agent !== 'claude' || !config.navigation.readGuard.enabled) return null;
     const session = safeId.safeParse(ev.sessionId);
     if (!session.success) return null;
@@ -147,7 +148,7 @@ export const readGuard: HookHandler = {
     if (eventLog) log(root, 'info', eventLog.name, { sessionId: id, file, from, to, estimatedTokensSaved: eventLog.estimatedTokensSaved, method: TOKEN_ESTIMATE_METHOD });
     if (result) return result;
     if (input.data.offset === undefined && input.data.limit === undefined && lineCount > config.navigation.readGuard.largeFileLines) {
-      return { action: 'context', message: hint(root, file, lineCount, recentQuery) };
+      return { action: 'context', message: await hint(root, file, lineCount, recentQuery) };
     }
     return null;
   },

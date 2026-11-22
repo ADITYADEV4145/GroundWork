@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { readFingerprintedSymbols, type FingerprintedSymbol } from '../index/query.js';
+import { indexedLanguages, readFingerprintedSymbols, type FingerprintedSymbol } from '../index/query.js';
 import { languageForPath } from '../lang/index.js';
+import { initParsersFor } from '../lang/parser.js';
 import type { Db } from '../store/db.js';
 import type { GroundworkConfig } from '../config/schema.js';
 import type { Embedding, EmbedderFactory } from './embeddings.js';
@@ -18,6 +19,10 @@ function bands(s: ComparableSymbol): string[] {
 }
 
 type Candidate = FingerprintedSymbol & { bindingHash?: string | null; contract?: Contract | null; embedding?: Embedding };
+export async function prepareCandidateParsers(db: Db): Promise<void> {
+  await initParsersFor(indexedLanguages(db));
+}
+
 export class CandidateIndex {
   readonly symbols: Candidate[];
   readonly idf: Map<string, number>;

@@ -4,6 +4,8 @@ Groundwork stops two kinds of duplication: writing code that already exists unde
 
 ## Before writing: `find_similar`
 
+Search before a new non-trivial helper/function. Skip small edits and inline code; reuse known helpers and unchanged search evidence within the task.
+
 ```json
 find_similar({
   "description": "format a Date as YYYY-MM-DD for the UI",
@@ -16,7 +18,6 @@ find_similar({
 ```
 reuse as-is: formatDate (src/utils/date.ts:4) — same structure and vocabulary; formats a Date as an ISO day
 extend: formatDateTime (src/utils/date.ts:18) — similar purpose; add an option instead of a sibling
-State REUSE <symbol> / EXTEND <symbol> / NEW because <reason>.
 ```
 
 Then answer in one line:

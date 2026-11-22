@@ -1,5 +1,45 @@
 # Combining paired runs
 
+## Post-fix experiment (v2)
+
+The fresh paired experiment pins both arms and suites to collector/tool revision
+`e605fe9559cae088a2060a4ed53a27c32daa4df9`. Its GroundWork LH arm uses revised
+guidance with fewer required calls: this is a protocol change, not just an
+implementation comparison. Baselines were re-collected at the new commit.
+
+Keep these exports separate from the published pre-fix captures. Once all 32
+exports arrive, use a built checkout at **exactly** that revision:
+
+```sh
+node scripts/bench-combine-v2.mjs \
+  --nav-captures /path/to/new-nav-exports \
+  --lh-captures /path/to/new-lh-exports \
+  --build /path/to/built-e605fe9-checkout
+node --test scripts/bench-*.test.mjs
+```
+
+The current PR checkout/build can serve as `--build` while its HEAD is e605fe9;
+after committing preparation changes, retain a separate detached worktree/build
+at e605fe9. Historical compatibility builds are **not** used for v2 grading.
+The command requires runs 1–8 for both arms, checks revision/agent/model/Node,
+and uses the unchanged suite graders. Higher runs are ignored; missing and
+duplicate selected runs or differing archived exports are rejected.
+
+It writes only `bench/{nav,long-horizon}/v2/{observations,results}` for evidence,
+then regenerates new `before-after-{output,wall,success}.svg` charts and marked
+README/site comparison sections. Existing published evidence, charts (including
+copied-code and grounding results), and prose outside those sections are preserved.
+Both suites must grade successfully before either suite is archived. Identical
+archive replays are allowed; differing bytes cannot replace existing captures.
+
+To regenerate just the comparison from saved reports:
+`node scripts/bench-comparison.mjs`. With neither after report present, after
+rows/charts say Pending. One missing report or inconsistent statistics/revisions
+is an error, never silently presented as a completed comparison. Synthetic test
+fixtures must stay outside the repository; do not publish old data as new results.
+
+## Published pre-fix experiment
+
 Navigation and long-horizon `results/combined.evidence.json` files feed the charts.
 `results/combined.json` and `results/combined.md` retain the complete latest
 combined grader output; existing active evidence, dated historical reports and

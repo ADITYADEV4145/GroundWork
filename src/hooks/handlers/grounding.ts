@@ -4,7 +4,7 @@ import { openDb } from '../../store/db.js';
 import { log } from '../../util/log.js';
 import { hookTiming } from '../../util/hook-timing.js';
 import type { HookHandler } from '../types.js';
-import { EDIT_TOOLS } from './refresh_on_edit.js';
+import { EDIT_TOOLS } from '../edit-tools.js';
 
 // Phase 4: after an edit (and after refresh_on_edit re-indexed it), check only the changed lines for invented
 // imports, calls, members and wrong arguments. Feedback is context for the agent, never a block; silent when clean.

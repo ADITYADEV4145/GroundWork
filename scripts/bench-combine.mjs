@@ -4,6 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { generate } from './bench-charts.mjs';
+import { generateComparison } from './bench-comparison.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const pins = { nav: 'e0c5f6bbc7a49f9399abf4227ef7253958d03a97', 'long-horizon': 'fa8657cbb6bc73dfb9a8011b891f55b6af499eda' };
@@ -22,12 +23,12 @@ export function options(args) {
   return result;
 }
 
-export function validateCaptures(directory, suite, runs) {
+export function validateCaptures(directory, suite, runs, captureRevision = pins[suite]) {
   const rows = readdirSync(directory).filter((p) => p.endsWith('.json')).map((p) => ({ source: path.join(directory, p), capture: json(path.join(directory, p)) }))
     .filter(({ capture: c }) => !Number.isInteger(c.run) || c.run <= runs);
   const pairs = new Set();
   for (const { capture: c } of rows) {
-    if (c.suite !== suite || c.captureRevision !== pins[suite] || c.node !== 'v24.22.2' || c.agent !== 'Devin normal' || c.model !== null) throw new Error(`Unexpected ${suite} capture provenance`);
+    if (c.suite !== suite || c.captureRevision !== captureRevision || c.node !== 'v24.22.2' || c.agent !== 'Devin normal' || c.model !== null) throw new Error(`Unexpected ${suite} capture provenance`);
     const pair = `${c.condition}:${c.run}`;
     if (!['baseline', 'groundwork'].includes(c.condition) || !Number.isInteger(c.run) || c.run < 1 || c.run > runs || pairs.has(pair)) throw new Error(`Unexpected or duplicate ${pair}`);
     pairs.add(pair);
@@ -46,13 +47,18 @@ export function planArchive(rows, directory, prefix) {
 }
 
 export function combine(config) {
+  const after = config.experiment === 'v2';
+  if (after && config.runs !== 8) throw new Error('The v2 comparison requires eight runs per arm');
+  const destination = after ? config.outputRoot ?? root : root;
+  const suiteDir = (suite) => path.join(destination, 'bench', suite, ...(after ? ['v2'] : []));
   const scratch = mkdtempSync(path.join(os.homedir(), 'bench-combine-'));
   const reports = [];
   for (const [suite, directory, build] of [['nav', config.navCaptures, config.navBuild], ['long-horizon', config.lhCaptures, config.lhBuild]]) {
     const revision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: build, encoding: 'utf8' }).trim();
-    if (revision !== pins[suite]) throw new Error(`Expected ${suite} build checkout ${pins[suite]}, got ${revision}`);
-    const rows = validateCaptures(directory, suite, config.runs);
-    const copies = planArchive(rows, path.join(root, 'bench', suite, 'observations'), suite === 'nav' ? 'nav' : 'lh2');
+    const expected = after ? config.captureRevision : pins[suite];
+    if (!expected || revision !== expected) throw new Error(`Expected ${suite} build checkout ${expected}, got ${revision}`);
+    const rows = validateCaptures(directory, suite, config.runs, expected);
+    const copies = planArchive(rows, path.join(suiteDir(suite), 'observations'), suite === 'nav' ? 'nav' : 'lh2');
     const output = path.join(scratch, suite);
     const input = path.join(scratch, `${suite}-captures`);
     mkdirSync(input);
@@ -64,12 +70,12 @@ export function combine(config) {
     const data = json(path.join(output, resultFile));
     const report = data[0];
     const { summary: s } = report;
-    if (data.length !== 1 || s.suite !== suite || s.runs !== config.runs || report.evidence.captures.some((c) => c.captureRevision !== pins[suite])) throw new Error(`Invalid ${suite} grader report`);
+    if (data.length !== 1 || s.suite !== suite || s.runs !== config.runs || report.evidence.captures.some((c) => c.captureRevision !== expected)) throw new Error(`Invalid ${suite} grader report`);
     console.log(`${suite}: ${s.runs} runs, success ${s.baseline.success}/${s.baseline.attempts} vs ${s.groundwork.success}/${s.groundwork.attempts}; tool-output reduction ${JSON.stringify(s.estimatedToolOutputReductionPct)}; wall reduction ${JSON.stringify(s.wallTimeReductionPct)}`);
     reports.push({ suite, copies, report, markdown: readFileSync(path.join(output, resultFile.replace(/\.json$/, '.md')), 'utf8') });
   }
   for (const { suite, copies, report, markdown } of reports) {
-    const dir = path.join(root, 'bench', suite);
+    const dir = suiteDir(suite);
     mkdirSync(path.join(dir, 'results'), { recursive: true });
     mkdirSync(path.join(dir, 'observations'), { recursive: true });
     for (const { source, target } of copies) copyFileSync(source, target, constants.COPYFILE_EXCL);
@@ -77,7 +83,8 @@ export function combine(config) {
     writeFileSync(path.join(dir, 'results/combined.json'), JSON.stringify([report], null, 2) + '\n');
     writeFileSync(path.join(dir, 'results/combined.md'), markdown);
   }
-  generate();
+  if (after) generateComparison(destination, config.captureRevision);
+  else generate();
   console.log(`Combined evidence, reports, raw exports and charts updated. Grader scratch: ${scratch}`);
 }
 

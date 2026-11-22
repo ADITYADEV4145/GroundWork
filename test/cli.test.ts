@@ -52,4 +52,13 @@ describe('gw cli', () => {
     expect(r.status).toBe(0);
     expect(r.stdout).toBe('');
   });
+
+  it('keeps global and scoped help available with lazy command registration', () => {
+    expect(gw('--help')).toContain('selftest');
+    expect(gw('mcp', '--help')).toContain('stdio');
+    expect(gw('symbols', '--help')).toContain('--no-refresh');
+    const result = spawnSync(process.execPath, ['--import', TSX, MAIN, `--root=${dir}`, '--json', 'stats'], { encoding: 'utf8' });
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout).files).toBe(8);
+  });
 });

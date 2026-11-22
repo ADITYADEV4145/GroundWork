@@ -1,5 +1,33 @@
 # Combining paired runs
 
+## Round 4 (v5)
+
+Round 4 pins both arms to `6f242a68c4e2461a4156089f1195d60affcbbc59`.
+The sessions still export `nav3-*` / `lh3-*` filenames; select v5 explicitly:
+
+```sh
+node scripts/bench-combine-v2.mjs --experiment v5 \\
+  --nav-captures /path/to/v5-nav-exports \\
+  --lh-captures /path/to/v5-lh-exports \\
+  --build /path/to/built-6f242a6-checkout
+```
+
+V5 writes only `bench/{nav,long-horizon}/v5/{observations,results}` evidence,
+archiving unchanged export bytes as `nav5-*` / `lh5-*`. Original/v2/v3/v4 evidence
+and the published Round 3 results are preserved. The fifth row per suite stays
+Pending until both fresh eight-run suite reports are present; experiments are
+not pooled. Synthetic orchestration tests are not benchmark results.
+
+Round 4 includes batched outline, a shared daemon with root-local state and
+trimmed orientation/search/verification guidance. The round-3 read paths
+(large-Read compaction and explore-first guidance) are now default-off behind
+`navigation.experimentalReadPaths`. The v5 GroundWork prompts run defaults;
+explore remains available, and batched read_symbol, include_body, hook forwarding
+and carried evidence remain on. Baselines are freshly collected at 6f242a6;
+protocol and implementation effects cannot be separated by cross-round comparisons.
+
+V5 workflow session notes: navigation baseline-1 submitted a finish and the next begin in the same turn with a three-second delay, so strict sequencing is not guaranteed. Several cwd/environment/shell/quoting failures were retried, some before capture. Navigation GroundWork-3/4/8 reported invalid read_symbols calls; GroundWork-1/4/5/6 used captured shell cat, and some edits used shell sed/git diff instead of read wrappers. Several searches used fitToBudget from the preloaded AGENTS.md. GroundWork-3 staged edit scripts in ~/edits using earlier-task definitions, then re-read targets in the edit tasks; GroundWork-7 used repo_map depth 2. LH baseline-3/4/6/8 staged scratch checks in /tmp, and baseline-7 was executed by a same-VM subagent. Several LH GroundWork runs used repo_map plus outline plus batched read_symbol rather than a single orientation step; GroundWork-7 repeated two unchanged helper lookups. GroundWork-1 called find_similar after writing the helper; GroundWork-4 skipped it for a new shared helper, while other runs skipped searches for requested exports or extensions. Several runs skipped explicit verify_calls because cross-file targets were already confirmed by unchanged read_symbol evidence. Quick checks and Python __pycache__ cleanup were also noted. These are recorded executions, not perfectly uniform protocol adherence. Work outside wrappers or task timers is unmeasured; shell writes still do not dispatch edit or Stop hooks.
+
 ## Round 3 (v4)
 
 Round 3 pins both arms to `ff578514d78397faffd2ac1836fb3cbd03e62ee1`.

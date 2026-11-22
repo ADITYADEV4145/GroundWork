@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 export function options(args) {
   let experiment = 'v2';
   const overrides = {};
-  const usage = 'Use --experiment v2|v3|v4 --nav-captures DIR --lh-captures DIR --build DIR';
+  const usage = 'Use --experiment v2|v3|v4|v5 --nav-captures DIR --lh-captures DIR --build DIR';
   for (let i = 0; i < args.length; i += 2) {
     const value = args[i + 1];
     if (!value) throw new Error(usage);

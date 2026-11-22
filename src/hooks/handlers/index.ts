@@ -17,6 +17,13 @@ const groundingOnEdit: HookHandler = {
   name: 'grounding_on_edit', events: ['post_tool'], tools: EDIT_TOOLS,
   async run(ev, ctx) { return (await import('./grounding.js')).groundingOnEdit.run(ev, ctx); },
 };
+const typesOnEdit: HookHandler = {
+  name: 'types_on_edit', events: ['post_tool'], tools: EDIT_TOOLS,
+  async run(ev, ctx) {
+    if (!ctx.config.types.enabled || !ctx.config.types.postToolHook) return null;
+    return (await import('./types.js')).typesOnEdit.run(ev, ctx);
+  },
+};
 
 const readGuard: HookHandler = {
   name: 'read_guard',
@@ -28,4 +35,4 @@ const readGuard: HookHandler = {
 };
 
 // Register hook handlers here (one import + one entry). Order matters: the first 'deny' wins.
-export const HANDLERS: HookHandler[] = [wasteGuards, refreshOnEdit, readGuard, groundingOnEdit, duplicateGate];
+export const HANDLERS: HookHandler[] = [wasteGuards, refreshOnEdit, readGuard, groundingOnEdit, typesOnEdit, duplicateGate];

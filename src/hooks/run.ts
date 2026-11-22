@@ -132,6 +132,10 @@ export async function runHook(agent: AgentName, event: HookEventName, timeoutMs 
     const raw: unknown = text.trim() ? JSON.parse(text) : {};
     const ev = normalise(agent, event, raw);
     root = findRepoRoot(ev.cwd);
+    if (event === 'stop' || event === 'post_tool') {
+      const config = loadConfig(root);
+      if (config.types.enabled && (event === 'stop' ? config.types.stopGate : config.types.postToolHook)) timeoutMs = config.types.timeoutMs + 1500;
+    }
     if (ev.tool !== 'Read' && ev.event !== 'pre_compact' && !/^mcp__(?:plugin_groundwork_)?groundwork__find_code$/.test(ev.tool ?? '')) {
       const sqlStart = performance.now();
       const { initSqlBackend } = await import('../store/db.js');

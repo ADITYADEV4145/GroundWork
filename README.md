@@ -233,6 +233,22 @@ Or edit `.groundwork/config.json`. Explicit settings override profile defaults:
 
 Commit `config.json` to share your team's preferences. Everything else in `.groundwork/` is git-ignored.
 
+### Optional type checking
+
+`gw types check [files...] [--base ref]` checks changed lines using the target project's
+own TypeScript compiler or Pyright (the project's binary, then PATH). Nothing is downloaded;
+missing compilers leave syntax/import grounding unchanged and are reported only in explicit
+CLI/MCP output. `check_types` accepts `files: [{file, lines?}]` and returns budgeted findings.
+`gw check` and Stop include type findings; strict Stop can block new definite errors,
+while standard reports context. Existing diagnostics in the base file are informational.
+`gw types def|impl|refs file:line:col` provides TypeScript navigation. All support `--json`.
+
+The optional `types` config section defaults to
+`{ "enabled": true, "stopGate": true, "postToolHook": false, "timeoutMs": 4000,
+"budgetTokens": 400, "typescript": "auto", "python": "auto" }`.
+Set `enabled: false` to disable it, or set either language to `"off"`.
+Timeouts fail open; type checking is not enabled after individual edits by default.
+
 > The profile controls the **Stop gate**, not every possible intervention. Read and repeat-command guards can deny redundant actions in the profiles where they are enabled; each has an override.
 
 ## Commands

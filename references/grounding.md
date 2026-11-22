@@ -1,5 +1,15 @@
 # Grounding checks
 
+An optional type layer also uses the target project's TypeScript compiler or Pyright.
+Use `gw types check [files...] [--base ref]` or MCP `check_types` with
+`files: [{file, lines?}]`. CLI commands support `--json`; TypeScript navigation is
+available through `gw types def|impl|refs file:line:col`. Missing compilers are
+reported only on explicit calls. Runtime never installs them or downloads models.
+Only allowlisted definite errors absent from the base file may block strict Stop;
+standard Stop reports context. Other diagnostics are informational. Timeouts fail open.
+Configure `types.enabled`, `stopGate`, `postToolHook` (default false), `timeoutMs`
+(4000), `budgetTokens` (400), and `typescript`/`python` (`auto` or `off`).
+
 Agents tend to predict plausible names instead of looking them up. Groundwork checks the lines you change against the index and reports:
 
 - imports of names a repo module does not export

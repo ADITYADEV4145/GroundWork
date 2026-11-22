@@ -23,7 +23,7 @@ import { renderSuggestions, suggest, type Suggestion } from './suggest.js';
 // Grounding (Phase 4): flag imports, calls and arguments the agent invented. Precision first: every rule
 // only fires when the index proves the error; anything dynamic, unparsed, external or ambiguous is skipped.
 
-export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword';
+export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword' | 'type';
 
 export interface Finding {
   file: string;
@@ -35,6 +35,7 @@ export interface Finding {
   /** Definite errors the Stop gate / `gw check` may block on. */
   blocking: boolean;
   suggestions: Suggestion[];
+  typeConfirmed?: boolean;
 }
 
 export interface VerifyResult {

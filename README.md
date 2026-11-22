@@ -253,6 +253,54 @@ Every command accepts `--json`.
 ## Benchmark results
 
 <!-- stable-protocol:start -->
+<!-- v10-results:start -->
+### v10 (PR #48: engineering gates, not a speed win)
+
+V10 measured PR #48 at product/collector/grader pin e3bdc7401daf7264b242b32a2d7bc4de09178f69, not a claim that PR #48 is shipped. There are 96 unchanged raw captures: 16 sessions per arm per suite, sharing one baseline within each suite. Compliant arms are official; regenerated-skill arms are disclosed deviations and never stand in for official results.
+
+The navigation engineering gate passed on fewer actions, in both official and disclosed deviation arms. There is no speed win: navigation session-time intervals cross zero, and navigation tool-side time is about 5x baseline (5.66x official; 5.57x disclosed deviation). The LH disclosed deviation also passed its engineering gate; its session-time interval crosses zero.
+
+Engineering gate: GW mean actions/session no higher than baseline, session-time reduction CI includes zero or better, and no category success drop. These are captured actions, not LLM conversation turns. Reductions are 100*(1-GW/B); positive favors GW. Nominal 95% intervals use 10,000 independent whole-session bootstrap draws per arm, seed 0x51ab17ed. Navigation success is 480/480 per arm; valid LH deviation and baseline are 160/160 each, with all category guardrails met. Gate passage is not superiority or equivalence; bytes are emitted output, not billed tokens or dollar savings.
+
+| Comparison | Estimand | Baseline mean | GW mean | Reduction % [95% CI] |
+| --- | --- | --- | --- | --- |
+| Navigation official | Session elapsed/task (ms) | 5668.09 | 5445.73 | 3.92 [-4.43, 11.31] |
+| Navigation official | Emitted bytes/session | 32401.62 | 33028.19 | -1.93 [-8.26, 4.23] |
+| Navigation official | Tool-side ms/session | 1315.68 | 7445.79 | -465.93 [-540.05, -405.27] |
+| Navigation disclosed deviation | Session elapsed/task (ms) | 5668.09 | 5959.93 | -5.15 [-13.10, 1.98] |
+| Navigation disclosed deviation | Emitted bytes/session | 32401.62 | 35947.62 | -10.94 [-20.11, -2.04] |
+| Navigation disclosed deviation | Tool-side ms/session | 1315.68 | 7328.08 | -456.98 [-531.10, -390.89] |
+| LH disclosed deviation | Session elapsed/task (ms) | 9418.56 | 10215.93 | -8.47 [-19.87, 1.55] |
+| LH disclosed deviation | Emitted bytes/session | 5149.94 | 6333.25 | -22.98 [-45.58, -2.43] |
+| LH disclosed deviation | Tool-side ms/session | 506.18 | 1242.24 | -145.42 [-225.64, -81.75] |
+
+| Comparison | Baseline actions/session [95% CI] | GW actions/session [95% CI] | GW - B [95% CI] | Engineering gate |
+| --- | --- | --- | --- | --- |
+| Navigation official | 57.12 [54.44, 59.69] | 50.31 [49.06, 51.75] | -6.81 [-9.75, -3.69] | PASS |
+| Navigation disclosed deviation | 57.12 [54.44, 59.69] | 52.62 [50.06, 55.44] | -4.50 [-8.25, -0.62] | PASS |
+| LH disclosed deviation | 17.44 [14.56, 20.75] | 17.31 [16.00, 19.00] | -0.12 [-3.75, 3.19] | PASS |
+
+#### Official long-horizon — EXPLORATORY ONLY
+
+Official long-horizon has no confirmatory verdict. The rejected capture v10-lh-groundwork-11, task lh-04, action "outline", is disclosed unchanged. EXPLORATORY ONLY: a separate analysis copy maps that one rejected action to the shell schema bucket, not an executed shell, retaining its count, 30 bytes, 0.07910900000001675 ms and timestamps. Exploratory official LH numbers support no publication claim and never replace official results.
+
+| Comparison | Estimand | Baseline mean | GW mean | Reduction % [95% CI] |
+| --- | --- | --- | --- | --- |
+| EXPLORATORY official LH | Session elapsed/task (ms) | 9418.56 | 10371.71 | -10.12 [-20.21, -0.79] |
+| EXPLORATORY official LH | Emitted bytes/session | 5149.94 | 6298.06 | -22.29 [-43.04, -5.28] |
+| EXPLORATORY official LH | Tool-side ms/session | 506.18 | 1304.47 | -157.71 [-243.83, -90.61] |
+
+| Comparison | Baseline actions/session [95% CI] | GW actions/session [95% CI] | GW - B [95% CI] | Engineering gate |
+| --- | --- | --- | --- | --- |
+| EXPLORATORY official LH | 17.44 [14.56, 20.75] | 17.44 [16.25, 18.81] | 0.00 [-3.50, 3.19] | NO CONFIRMATORY VERDICT |
+
+18 never-started sessions across 17 units were terminated and relaunched; no data was collected from those attempts. Official nav baseline run 10 required two terminations. Final completed exports are all retained, including the schema-rejected official LH capture.
+
+The capture.mjs root cause is in the capture harness, not product outline: an unknown subcommand falls through dispatch, then its caught error is recorded with action=argv[0], outside the schema enum. The written proposal is for a future pre-registered run only: reject unknown wrapper verbs before recording, with an explicit policy for failed-attempt counts and timing. No capture.mjs, schema, grader or PROTOCOL.md change is included.
+
+[Full analysis and rejected-record/root-cause evidence](bench/V10-ANALYSIS.md) · [Inputs and hashes](bench/V10-INPUTS.json) · [Per-tool tables](bench/v10/results/per-tool.md) · [Pre-collection arms](bench/V10-ARMS-NOTE.md).
+<!-- v10-results:end -->
+
 ### v8 (PR #39: fresh-root index cloning + bundled service, not shipped)
 
 V8 publishes the completed v8b recollection: 16 sessions per arm per suite, product and unchanged stable-v1 collector/grader pinned to 243bb549e352ee4a63e968230055cda0c165bbe5. The earlier 3e804c9 run was killed and discarded; none of its captures are included.

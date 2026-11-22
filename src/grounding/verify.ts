@@ -56,7 +56,7 @@ export interface VerifyOptions {
 const CALLABLE = new Set(['function', 'method', 'class', 'component', 'dataclass']);
 const POOL_KINDS = ['function', 'method', 'class', 'component', 'dataclass', 'constant', 'variable', 'interface', 'type', 'enum'] as const;
 const SAFE_PY_DECORATORS = new Set(['staticmethod', 'classmethod', 'abstractmethod', 'abc.abstractmethod', 'override', 'typing.override', 'typing_extensions.override']);
-const DYNAMIC_TEXT = /\b(setattr|__getattr__|__getattribute__|Proxy|Reflect\.|Object\.assign|Object\.defineProperty|defineProperty|mixin|Mixin|prototype)\b/;
+export const DYNAMIC_TEXT = /\b(setattr|__getattr__|__getattribute__|Proxy|Reflect\.|Object\.assign|Object\.defineProperty|defineProperty|mixin|Mixin|prototype)\b/;
 type Lookup = SymbolFact | 'module' | 'unknown' | null;
 
 const isTs = (f: FileFacts) => f.language === 'typescript' || f.language === 'tsx';

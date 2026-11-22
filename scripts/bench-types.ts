@@ -199,7 +199,7 @@ export function markdown(results: Results): string {
     '- Historical workspaces use their own source/config but the same currently installed development dependencies, not reconstructed historical installs. Dependency/compiler skew can create diagnostics; no such rows are removed.',
     '- This is a fixed seeded corpus and a designated-clean proxy, not a population precision estimate or agent success evaluation. A failure is published without tuning the checker.',
     '- Types remain Stop-only by default (`types.postToolHook: false`). No PostToolUse latency claim is made, and this evaluation does not authorize enabling that hook.',
-    '- Post-registration checker fixes: none. The preregistered Stop-output filter fix affects presentation only, not either arm\'s blocking decisions.',
+    '- Post-registration checker fixes (requested after analysis of v1): files matching grounding\'s shared DYNAMIC_TEXT signal retain type diagnostics as info; TS 2307 is no longer blocking because grounding owns missing modules. These are general precision policies, not filename/corpus exceptions. Full v1 rerun uses the unchanged frozen manifest and original scoring rules; earlier runs remain archived.',
     '- Runner-only correction after the initial run: explicitly validate anchor/history reachability and restrict reference changed-file metadata to its workflow target (excluding the unsupported dependency symlink). Both full runs are retained; checker policy, corpus and scoring are unchanged.',
     `- Environment: ${JSON.stringify(results.environment)}.`,
     '- Raw per-mutation findings, availability, clean cases, warm-up and samples: `results.json`.', '');

@@ -89,13 +89,27 @@ describe('optional project types', () => {
     expect(result.findings).toEqual(expect.arrayContaining([expect.objectContaining({ code: 2339, blocking: false, preExisting: true })]));
   }, 30000);
 
-  it('keeps external missing modules and non-allowlisted diagnostics informational', async () => {
+  it('leaves all missing modules to grounding and keeps other non-allowlisted diagnostics informational', async () => {
     const root = fixture();
     writeFileSync(path.join(root, 'app.ts'), 'import x from "not-installed";\nimport y from "./missing.js";\nconst n: number = "wrong";\n');
     const result = await typeCheck(root, [{ file: 'app.ts', ranges: null }], config());
     expect(result.findings.find((f) => f.name === 'not-installed')?.blocking).toBe(false);
-    expect(result.findings.find((f) => f.name === './missing.js')?.blocking).toBe(true);
+    expect(result.findings.find((f) => f.name === './missing.js')).toMatchObject({ code: 2307, blocking: false });
     expect(result.findings.find((f) => f.code === 2322)?.blocking).toBe(false);
+  }, 30000);
+
+  it('keeps diagnostics in dynamically patched files informational without hiding them', async () => {
+    const root = fixture();
+    const source = 'class Service { run(value: string) {} }\nnew Service().run();\n';
+    for (const patch of ['Object.assign(Service.prototype, {});', 'Object.defineProperty(Service.prototype, "run", {value: () => {}});']) {
+      writeFileSync(path.join(root, 'app.ts'), `${source}${patch}\n`);
+      const result = await typeCheck(root, [{ file: 'app.ts', ranges: [[2, 2]] }], config());
+      expect(result.findings).toEqual(expect.arrayContaining([expect.objectContaining({ code: 2554, blocking: false })]));
+      expect(renderTypes(result, 1000)).toContain('info 2554');
+    }
+    writeFileSync(path.join(root, 'app.ts'), source);
+    const result = await typeCheck(root, [{ file: 'app.ts', ranges: null }], config());
+    expect(result.findings).toEqual(expect.arrayContaining([expect.objectContaining({ code: 2554, blocking: true })]));
   }, 30000);
 
   it('falls back without a project compiler, stays silent in hooks and times out open', async () => {

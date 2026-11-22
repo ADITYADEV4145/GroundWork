@@ -4,7 +4,7 @@ import type * as TS from 'typescript';
 import type { TypeFinding } from './index.js';
 
 const services = new Map<string, { service: TS.LanguageService; overlay: Map<string, string>; roots: Set<string> }>();
-const blockingCodes = new Set([2304, 2305, 2724, 2307, 2339, 2551, 2349, 2554, 2555, 2556, 2345, 2353, 2561]);
+const blockingCodes = new Set([2304, 2305, 2724, 2339, 2551, 2349, 2554, 2555, 2556, 2345, 2353, 2561]);
 
 export function projectService(root: string, file: string) {
   const ts = createRequire(path.join(root, 'package.json'))('typescript') as typeof TS;
@@ -49,7 +49,7 @@ export function tsDiagnostics(root: string, file: string, text?: string): TypeFi
       const name = d.file.text.slice(d.start, d.start + (d.length ?? 0)).replace(/^['"]|['"]$/g, '');
       return [{ file, line: pos.line + 1, column: pos.character + 1, name, code: d.code,
         message: ts.flattenDiagnosticMessageText(d.messageText, ' '), language: 'typescript' as const,
-        blocking: d.category === ts.DiagnosticCategory.Error && blockingCodes.has(d.code) && (d.code !== 2307 || name.startsWith('.')) }];
+        blocking: d.category === ts.DiagnosticCategory.Error && blockingCodes.has(d.code) }];
     });
   } finally { overlay.delete(absolute); }
 }

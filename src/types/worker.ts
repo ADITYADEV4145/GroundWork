@@ -1,4 +1,7 @@
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { DYNAMIC_TEXT } from '../grounding/verify.js';
 import type { ChangedFile } from '../grounding/ranges.js';
 import type { GroundworkConfig } from '../config/schema.js';
 import type { TypeCheckResult, TypeFinding } from './index.js';
@@ -19,6 +22,9 @@ process.on('message', (request: { root: string; changed: ChangedFile[]; config: 
         const findings = check(request.root, changed.file);
         result.available[language] = true;
         const relevant = findings.filter((f) => changed.ranges === null || changed.ranges.some(([a, b]) => f.line >= a && f.line <= b));
+        if (DYNAMIC_TEXT.test(readFileSync(path.resolve(request.root, changed.file), 'utf8'))) {
+          for (const finding of relevant) finding.blocking = false;
+        }
         if (relevant.some((f) => f.blocking)) {
           let baseText: string | undefined;
           try { baseText = execFileSync('git', ['show', `${request.base ?? 'HEAD'}:${changed.file}`], { cwd: request.root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); }

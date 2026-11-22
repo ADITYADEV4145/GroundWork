@@ -7,6 +7,20 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_restored_helper_inherits_its_historical_lineage(self):
+        code='def helper(value):\n'+''.join('    value = value + '+str(i)+'\n' for i in range(15))+'    return value\n'
+        chain={'package':'feature','turns':[dict(entry='helper',opportunities=[dict(kind='repo',file='base.py',symbol='canonical')])]*3}
+        file='src/feature/steps.py'
+        trajectory=Trajectory({},chain)
+        first=trajectory.advance({file:code},1)
+        original=set(trajectory.previous)
+        trajectory.advance({},2)
+        restored=trajectory.advance({file:code},3)
+        self.assertEqual(restored['introducedTokens'],first['introducedTokens'])
+        self.assertEqual(restored['earlierDuplicateTokens'],0)
+        self.assertEqual(restored['duplicateRate'],0)
+        self.assertEqual(set(trajectory.previous),original)
+
     def test_deleting_or_reordering_same_name_definitions_introduces_no_tokens(self):
         first='def helper(value):\n'+''.join('    value = value + '+str(i)+'\n' for i in range(30))+'    return value\n'
         second='if available:\n    def helper(value):\n'+''.join('        if value:\n            value = not value\n' for _ in range(30))+'        return value\n'

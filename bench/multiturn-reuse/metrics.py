@@ -339,10 +339,14 @@ class Trajectory:
             previous = next((key for key, before in remaining.items()
                              if binding(key) == binding(identity) and before == tokens), None)
             if previous is None:
+                previous = next((key[:2] for key, before in reversed(self.history.items())
+                                 if binding(key) == binding(identity) and before == tokens
+                                 and key[:2] not in self.previous and key[:2] not in current), None)
+            if previous is None:
                 pending.append((identity, tokens))
             else:
                 current[previous] = tokens
-                del remaining[previous]
+                remaining.pop(previous, None)
         for identity, tokens in pending:
             previous = next((key for key in remaining if binding(key) == binding(identity)), None)
             if previous is not None:

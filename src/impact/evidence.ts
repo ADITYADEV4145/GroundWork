@@ -72,17 +72,26 @@ export function sessionEvidence(root: string, sessionId?: string) {
   let packageTest = '';
   try { packageTest = String(JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')).scripts?.test ?? ''); } catch { /* Python-only repository. */ }
   const ran = (file: string) => commands.some(({ command, cwd }) => {
-    if (/[;&|`$<>\n]/.test(command)) return false;
-    const words = (command.match(/"[^"]*"|'[^']*'|\S+/g) ?? []).map((w) => w.replace(/^['"]|['"]$/g, ''));
+    const words = shellWords(command); if (!words) return false;
+    const runnerArgs = (parts: string[]) => {
+      const offset = parts[0] === 'npx' ? 1 : /^python(?:3)?$/.test(parts[0] ?? '') && parts[1] === '-m' ? 2 : 0;
+      return /^(vitest|jest|pytest)$/.test(parts[offset] ?? '') ? parts.slice(offset + 1) : null;
+    };
     let args: string[];
-    if (/^(?:npx )?(?:vitest|jest|pytest)\b/.test(command.trim()) || /^python(?:3)? -m pytest\b/.test(command.trim())) {
-      args = words.slice(words[0] === 'npx' ? 2 : words[1] === '-m' ? 3 : 1);
-    } else if (/\b(vitest|jest|pytest)\b/.test(packageTest) && path.resolve(cwd) === path.resolve(root) && /^(npm|pnpm|yarn) (?:run )?test(?:\s|$)/.test(command.trim())) {
-      args = words.slice(words[1] === 'run' ? 3 : 2);
+    const direct = runnerArgs(words);
+    if (direct) args = direct;
+    else if (path.resolve(cwd) === path.resolve(root) && /^(npm|pnpm|yarn) (?:run )?test(?:\s|$)/.test(command.trim())) {
+      const script = shellWords(packageTest), selectors = script && runnerArgs(script);
+      if (!selectors) return false;
+      args = [...selectors, ...words.slice(words[1] === 'run' ? 3 : 2)];
     } else return false;
     args = args.filter((a) => a !== '--' && a !== 'run' && a !== '--run');
     if (!args.length) return path.resolve(root, file).startsWith(path.resolve(cwd) + path.sep);
-    return args.some((a) => !a.startsWith('-') && repoRelative(root, a, cwd) === file);
+    return args.some((a) => {
+      if (a.startsWith('-')) return false;
+      const selected = repoRelative(root, a.split('::')[0]!, cwd);
+      return !!selected && (selected === file || file.startsWith(selected.replace(/\/$/, '') + '/'));
+    });
   });
   return { opened, ran, known, commandsObserved };
 }

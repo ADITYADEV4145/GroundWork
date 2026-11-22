@@ -39,6 +39,15 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('respects package test script selectors rather than marking every test run', () => {
+    const root = fixture();
+    writeFileSync(path.join(root, 'package.json'), JSON.stringify({ scripts: { test: 'vitest run test/unit' } }));
+    recordImpactEvidence(root, { ...stopEvent(root, false, 'selected'), event: 'post_tool', tool: 'Bash', input: { command: 'npm test' }, response: 'passed' });
+    const evidence = sessionEvidence(root, 'selected');
+    expect(evidence.ran('test/api.test.ts')).toBe(false);
+    expect(evidence.ran('test/unit/example.test.ts')).toBe(true);
+    expect(evidence.ran('test/unit-other/example.test.ts')).toBe(false);
+  });
   it('records test commands rewritten by the output-trimming wrapper', () => {
     const root = fixture();
     const command = `GW_SESSION_ID='wrapped' GW_ROOT=${shellQuote(root)} '/usr/bin/node' '--import' '/package/node_modules/tsx/dist/loader.mjs' '/package/src/cli/main.ts' run -- ${shellQuote("npx vitest run 'test/api.test.ts'")}`;

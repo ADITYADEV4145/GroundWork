@@ -69,7 +69,7 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
         const language = languageForPath(file);
         if (language) languages.add(language);
       }
-      await initParsersFor([...languages]);
+      if (languages.size) await initParsersFor([...languages]);
       for (const language of languages) ready.add(language);
     } catch { /* Normal refresh handles unavailable cache or parsers. */ }
   }

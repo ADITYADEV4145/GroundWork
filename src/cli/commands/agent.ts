@@ -10,8 +10,8 @@ export function register(program: Command): void {
     .command('mcp')
     .description('run the Groundwork MCP server on stdio')
     .action(async (_o, cmd: Command) => {
-      const { startMcpServer } = await import('../../mcp/server.js');
-      await startMcpServer(repoRoot(globalOpts(cmd)));
+      const { runMcp } = await import('../../mcp/relay.js');
+      await runMcp(repoRoot(globalOpts(cmd)));
     });
 
   program

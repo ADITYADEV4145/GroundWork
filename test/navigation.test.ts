@@ -36,6 +36,10 @@ describe('MCP navigation', () => {
       const query = { query: 'format date', kind: 'function' };
       const full = await runNavigationTool('find_code', { ...query, locations_only: false }, ctx);
       expect(full).toContain('formatDate(d: Date');
+      const fullPage = await runNavigationTool('find_code', { ...query, locations_only: false, limit: 1 }, ctx);
+      const fullCursor = JSON.parse(fullPage.split('Next: find_code(')[1]!.slice(0, -1));
+      expect(fullCursor.locations_only).toBe(false);
+      expect(await runNavigationTool('find_code', fullCursor, ctx)).toContain('pad(n: number');
       const locations = await runNavigationTool('find_code', { ...query, locations_only: true }, ctx);
       expect(locations).toContain('formatDate (function) — src/utils/date.ts:4');
       expect(locations).not.toContain('formatDate(d: Date');

@@ -7,7 +7,7 @@ import { log } from '../util/log.js';
 import { VERSION } from '../util/version.js';
 import { TOOLS } from './tools/index.js';
 
-export async function startMcpServer(root: string): Promise<void> {
+export async function createMcpServer(root: string): Promise<McpServer> {
   await initSqlBackend();
   const server = new McpServer({ name: 'groundwork', version: VERSION });
   for (const tool of TOOLS) {
@@ -31,5 +31,12 @@ export async function startMcpServer(root: string): Promise<void> {
       }
     });
   }
-  await server.connect(new StdioServerTransport());
+  return server;
+}
+
+export async function startMcpServer(root: string): Promise<void> {
+  const server = await createMcpServer(root);
+  const transport = new StdioServerTransport();
+  process.stdin.once('end', () => { void server.close(); });
+  await server.connect(transport);
 }

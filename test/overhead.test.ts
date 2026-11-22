@@ -15,6 +15,7 @@ import { initSqlBackend, openDb } from '../src/store/db.js';
 describe('incremental runtime overhead', () => {
   it('initializes only changed languages, skips warm/empty refreshes, and invalidates on config changes', async () => {
     const root = tempDir('gw-freshness-');
+    vi.stubEnv('GW_CACHE_DIR', path.join(root, 'cache'));
     const init = vi.spyOn(parser, 'initParsersFor');
     try {
       await initSqlBackend();
@@ -36,7 +37,7 @@ describe('incremental runtime overhead', () => {
       expect(changed.rebuilt).toBe(true);
       expect(changed.files).toBe(1);
       expect(init.mock.calls).toEqual([[['python']]]);
-    } finally { init.mockRestore(); rmSync(root, { recursive: true, force: true }); }
+    } finally { vi.unstubAllEnvs(); init.mockRestore(); rmSync(root, { recursive: true, force: true }); }
   });
 
   it('reuses candidates only for the same root, generation and config', async () => {

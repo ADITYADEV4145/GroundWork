@@ -88,7 +88,7 @@ const findCodeTool = defineTool({
       start: args.offset, count: args.limit ?? (args.locations_only ? 3 : 8), budget: NAVIGATION_BUDGETS.find_code,
       render: (s) => args.locations_only ? choice(s) :
         `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
-      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only || undefined, offset }),
+      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, offset }),
     });
   },
 });
@@ -105,7 +105,7 @@ const outlineTool = defineTool({
     return page({
       items: entry.symbols, title, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
       render: (s) => `[${s.id}] ${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind})${args.locations_only ? '' : ': ' + compact(s.signature)}`,
-      next: (offset) => call('outline', { ...args, locations_only: args.locations_only || undefined, offset }),
+      next: (offset) => call('outline', { ...args, locations_only: args.locations_only ? undefined : false, offset }),
     });
   },
 });

@@ -1,5 +1,7 @@
 # Multi-turn reuse v1 — pre-registration
 
+Pre-collection amendment: PR #44 corrects nested-token double counting, conditional-function clone coverage, rebound local-import resolution and package-initializer relative imports; no agent data exists and thresholds, estimands and decision rules are unchanged.
+
 Freeze this document and the task/hidden manifests, acceptance tests, clone detector,
 grader, collector and product pin before collection. Inspired by RepoReuse [1]
 (arXiv:2609.35357) and SlopCodeBench [3] (arXiv:2603.24755); not a reproduction

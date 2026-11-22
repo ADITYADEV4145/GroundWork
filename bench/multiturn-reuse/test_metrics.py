@@ -7,6 +7,14 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_function_local_relative_imports_respect_package_initializers(self):
+        for file, relative, helper in [('src/pkg/__init__.py','.helpers','src/pkg/helpers.py'),
+                                       ('src/pkg/nested/__init__.py','..helpers','src/pkg/helpers.py'),
+                                       ('src/pkg/feature.py','.helpers','src/pkg/helpers.py')]:
+            with self.subTest(file=file):
+                files={helper:'def canonical(x):\n    return x\n',file:'def prepare(x):\n    from '+relative+' import canonical as helper\n    return helper(x)\n'}
+                self.assertIn((helper,'canonical'),CodeGraph(files).reachable(file,'prepare'))
+
     def test_rebinding_a_local_import_invalidates_later_calls(self):
         baseline={'src/pkg/helpers.py':'def canonical(x):\n    return x\n'}
         for rebound in ['helper = lambda x: x', 'helper: object = lambda x: x', 'helper += other', 'del helper', '(helper := other)']:

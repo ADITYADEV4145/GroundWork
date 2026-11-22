@@ -218,7 +218,7 @@ class CodeGraph:
             if isinstance(statement, ast.ImportFrom):
                 base = statement.module or ''
                 if statement.level:
-                    parent = module.split('.')[:-1]
+                    parent = module.split('.') if definition['file'].endswith('/__init__.py') else module.split('.')[:-1]
                     base = '.'.join(parent[:len(parent) - statement.level + 1] + ([base] if base else []))
                 for alias in statement.names:
                     if alias.name != '*':

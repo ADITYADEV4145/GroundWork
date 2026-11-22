@@ -1,5 +1,6 @@
 """Independent Python AST/call-resolution and normalized-token winnowing metrics."""
 import ast
+import copy
 import difflib
 import hashlib
 import io
@@ -33,11 +34,19 @@ def normalized(source):
     return result
 
 
+class OwnBody(ast.NodeTransformer):
+    def visit_FunctionDef(self, node):
+        return None
+
+    visit_AsyncFunctionDef = visit_FunctionDef
+    visit_ClassDef = visit_FunctionDef
+
+
 def body_tokens(node, source):
-    statements = list(node.body)
+    statements = copy.deepcopy(node.body)
     if statements and isinstance(statements[0], ast.Expr) and isinstance(statements[0].value, ast.Constant) and isinstance(statements[0].value.value, str):
         statements.pop(0)
-    module = ast.Module(body=statements, type_ignores=[])
+    module = OwnBody().visit(ast.Module(body=statements, type_ignores=[]))
     for child in ast.walk(module):
         if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             if child.body and isinstance(child.body[0], ast.Expr) and isinstance(child.body[0].value, ast.Constant) and isinstance(child.body[0].value.value, str):

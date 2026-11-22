@@ -7,6 +7,15 @@ from metrics import CloneIndex, CodeGraph, Trajectory, normalized, MINIMUM
 
 
 class MetricsTests(unittest.TestCase):
+    def test_nested_helper_tokens_have_one_owner(self):
+        code='def outer():\n    def inner(value):\n        return value + 1\n    return inner(2)\n'
+        graph=CodeGraph({'src/feature/steps.py':code})
+        self.assertEqual(graph.bodies[('src/feature/steps.py','outer')],normalized('return inner(2)'))
+        self.assertEqual(graph.bodies[('src/feature/steps.py','outer.inner')],normalized('return value + 1'))
+        chain={'package':'feature','turns':[dict(entry='outer',opportunities=[dict(kind='repo',file='base.py',symbol='canonical')])]}
+        row=Trajectory({},chain).advance({'src/feature/steps.py':code},1)
+        self.assertEqual(row['introducedTokens'],sum(map(len,graph.bodies.values())))
+
     def test_import_aliases_and_reexports_resolve_to_file_and_symbol(self):
         files = {'src/pkg/helpers.py':'def canonical(x):\n    return x\n',
                  'src/pkg/__init__.py':'from .helpers import canonical as public\n',

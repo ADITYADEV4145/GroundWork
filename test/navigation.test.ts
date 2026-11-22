@@ -15,6 +15,48 @@ import { initSqlBackend, openDb, sqliteBackendAvailable } from '../src/store/db.
 const config = defaultConfig();
 
 describe('MCP navigation', () => {
+  it('batches outlines under one budget, preserves cursors and reports empty or invalid inputs', async () => {
+    await withIndexedFixture('ts-app', async (db, root) => {
+      const ctx = { root, db, config };
+      const files = ['src/utils/date.ts', 'src/main.ts', 'missing.ts', '../outside.ts'];
+      const batch = await runNavigationTool('outline', { files }, ctx);
+      expect(batch).toContain('formatDate');
+      expect(batch).toContain('src/main.ts:');
+      expect(batch).toContain('missing.ts: not indexed');
+      expect(batch).toContain('../outside.ts: not indexed');
+      expect(batch).not.toContain('formatDate(d:');
+      expect(Buffer.byteLength(batch)).toBeLessThanOrEqual(1600);
+      expect(await runNavigationTool('outline', {}, ctx)).toContain('exactly one');
+      expect(await runNavigationTool('outline', { file: files[0], files }, ctx)).toContain('exactly one');
+      for (const files of [[], Array(21).fill('a.ts'), ['a'.repeat(901)]]) {
+        await expect(runNavigationTool('outline', { files }, ctx)).rejects.toThrow();
+      }
+      const many = Array(12).fill('src/utils/date.ts');
+      let args: Record<string, unknown> = { files: many, locations_only: false };
+      let count = 0;
+      for (let i = 0; i < 100; i++) {
+        const text = await runNavigationTool('outline', args, ctx);
+        expect(Buffer.byteLength(text)).toBeLessThanOrEqual(1600);
+        count += text.split('\n').filter((line) => line.startsWith('[')).length;
+        if (!text.includes('Next: outline(')) break;
+        const next = JSON.parse(text.split('Next: outline(')[1]!.slice(0, -1));
+        expect(next.offset).toBeGreaterThan(args.offset ?? 0);
+        expect(next.files).toEqual(many);
+        expect(next.locations_only).toBe(false);
+        args = next;
+      }
+      const single = await runNavigationTool('outline', { file: many[0] }, ctx);
+      expect(count).toBe(12 * single.split('\n').filter((line) => line.startsWith('[')).length);
+    });
+    const root = tempDir('gw-empty-outline-');
+    try {
+      writeFileSync(path.join(root, 'empty.ts'), '// no definitions\n');
+      await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try { expect(await runNavigationTool('outline', { files: ['empty.ts'] }, { root, db, config })).toContain('no indexed symbols'); }
+      finally { db.close(); }
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
   it('matches the fixture goldens', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const output = Object.fromEntries(await Promise.all(FIXTURE_NAVIGATION.map(async ([name, args]) => {

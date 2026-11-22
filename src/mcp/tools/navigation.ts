@@ -131,10 +131,26 @@ const findCodeTool = defineTool({
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List a file’s symbols and line ranges without bodies. Set locations_only: false for signatures. For a known helper use read_symbol, batched for several, instead of whole-file Read. For traces chain callees/read_symbol, not outline+Read.',
-  inputSchema: { file: pathInput, locations_only: locationsOnly, offset },
+  description: 'List symbols and ranges without bodies. Pass file or files for a budgeted batch, not both. Outline several files in one call, at most once per orientation. Set locations_only: false for signatures. Skip outline for known symbols; use batched read_symbol.',
+  inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, offset },
   handler(args, { root, db }) {
-    const file = repoRelative(root, args.file);
+    if (Boolean(args.file) === Boolean(args.files)) return 'Provide exactly one of file or files.';
+    if (args.files) {
+      const items = args.files.flatMap((input) => {
+        const file = repoRelative(root, input);
+        const entry = file ? fileOutline(db, file) : null;
+        const label = compact(file ?? input, 160);
+        if (!entry) return [`${label}: not indexed; use a ranged Read.`];
+        if (!entry.symbols.length) return [`${label}: no indexed symbols (${entry.status}).`];
+        return entry.symbols.map((s) => `[${s.id}] ${label}:${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind}; ${entry.status})${args.locations_only ? '' : ': ' + compact(s.signature)}`);
+      });
+      return page({
+        items, title: `Files (${args.files.length}; symbol locations):`, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
+        render: (item) => item,
+        next: (offset) => call('outline', { ...args, offset }),
+      });
+    }
+    const file = repoRelative(root, args.file!);
     const entry = file ? fileOutline(db, file) : null;
     if (!entry) return 'File is not indexed. For non-code or unsupported files, use a ranged Read.';
     const title = `${prefixBytes(compact(file!, 100), 250)} (${entry.lines} lines; ${entry.symbols.length} symbols${entry.status === 'ok' ? '' : `; ${entry.status}${entry.reason ? `: ${entry.reason}` : ''}`})`;

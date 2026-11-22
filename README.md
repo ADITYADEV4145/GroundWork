@@ -253,6 +253,25 @@ Every command accepts `--json`.
 ## Benchmark results
 
 <!-- stable-protocol:start -->
+### v8 (PR #39: fresh-root index cloning + bundled service, not shipped)
+
+V8 publishes the completed v8b recollection: 16 sessions per arm per suite, product and unchanged stable-v1 collector/grader pinned to 243bb549e352ee4a63e968230055cda0c165bbe5. The earlier 3e804c9 run was killed and discarded; none of its captures are included.
+
+| Suite | Estimand | Baseline mean | GroundWork mean | Reduction [95% CI] | Success guardrail |
+| --- | --- | --- | --- | --- | --- |
+| nav | Session elapsed/task (ms) | 5349.62 | 6321.17 | -18.2% [-27.1, -10.4] | met: 480/480 / 480/480 |
+| nav | Emitted bytes/session | 34848.31 | 33048.69 | 5.2% [-3.8, 13.2] | met: 480/480 / 480/480 |
+| nav | Tool-side ms/session | 1604.53 | 8739.16 | -444.7% [-501.5, -395.3] | met: 480/480 / 480/480 |
+| long-horizon | Session elapsed/task (ms) | 9308.21 | 10814.69 | -16.2% [-28.7, -4.7] | met: 160/160 / 160/160 |
+| long-horizon | Emitted bytes/session | 5858.75 | 6774.69 | -15.6% [-40.5, 8.2] | met: 160/160 / 160/160 |
+| long-horizon | Tool-side ms/session | 504.32 | 1561.25 | -209.6% [-324.3, -129.9] | met: 160/160 / 160/160 |
+
+Tool-level find_code fell from 434 to 285ms mean per call and LH repo_map from 616 to 337ms (descriptive cross-round), but end to end GroundWork was still significantly slower in both suites: navigation −18.2% [−27.1, −10.4], long-horizon −16.2% [−28.7, −4.7]. Output CIs cross zero in both suites; tool-side time is significantly higher in both. Navigation’s elapsed gap is about 29s per session versus about 7s of additional tool time: most of the loss is outside captured dispatch, in the agent-turn/inter-action portion of the envelope. This residual does not identify model thinking, provider latency or a causal product effect. These product changes were measured and not shipped on main.
+
+Success guardrails are met (480/480 each navigation, 160/160 each LH). Neither suite meets the confirmatory latency-win rule: adjusted 97.5% per-suite lower bounds are −28.35% navigation and −30.45% LH. Positive reduction favors GW; all nominal 95% intervals use the frozen whole-session bootstrap. Equal success is not a correctness win. LH GW16’s 86.216s envelope is complete and valid under the timing rules; it is retained. Tool bytes are not billed tokens or dollar savings.
+
+[Full v8 analysis and tool totals](bench/V8-ANALYSIS.md).
+
 ### Stable protocol (v7)
 
 Completed: 16 sessions per arm per suite (64 total), collector 01b1426; product main at e0cad99, experimental read paths off. All submitted sessions are retained.

@@ -427,11 +427,12 @@ export interface ReuseState {
 }
 
 /** Small session-memory projection; no fingerprints, source reads or parser initialization. */
-export function readSessionSymbols(db: Db) {
+export function readSessionSymbols(db: Db, file?: string) {
   return db.prepare(`SELECT s.id, s.qualified_name, s.kind, s.start_line, s.signature, s.body_hash, f.path
     FROM symbols s JOIN files f ON f.id = s.file_id
     WHERE f.is_test = 0 AND f.is_generated = 0 AND f.status = 'ok' AND s.token_count >= 15
-    ORDER BY f.path, s.start_line`).all().filter((r) =>
+    ${file === undefined ? '' : 'AND f.path = ?'}
+    ORDER BY f.path, s.start_line`).all(...(file === undefined ? [] : [file])).filter((r) =>
       !/^__.*__$/.test(String(r.qualified_name).split('.').at(-1) ?? '') && !/^(get|set)\s/.test(String(r.signature)))
     .map((r) => ({ id: String(r.id), qualifiedName: String(r.qualified_name), kind: String(r.kind),
       line: Number(r.start_line), signature: String(r.signature), bodyHash: String(r.body_hash), file: String(r.path) }));

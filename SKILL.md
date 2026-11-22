@@ -5,8 +5,6 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 # Groundwork
 
-Session reuse memory offers code you wrote in earlier turns before new work; disable it with `reuse.sessionMemory: false`.
-
 Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
 
 ## 1. Navigate: use the cheapest sufficient evidence
@@ -23,6 +21,8 @@ For continuing or long-horizon work, do one orientation step: batched `outline` 
 Fall back to ordinary search and ranged reads for docs, logs, config, unsupported languages, and raw text the index does not hold. If a result is missing or incomplete, check the lines directly. If the MCP server is not connected, `gw symbols` and `gw show` find symbols from the shell.
 
 ## 2. Reuse first: look before you write
+
+Session reuse memory offers code you wrote in earlier turns before new work; disable it with `reuse.sessionMemory: false`.
 
 Before writing a genuinely new non-trivial helper/function (including a class, hook or component with new reusable logic), check for existing code. Skip `find_similar` for small edits, inline code, simple constants and already-confirmed helpers; reuse known symbols directly. Reuse unchanged search evidence across continuing steps and sessions when it is carried into your current context; repeat only if the relevant code changed or the evidence is missing. Default results are actionable reuse/extend matches; request `detail: "full"` only when related matches are useful.
 

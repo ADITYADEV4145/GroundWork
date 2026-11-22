@@ -211,7 +211,6 @@ export function targetsFor(opts: TargetOptions): AgentTarget[] {
       label: 'Cursor',
       edits: [
         cursorHooks(path.join(root, '.cursor', 'hooks.json'), {
-          beforeSubmitPrompt: [{ command: `${gw} hook cursor prompt` }],
           preToolUse: [{ matcher: 'Read|Shell', command: `${gw} hook cursor pre_tool` }],
           postToolUse: [{ matcher: 'Read|Shell|Write|Edit|MCP:find_code', command: `${gw} hook cursor post_tool` }],
           preCompact: [{ command: `${gw} hook cursor pre_compact` }],

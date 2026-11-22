@@ -14,22 +14,22 @@ const memorySchema = z.object({ turn: z.number().int().nonnegative().default(0),
 export function sessionMemory(root: string, session: string) {
   return memorySchema.parse(readSessionLedger(root, session));
 }
-export function memorySymbols(root: string): Omit<SessionWritten, 'turn'>[] {
+export function memorySymbols(root: string, file?: string): Omit<SessionWritten, 'turn'>[] {
   if (!existsSync(indexDbPath(root))) return [];
   const db = openDb(indexDbPath(root), { readonly: true });
   try {
-    return readSessionSymbols(db);
+    return readSessionSymbols(db, file);
   } finally { db.close(); }
 }
-export function recordWritten(root: string, session: string, before: Omit<SessionWritten, 'turn'>[], after: Omit<SessionWritten, 'turn'>[]): void {
+export function recordWritten(root: string, session: string, before: Omit<SessionWritten, 'turn'>[], after: Omit<SessionWritten, 'turn'>[], file?: string): void {
   const previous = new Map(before.map((s) => [s.id, s.bodyHash]));
   const current = new Map(after.map((s) => [s.id, s]));
   updateSessionLedger(root, session, (ledger) => {
     const memory = memorySchema.parse(ledger);
     const changed = after.filter((s) => previous.get(s.id) !== s.bodyHash);
     const changedIds = new Set(changed.map((s) => s.id));
-    const written = memory.written.filter((s) => current.has(s.id) && !changedIds.has(s.id))
-      .map((s) => ({ ...current.get(s.id)!, turn: s.turn }));
+    const written = memory.written.filter((s) => (file !== undefined && s.file !== file) || (current.has(s.id) && !changedIds.has(s.id)))
+      .map((s) => current.has(s.id) ? { ...current.get(s.id)!, turn: s.turn } : s);
     return { ...ledger, written: [...written, ...changed.map((s) => ({ ...s, turn: memory.turn }))].slice(-200) };
   });
 }

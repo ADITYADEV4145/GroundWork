@@ -195,7 +195,7 @@ The map is shared; hook capabilities differ.
 | --- | --- | --- | --- |
 | MCP navigation and reuse tools | Yes | Yes | Yes |
 | Index refresh and grounding notes after edits | Yes | Yes | Yes |
-| Earlier-turn session code reminders | Yes | Yes | Yes |
+| Earlier-turn session code reminders | Yes | Yes | — |
 | Unchanged-file read guard | Yes | — | — |
 | Automatic noisy-command wrapping | Yes | — | — |
 | Stop findings in `standard` | Warnings | Warnings | Not shown |

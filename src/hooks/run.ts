@@ -59,8 +59,6 @@ const CLAUDE_EVENT: Record<HookEventName, string> = {
 function renderCursor(ev: HookEvent, r: HookResult): string {
   const msg = r.action === 'allow' ? undefined : r.message;
   switch (ev.event) {
-    case 'prompt':
-      return msg ? JSON.stringify({ continue: true, additional_context: msg }) : '';
     case 'pre_tool':
       return JSON.stringify(r.action === 'deny' && msg ? { permission: 'deny', agent_message: msg, user_message: msg } : { permission: 'allow' });
     case 'post_tool':

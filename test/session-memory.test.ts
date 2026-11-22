@@ -1,6 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import * as memory from '../src/hooks/session-memory.js';
 import { defaultConfig } from '../src/config/load.js';
 import { refreshOnEdit } from '../src/hooks/handlers/refresh_on_edit.js';
 import { sessionMemoryPrompt } from '../src/hooks/handlers/session_memory.js';
@@ -33,9 +34,46 @@ describe('session reuse memory', () => {
         const hookEdit = target.edits.find((e) => e.kind === 'json' && (e.file.endsWith('hooks.json') || e.file.endsWith('settings.json')))!;
         const doc = {};
         if (hookEdit.kind === 'json') hookEdit.add(doc, new Set());
-        expect(JSON.stringify(doc)).toContain(`gw hook ${agent} prompt`);
-        expect(render(normalise(agent, 'prompt', {}), { action: 'context', message: 'Reuse earlier code' })).toContain('Reuse earlier code');
+        if (agent === 'cursor') {
+          expect(JSON.stringify(doc)).not.toContain('gw hook cursor prompt');
+          expect(render(normalise(agent, 'prompt', {}), { action: 'context', message: 'Reuse earlier code' })).toBe('');
+        } else {
+          expect(JSON.stringify(doc)).toContain(`gw hook ${agent} prompt`);
+          expect(render(normalise(agent, 'prompt', {}), { action: 'context', message: 'Reuse earlier code' })).toContain('Reuse earlier code');
+        }
       }
+    });
+  });
+  it('scopes edit reads and removal to the edited file, with full-scan fallback', async () => {
+    await withCheckScenario('clean', async (root) => {
+      await initSqlBackend();
+      await refreshIndex(root);
+      nextTurn(root, 'scoped');
+      const ctx = { root, config: defaultConfig() };
+      const edit = (file?: string) => refreshOnEdit.run(normalise('claude', 'post_tool', {
+        session_id: 'scoped', cwd: root, tool_name: 'Write', tool_input: file ? { file_path: file } : {},
+      }), ctx);
+      const reads = vi.spyOn(memory, 'memorySymbols');
+      try {
+        writeScenarioFile(root, 'a.ts', source);
+        await edit('a.ts');
+        const first = sessionMemory(root, 'scoped').written;
+        expect(reads.mock.calls).toEqual([[root, 'a.ts'], [root, 'a.ts']]);
+        reads.mockClear();
+        writeScenarioFile(root, 'b.ts', source.replaceAll('sessionHelper', 'otherHelper'));
+        await edit('b.ts');
+        expect(reads.mock.calls).toEqual([[root, 'b.ts'], [root, 'b.ts']]);
+        expect(memorySymbols(root, 'b.ts').map((s) => s.file)).toEqual(['b.ts']);
+        expect(sessionMemory(root, 'scoped').written).toEqual([...first, expect.objectContaining({ file: 'b.ts' })]);
+        writeScenarioFile(root, 'a.ts', '');
+        await edit('a.ts');
+        expect(sessionMemory(root, 'scoped').written.map((s) => s.file)).toEqual(['b.ts']);
+        writeScenarioFile(root, 'b.ts', '');
+        reads.mockClear();
+        await edit();
+        expect(reads.mock.calls).toEqual([[root, undefined], [root, undefined]]);
+        expect(sessionMemory(root, 'scoped').written).toEqual([]);
+      } finally { reads.mockRestore(); }
     });
   });
   it('counts turns, records new and changed symbols, skips unchanged/tests/generated/noise, drops removed symbols', async () => {

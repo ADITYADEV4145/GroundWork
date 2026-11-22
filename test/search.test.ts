@@ -1,8 +1,9 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { rmSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { evaluateTask, manifest, metrics, prepareBenchmarkEmbeddings } from '../bench/search/run.js';
+import { benchmarkOutput, evaluateTask, manifest, metrics, prepareBenchmarkEmbeddings } from '../bench/search/run.js';
 import { defaultConfig } from '../src/config/load.js';
 import { findCode } from '../src/index/navigation.js';
 import { searchDocuments } from '../src/index/query.js';
@@ -12,10 +13,20 @@ import { TOOLS } from '../src/mcp/tools/index.js';
 import * as embeddings from '../src/reuse/embeddings.js';
 import { searchCode } from '../src/search/index.js';
 import { alternatives, reciprocalRankFusion, stemTerm, terms } from '../src/search/terms.js';
-import { withIndexedFixture } from '../src/selftest/fixtures.js';
+import { tempDir, withIndexedFixture } from '../src/selftest/fixtures.js';
 import { estimateTokens } from '../src/util/tokens.js';
 
 describe('plain-English search', () => {
+  it('refuses published or existing benchmark output and accepts only a new explicit directory', () => {
+    const root = tempDir('gw-search-output-');
+    try {
+      expect(() => benchmarkOutput([], 2)).toThrow('Refusing to overwrite');
+      expect(() => benchmarkOutput(['--out', root], 2)).toThrow('Refusing to overwrite');
+      expect(() => benchmarkOutput(['--out'], 2)).toThrow('--out requires');
+      expect(() => benchmarkOutput(['--out', '--v2'], 2)).toThrow('--out requires');
+      expect(benchmarkOutput(['--out', path.join(root, 'new')], 2)).toBe(path.join(root, 'new'));
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
   it('collects call and literal evidence with two queries independent of symbol count', async () => {
     await withIndexedFixture('ts-app', async (db) => {
       const prepare = vi.spyOn(db, 'prepare');

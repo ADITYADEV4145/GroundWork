@@ -32,3 +32,8 @@ for settings-like double stems. By inspection only, task `v2-p37` contains
 `settings` ("fill missing settings from a named preset without overriding explicit values").
 The correction is not re-measured; no v2 evaluation was repeated and the frozen
 tasks and raw results remain unchanged.
+
+The runner now refuses existing results directories before evaluation; an
+intentional independent rerun must select `--out <new directory>`. This protects
+the published results from overwrite or accidental loss of the hybrid arm.
+This harness correction is not re-measured on v2.

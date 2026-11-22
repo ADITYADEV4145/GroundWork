@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -51,14 +51,22 @@ export function prepareBenchmarkEmbeddings(roots: string[], consent: boolean,
   } catch (error) { return { semanticStatus: 'NOT RUN', semanticReason: (error as Error).message }; }
 }
 
+export function benchmarkOutput(args: string[], version: number): string {
+  const at = args.indexOf('--out');
+  const output = at < 0 ? path.join(HERE, version === 2 ? 'results-v2' : 'results') : args[at + 1];
+  if (!output || output.startsWith('--')) throw new Error('--out requires a new output directory');
+  const resolved = path.resolve(output);
+  if (existsSync(resolved)) throw new Error(`Refusing to overwrite benchmark results: ${resolved}. Use --out <new directory>.`);
+  return resolved;
+}
+
 async function run() {
   const version = process.argv.includes('--v2') ? 2 : 1;
   const manifestSha = version === 2 ? V2_MANIFEST_SHA : MANIFEST_SHA;
   const frozen = manifest(version);
+  const results = process.argv.includes('--validate-only') ? '' : benchmarkOutput(process.argv.slice(2), version);
   execFileSync('git', ['merge-base', '--is-ancestor', frozen.anchor, 'HEAD'], { cwd: REPO });
-  const workspace = path.join(os.homedir(), `groundwork-search-${process.argv.includes('--validate-only') ? 'validation' : 'evaluation'}-v${version}`);
-  if (existsSync(workspace)) throw new Error(`Refusing to reuse benchmark workspace: ${workspace}`);
-  mkdirSync(workspace);
+  const workspace = mkdtempSync(path.join(os.homedir(), `groundwork-search-${process.argv.includes('--validate-only') ? 'validation' : 'evaluation'}-v${version}-`));
   const archive = execFileSync('git', ['archive', frozen.anchor, 'src', 'fixtures/py-app/app'], { cwd: REPO, maxBuffer: 50 * 1024 * 1024 });
   execFileSync('tar', ['-x', '-C', workspace], { input: archive });
   const roots = { groundwork: workspace, python: path.join(workspace, 'fixtures/py-app') };
@@ -86,8 +94,8 @@ async function run() {
     const controls = (['recall1', 'recall5', 'mrr'] as const).every((m) => get('lexical', 'exact')[m] >= get('baseline', 'exact')[m]);
     const pass = gain >= 0.15 && controls;
     const result = { anchor: frozen.anchor, manifestSha256: manifestSha, semanticStatus, semanticReason, summary, gain, controls, gate: pass ? 'PASS' : 'FAIL', rows };
-    const results = path.join(HERE, version === 2 ? 'results-v2' : 'results');
-    mkdirSync(results, { recursive: true });
+    mkdirSync(path.dirname(results), { recursive: true });
+    mkdirSync(results);
     writeFileSync(path.join(results, 'results.json'), JSON.stringify(result, null, 2) + '\n');
     const percent = (n: number) => (100 * n).toFixed(1) + '%';
     const md = `# Natural-language search — frozen v${version} results\n\nDeterministic retrieval only, not an agent evaluation. No speed, token or cost claims.\n\n| Arm | Set | N | Recall@1 | Recall@5 | MRR |\n| --- | --- | ---: | ---: | ---: | ---: |\n${summary.map((s) => `| ${s.arm} | ${s.set} | ${s.tasks} | ${percent(s.recall1)} | ${percent(s.recall5)} | ${s.mrr.toFixed(4)} |`).join('\n')}\n\n**Gate: ${result.gate}.** Paraphrase Recall@5 gain: ${(100 * gain).toFixed(1)} points (required ≥15). Exact controls no drop: ${controls ? 'PASS' : 'FAIL'}.\n\nEmbeddings: ${semanticStatus}. ${semanticReason}\n\nCorpus anchor: ${frozen.anchor}. Manifest SHA256: ${manifestSha}.\nAll 50 target IDs validated. One full evaluation, no post-result tuning.\nMRR retrieval horizon: search API returns at most 100 hits; baseline uses its full result list.\nFull returned ID lists and per-task ranks are retained in results.json.\nLimitations: small author-written corpus; behavior paraphrases are not an independent user sample.\n${version === 2 ? 'V1 remains FAIL. V2 ranking used v1 failures, not v2 outcomes. PREREGISTRATION-v2-main.md supersedes the unrun old-main anchor without query changes.\n' : ''}`;

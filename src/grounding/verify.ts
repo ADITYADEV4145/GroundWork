@@ -23,7 +23,7 @@ import { renderSuggestions, suggest, type Suggestion } from './suggest.js';
 // Grounding (Phase 4): flag imports, calls and arguments the agent invented. Precision first: every rule
 // only fires when the index proves the error; anything dynamic, unparsed, external or ambiguous is skipped.
 
-export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword';
+export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword' | 'type';
 
 export interface Finding {
   file: string;
@@ -35,6 +35,8 @@ export interface Finding {
   /** Definite errors the Stop gate / `gw check` may block on. */
   blocking: boolean;
   suggestions: Suggestion[];
+  typeConfirmed?: boolean;
+  typeBlocking?: boolean;
 }
 
 export interface VerifyResult {
@@ -55,7 +57,7 @@ export interface VerifyOptions {
 const CALLABLE = new Set(['function', 'method', 'class', 'component', 'dataclass']);
 const POOL_KINDS = ['function', 'method', 'class', 'component', 'dataclass', 'constant', 'variable', 'interface', 'type', 'enum'] as const;
 const SAFE_PY_DECORATORS = new Set(['staticmethod', 'classmethod', 'abstractmethod', 'abc.abstractmethod', 'override', 'typing.override', 'typing_extensions.override']);
-const DYNAMIC_TEXT = /\b(setattr|__getattr__|__getattribute__|Proxy|Reflect\.|Object\.assign|Object\.defineProperty|defineProperty|mixin|Mixin|prototype)\b/;
+export const DYNAMIC_TEXT = /\b(setattr|__getattr__|__getattribute__|Proxy|Reflect\.|Object\.assign|Object\.defineProperty|defineProperty|mixin|Mixin|prototype)\b/;
 type Lookup = SymbolFact | 'module' | 'unknown' | null;
 
 const isTs = (f: FileFacts) => f.language === 'typescript' || f.language === 'tsx';

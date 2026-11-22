@@ -4,6 +4,7 @@ import { navigationConfigSchema } from './sections/navigation.js';
 import { reuseConfigSchema } from './sections/reuse.js';
 import { groundingConfigSchema } from './sections/grounding.js';
 import { guardsConfigSchema } from './sections/guards.js';
+import { typesConfigSchema } from './sections/types.js';
 
 // Each section lives in its own file so feature streams can extend their part without touching the others.
 export const configSchema = z
@@ -15,6 +16,7 @@ export const configSchema = z
     reuse: reuseConfigSchema.default(reuseConfigSchema.parse({})),
     grounding: groundingConfigSchema.default(groundingConfigSchema.parse({})),
     guards: guardsConfigSchema.default(guardsConfigSchema.parse({})),
+    types: typesConfigSchema.default(typesConfigSchema.parse({})),
   })
   .strict();
 

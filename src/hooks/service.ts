@@ -3,6 +3,7 @@ import path from 'node:path';
 import { findRepoRoot } from '../util/paths.js';
 import { dispatch, normalise, render } from './run.js';
 import type { AgentName, HookEventName } from './types.js';
+import { loadConfig } from '../config/load.js';
 
 export async function serviceHook(root: string, message: { groundworkCwd?: unknown; agent?: unknown; event?: unknown; raw?: unknown }): Promise<string | null> {
   if (!['claude', 'codex', 'cursor'].includes(message.agent as string) || !['pre_tool', 'post_tool'].includes(message.event as string)) return '';
@@ -14,6 +15,7 @@ export async function serviceHook(root: string, message: { groundworkCwd?: unkno
   } catch { return null; }
   let timer: NodeJS.Timeout | undefined;
   try {
+    if (message.event === 'post_tool' && loadConfig(root).types.postToolHook) return null;
     const ev = normalise(message.agent as AgentName, message.event as HookEventName, message.raw, cwd);
     const timeout = new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), 250); });
     const result = await Promise.race([dispatch(ev, root), timeout]);

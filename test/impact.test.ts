@@ -39,6 +39,17 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('only applies whole-path runner exclusions, not individual node ids', () => {
+    const root = fixture();
+    for (const option of ['--deselect', '--ignore']) {
+      const record = (session: string, value: string) => recordImpactEvidence(root, { ...stopEvent(root, false, session), event: 'post_tool', tool: 'Bash', input: { command: `pytest ${option}=${value} tests` }, response: 'passed' });
+      record(option + '-node', 'tests/unit/test_api.py::test_one');
+      expect(sessionEvidence(root, option + '-node').ran('tests/unit/test_api.py')).toBe(true);
+      record(option + '-file', 'tests/unit/test_api.py');
+      expect(sessionEvidence(root, option + '-file').ran('tests/unit/test_api.py')).toBe(false);
+      expect(sessionEvidence(root, option + '-file').ran('tests/unit/test_other.py')).toBe(true);
+    }
+  });
   it('does not claim file-level test coverage for runner name or marker filters', () => {
     const root = fixture();
     for (const filter of ['-k smoke', '-m slow', '-t case', '--testNamePattern=case', '--grep case']) {

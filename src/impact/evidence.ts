@@ -103,7 +103,7 @@ export function sessionEvidence(root: string, sessionId?: string) {
       const value = equals < 0 ? args[++i] : arg.slice(equals + 1);
       if (!value || value.startsWith('-')) return false;
       if (discoveryOptions.has(flag)) discovery.push(value);
-      if (flag === '--ignore' || flag === '--deselect') exclusions.push(value);
+      if ((flag === '--ignore' || flag === '--deselect') && !value.includes('::')) exclusions.push(value);
     }
     const matches = (a: string) => {
       if (a === '.' || a === './') return path.resolve(root, file).startsWith(path.resolve(cwd) + path.sep);

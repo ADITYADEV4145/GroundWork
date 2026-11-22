@@ -39,6 +39,13 @@ async function run(root: string, sessionId?: string, c = config(), refresh = tru
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('change impact', () => {
+  it('treats any deselected test node as unknown coverage for its containing file', () => {
+    const root = fixture();
+    recordImpactEvidence(root, { ...stopEvent(root, false, 'only-node'), event: 'post_tool', tool: 'Bash', input: { command: 'pytest --deselect tests/unit/test_api.py::test_only tests' }, response: 'passed' });
+    const evidence = sessionEvidence(root, 'only-node');
+    expect(evidence.ran('tests/unit/test_api.py')).toBe(false);
+    expect(evidence.ran('tests/unit/test_other.py')).toBe(true);
+  });
   it('does not treat the pytest rootdir option as a collection restriction', () => {
     const root = fixture();
     for (const [session, command] of [['default-root', 'pytest --rootdir=tests/unit'], ['explicit-path', 'pytest --rootdir tests/unit tests/integration']]) {
@@ -47,12 +54,12 @@ describe('change impact', () => {
     }
     expect(sessionEvidence(root, 'explicit-path').ran('tests/unit/test_api.py')).toBe(false);
   });
-  it('only applies whole-path runner exclusions, not individual node ids', () => {
+  it('distinguishes literal ignore paths from conservative deselection coverage', () => {
     const root = fixture();
     for (const option of ['--deselect', '--ignore']) {
       const record = (session: string, value: string) => recordImpactEvidence(root, { ...stopEvent(root, false, session), event: 'post_tool', tool: 'Bash', input: { command: `pytest ${option}=${value} tests` }, response: 'passed' });
       record(option + '-node', 'tests/unit/test_api.py::test_one');
-      expect(sessionEvidence(root, option + '-node').ran('tests/unit/test_api.py')).toBe(true);
+      expect(sessionEvidence(root, option + '-node').ran('tests/unit/test_api.py')).toBe(option === '--ignore');
       record(option + '-file', 'tests/unit/test_api.py');
       expect(sessionEvidence(root, option + '-file').ran('tests/unit/test_api.py')).toBe(false);
       expect(sessionEvidence(root, option + '-file').ran('tests/unit/test_other.py')).toBe(true);

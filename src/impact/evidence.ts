@@ -95,7 +95,7 @@ export function sessionEvidence(root: string, sessionId?: string) {
     for (let i = 0; i < args.length; i++) {
       const arg = args[i]!;
       if (arg === '--') continue;
-      if (!arg.startsWith('-')) { selectors.push(arg); continue; }
+      if (!arg.startsWith('-')) { selectors.push(arg.split('::')[0]!); continue; }
       const equals = arg.indexOf('='), flag = equals < 0 ? arg : arg.slice(0, equals);
       if (nameFilters.has(flag)) return false;
       if (flags.has(flag)) continue;
@@ -103,11 +103,12 @@ export function sessionEvidence(root: string, sessionId?: string) {
       const value = equals < 0 ? args[++i] : arg.slice(equals + 1);
       if (!value || value.startsWith('-')) return false;
       if (discoveryOptions.has(flag)) discovery.push(value);
-      if ((flag === '--ignore' || flag === '--deselect') && !value.includes('::')) exclusions.push(value);
+      if (flag === '--ignore') exclusions.push(value);
+      if (flag === '--deselect') exclusions.push(value.split('::')[0]!);
     }
     const matches = (a: string) => {
       if (a === '.' || a === './') return path.resolve(root, file).startsWith(path.resolve(cwd) + path.sep);
-      const selected = repoRelative(root, a.split('::')[0]!, cwd);
+      const selected = repoRelative(root, a, cwd);
       return !!selected && (selected === file || file.startsWith(selected.replace(/\/$/, '') + '/'));
     };
     if (!discovery.every(matches)) return false;

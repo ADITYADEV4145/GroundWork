@@ -28,6 +28,8 @@ sessionEndedAt. This harness owns the timestamps, not the outer model dispatch:
 provisioning, install/build, pre-init instructions and final export are excluded.
 Do not call state-free list or inspect prompts/source before init/list STATE.
 These are session-envelope measurements, not provider reasoning time.
+Legacy invocations without stable-v1 record a first-captured-action start instead;
+that fallback is labeled separately and is not eligible for v7 collection.
 
 Every read/mcp/shell action, including errors and empty responses, records epoch
 startedAt/endedAt and monotonic durationMs around dispatch, hooks, transport and
@@ -53,8 +55,9 @@ error, not zero tool time. Success is a guardrail: no category may have fewer GW
 successes; report counts/failures alongside performance, with no correctness-win
 claim from equal scores. Never drop a failed task's costs.
 
-Latency (1) is the confirmatory primary per suite; bytes/tool time are secondary
-primary cost estimands, not alternative ways to declare an agent-latency win.
+All three are pre-registered primary estimands. Latency (1) is the confirmatory
+outcome per suite; bytes/tool time are primary cost reports, not alternative ways
+to declare an agent-latency win.
 Show nominal 95% intervals for all three. For a confirmatory latency win require
 the success guardrail and a positive lower bound at 97.5% per-suite confidence
 (Bonferroni across two suites); additionally show that adjusted bound. No overall
@@ -70,3 +73,20 @@ Old files have no tool-side durations: report unavailable. Do not modify archive
 published rows, or infer provider/VM time from residuals. Six changed rounds are
 not independent replications of one treatment. New-session bootstrap precision
 does not measure unobserved provider-wave or new-project variance.
+
+## Commands
+
+Build the pinned collector/grader checkout, then combine without updating historical
+comparison tables/charts:
+
+```sh
+npm run build
+node scripts/bench-combine-v2.mjs --experiment v7 --build /path/to/pinned-checkout \
+  --nav-captures /path/to/nav-exports --lh-captures /path/to/lh-exports
+node scripts/bench-historical.mjs /path/outside/repo/historical-sensitivity.md
+```
+
+V7 requires 32 exports per suite, stable-v1 timing, runs 1–16 in each arm, and a
+grader checkout whose HEAD matches every capture. Extra runs are rejected, not
+silently filtered. Results/archive destinations are bench/{nav,long-horizon}/v7;
+existing observation files cannot be replaced with differing bytes.

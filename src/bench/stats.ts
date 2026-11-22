@@ -1,4 +1,5 @@
 import type { Evidence, Sample, Suite } from './schema.js';
+import { sessionSummary } from './session-stats.js';
 
 const add = (values: number[]) => values.reduce((acc, v) => acc + v, 0);
 
@@ -106,6 +107,7 @@ export function summarize(suite: Suite, suiteName: string, evidence: Evidence, r
   return {
     suite: suiteName, revision: suite.revision, captureRevision: first.captureRevision, agent: first.agent, model: first.model, runs,
     baseline: baselineTotals, groundwork: treatmentTotals, categories, tasks: rows, metrics,
+    sessionPrimary: sessionSummary(evidence, suite.tasks.length, runs),
     estimatedToolOutputReductionPct: interval(estimatedReductions), toolOutputReductionCoverage: estimatedReductions.length,
     modelInputReductionPct: modelReductions.length === rows.length ? interval(modelReductions) : null,
     wallTimeReductionPct: interval(valid(rows.map((row) => reduction(row.baseline.wallMs, row.groundwork.wallMs)))),

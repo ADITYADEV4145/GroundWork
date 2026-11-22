@@ -49,9 +49,10 @@ test('v3 option selects isolated directories and the round-2 build revision rega
   assert.equal(config.navBuild, '/build');
   assert.equal(config.lhBuild, '/build');
   assert.equal(options(['--experiment', 'v3', '--nav-captures', '/nav3']).navCaptures, '/nav3');
-  assert.throws(() => options(['--experiment', 'v7']), /Use/);
+  assert.equal(options(['--experiment', 'v7']).runs, 16);
+  assert.throws(() => options(['--experiment', 'v8']), /Use/);
   assert.throws(() => combine({ ...config, runs: 3 }), /eight runs/);
-  assert.throws(() => combine({ ...config, experiment: 'v7' }), /Unknown experiment/);
+  assert.throws(() => combine({ ...config, experiment: 'v8' }), /Unknown experiment/);
   assert.throws(() => validateCaptures(path.join(root, 'bench/nav/v2/observations'), 'nav', 8, ROUND2_REVISION), /provenance/);
 });
 test('v4 option selects isolated directories and requires the round-3 build revision', () => {

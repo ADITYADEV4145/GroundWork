@@ -27,6 +27,7 @@ export const observationSchema = z.object({
   task: label,
   startedAt: count,
   wallMs: count,
+  endedAt: count.optional(),
   answer: z.array(z.string()).max(100).optional(),
   patch: z.string().max(1_000_000).optional(),
   usage: usage.optional(),
@@ -37,8 +38,14 @@ export const observationSchema = z.object({
     readBytes: count.optional(),
     file: z.string().optional(),
     blocked: z.boolean().optional(),
-  })).max(1_000),
-});
+    startedAt: count.optional(),
+    endedAt: count.optional(),
+    durationMs: z.number().finite().nonnegative().optional(),
+  }).refine((t) => {
+    const times = [t.startedAt, t.endedAt, t.durationMs];
+    return times.every((x) => x === undefined) || (times.every((x) => x !== undefined) && t.endedAt! >= t.startedAt!);
+  }, 'Incomplete or reversed action timing')).max(1_000),
+}).refine((o) => o.endedAt === undefined || o.endedAt === o.startedAt + o.wallMs, 'Inconsistent task end');
 export type Observation = z.infer<typeof observationSchema>;
 
 const runMetadata = z.object({
@@ -51,8 +58,15 @@ const runMetadata = z.object({
   node: z.string().min(1),
   captureRevision: revision,
   sessionUrl: z.url().optional(),
+  protocol: z.literal('stable-v1').optional(),
+  sessionStartedAt: count.optional(),
+  sessionEndedAt: count.optional(),
+  sessionStartBasis: z.enum(['workspace-ready', 'first-captured-action']).optional(),
 });
-export const captureSchema = runMetadata.extend({ observations: z.array(observationSchema).min(1) });
+export const captureSchema = runMetadata.extend({ observations: z.array(observationSchema).min(1) }).refine((c) =>
+  c.protocol !== 'stable-v1' || (c.sessionStartedAt !== undefined && c.sessionEndedAt !== undefined && c.sessionStartBasis !== undefined &&
+    c.sessionEndedAt >= c.sessionStartedAt && c.observations.every((o) => o.endedAt !== undefined && o.startedAt >= c.sessionStartedAt! && o.endedAt <= c.sessionEndedAt! &&
+      o.tools.every((t) => t.startedAt !== undefined && t.startedAt >= o.startedAt && t.endedAt! <= o.endedAt!))), 'Incomplete stable timing');
 export type Capture = z.infer<typeof captureSchema>;
 
 export const gradeSchema = z.union([z.boolean(), z.object({
@@ -68,6 +82,9 @@ export const sampleSchema = z.object({
   readBytes: count,
   readBlocks: count,
   wallMs: count,
+  startedAt: count.optional(),
+  endedAt: count.optional(),
+  toolSideMs: z.number().finite().nonnegative().optional(),
   usage: usage.optional(),
   metrics: z.record(metricNames, z.number().finite()).optional(),
 });

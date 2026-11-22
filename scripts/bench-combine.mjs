@@ -23,9 +23,9 @@ export function options(args) {
   return result;
 }
 
-export function validateCaptures(directory, suite, runs, captureRevision = pins[suite]) {
+export function validateCaptures(directory, suite, runs, captureRevision = pins[suite], strict = false) {
   const rows = readdirSync(directory).filter((p) => p.endsWith('.json')).map((p) => ({ source: path.join(directory, p), capture: json(path.join(directory, p)) }))
-    .filter(({ capture: c }) => !Number.isInteger(c.run) || c.run <= runs);
+    .filter(({ capture: c }) => strict || !Number.isInteger(c.run) || c.run <= runs);
   const pairs = new Set();
   for (const { capture: c } of rows) {
     if (c.suite !== suite || c.captureRevision !== captureRevision || c.node !== 'v24.22.2' || c.agent !== 'Devin normal' || c.model !== null) throw new Error(`Unexpected ${suite} capture provenance`);
@@ -47,19 +47,21 @@ export function planArchive(rows, directory, prefix) {
 }
 
 export function combine(config) {
-  const after = ['v2', 'v3', 'v4', 'v5', 'v6'].includes(config.experiment);
-  if (config.experiment && !after) throw new Error('Unknown experiment; expected v2, v3, v4, v5 or v6');
-  if (after && config.runs !== 8) throw new Error(`The ${config.experiment} comparison requires eight runs per arm`);
+  const stable = config.experiment === 'v7';
+  const after = ['v2', 'v3', 'v4', 'v5', 'v6', 'v7'].includes(config.experiment);
+  if (config.experiment && !after) throw new Error('Unknown experiment; expected v2, v3, v4, v5, v6 or v7');
+  if (after && config.runs !== (stable ? 16 : 8)) throw new Error(`The ${config.experiment} comparison requires ${stable ? 'sixteen' : 'eight'} runs per arm`);
   const destination = after ? config.outputRoot ?? root : root;
   const suiteDir = (suite) => path.join(destination, 'bench', suite, ...(after ? [config.experiment] : []));
   const scratch = mkdtempSync(path.join(os.homedir(), 'bench-combine-'));
   const reports = [];
   for (const [suite, directory, build] of [['nav', config.navCaptures, config.navBuild], ['long-horizon', config.lhCaptures, config.lhBuild]]) {
     const revision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: build, encoding: 'utf8' }).trim();
-    const expected = after ? config.captureRevision : pins[suite];
+    const expected = stable ? revision : after ? config.captureRevision : pins[suite];
     if (!expected || revision !== expected) throw new Error(`Expected ${suite} build checkout ${expected}, got ${revision}`);
-    const rows = validateCaptures(directory, suite, config.runs, expected);
-    const prefix = ['v3', 'v4', 'v5', 'v6'].includes(config.experiment) ? `${suite === 'nav' ? 'nav' : 'lh'}${config.experiment.slice(1)}` : (suite === 'nav' ? 'nav' : 'lh2');
+    const rows = validateCaptures(directory, suite, config.runs, expected, stable);
+    if (stable && rows.some(({ capture: c }) => c.protocol !== 'stable-v1')) throw new Error('V7 requires stable-v1 instrumentation');
+    const prefix = ['v3', 'v4', 'v5', 'v6', 'v7'].includes(config.experiment) ? `${suite === 'nav' ? 'nav' : 'lh'}${config.experiment.slice(1)}` : (suite === 'nav' ? 'nav' : 'lh2');
     const copies = planArchive(rows, path.join(suiteDir(suite), 'observations'), prefix);
     const output = path.join(scratch, suite);
     const input = path.join(scratch, `${suite}-captures`);
@@ -73,7 +75,9 @@ export function combine(config) {
     const report = data[0];
     const { summary: s } = report;
     if (data.length !== 1 || s.suite !== suite || s.runs !== config.runs || report.evidence.captures.some((c) => c.captureRevision !== expected)) throw new Error(`Invalid ${suite} grader report`);
-    console.log(`${suite}: ${s.runs} runs, success ${s.baseline.success}/${s.baseline.attempts} vs ${s.groundwork.success}/${s.groundwork.attempts}; tool-output reduction ${JSON.stringify(s.estimatedToolOutputReductionPct)}; wall reduction ${JSON.stringify(s.wallTimeReductionPct)}`);
+    if (stable && (s.sessionPrimary?.basis !== 'recorded-session' || !s.sessionPrimary.elapsedMsPerTask || !s.sessionPrimary.emittedBytesPerSession || !s.sessionPrimary.toolSideMsPerSession)) throw new Error('V7 requires a session-primary grader report');
+    if (stable) console.log(`${suite}: ${s.runs} sessions/arm; success guardrail ${s.noSuccessDrop}; session-primary ${JSON.stringify(s.sessionPrimary)}`);
+    else console.log(`${suite}: ${s.runs} runs, success ${s.baseline.success}/${s.baseline.attempts} vs ${s.groundwork.success}/${s.groundwork.attempts}; tool-output reduction ${JSON.stringify(s.estimatedToolOutputReductionPct)}; wall reduction ${JSON.stringify(s.wallTimeReductionPct)}`);
     reports.push({ suite, copies, report, markdown: readFileSync(path.join(output, resultFile.replace(/\.json$/, '.md')), 'utf8') });
   }
   for (const { suite, copies, report, markdown } of reports) {
@@ -85,9 +89,10 @@ export function combine(config) {
     writeFileSync(path.join(dir, 'results/combined.json'), JSON.stringify([report], null, 2) + '\n');
     writeFileSync(path.join(dir, 'results/combined.md'), markdown);
   }
-  if (after) generateComparison(destination);
+  if (stable) console.log('V7 session-primary reports written; historical publication unchanged.');
+  else if (after) generateComparison(destination);
   else generate();
-  console.log(`Combined evidence, reports, raw exports and charts updated. Grader scratch: ${scratch}`);
+  console.log(`${stable ? 'V7 evidence, reports and raw exports' : 'Combined evidence, reports, raw exports and charts'} updated. Grader scratch: ${scratch}`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) combine(options(process.argv.slice(2)));

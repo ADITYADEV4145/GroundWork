@@ -1,8 +1,8 @@
 # Dependency-hallucination gate: v2 protocol, rerun after review fixes
 
-The checker changed after the [v2 result](../results-v2/RESULTS.md) to fix four rounds of code-review findings (none drawn from the benchmark cases), so the unchanged v2 protocol and cases were run again on the fixed code. The same eight cases are missed. The accepted-check count differs because Groundwork's own source, which is one of the accepted corpora, grew.
+The checker changed after the [v2 result](../results-v2/RESULTS.md) to fix code-review findings (none drawn from the benchmark cases), so the unchanged v2 protocol and cases were run again on the fixed code. The same eight cases are missed. The accepted-check count differs because Groundwork's own source, which is one of the accepted corpora, grew.
 
-Protocol: [PREREGISTRATION-v2.md](../PREREGISTRATION-v2.md); the first run is in [../results](../results/RESULTS.md). Commit `01a1aa436d`, Node v24.22.2. Raw data: [result.json](result.json).
+Protocol: [PREREGISTRATION-v2.md](../PREREGISTRATION-v2.md); the first run is in [../results](../results/RESULTS.md). Commit `8eeb99d1c2`, Node v24.22.2. Raw data: [result.json](result.json).
 
 **Gate: PASS**
 
@@ -10,8 +10,8 @@ Protocol: [PREREGISTRATION-v2.md](../PREREGISTRATION-v2.md); the first run is in
 | --- | --- | --- | --- |
 | Valid cases | 69 of 69 | ≥ 60, ≥ 8 per ecosystem | pass |
 | Recall | 61/69 (88.4%) | ≥ 80% | pass |
-| False blocks | 0 in 8221 accepted checks (0 per 100) | ≤ 1 per 100 | pass |
-| Index time, cold | 3.1 s for 1048 packages | < 30 s for ≥ 500 | pass |
+| False blocks | 0 in 8448 accepted checks (0 per 100) | ≤ 1 per 100 | pass |
+| Index time, cold | 3.3 s for 1048 packages | < 30 s for ≥ 500 | pass |
 | Network calls | 0 | 0 | pass |
 
 Of the caught cases, 100% block; the rest are warnings. Warm index time: 0.21 s (1048 surfaces from the per-version cache). Of the 1048 timed packages, 392 could be fully listed and 656 are left open (unchecked).
@@ -36,7 +36,7 @@ Of the caught cases, 100% block; the rest are warnings. Warm index time: 0.21 s 
 | requests, click, jinja2 sources | 59 | 36 | 0 | 0 |
 | uuid, pflag sources | 81 | 546 | 0 | 0 |
 | commons-text sources | 106 | 118 | 0 | 0 |
-| Groundwork src, scripts, test | 316 | 7366 | 0 | 0 |
+| Groundwork src, scripts, test | 325 | 7593 | 0 | 0 |
 
 ## Misses
 

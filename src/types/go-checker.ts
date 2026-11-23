@@ -212,6 +212,15 @@ func exports() {
 		if p.local || path == "unsafe" || p.Dir == "" {
 			continue
 		}
+		// Export data names its own copy of a package, which is not the one checked from source here.
+		for _, s := range p.Imports {
+			if m := p.ImportMap[s]; m != "" {
+				s = m
+			}
+			if q := packages[s]; q != nil && q.local {
+				fail("dependency " + path + " imports " + s + ", which is checked from source")
+			}
+		}
 		if file := known[exportKey(p)]; file != "" {
 			if _, err := os.Stat(file); err == nil {
 				p.Export = file

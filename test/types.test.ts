@@ -29,12 +29,12 @@ afterEach(() => { for (const root of directories.splice(0)) rmSync(root, { recur
 const config = () => { const c = defaultConfig(); c.types.timeoutMs = 20000; return c; };
 
 describe('optional project types', () => {
-  it('safely skips Go, Rust, Java, C# and Ruby files', async () => {
+  it('safely skips Ruby files and Go, Rust and C# files outside a project', async () => {
     const root = fixture(false);
-    const files = ['app.go', 'app.rs', 'App.java', 'App.cs', 'app.rb'];
+    const files = ['app.go', 'app.rs', 'App.cs', 'app.rb'];
     for (const file of files) writeFileSync(path.join(root, file), 'unsupported compiler input');
     expect(await typeCheck(root, files.map((file) => ({ file, ranges: null })), config())).toEqual({
-      available: { typescript: false, python: false }, findings: [], timedOut: false,
+      available: { typescript: false, python: false, go: 'no go.mod', rust: 'no Cargo.toml', java: false, csharp: 'no .csproj' }, findings: [], timedOut: false,
     });
   });
   it('keeps informational type diagnostics out of Stop, including mixed reports', async () => {

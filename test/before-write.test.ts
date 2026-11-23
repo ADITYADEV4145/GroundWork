@@ -8,7 +8,10 @@ import { workspaceFingerprint } from '../src/guards/repeat.js';
 import { duplicateGate } from '../src/hooks/handlers/duplicate_gate.js';
 import { beforeWriteTool } from '../src/mcp/tools/before_write.js';
 import { TOOLS } from '../src/mcp/tools/index.js';
+import { refreshIndex } from '../src/index/refresh.js';
+import { indexDbPath } from '../src/index/store.js';
 import { withIndexedFixture } from '../src/selftest/fixtures.js';
+import { initSqlBackend, openDb } from '../src/store/db.js';
 import { estimateTokens } from '../src/util/tokens.js';
 
 describe('before_write', () => {
@@ -32,6 +35,41 @@ describe('before_write', () => {
       expect(only).not.toContain('Callers');
       await expect(beforeWriteTool.handler({}, ctx)).rejects.toThrow('Provide new, calls or changes');
     });
+  });
+
+  it('refuses ambiguous file-qualified names and pages every caller', async () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), 'gw-bw-'));
+    try {
+      writeFileSync(path.join(root, 'models.ts'), 'export class A { save(): number { return 1; } }\nexport class B { save(): number { return 2; } }\nexport function hot(n: number): number { return n; }\n');
+      for (let i = 0; i < 7; i++) writeFileSync(path.join(root, `use${i}.ts`), "import { hot } from './models';\n"
+        + Array.from({ length: 10 }, (_, j) => `export function f${i}_${j}(): number { return hot(${j}); }`).join('\n') + '\n');
+      await initSqlBackend();
+      await refreshIndex(root);
+      const db = openDb(indexDbPath(root), { readonly: true });
+      try {
+        const ctx = { root, db, config: configSchema.parse({}) };
+        const ambiguous = await beforeWriteTool.handler({ changes: ['models.ts:save'] }, ctx);
+        expect(ambiguous).toContain('2 symbols match');
+        expect(ambiguous).toContain('A.save');
+        expect(ambiguous).toContain('B.save');
+        expect(await beforeWriteTool.handler({ changes: ['models.ts:B.save'] }, ctx)).not.toContain('symbols match');
+        const seen = new Set<string>();
+        const sites = (text: string) => text.split('\n').filter((l) => /^  use\d\.ts:\d+ in /.test(l));
+        const first = await beforeWriteTool.handler({ changes: ['hot'] }, ctx);
+        expect(first).toContain('70 call site(s) in 7 file(s)');
+        expect(first).toContain('62 more: expand "callers", offset 8');
+        let offset = 0;
+        for (let page = 0; page < 5 && seen.size < 70; page++) {
+          const text = await beforeWriteTool.handler({ changes: ['hot'], expand: 'callers', offset }, ctx);
+          expect(text).not.toContain('over budget');
+          const rows = sites(text);
+          expect(rows.length).toBeGreaterThan(0);
+          for (const row of rows) { expect(seen.has(row)).toBe(false); seen.add(row); }
+          offset += rows.length;
+        }
+        expect(seen.size).toBe(70);
+      } finally { db.close(); }
+    } finally { rmSync(root, { recursive: true, force: true }); }
   });
 });
 

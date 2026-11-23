@@ -17,6 +17,7 @@ export const beforeWriteTool = defineTool({
     calls: z.array(ref).max(20).optional().describe('symbols you will call: name, file:qualifiedName or symbol ID'),
     changes: z.array(ref).max(10).optional().describe('symbols you will change'),
     expand: z.enum(['reuse', 'callers']).optional().describe('repeat the same call with this to get the full section'),
+    offset: z.number().int().min(0).optional().describe('with expand "callers": skip this many call sites, to page past the first answer'),
   },
   async handler(args, { root, db, config }) {
     if (!args.new && !args.calls?.length && !args.changes?.length) throw new Error('Provide new, calls or changes.');
@@ -41,21 +42,25 @@ export const beforeWriteTool = defineTool({
       }).join('\n'));
     }
     if (args.changes?.length) {
-      const limit = args.expand === 'callers' ? 100 : 8;
+      const expanded = args.expand === 'callers', limit = expanded ? 60 : 8, offset = expanded ? args.offset ?? 0 : 0;
       sections.push('Callers to update\n' + args.changes.map((name) => {
         const found = navigationSymbols(db, name);
         if (!found.length) return `${name}: not in the index.`;
-        if (found.length > 1 && !name.includes(':')) return `${name}: ${found.length} symbols share this name; pass file:name (${found.slice(0, 3).map((s) => `${s.file}:${s.line}`).join(', ')})`;
-        const symbol = found[0]!, sites = symbolCalls(db, symbol.id, 'callers');
+        // Overloads share a file and qualified name and are changed together; anything else must be told apart.
+        if (found.some((s) => s.file !== found[0]!.file || s.name !== found[0]!.name))
+          return `${name}: ${found.length} symbols match; pass file:Qualified.name or one of these IDs\n`
+            + found.slice(0, 5).map((s) => `  ${s.id} ${s.name} (${s.file}:${s.line})`).join('\n') + (found.length > 5 ? `\n  … ${found.length - 5} more` : '');
+        const symbol = found[0]!, sites = found.flatMap((s) => symbolCalls(db, s.id, 'callers'));
         const seen = new Set<string>(), rows: string[] = [];
         for (const c of sites) { const key = `${c.file}:${c.line}`; if (!seen.has(key)) { seen.add(key); rows.push(`  ${key} in ${c.name}`); } }
-        const files = new Set(sites.map((c) => c.file)).size;
+        const files = new Set(sites.map((c) => c.file)).size, shown = rows.slice(offset, offset + limit), left = rows.length - offset - shown.length;
         return `${one(symbol.signature || symbol.name)} (${symbol.file}:${symbol.line}): ${rows.length ? `${rows.length} call site(s) in ${files} file(s)` : 'no indexed callers'}`
-          + (rows.length ? '\n' + rows.slice(0, limit).join('\n') : '') + (rows.length > limit ? `\n  … ${rows.length - limit} more: expand "callers"` : '');
+          + (shown.length ? '\n' + shown.join('\n') : '')
+          + (left > 0 ? `\n  … ${left} more: expand "callers", offset ${offset + shown.length}` : '');
       }).join('\n'));
     }
     const budget = args.expand ? BUDGET * 3 : BUDGET;
     const { items, truncated: dropped } = fitToBudget(sections.join('\n\n').split('\n'), (line) => line, budget);
-    return items.join('\n') + (dropped ? `\n… ${dropped} line(s) over budget; ask for fewer symbols per call` : '');
+    return items.join('\n') + (dropped ? `\n… ${dropped} line(s) over budget; pass one symbol per call` : '');
   },
 });

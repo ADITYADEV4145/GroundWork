@@ -108,8 +108,9 @@ For a skill-only install (no MCP or hooks), use `npx skills add ADITYADEV4145/Gr
 the repository's root `SKILL.md` and `references/` follow the Agent Skills layout.
 
 For **Cursor MCP only**, open the repository in Cursor and choose
-[Add to Cursor](https://cursor.com/install-mcp?name=groundwork&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImdyb3VuZHdvcmstYWdlbnQiLCItLXJvb3QiLCIke3dvcmtzcGFjZUZvbGRlcn0iLCJtY3AiXX0%3D).
-The link starts the local MCP server with `npx` and points it at the open workspace.
+[Add to Cursor](https://cursor.com/install-mcp?name=groundwork&config=eyJjb21tYW5kIjoiZ3ciLCJhcmdzIjpbIi0tcm9vdCIsIiR7d29ya3NwYWNlRm9sZGVyfSIsIm1jcCJdfQ%3D%3D).
+The link requires `gw` on your PATH (use any install method above that puts it there)
+and points the local MCP server at the open workspace.
 It adds MCP tools only; for project-level setup with hooks, use `gw install --client cursor` instead.
 
 Want to see exactly what setup would do first?

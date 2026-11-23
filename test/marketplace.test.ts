@@ -36,8 +36,8 @@ describe('marketplace metadata', () => {
     expect(url.searchParams.get('name')).toBe('groundwork');
     const config = Buffer.from(url.searchParams.get('config')!, 'base64').toString('utf8');
     expect(JSON.parse(config)).toEqual({
-      command: 'npx',
-      args: ['-y', pkg.name, '--root', '${workspaceFolder}', 'mcp'],
+      command: 'gw',
+      args: ['--root', '${workspaceFolder}', 'mcp'],
     });
   });
 });

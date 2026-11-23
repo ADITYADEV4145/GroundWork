@@ -5,7 +5,7 @@ import path from 'node:path';
 import * as z from 'zod';
 import { grade, GRADER_VERSION, type Grade } from './grade.js';
 import { dataRoot, loadManifest, projectRoot, taskSetHash, type Repo, type Task } from './tasks.js';
-import { git, materialize, snapshotSetup, taskPrompt, writeJson } from './workspaces.js';
+import { findMirror, git, materialize, snapshotSetup, taskPrompt, writeJson } from './workspaces.js';
 
 const id = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const mcpServer = z.object({ name: id, command: z.string().min(1), args: z.array(z.string()).default([]), env: z.record(z.string(), z.string()).default({}) });
@@ -198,6 +198,9 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
   for (const id of new Set(tasks.map((t) => t.repo))) {
     const tool = manifest.repos.find((r) => r.id === id)!.test[0]!;
     if (!onPath(tool)) throw new Error(`${tool} is not on PATH; it is needed to grade ${id} tasks`);
+    // Likewise a missing mirror: its records would be kept as invalid and skipped on resume.
+    const repo = manifest.repos.find((r) => r.id === id)!;
+    if (repo.source.kind !== 'fixture' && !findMirror(repo, options.cache)) throw new Error(`No local mirror of ${id}; clone ${repo.source.url} and pass --cache, or leave its tasks out with --tasks`);
   }
   let records = 0, skipped = 0;
   for (const arm of wanted) {

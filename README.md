@@ -244,6 +244,18 @@ Or edit `.groundwork/config.json`. Explicit settings override profile defaults:
 
 Commit `config.json` to share your team's preferences. Everything else in `.groundwork/` is git-ignored.
 
+### Change impact
+
+`gw impact [--base ref] [--depth n] [--json]` and MCP `change_impact` list changed
+symbols, unchanged callers and reaching tests, with simple high/medium/low risk.
+Session evidence marks callers not observed opened/edited and tests not observed
+running. Stop adds nonblocking, deduplicated context only; timeouts fail open.
+`complete: true` means no further lookup changes the indexed static answer for that
+snapshot; ambiguity, stale/unparsed files or depth truncation keep it false.
+Configure `impact` (`enabled`, `stopGate`, `depth`, `budgetTokens`, `timeoutMs`).
+See [impact rules and limitations](references/impact.md). The deterministic tool
+benchmark is not an agent run; the planted-caller agent gate remains pending.
+
 ### Optional type checking
 
 `gw types check [files...] [--base ref]` checks changed lines using the target project's

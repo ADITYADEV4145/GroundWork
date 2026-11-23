@@ -11,6 +11,7 @@ const program = new Command()
 
 const groups = [
   { names: ['search'], load: () => import('./commands/search.js') },
+  { names: ['impact'], load: () => import('./commands/impact.js') },
   { names: ['types'], load: () => import('./commands/types.js') },
   { names: ['init', 'index', 'refresh', 'stats'], load: () => import('./commands/index-cmds.js') },
   { names: ['symbols', 'show'], load: () => import('./commands/query.js') },

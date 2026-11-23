@@ -478,3 +478,19 @@ export function readEmbedding(db: Db, model: string, contentHash: string): numbe
     return Array.isArray(value) && value.length > 0 && value.every((n) => typeof n === 'number' && Number.isFinite(n)) && value.some((n) => n !== 0) ? value : null;
   } catch { return null; }
 }
+
+/** Uncapped graph snapshot for impact traversal; feature code never reads index SQL. */
+export function readImpactState(db: Db) {
+  const state = readReuseState(db);
+  return {
+    files: state.files,
+    calls: state.calls,
+    symbols: db.prepare(`SELECT ${FACT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id ORDER BY f.path, s.start_line`).all().map(toFact),
+    imports: db.prepare(`SELECT f.path, i.module, i.name, i.alias, i.kind, i.line, i.unresolved_reason, target.path target
+      FROM imports i JOIN files f ON f.id = i.file_id LEFT JOIN files target ON target.id = i.resolved_file_id`).all().map((r) => ({
+      file: String(r.path), module: String(r.module), name: String(r.name), alias: r.alias === null ? null : String(r.alias),
+      kind: String(r.kind), line: Number(r.line), target: r.target === null ? null : String(r.target),
+      unresolvedReason: r.unresolved_reason === null ? null : String(r.unresolved_reason),
+    })),
+  };
+}

@@ -7,6 +7,12 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
 
+After API edits, use `change_impact` (or `gw impact --json`) for unchanged callers,
+reaching tests and session coverage. High/medium-risk Stop context is evidence,
+never a block. A `complete: true` answer needs no further impact lookup for that
+snapshot; edits invalidate it. Incomplete reasons and test commands guide follow-up.
+See [impact](references/impact.md). Tool-level benchmark results are not agent runs.
+
 ## 1. Navigate: use the cheapest sufficient evidence
 
 Use `search_code({ "query": "where do we retry failed requests", "limit": 5 })`

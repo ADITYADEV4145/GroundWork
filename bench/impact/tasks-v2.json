@@ -1,0 +1,150 @@
+{
+  "version": 2,
+  "sourceCommit": "4507e279fa853f6676b15f590808f088be949eae",
+  "tasks": [
+    {
+      "id": "customer-desk/required-param",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserById",
+      "operator": "required-param",
+      "before": "export function getUserById(users: User[], id: string): User | null ",
+      "after": "export function getUserById(impactRequired: number, users: User[], id: string): User | null "
+    },
+    {
+      "id": "customer-desk/rename",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserById",
+      "operator": "rename",
+      "before": "export function getUserById(users: User[], id: string): User | null ",
+      "after": "export function getUserByIdRenamedV2(users: User[], id: string): User | null "
+    },
+    {
+      "id": "customer-desk/delete",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserById",
+      "operator": "delete",
+      "before": "export function getUserById(users: User[], id: string): User | null {\n  return users.find((u) => u.id === id) ?? null;\n}",
+      "after": ""
+    },
+    {
+      "id": "customer-desk/return-shape",
+      "repo": "customer-desk",
+      "file": "src/users.ts",
+      "name": "getUserById",
+      "operator": "return-shape",
+      "before": "export function getUserById(users: User[], id: string): User | null ",
+      "after": "export function getUserById(users: User[], id: string): { id: number } | null "
+    },
+    {
+      "id": "parcel-ops/required-param",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "getOrderByReference",
+      "operator": "required-param",
+      "before": "export function getOrderByReference(orders: Order[], reference: string): Order | null ",
+      "after": "export function getOrderByReference(impactRequired: number, orders: Order[], reference: string): Order | null "
+    },
+    {
+      "id": "parcel-ops/rename",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "getOrderByReference",
+      "operator": "rename",
+      "before": "export function getOrderByReference(orders: Order[], reference: string): Order | null ",
+      "after": "export function getOrderByReferenceRenamedV2(orders: Order[], reference: string): Order | null "
+    },
+    {
+      "id": "parcel-ops/delete",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "getOrderByReference",
+      "operator": "delete",
+      "before": "export function getOrderByReference(orders: Order[], reference: string): Order | null { return orders.find((o) => o.reference === reference) ?? null; }",
+      "after": ""
+    },
+    {
+      "id": "parcel-ops/return-shape",
+      "repo": "parcel-ops",
+      "file": "src/orders.ts",
+      "name": "getOrderByReference",
+      "operator": "return-shape",
+      "before": "export function getOrderByReference(orders: Order[], reference: string): Order | null ",
+      "after": "export function getOrderByReference(orders: Order[], reference: string): { id: number } | null "
+    },
+    {
+      "id": "dispatch-desk/required-param",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "get_order",
+      "operator": "required-param",
+      "before": "def get_order(orders: list[Order], reference: str) -> Order | None:",
+      "after": "def get_order(impact_required: int, orders: list[Order], reference: str) -> Order | None:"
+    },
+    {
+      "id": "dispatch-desk/rename",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "get_order",
+      "operator": "rename",
+      "before": "def get_order(orders: list[Order], reference: str) -> Order | None:",
+      "after": "def get_orderRenamedV2(orders: list[Order], reference: str) -> Order | None:"
+    },
+    {
+      "id": "dispatch-desk/delete",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "get_order",
+      "operator": "delete",
+      "before": "def get_order(orders: list[Order], reference: str) -> Order | None:\n    return next((o for o in orders if o.reference == reference), None)\n",
+      "after": ""
+    },
+    {
+      "id": "dispatch-desk/return-shape",
+      "repo": "dispatch-desk",
+      "file": "dispatch/orders.py",
+      "name": "get_order",
+      "operator": "return-shape",
+      "before": "def get_order(orders: list[Order], reference: str) -> Order | None:",
+      "after": "def get_order(orders: list[Order], reference: str) -> int:"
+    },
+    {
+      "id": "groundwork/required-param",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "fitToBudget",
+      "operator": "required-param",
+      "before": "export function fitToBudget<T>(items: T[], render: (item: T) => string, budgetTokens: number, reserve = 40): Budgeted<T> ",
+      "after": "export function fitToBudget<T>(impactRequired: number, items: T[], render: (item: T) => string, budgetTokens: number, reserve = 40): Budgeted<T> "
+    },
+    {
+      "id": "groundwork/rename",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "fitToBudget",
+      "operator": "rename",
+      "before": "export function fitToBudget<T>(items: T[], render: (item: T) => string, budgetTokens: number, reserve = 40): Budgeted<T> ",
+      "after": "export function fitToBudgetRenamedV2<T>(items: T[], render: (item: T) => string, budgetTokens: number, reserve = 40): Budgeted<T> "
+    },
+    {
+      "id": "groundwork/delete",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "fitToBudget",
+      "operator": "delete",
+      "before": "export function fitToBudget<T>(items: T[], render: (item: T) => string, budgetTokens: number, reserve = 40): Budgeted<T> {\n  const kept: T[] = [];\n  let used = reserve;\n  for (const item of items) {\n    const cost = estimateTokens(render(item)) + 1;\n    if (used + cost > budgetTokens && kept.length > 0) break;\n    kept.push(item);\n    used += cost;\n  }\n  return { items: kept, truncated: items.length - kept.length };\n}",
+      "after": ""
+    },
+    {
+      "id": "groundwork/return-shape",
+      "repo": "groundwork",
+      "file": "src/util/tokens.ts",
+      "name": "fitToBudget",
+      "operator": "return-shape",
+      "before": "export function fitToBudget<T>(items: T[], render: (item: T) => string, budgetTokens: number, reserve = 40): Budgeted<T> ",
+      "after": "export function fitToBudget<T>(items: T[], render: (item: T) => string, budgetTokens: number, reserve = 40): string "
+    }
+  ]
+}

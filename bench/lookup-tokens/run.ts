@@ -92,7 +92,8 @@ function checkout(repo: Manifest['repos'][number], cache: string, setup: boolean
     git(dir, 'checkout', '-q', '--detach', repo.sha);
   }
   if (git(dir, 'rev-parse', 'HEAD') !== repo.sha) throw new Error(`${dir}: HEAD is not ${repo.sha}`);
-  if (git(dir, 'status', '--porcelain', '--untracked-files=no')) throw new Error(`${dir}: tracked files differ from ${repo.sha}`);
+  // The index lives in .groundwork/, which discovery never reads; anything else untracked would enter both corpora.
+  if (git(dir, 'status', '--porcelain', '--untracked-files=all', '--', '.', ':(exclude).groundwork')) throw new Error(`${dir}: files differ from ${repo.sha}`);
   return dir;
 }
 

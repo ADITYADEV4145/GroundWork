@@ -22,15 +22,21 @@ export function snapshotSetup(dir: string): string {
   return git(dir, 'rev-parse', 'HEAD');
 }
 
+/** Tasks pinned at different commits of one project share its mirror, named after the task repo or the project, bare (`.git`) or not. */
+export function findMirror(repo: Repo, cache?: string): string | undefined {
+  if (!cache || repo.source.kind === 'fixture') return undefined;
+  const project = path.basename(repo.source.url).replace(/\.git$/, '');
+  return [repo.id, project, `${repo.id}.git`, `${project}.git`].map((name) => path.join(cache, name)).find(existsSync);
+}
+
 export function materialize(repo: Repo, dir: string, options: { root?: string; cache?: string } = {}): string {
   if (existsSync(dir)) throw new Error(`Refusing to overwrite ${dir}`);
   mkdirSync(dir, { recursive: true });
   if (repo.source.kind === 'fixture') {
     cpSync(path.join(options.root ?? dataRoot, 'repos', repo.id), dir, { recursive: true });
   } else {
-    // Tasks pinned at different commits of one project share its mirror, named after the project.
-    const mirror = [repo.id, path.basename(repo.source.url).replace(/\.git$/, '')].map((name) => path.join(options.cache ?? '', name)).find(existsSync) ?? path.join(options.cache ?? '', repo.id);
-    if (!options.cache || !existsSync(mirror)) throw new Error(`No local mirror of ${repo.id}; clone ${repo.source.url} into ${mirror} first`);
+    const mirror = findMirror(repo, options.cache);
+    if (!mirror) throw new Error(`No local mirror of ${repo.id}; clone ${repo.source.url} into ${path.join(options.cache ?? '<cache>', repo.id)} first`);
     const archive = execFileSync('git', ['archive', repo.source.sha], { cwd: mirror, maxBuffer: 1024 * 1024 * 1024 });
     execFileSync('tar', ['-xf', '-'], { cwd: dir, input: archive });
   }

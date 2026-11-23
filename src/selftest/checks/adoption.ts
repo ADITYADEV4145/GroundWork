@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,6 +49,8 @@ export const SEEDED_MISCONFIGURATIONS: Seed[] = [
   { name: 'index deleted', seed: (r) => rmSync(path.join(r, '.groundwork/index.db')), expect: { check: 'index', status: 'warn', detail: /not built yet/ } },
   { name: 'index is not a database', seed: (r) => write(r, '.groundwork/index.db', 'not sqlite'), expect: { check: 'index', status: 'warn', detail: /unreadable|schema/ } },
   { name: 'config.json invalid', seed: (r) => write(r, '.groundwork/config.json', '{"profile":"loud"}'), expect: { check: 'config', status: 'fail', detail: /profile/ } },
+  { name: 'no TypeScript compiler in the project', seed: (r) => rmSync(path.join(r, 'node_modules'), { recursive: true }), expect: { check: 'types:typescript', status: 'warn', detail: /no TypeScript compiler/ } },
+  { name: 'server switched off (OpenCode)', seed: (r) => writeFileSync(path.join(r, 'opencode.json'), readFileSync(path.join(r, 'opencode.json'), 'utf8').replace('"enabled": true', '"enabled": false')), expect: { check: 'client:opencode', status: 'fail', detail: /switched off/ } },
   { name: 'type checks disabled', seed: (r) => write(r, '.groundwork/config.json', '{"types":{"enabled":false}}'), expect: { check: 'types:typescript', status: 'warn', detail: /disabled/ } },
   { name: 'Python files but no pyright', seed: () => {}, hasBin: (b) => b !== 'pyright', expect: { check: 'types:python', status: 'warn', detail: /pyright not found/ } },
   { name: 'stale index lock', seed: (r) => write(r, '.groundwork/index.lock', '999999'), expect: { check: 'lock', status: 'warn', detail: /index\.lock/ } },
@@ -64,6 +67,9 @@ export async function doctorSeedResults(): Promise<{ name: string; ok: boolean; 
     await withCheckScenario('clean', async (root) => {
       const home = tempDir('gw-adoption-home-');
       try {
+        // Type checks use the project's compiler, so a healthy project has one.
+        mkdirSync(path.join(root, 'node_modules'), { recursive: true });
+        symlinkSync(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), path.join(root, 'node_modules', 'typescript'), 'junction');
         const failed = gw(root, ['init']).status !== 0 ? 'gw init failed' : installed(root);
         if (failed) throw new Error(failed);
         const hasBin = s.hasBin ?? (() => true);

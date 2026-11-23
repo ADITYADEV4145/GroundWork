@@ -42,6 +42,9 @@ describe('gw install', () => {
     mkdirSync(path.join(home, '.gemini'));
     mkdirSync(path.join(home, '.config', 'zed'), { recursive: true });
     mkdirSync(path.join(root, '.kiro'));
+    mkdirSync(path.join(root, '.claude'));
+    expect(detectClients(home, root, () => false)).toContain('claude');
+    rmSync(path.join(root, '.claude'), { recursive: true });
     expect(detectClients(home, root, (bin) => bin === 'opencode' || bin === 'code')).toEqual(['gemini', 'copilot', 'zed', 'kiro', 'opencode']);
   });
 
@@ -138,7 +141,13 @@ describe('gw update', () => {
 
   it('will not replace a source checkout', () => {
     expect(selfUpdateBlocker()).toMatch(/source checkout/);
-    expect(selfUpdateBlocker(temp())).toBeNull();
+    const prefix = temp(), pkg = path.join(prefix, 'groundwork-agent');
+    mkdirSync(pkg);
+    expect(selfUpdateBlocker(pkg, () => prefix)).toBeNull();
+    expect(selfUpdateBlocker(temp(), () => prefix)).toMatch(/not in npm's global directory/);
+    expect(compareVersions('1.0.0-rc.10', '1.0.0-rc.9')).toBeGreaterThan(0);
+    expect(compareVersions('1.0.0-rc.1', '1.0.0-rc')).toBeGreaterThan(0);
+    expect(compareVersions('1.0.0-alpha', '1.0.0-1')).toBeGreaterThan(0);
   });
 });
 

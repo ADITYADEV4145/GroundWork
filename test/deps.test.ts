@@ -266,6 +266,13 @@ describe('review regressions', () => {
       expect(await run(dir, [{ file: 'src/shadow.ts', ranges: null }, { file: 'src/patch.py', ranges: null }])).toEqual([]);
       expect(await run(dir, [{ file: 'src/multi.ts', ranges: [[3, 3]] }])).toEqual(['src/multi.ts:3:unknown-export:clampEvery']);
       expect(await run(dir, [{ file: 'src/multi.ts', ranges: [[1, 2]] }])).toEqual([]);
+      // The statement's own context still applies to a name on a later line.
+      write(dir, 'src/opt.py', 'try:\n    from textkit import (\n        shout,\n        nope,\n    )\nexcept ImportError:\n    nope = None\n');
+      write(dir, 'src/ignored.ts', "// gw: ignore\nimport {\n  clamp,\n  clampEvery,\n} from 'mathkit';\nexport const a = [clamp, clampEvery];\n");
+      // Importing by destructuring, or testing the name in a condition, is not shadowing.
+      write(dir, 'src/req.cjs', "const { clamp } = require('mathkit');\nif (clamp) {\n  clamp();\n}\n");
+      expect(await run(dir, [{ file: 'src/opt.py', ranges: null }, { file: 'src/ignored.ts', ranges: null }])).toEqual([]);
+      expect(await run(dir, [{ file: 'src/req.cjs', ranges: null }])).toEqual(['src/req.cjs:3:arity:clamp']);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -284,12 +291,21 @@ describe('review regressions', () => {
       write(dir, 'packages/app/node_modules/dual/package.json', '{"name":"dual","version":"1.0.0","exports":{".":{"import":{"types":"./esm.d.ts"},"require":{"types":"./cjs.d.cts"}}}}');
       write(dir, 'packages/app/node_modules/dual/esm.d.ts', 'export declare function esmOnly(): void;\n');
       write(dir, 'packages/app/node_modules/dual/cjs.d.cts', 'export declare function cjsOnly(): void;\n');
+      write(dir, 'packages/app/node_modules/untyped/package.json', '{"name":"untyped","version":"1.0.0","main":"index.js"}');
+      write(dir, 'packages/app/node_modules/untyped/index.js', 'module.exports = {};\n');
+      write(dir, 'packages/app/node_modules/@types/untyped/package.json', '{"name":"@types/untyped","version":"1.0.0","exports":{".":{"import":{"types":"./esm.d.ts"},"require":{"types":"./cjs.d.cts"}}}}');
+      write(dir, 'packages/app/node_modules/@types/untyped/esm.d.ts', 'export declare function esmOnly(): void;\n');
+      write(dir, 'packages/app/node_modules/@types/untyped/cjs.d.cts', 'export declare function cjsOnly(): void;\n');
+      write(dir, 'packages/app/c.ts', "import { esmOnly, cjsOnly } from 'untyped';\nexport const y = [esmOnly, cjsOnly];\n");
+      write(dir, 'packages/app/d.cjs', "const u = require('untyped');\nu.cjsOnly();\nu.esmOnly();\n");
       write(dir, 'packages/app/a.ts', "import { old, fresh } from 'shared';\nimport { esmOnly, cjsOnly } from 'dual';\nexport const x = [old, fresh, esmOnly, cjsOnly];\n");
       write(dir, 'packages/app/b.cjs', "const dual = require('dual');\ndual.cjsOnly();\ndual.esmOnly();\n");
-      expect(await run(dir, [{ file: 'packages/app/a.ts', ranges: null }, { file: 'packages/app/b.cjs', ranges: null }])).toEqual([
+      expect(await run(dir, ['a.ts', 'b.cjs', 'c.ts', 'd.cjs'].map((f) => ({ file: `packages/app/${f}`, ranges: null })))).toEqual([
         'packages/app/a.ts:1:unknown-export:fresh',
         'packages/app/a.ts:2:unknown-export:cjsOnly',
         'packages/app/b.cjs:3:unknown-member:esmOnly',
+        'packages/app/c.ts:1:unknown-export:cjsOnly',
+        'packages/app/d.cjs:3:unknown-member:esmOnly',
       ]);
     } finally {
       rmSync(dir, { recursive: true, force: true });

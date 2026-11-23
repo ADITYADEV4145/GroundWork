@@ -76,6 +76,18 @@ function nameLine(lines: string[], imp: ImportFact): number {
   return imp.line;
 }
 
+/** The file with one import statement blanked, so the statement is not mistaken for a second binding of its own names. */
+function withoutStatement(lines: string[], imp: Import): string {
+  const out = [...lines];
+  const closes = new RegExp(`['"\`]${escapeRe(imp.module)}['"\`]`);
+  for (let i = imp.stmtLine - 1; i < Math.min(out.length, imp.stmtLine + 200); i++) {
+    const line = out[i]!;
+    out[i] = '';
+    if (closes.test(line)) break;
+  }
+  return out.join('\n');
+}
+
 function npmKey(file: string, spec: string, cjs: boolean): string {
   return `npm:${path.dirname(file)}:${spec}${cjs ? ':require' : ''}`;
 }
@@ -312,7 +324,7 @@ export class DependencyChecker {
         return none;
       }
       const lines = text.split('\n');
-      const imports = importFacts(this.db, f.id).filter((i) => i.resolvedFileId === null).map((i) => ({ ...i, line: nameLine(lines, i) }));
+      const imports = importFacts(this.db, f.id).filter((i) => i.resolvedFileId === null).map((i) => ({ ...i, line: nameLine(lines, i), stmtLine: i.line }));
       const calls = callFacts(this.db, f.id).filter((c) => inRanges(c.line, ranges) && !suppressed(lines, c.line));
       const ctx: Ctx = { f, rel, lang, text, lines, imports, calls, ranges, findings: [] };
       if (lang === 'js' || lang === 'ts') await this.checkJs(ctx);
@@ -327,8 +339,8 @@ export class DependencyChecker {
     }
   }
 
-  private importLive(ctx: Ctx, imp: ImportFact): boolean {
-    return inRanges(imp.line, ctx.ranges) && !suppressed(ctx.lines, imp.line);
+  private importLive(ctx: Ctx, imp: Import): boolean {
+    return inRanges(imp.line, ctx.ranges) && !suppressed(ctx.lines, imp.line) && !suppressed(ctx.lines, imp.stmtLine);
   }
 
   // ---- JavaScript / TypeScript ----
@@ -352,7 +364,7 @@ export class DependencyChecker {
           if (!info) ctx.findings.push(this.missing(ctx, imp.line, 'unknown-export', imp.name, imp.module, loaded, surface.exports, definite));
           else if (info.deprecated !== undefined) ctx.findings.push(this.deprecated(ctx, imp.line, imp.name, imp.module, loaded, info));
         }
-        if (info && imp.kind === 'named') this.checkJsCalls(ctx, imp.alias ?? imp.name, imp.module, loaded, info, definite, false);
+        if (info && imp.kind === 'named') this.checkJsCalls(ctx, imp.alias ?? imp.name, imp.module, loaded, info, definite, false, imp);
       } else if (imp.kind === 'namespace' || imp.kind === 'default') {
         if (!imp.alias) continue;
         const whole: ExportInfo | undefined = imp.kind === 'namespace' ? { kind: 'namespace', members: surface.exports, ...(surface.exports['export=']?.arities ? { arities: surface.exports['export=']!.arities } : {}) } : surface.exports.default;
@@ -361,7 +373,7 @@ export class DependencyChecker {
     }
   }
 
-  private checkJsCalls(ctx: Ctx, local: string, module: string, loaded: Loaded, info: ExportInfo, definite: boolean, viaRequire: boolean): void {
+  private checkJsCalls(ctx: Ctx, local: string, module: string, loaded: Loaded, info: ExportInfo, definite: boolean, viaRequire: boolean, own?: Import): void {
     // A second binding of the same name (a parameter, a local) means calls may not refer to the import.
     const rebinds = [...ctx.text.matchAll(new RegExp(`\\b(?:const|let|var|function|class)\\s+${escapeRe(local)}\\b|[(,]\\s*${escapeRe(local)}\\s*[,):=]`, 'g'))].length;
     const n = escapeRe(local);
@@ -375,9 +387,9 @@ export class DependencyChecker {
         `\\(${params}\\)\\s*(?::[^=;{]+)?=>`,
         `\\b${n}\\s*=>`,
         `[(,]\\s*(?:public |private |protected |readonly )*${n}\\s*\\??:`,
-        `\\(${params}\\)\\s*(?::[^=;{]+)?\\{`,
+        `(?<!\\b(?:if|while|for|switch|with)\\s*)\\(${params}\\)\\s*(?::[^=;{]+)?\\{`,
       ].join('|'),
-    ).test(ctx.text);
+    ).test(own ? withoutStatement(ctx.lines, own) : ctx.text);
     if (viaRequire ? rebinds > 1 : usedAsArg) return;
     for (const call of ctx.calls) {
       if (call.calleeText === local) {
@@ -412,7 +424,7 @@ export class DependencyChecker {
       const { surface } = loaded;
       const known = (name: string): boolean => name in surface.exports || (surface.mentions ?? []).includes(name) || name.startsWith('__');
       // try/except ImportError around the import is the idiom for an optional name.
-      const optional = /^\s*(try\s*:|except\b)/.test(ctx.lines[imp.line - 2] ?? '') || /^\s*try\s*:/.test(ctx.lines[imp.line - 3] ?? '');
+      const optional = /^\s*(try\s*:|except\b)/.test(ctx.lines[imp.stmtLine - 2] ?? '') || /^\s*try\s*:/.test(ctx.lines[imp.stmtLine - 3] ?? '');
       if (imp.kind === 'named') {
         if (this.importLive(ctx, imp) && !optional) {
           this.stats.checks++;
@@ -608,13 +620,16 @@ export class DependencyChecker {
   }
 }
 
+type Import = ImportFact & { stmtLine: number };
+
 interface Ctx {
   f: FileFacts;
   rel: string;
   lang: Lang;
   text: string;
   lines: string[];
-  imports: ImportFact[];
+  /** `line` is where the name is written; `stmtLine` is where its import statement starts. */
+  imports: Import[];
   calls: CallFact[];
   ranges: [number, number][] | null | undefined;
   findings: Finding[];

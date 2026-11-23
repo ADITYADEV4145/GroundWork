@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { GroundworkConfig } from '../config/schema.js';
 import type { Finding } from '../grounding/verify.js';
@@ -179,6 +179,99 @@ export class DependencyChecker {
     }
     this.surfaces.set(key, loaded);
     return loaded;
+  }
+
+  /** Installed npm package names visible from the repo root and from each workspace package. */
+  private npmInstalled(): { file: string; specifiers: string[] }[] {
+    const out: { file: string; specifiers: string[] }[] = [];
+    const seen = new Set<string>();
+    for (const dir of ['', ...this.workspaces.packages.filter((p) => p.kind === 'npm').map((p) => p.dir)]) {
+      const modules = path.join(this.root, dir, 'node_modules');
+      const names: string[] = [];
+      let entries: string[];
+      try {
+        entries = readdirSync(modules);
+      } catch {
+        continue;
+      }
+      for (const e of entries) {
+        if (e.startsWith('.')) continue;
+        if (!e.startsWith('@')) names.push(e);
+        else {
+          try {
+            for (const sub of readdirSync(path.join(modules, e))) names.push(`${e}/${sub}`);
+          } catch {
+            // unreadable scope
+          }
+        }
+      }
+      // `@types/x` is read as the types of `x`, not as a package of its own.
+      const specifiers = names.filter((n) => !n.startsWith('@types/') && !seen.has(`${dir}:${n}`));
+      specifiers.forEach((n) => seen.add(`${dir}:${n}`));
+      if (specifiers.length) out.push({ file: path.posix.join(dir.split(path.sep).join('/'), 'package.json'), specifiers });
+    }
+    return out;
+  }
+
+  private pyInstalled(): string[] {
+    const out = new Set<string>();
+    for (const site of this.pySites()) {
+      let entries;
+      try {
+        entries = readdirSync(site, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      for (const e of entries) {
+        if (e.name.startsWith('_') || e.name.startsWith('.') || /[.-](dist-info|egg-info|libs)$/.test(e.name)) continue;
+        if (e.isDirectory() && /^[A-Za-z]\w*$/.test(e.name)) out.add(e.name);
+        else if (/^[A-Za-z]\w*\.pyi?$/.test(e.name)) out.add(e.name.replace(/\.pyi?$/, ''));
+      }
+    }
+    return [...out];
+  }
+
+  /** Read every installed package's entry surface into the per-version cache (`gw deps build`). */
+  async buildAll(): Promise<{ packages: number; closed: number; open: number; built: number; cached: number; byEcosystem: Record<string, number> }> {
+    const byEcosystem: Record<string, number> = {};
+    let packages = 0;
+    let open = 0;
+    const count = (loaded: Loaded | null): void => {
+      if (!loaded) return;
+      packages++;
+      byEcosystem[loaded.ref.ecosystem] = (byEcosystem[loaded.ref.ecosystem] ?? 0) + 1;
+      if (loaded.surface.open) open++;
+    };
+    const npm = this.npmInstalled();
+    await this.prepareNpm(npm);
+    for (const { file, specifiers } of npm) for (const s of specifiers) count(this.npm(file, s));
+    for (const module of this.pyInstalled()) count(await this.python(module).catch(() => null));
+    const goFiles = new Set<string>(['go.mod', ...this.workspaces.packages.filter((p) => p.kind === 'go').map((p) => path.posix.join(p.dir.split(path.sep).join('/'), 'go.mod'))]);
+    for (const file of goFiles) {
+      const mod = this.goMod(file);
+      if (!mod) continue;
+      for (const importPath of mod.requires.keys()) {
+        const loaded = await this.go(file, importPath).catch(() => null);
+        count(loaded === 'missing' ? null : loaded);
+      }
+    }
+    return { packages, closed: packages - open, open, built: this.stats.built, cached: this.stats.cached, byEcosystem };
+  }
+
+  /** The surface an import of `module` from `fromFile` would be checked against, whichever ecosystem owns it. */
+  async show(module: string, fromFile = 'package.json'): Promise<{ ref: PackageRef; surface: ModuleSurface } | null> {
+    if (fromFile.endsWith('.py')) return this.python(module);
+    if (fromFile.endsWith('.go')) {
+      const loaded = await this.go(fromFile, module);
+      return loaded === 'missing' ? null : loaded;
+    }
+    await this.prepareNpm([{ file: fromFile, specifiers: [module] }]);
+    const npm = this.npm(fromFile, module);
+    if (npm) return npm;
+    const py = await this.python(module);
+    if (py) return py;
+    const go = await this.go('go.mod', module).catch(() => null);
+    return go === 'missing' ? null : go;
   }
 
   /** Dependency findings for one indexed file. Never throws: a failure is "nothing to report". */

@@ -21,6 +21,7 @@ const groups = [
   { names: ['mcp', 'hook'], load: () => import('./commands/agent.js') },
   { names: ['run', 'report'], load: () => import('./commands/waste.js') },
   { names: ['verify'], load: () => import('./commands/verify.js') },
+  { names: ['deps'], load: () => import('./commands/deps.js') },
   { names: ['similar'], load: () => import('./commands/similar.js') },
   { names: ['refactor'], load: () => import('./commands/refactor.js') },
   { names: ['check'], load: () => import('./commands/check.js') },

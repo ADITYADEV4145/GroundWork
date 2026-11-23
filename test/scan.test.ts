@@ -81,6 +81,27 @@ describe('gw scan', () => {
   });
 });
 
+describe('gw scan on a diff with context', () => {
+  it('ignores defects on context lines and in symbols the diff does not touch', async () => {
+    const root = fixture();
+    const { config, db } = await open(root);
+    config.types.enabled = false;
+    try {
+      // Line 3 of use.ts is added; lines 1 and 2, which hold existing defects, are context.
+      const context = changedFromDiff('--- a/use.ts\n+++ b/use.ts\n@@ -1,2 +1,3 @@\n import { total, missing } from "./lists.js";\n export const sum = total(1);\n+export const other = missing;\n');
+      expect(context).toEqual([{ file: 'use.ts', ranges: [[3, 3]] }]);
+      expect((await scanRepository(db, root, { config, changed: context })).findings).toEqual([]);
+      expect(changedFromDiff('--- a/use.ts\n+++ b/use.ts\n@@ -1,3 +1,2 @@\n import { total, missing } from "./lists.js";\n-export const sum = total(1);\n export const other = missing;\n')).toEqual([]);
+      // Only the last line of lists.ts changes: its duplicated function, and the dead code in copy.ts, were there before.
+      const tail = await scanRepository(db, root, { config, changed: [{ file: 'lists.ts', ranges: [[10, 10]] }] });
+      expect(tail.findings.map((f) => `${f.kind} ${f.file}:${f.line}`)).toEqual(['duplicate-constant lists.ts:10']);
+      // A diff that writes the copy reports it against the untouched original.
+      const copy = await scanRepository(db, root, { config, changed: [{ file: 'copy.ts', ranges: [[1, 8]] }] });
+      expect(copy.findings).toEqual([expect.objectContaining({ kind: 'duplicate-logic', file: 'copy.ts', suggestion: 'chunk (lists.ts:1)' })]);
+    } finally { db.close(); }
+  });
+});
+
 describe('gw scan command', () => {
   it('prints SARIF, exits 1 on a high-confidence finding and keeps its index out of git status', () => {
     const root = fixture();

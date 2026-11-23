@@ -50,18 +50,27 @@ function fromGrounding(f: Finding): ScanFinding {
   };
 }
 
-/** Unified diff to the added line ranges of each file it touches. */
+/** Unified diff to the added lines of each file it touches; context and removed lines are not part of the change. */
 export function changedFromDiff(diff: string): ChangedFile[] {
   const files = new Map<string, LineRange[]>();
-  let current: LineRange[] | null = null;
+  // The hunk header's counts say where a hunk ends, so a following `--- a/file` header is not read as a removed line.
+  let current: LineRange[] | null = null, next = 0, oldLeft = 0, newLeft = 0;
   for (const line of diff.split('\n')) {
-    const file = /^\+\+\+ (?:b\/)?(.+?)(?:\t.*)?$/.exec(line);
-    if (file) { current = file[1] === '/dev/null' ? null : (files.get(file[1]!) ?? files.set(file[1]!, []).get(file[1]!)!); continue; }
-    const hunk = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/.exec(line);
-    if (hunk && current) {
-      const start = Number(hunk[1]), count = hunk[2] === undefined ? 1 : Number(hunk[2]);
-      if (count > 0) current.push([start, start + count - 1]);
+    if (oldLeft > 0 || newLeft > 0) {
+      if (line[0] === '\\') continue;
+      if (line[0] === '-') { oldLeft--; continue; }
+      if (line[0] === '+' && current) {
+        const last = current.at(-1);
+        if (last && last[1] === next - 1) last[1] = next; else current.push([next, next]);
+      }
+      if (line[0] !== '+') oldLeft--;
+      newLeft--; next++;
+      continue;
     }
+    const hunk = /^@@ -\d+(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(line);
+    if (hunk) { oldLeft = hunk[1] === undefined ? 1 : Number(hunk[1]); next = Number(hunk[2]); newLeft = hunk[3] === undefined ? 1 : Number(hunk[3]); continue; }
+    const file = /^\+\+\+ (?:b\/)?(.+?)(?:\t.*)?$/.exec(line);
+    if (file) current = file[1] === '/dev/null' ? null : (files.get(file[1]!) ?? files.set(file[1]!, []).get(file[1]!)!);
   }
   return [...files].filter(([, ranges]) => ranges.length).map(([file, ranges]) => ({ file, ranges }));
 }
@@ -75,7 +84,9 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
   const skipped: string[] = [];
   const state = readReuseState(db);
   const usable = (f: { isTest: boolean; isGenerated: boolean; status: string }) => !f.isTest && !f.isGenerated && f.status === 'ok';
-  const scope = changed ? new Set(changed.map((c) => c.file)) : null;
+  const ranges = changed ? new Map(changed.map((c) => [c.file, c.ranges])) : null;
+  /** In a diff scan only what the change itself touches is reported; the rest of the repository was like that before. */
+  const touched = (file: string, from: number, to = from) => !ranges || (ranges.get(file) ?? []).some(([a, b]) => from <= b && to >= a);
   const results = changed ? verifyChanged(db, root, changed, config) : state.files.filter(usable).map((f) => verifyFile(db, root, f.file, { config }));
   for (const result of results) all.push(...result.findings.map(fromGrounding));
 
@@ -102,11 +113,12 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
   }
   for (const group of groups.values()) {
     if (group.length < 2) continue;
-    const [first, ...copies] = group;
-    for (const copy of copies) {
-      if (scope && !scope.has(copy.file) && !scope.has(first!.file)) continue;
+    // The copy is whichever one the change wrote; an untouched symbol is the original to point at.
+    const original = group.find((s) => !touched(s.file, s.line, s.endLine)) ?? group[0]!;
+    for (const copy of group) {
+      if (copy === original || !touched(copy.file, copy.line, copy.endLine)) continue;
       all.push({ kind: 'duplicate-logic', confidence: 'high', file: copy.file, line: copy.line,
-        message: `${copy.qualifiedName} has the same body as ${first!.qualifiedName}.`, suggestion: `${first!.qualifiedName} (${first!.file}:${first!.line})` });
+        message: `${copy.qualifiedName} has the same body as ${original.qualifiedName}.`, suggestion: `${original.qualifiedName} (${original.file}:${original.line})` });
     }
   }
 
@@ -121,9 +133,9 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
     constants.set(key, [...(constants.get(key) ?? []), l]);
   }
   for (const group of constants.values()) {
-    const [first, ...copies] = group;
-    for (const copy of copies) {
-      if (copy.file === first!.file || (scope && !scope.has(copy.file) && !scope.has(first!.file))) continue;
+    const first = group.find((l) => !touched(l.file, l.line)) ?? group[0];
+    for (const copy of group) {
+      if (copy === first || copy.file === first!.file || !touched(copy.file, copy.line)) continue;
       all.push({ kind: 'duplicate-constant', confidence: copy.constName === first!.constName ? 'high' : 'low', file: copy.file, line: copy.line,
         message: `${copy.constName} repeats the value of ${first!.constName}.`, suggestion: `${first!.constName} (${first!.file}:${first!.line})` });
     }
@@ -139,7 +151,7 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
   };
   for (const s of state.symbols) {
     if (s.kind !== 'function' || s.exported || s.parentId !== null || !fileOk.get(s.file) || called.has(s.id) || calledNames.has(s.name)) continue;
-    if (scope && !scope.has(s.file)) continue;
+    if (!touched(s.file, s.line, s.endLine)) continue;
     // Python has no export keyword: only a leading underscore marks a function private.
     if (s.file.endsWith('.py') && (!s.name.startsWith('_') || s.name.endsWith('__'))) continue;
     const source = text(s.file);

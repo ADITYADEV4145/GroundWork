@@ -39,6 +39,14 @@ describe('task_context', () => {
     });
   });
 
+  it('resolves a backticked identifier even if it is a stopword', async () => {
+    await indexedTestSource('export class Finder { find() { return 42; } }', async (ctx) => {
+      const text = await context({ task: 'How to use `find`?', files: ['options.ts'] }, ctx);
+      expect(text.split('\n')[0]).toContain('Finder.find options.ts:1');
+      expect(text).toMatch(/Body \[.*?\]:\nfind\(\) \{ return 42; \}/);
+    });
+  });
+
   it('returns a ranked definition, its caller and existing helper without reading the whole file', async () => {
     await withIndexedFixture('ts-app', async (db, root) => {
       const ctx = { db, root, config: defaultConfig() };

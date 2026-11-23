@@ -18,9 +18,10 @@ const oneLine = (s: string, limit = 140) => {
 
 function rank(task: string, hints: string[], files: string[], { db }: ToolContext) {
   const exact = new Map<string, NavigationSymbol>();
+  const quoted = [...task.matchAll(/`([^`\s]+)`/gu)].map((match) => match[1]!);
   const words = task.match(/[\p{L}\p{N}_$]+(?:\.[\p{L}\p{N}_$]+)*/gu) ?? [];
   const names = [...new Set(words.filter((w) => !ignored.has(w.toLowerCase())).slice(0, 24))];
-  const selections = hints.map((ref) => {
+  const selections = [...new Set([...hints, ...quoted])].map((ref) => {
     const found = navigationSymbols(db, ref);
     return { found, specific: found.length === 1 || ref.includes(':') };
   });

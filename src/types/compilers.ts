@@ -103,14 +103,14 @@ const goFailed = new Map<string, string>();
 const goModule = (root: string, file: string) => nearest(root, file, (names) => names.includes('go.mod') ? 'go.mod' : undefined);
 /** The checker binary for the Go toolchain this module selects, built on first use. Null when it cannot be built. */
 function goChecker(root: string, module: string, deadline: number): string | null {
-  const version = run('go', ['env', 'GOVERSION'], module, deadline).output.trim().split('\n')[0]!;
+  const [version = '', GOOS = '', GOARCH = ''] = run('go', ['env', 'GOVERSION', 'GOHOSTOS', 'GOHOSTARCH'], module, deadline).output.trim().split('\n');
   const directory = path.join(scratch(root), `go-check-${createHash('sha256').update(`${version}\0${GO_CHECKER_SOURCE}`).digest('hex').slice(0, 16)}`);
   const binary = path.join(directory, process.platform === 'win32' ? 'gw-go-check.exe' : 'gw-go-check');
   if (existsSync(binary)) return binary;
   mkdirSync(directory, { recursive: true });
   writeFileSync(path.join(directory, 'main.go'), GO_CHECKER_SOURCE);
   const temporary = `${binary}.${process.pid}`;
-  const built = run('go', ['build', '-o', temporary, path.join(directory, 'main.go')], module, deadline, { GOPROXY: 'off', GOFLAGS: '', GOWORK: 'off' });
+  const built = run('go', ['build', '-o', temporary, path.join(directory, 'main.go')], module, deadline, { GOPROXY: 'off', GOFLAGS: '', GOWORK: 'off', GOOS, GOARCH });
   if (built.status !== 0) { rmSync(temporary, { force: true }); return null; }
   renameSync(temporary, binary);
   return binary;

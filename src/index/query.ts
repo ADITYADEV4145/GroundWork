@@ -216,6 +216,21 @@ export function indexedLanguages(db: Db): import('../types.js').Language[] {
   return db.prepare('SELECT DISTINCT language FROM files WHERE language IS NOT NULL').all().map((row) => String(row.language) as import('../types.js').Language);
 }
 
+export interface ModuleGraph {
+  files: { path: string; language: string | null; lines: number }[];
+  /** Resolved file-to-file imports, one per pair. */
+  edges: { from: string; to: string }[];
+}
+
+export function moduleGraph(db: Db): ModuleGraph {
+  return {
+    files: db.prepare('SELECT path, language, lines FROM files ORDER BY path').all().map((r) => ({ path: String(r.path), language: r.language === null ? null : String(r.language), lines: Number(r.lines) })),
+    edges: db.prepare(`SELECT DISTINCT source.path s, target.path t FROM imports i
+      JOIN files source ON source.id = i.file_id JOIN files target ON target.id = i.resolved_file_id
+      WHERE source.id != target.id ORDER BY s, t`).all().map((r) => ({ from: String(r.s), to: String(r.t) })),
+  };
+}
+
 export function indexGeneration(db: Db): string | null {
   const row = db.prepare("SELECT value FROM meta WHERE key = 'generation'").get();
   return row ? String(row.value) : null;

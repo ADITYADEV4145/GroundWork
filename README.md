@@ -96,7 +96,7 @@ Then, **from the repository you want your agent to work in**:
 
 ```sh
 gw init       # build the local index in .groundwork/
-gw setup      # preview project-level changes, then confirm
+gw install    # detect your clients, preview project-level changes, then confirm
 ```
 
 Restart your agent after setup. Codex asks you to trust the new hooks once, under `/hooks`.
@@ -302,7 +302,10 @@ Timeouts fail open; type checking is not enabled after individual edits by defau
 | `gw run -- <cmd>` | Keep the full command log locally and print a trimmed summary. |
 | `gw report` | Show session guard activity and estimated savings. |
 | `gw refresh` / `gw stats` | Refresh the index or inspect its contents. |
-| `gw doctor` / `gw selftest` | Check the environment or run acceptance checks. |
+| `gw install [--client <names>\|all]` | Detect your clients and wire Groundwork into each; prints what each one enforces. See [clients](docs/clients.md). |
+| `gw update [--check]` | Update from the npm registry; installs only a download whose sha512 checksum matches. |
+| `gw view` | Open a local page with the module graph and where the last session was blocked. |
+| `gw doctor` / `gw selftest` | Check languages, type backends, the index and each client's hooks and MCP, or run acceptance checks. |
 
 Every command accepts `--json`.
 
@@ -591,7 +594,7 @@ See [reuse methodology](references/reuse.md), [grounding behavior](references/gr
 ## Privacy and security
 
 - **Local state:** the index, logs and session state stay in your repository's `.groundwork/`.
-- **Offline runtime:** there is no telemetry or hosted inference. The optional `gw init --embeddings` command downloads a local model only when explicitly requested; similarity search also works without it.
+- **Offline runtime:** there is no telemetry or hosted inference. `gw update` contacts the npm registry only when you run it. The optional `gw init --embeddings` command downloads a local model only when explicitly requested; similarity search also works without it.
 - **Your permissions:** hooks run as your user. They inspect agent actions and may wrap supported noisy commands with `gw run`; they are not an autonomous command runner.
 - **Fail open:** hook errors and timeouts let the agent continue. Explicit CLI checks still return nonzero on findings.
 
@@ -635,6 +638,10 @@ Run `gw setup --remove` to remove the integrations, then delete `.groundwork/` t
 </details>
 
 ## Learn more
+
+- [Clients](docs/clients.md): the eight supported clients and what Groundwork can enforce in each.
+- [Languages](docs/languages.md): what is checked per language and which type backend is used.
+- [Blocks](docs/blocks.md): every block and warning, what it means and how to clear it.
 
 | Start here | Go deeper |
 | --- | --- |

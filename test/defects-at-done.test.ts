@@ -135,6 +135,39 @@ func LateFeeCents(item model.Item, days int) int {
     });
     expect(shared.success).toBe(true);
     expect(shared.totalDefects).toBe(0);
+    const masked = await graded('stock-restock-then-late', {
+      'orders/restock_fee.go': `package orders
+
+import (
+	"stockroom/model"
+	"stockroom/money"
+)
+
+func stockValue(item model.Item) int {
+	return LineCents(item)
+}
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return money.RoundHalfEven(stockValue(item)*percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import "stockroom/model"
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	n, q := stockValue(item)*days*5, 0
+	q = n / 1000
+	if r := n % 1000; r*2 > 1000 || (r*2 == 1000 && q%2 == 1) {
+		q++
+	}
+	return q
+}
+`,
+    });
+    expect(masked.defects.duplicates).toBe(1);
   }, 120_000);
   it('does not count files written by arm setup as the agent\'s change', async () => {
     const { task, repo } = find('ledger-invoice-slug'), dir = path.join(work, 'setup-only');

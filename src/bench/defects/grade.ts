@@ -70,6 +70,30 @@ function tscDiagnostics(root: string): { items: { file: string; line: number; co
   return { items, infra: !r.ok && !items.length ? `tsc failed without diagnostics: ${r.output.slice(0, 300)}` : null };
 }
 
+/** Added lines split at each top-level declaration, so that a helper is credited only through code that is actually called. */
+function declarations(lines: { text: string }[]): { name: string; body: string }[] {
+  const out: { name: string; body: string }[] = [];
+  for (const l of lines) {
+    // A top-level comment documents the declaration after it, not the one before.
+    if (/^(\/\/|#|\/\*| \*)/.test(l.text)) continue;
+    const name = /^\S/.test(l.text) ? DECLARED.exec(l.text)?.[1] : undefined;
+    if (name) out.push({ name, body: l.text });
+    else if (out.length) out[out.length - 1]!.body += '\n' + l.text;
+  }
+  return out;
+}
+
+/** The bodies of the declarations `own` calls, directly or through one another. */
+function reached(own: string, all: { name: string; body: string }[]): string {
+  let text = '', rest = all;
+  for (;;) {
+    const hit = rest.filter((d) => word(d.name).test(own + '\n' + text));
+    if (!hit.length) return text;
+    text += hit.map((d) => d.body).join('\n') + '\n';
+    rest = rest.filter((d) => !hit.includes(d));
+  }
+}
+
 function goDiagnostics(root: string): { items: { file: string; line: number; message: string }[]; infra: string | null } {
   const r = run(root, ['go', 'vet', './...'], { GOFLAGS: '-mod=readonly', GOWORK: 'off' });
   if (r.infra) return { items: [], infra: r.infra };
@@ -125,11 +149,9 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
   // A compaction task whose last step was never written has nothing that could duplicate a helper.
   if (task.category === 'compaction' ? added.has(task.entry) : added.size && task.category === 'hidden-helper') {
     const join = (lines: { text: string }[]) => lines.map((l) => l.text).join('\n');
-    // After compaction only the last step's file counts: it must use each helper itself, or go through an earlier added file that does.
+    // After compaction only the last step's file counts: it must use each helper itself, or call an earlier added declaration that does.
     const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());
-    const through = task.category !== 'compaction' ? '' : [...added].filter(([file, lines]) => file !== task.entry
-      && [path.basename(file).replace(/\.[^.]+$/, ''), ...lines.flatMap((l) => DECLARED.exec(l.text)?.[1] ?? [])].some((name) => word(name).test(own)))
-      .map(([, lines]) => join(lines)).join('\n');
+    const through = task.category !== 'compaction' ? '' : reached(own, [...added].filter(([file]) => file !== task.entry).flatMap(([, lines]) => declarations(lines)));
     for (const ref of task.trap.existing) {
       const name = ref.split('#')[1]!.split('.').pop()!;
       if (!word(name).test(own) && !word(name).test(through)) items.push({ defect: 'duplicates', file: task.entry, name, evidence: `existing ${ref} is not used by the added code` });

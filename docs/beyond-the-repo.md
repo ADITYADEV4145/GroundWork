@@ -58,7 +58,7 @@ The preregistered gate is in [bench/deps](../bench/deps/PREREGISTRATION-v2.md): 
 | --- | --- | --- | --- | --- | --- |
 | [v1](../bench/deps/results/RESULTS.md) | 49/69 (71%) | 0 in 7,798 | 3.0 s for 1,048 packages | 0 | fail |
 | [v2](../bench/deps/results-v2/RESULTS.md) | 61/69 (88.4%) | 0 in 7,857 | 3.0 s for 1,048 packages | 0 | pass |
-| [v2 rerun](../bench/deps/results-v2-rerun/RESULTS.md) | 61/69 (88.4%) | 0 in 8,219 | 3.0 s for 1,048 packages | 0 | pass |
+| [v2 rerun](../bench/deps/results-v2-rerun/RESULTS.md) | 61/69 (88.4%) | 0 in 8,220 | 3.0 s for 1,048 packages | 0 | pass |
 
 v1 failed because the harness copied the Python control corpus into the case project, where it shadowed the installed packages; v2 changes only that and is disclosed in its preregistration. All results stay published. The rerun repeats the v2 protocol after code-review fixes to the checker; it misses the same eight cases.
 

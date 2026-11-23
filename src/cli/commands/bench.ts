@@ -60,11 +60,12 @@ function registerDefects(bench: Command): void {
     }));
   bench.command('validate')
     .description('check that every task fails untouched and passes with zero defects on its reference solution')
-    .action((_o: unknown, cmd: Command) => guard(cmd, async () => {
+    .option('--cache <dir>', 'local mirrors of pinned repositories; without it their tasks are skipped')
+    .action((o: { cache?: string }, cmd: Command) => guard(cmd, async () => {
       only();
       const { validate } = await import('../../bench/defects/validate.js');
-      const result = await validate();
-      emit(globalOpts(cmd), result, () => result.rows.map((r) => `${r.task}: untouched ${r.unmodifiedFails ? 'fails' : 'PASSES (bad)'}, reference ${r.referencePasses ? 'passes' : 'FAILS'}, ${r.referenceDefects} defects`).join('\n'));
+      const result = await validate(undefined, o.cache);
+      emit(globalOpts(cmd), result, () => [...result.skipped.map((t) => `${t}: skipped, no mirror (pass --cache)`), ...result.rows.map((r) => `${r.task}: untouched ${r.unmodifiedFails ? 'fails' : 'PASSES (bad)'}, reference ${r.referencePasses ? 'passes' : 'FAILS'}, ${r.referenceDefects} defects`)].join('\n'));
       if (!result.ok) process.exitCode = 1;
     }));
   bench.command('pr-study')

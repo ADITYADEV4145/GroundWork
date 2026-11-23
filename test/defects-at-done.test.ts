@@ -3,7 +3,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, write
 import os from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { grade } from '../src/bench/defects/grade.js';
+import { addedLines, grade } from '../src/bench/defects/grade.js';
 import { armBlocker, loadArms, parseUsage, registered, runSuite } from '../src/bench/defects/harness.js';
 import { prStudy } from '../src/bench/defects/pr-study.js';
 import { buildReport, leaderboard, markdown, pairedBootstrap, tasksNeeded, verdicts, writeReport } from '../src/bench/defects/report.js';
@@ -28,9 +28,9 @@ async function graded(id: string, files: Record<string, string>, reference = fal
 }
 
 describe('DefectsAtDone manifest', () => {
-  it('covers five categories on two languages and hashes reproducibly', () => {
-    expect(new Set(manifest.tasks.map((t) => t.category)).size).toBe(5);
-    expect(new Set(manifest.repos.map((r) => r.language))).toEqual(new Set(['typescript', 'python']));
+  it('covers all six categories on three languages and hashes reproducibly', () => {
+    expect(new Set(manifest.tasks.map((t) => t.category)).size).toBe(6);
+    expect(new Set(manifest.repos.map((r) => r.language))).toEqual(new Set(['typescript', 'python', 'go']));
     expect(taskSetHash()).toMatch(/^[a-f0-9]{64}$/);
     expect(taskSetHash()).toBe(taskSetHash());
     expect(CATEGORIES).toContain('real-failure');
@@ -72,6 +72,246 @@ export function refundCents(invoice: Invoice, feeFraction: number): number {
     expect(firstStepOnly.defects.duplicates).toBe(0);
   }, 120_000);
 
+  it('counts Go compile errors and accepts a Go helper shared across compaction', async () => {
+    const broken = await graded('stock-parcel-weight', { 'shipping/weight.go': `package shipping
+
+import (
+	"stockroom/internal/units"
+	"stockroom/model"
+)
+
+func TotalGrams(parcels []model.Parcel) (float64, error) {
+	total := 0
+	for _, p := range parcels {
+		grams, err := units.ToGrams(p.Weight, p.Unit)
+		if err != nil {
+			return 0, err
+		}
+		total += grams
+	}
+	return float64(total), nil
+}
+` });
+    expect(broken.defects.typeErrors).toBeGreaterThan(0);
+    const undeclared = await graded('stock-parcel-weight', { 'shipping/weight.go': `package shipping
+
+import (
+	"github.com/example/absent/units"
+	"stockroom/model"
+)
+
+func TotalGrams(parcels []model.Parcel) (float64, error) {
+	return units.Sum(parcels)
+}
+` });
+    expect(undeclared.defects.typeErrors).toBeGreaterThan(0);
+    expect(undeclared.success).toBe(false);
+    const shared = await graded('stock-restock-then-late', {
+      'orders/restock_fee.go': `package orders
+
+import (
+	"stockroom/model"
+	"stockroom/money"
+)
+
+func feeCents(item model.Item, num int, den int) int {
+	return money.RoundHalfEven(LineCents(item)*num, den)
+}
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return feeCents(item, percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import "stockroom/model"
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	return feeCents(item, days*5, 1000)
+}
+`,
+    });
+    expect(shared.success).toBe(true);
+    expect(shared.totalDefects).toBe(0);
+    const masked = await graded('stock-restock-then-late', {
+      'orders/restock_fee.go': `package orders
+
+import (
+	"stockroom/model"
+	"stockroom/money"
+)
+
+func stockValue(item model.Item) int {
+	return LineCents(item)
+}
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return money.RoundHalfEven(stockValue(item)*percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import "stockroom/model"
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	n, q := stockValue(item)*days*5, 0
+	q = n / 1000
+	if r := n % 1000; r*2 > 1000 || (r*2 == 1000 && q%2 == 1) {
+		q++
+	}
+	return q
+}
+`,
+    });
+    expect(masked.defects.duplicates).toBe(1);
+    const packaged = await graded('stock-restock-then-late', {
+      'fees/fees.go': `package fees
+
+import "stockroom/money"
+
+// Cents is num/den of a value in cents.
+func Cents(value int, num int, den int) int {
+	return money.RoundHalfEven(value*num, den)
+}
+`,
+      'orders/restock_fee.go': `package orders
+
+import (
+	"stockroom/fees"
+	"stockroom/model"
+)
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return fees.Cents(LineCents(item), percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import (
+	"stockroom/fees"
+	"stockroom/model"
+)
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	return fees.Cents(LineCents(item), days*5, 1000)
+}
+`,
+    });
+    expect(packaged.success).toBe(true);
+    expect(packaged.totalDefects).toBe(0);
+    // The earlier step adds an import to a block that was already there, so the added lines do not include the block's opening.
+    const total = readFileSync(path.join(process.cwd(), 'bench/defects-at-done/repos/stock-room/orders/total.go'), 'utf8');
+    const appended = await graded('stock-restock-then-late', {
+      'fees/fees.go': `package fees
+
+import "stockroom/money"
+
+// Cents is num/den of a value in cents.
+func Cents(value int, num int, den int) int {
+	return money.RoundHalfEven(value*num, den)
+}
+`,
+      'orders/total.go': total.replace('\t"stockroom/model"', '\t"stockroom/fees"\n\t"stockroom/model"') + `
+func feeOf(item model.Item, num int, den int) int {
+	return fees.Cents(LineCents(item), num, den)
+}
+`,
+      'orders/restock_fee.go': `package orders
+
+import "stockroom/model"
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return feeOf(item, percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import "stockroom/model"
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	return feeOf(item, days*5, 1000)
+}
+`,
+    });
+    expect(appended.success).toBe(true);
+    expect(appended.totalDefects).toBe(0);
+  }, 120_000);
+  it('reads a staged file whose name has a space under its real name', () => {
+    const repo = mkdtempSync(path.join(work, 'spaced-'));
+    const git = (...args: string[]) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@localhost', ...args], { cwd: repo, encoding: 'utf8', stdio: 'pipe' }).trim();
+    git('init', '-q'); git('commit', '-qm', 'base', '--allow-empty');
+    const base = git('rev-parse', 'HEAD');
+    writeFileSync(path.join(repo, 'fee notes.txt'), 'one\n');
+    git('add', '-A');
+    expect([...addedLines(repo, base).keys()]).toEqual(['fee notes.txt']);
+  });
+  it('follows a helper alias imported by an earlier step', async () => {
+    const g = await graded('route-pickup-then-dropoff', {
+      'routeplan/windows.py': `from routeplan.rounding import round_up_to_five as round_time
+
+
+def padded(minutes: float) -> int:
+    "Round a window up."
+    return round_time(minutes)
+
+
+def pickup_window(distance_km: float, speed_kph: float) -> int:
+    return padded(distance_km / speed_kph * 60 + 10)
+`,
+      'routeplan/dropoff.py': `from routeplan.windows import padded
+
+
+def dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int:
+    return padded(distance_km / speed_kph * 60 + 3 * parcels)
+`,
+    });
+    expect(g.success).toBe(true);
+    expect(g.defects.duplicates).toBe(0);
+    const windows = `from routeplan.rounding import round_up_to_five as round_time
+from routeplan.timing import eta_minutes, round_up_to_five
+
+
+def pickup_window(distance_km: float, speed_kph: float) -> int:
+    return round_time(distance_km / speed_kph * 60 + 10)
+`;
+    const own = `import math
+
+
+def round_time(minutes: float) -> int:
+    return int(math.ceil(minutes / 5.0)) * 5
+
+
+def dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int:
+    return round_time(distance_km / speed_kph * 60 + 3 * parcels)
+`;
+    const shadowed = await graded('route-pickup-then-dropoff', { 'routeplan/windows.py': windows, 'routeplan/dropoff.py': own });
+    expect(shadowed.defects.duplicates).toBe(1);
+    const sibling = await graded('route-pickup-then-dropoff', { 'routeplan/windows.py': windows,
+      'routeplan/dropoff.py': own.replace('import math', 'import math\nfrom routeplan.windows import eta_minutes').replace(/round_time/g, 'nearest_five') });
+    expect(sibling.defects.duplicates).toBe(1);
+    const qualified = await graded('route-pickup-then-dropoff', { 'routeplan/windows.py': windows, 'routeplan/dropoff.py': `from routeplan import windows
+
+
+def round_time(minutes: float) -> int:
+    return windows.round_time(minutes)
+
+
+def dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int:
+    return round_time(distance_km / speed_kph * 60 + 3 * parcels)
+` });
+    expect(qualified.defects.duplicates).toBe(0);
+    const unrelated = await graded('route-pickup-then-dropoff', { 'routeplan/windows.py': windows.replace(/round_time/g, 'ceil'),
+      'routeplan/dropoff.py': own.replace('int(math.ceil(minutes / 5.0)) * 5', 'math.ceil(minutes / 5.0) * 5') });
+    expect(unrelated.defects.duplicates).toBe(1);
+  });
   it('does not count files written by arm setup as the agent\'s change', async () => {
     const { task, repo } = find('ledger-invoice-slug'), dir = path.join(work, 'setup-only');
     materialize(repo, dir);
@@ -97,6 +337,39 @@ export function ownerEmail(store: AccountStore, handle: string): string | null {
 ` });
     expect(wrong.defects.wrongArguments).toBe(1);
     expect(wrong.defects.inventedCalls).toBe(0);
+  }, 120_000);
+  it('does not count a call a test expects to raise, but counts the same call outside it', async () => {
+    const test = (body: string) => `import unittest
+from routeplan.weight import format_weight
+
+
+class Required(unittest.TestCase):
+    def test_unit_required(self):
+${body}
+`;
+    const expected = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(TypeError):
+            format_weight(12.34)
+        self.assertRaises(TypeError, lambda: format_weight(12.34))`) }, true);
+    expect(expected.items).toEqual([]);
+    const plain = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(TypeError):
+            pass
+        format_weight(12.34)`) }, true);
+    expect(plain.defects.wrongArguments).toBe(1);
+  const eager = await graded('route-weight-unit', { 'tests/test_required.py': test(`        self.assertRaises(TypeError, format_weight(12.34))`) }, true);
+  expect(eager.defects.wrongArguments).toBe(1);
+  const wrapped = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(
+            TypeError
+        ):
+            format_weight(12.34)`) }, true);
+  expect(wrapped.items).toEqual([]);
+  const inline = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(TypeError): format_weight(12.34)`) }, true);
+  expect(inline.items).toEqual([]);
+  const named = await graded('route-weight-unit', { 'tests/test_required.py': test(`        ctx = self.subTest()
+        with self.assertRaises(TypeError), ctx: format_weight(12.34)`) }, true);
+  expect(named.items).toEqual([]);
+  const header = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(format_weight(12.34)):
+            pass`) }, true);
+  expect(header.defects.wrongArguments).toBe(1);
   }, 120_000);
   it('counts stale docs after a signature change and callers missed by a ripple change', async () => {
     const { repo } = find('ledger-tax-options');
@@ -132,6 +405,8 @@ describe('DefectsAtDone harness and report', () => {
     expect([again.records, again.skipped]).toEqual([0, 2]);
     await expect(runSuite({ ...options, arms: ['native'], model: 'other' })).rejects.toThrow(/different model/);
     await expect(runSuite({ ...options, arms: ['native'], out: path.join(process.cwd(), 'x') })).rejects.toThrow(/outside/);
+    await expect(runSuite({ ...options, run: 'unmirrored', arms: ['native'], tasks: ['mux-host-port-vars'] })).rejects.toThrow(/No local mirror/);
+    expect(existsSync(path.join(out, 'unmirrored', 'run.json'))).toBe(false);
     // The blocked arm survives a later report rebuild, and a changed arm definition cannot resume the run.
     expect(buildReport(path.join(out, 'unit')).notRun.map((b) => b.arm)).toEqual(['serena']);
     const root = path.join(work, 'data');

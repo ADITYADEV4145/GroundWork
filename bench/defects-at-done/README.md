@@ -21,7 +21,7 @@ re-implemented helpers, callers and docs left stale, and failing affected tests.
 ## Commands
 
 ```
-gw bench validate --suite defects-at-done            # untouched fails, reference passes, for every task
+gw bench validate --suite defects-at-done [--cache <mirrors>]  # untouched fails, reference passes, for every task
 gw bench run --suite defects-at-done --arms all --run <id> --out <dir outside the checkout> --model <model> [--prereg <file>]
 gw bench leaderboard --suite defects-at-done <dir>/<id>
 gw bench pr-study --suite defects-at-done --list prs.json --cache <mirrors>
@@ -33,7 +33,9 @@ gw bench pr-study --suite defects-at-done --list prs.json --cache <mirrors>
 
 ## Known gaps
 
-- 10 tasks on TypeScript and Python in five categories. There is no real-failure task yet; the preregistration requires 60 tasks with all six categories before a confirmatory run.
+- All 60 tasks the preregistration requires, on TypeScript, Python and Go. Each of the six categories has the required eight or more (real-failure 19, hidden-helper 9, the others 8). The real-failure tasks are 16 pinned more-itertools fixes and 3 pinned gorilla/mux fixes. A confirmatory run is still not possible: the two-person grader audit is not done and the competitor arms are not pinned. Only the five tasks in the exploratory pilot have had an agent run; the other 55 have had none.
+- The real-failure tasks are past bugs in more-itertools (MIT) and gorilla/mux (BSD-3-Clause), each pinned to the commit before its upstream fix; `reference/<task>.patch` is that upstream fix and `provenance` links it. They need local mirrors: `validate --cache <mirrors>` checks them and plain `validate` lists them as skipped. No agent has been run on them.
+- An exploratory pilot on five of these tasks tied at zero defects in both arms (`bench/pilots/2026-11-23-devin/`), so the current fixture tasks are not expected to separate arms on a strong agent.
 - Competitor arms are unpinned, so they are reported as not run.
 - Sessions run in fresh local workspaces, not containers.
 - The grader has unit tests but no human-label audit yet; the preregistration requires one.

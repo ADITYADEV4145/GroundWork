@@ -1,0 +1,13 @@
+You are one run of a coding benchmark. Do exactly the task below and nothing else.
+
+Setup: the attached file workspace.tgz is a small git repository. Extract it into an empty directory (`tar -xzf workspace.tgz`); the repository is the `workspace` directory. Work only inside it. Do not read, clone or search any other repository or any copy of GroundWork's source on this machine or online, do not look for this benchmark's tasks or answers, and do not read or write the long-term memory folder for this task. Do not open a pull request and do not push anywhere.
+
+GroundWork is provided for this task. Before you start, install it and index the workspace: `npm install -g ./groundwork-agent-0.0.1.tgz` (the second attached file), then run `gw init` inside the workspace. Its guide is the file SKILL.md in the installed package (`$(npm root -g)/groundwork-agent/SKILL.md`); read it and follow it. Its MCP server and hooks are not connected in this session, so use the `gw` command line instead: `gw symbols` and `gw show` to look up code, `gw similar` before writing a new helper, `gw impact` after changing a function's signature, `gw verify` on the files you changed, and `gw check` before you say done, fixing what it reports.
+
+Task:
+
+Add `pickup_window(distance_km: float, speed_kph: float) -> int` in a new module `routeplan/windows.py`: the travel time in minutes plus 10 minutes of loading, rounded the way this codebase rounds customer-facing times.
+
+Work only in this repository. Run the existing tests. Say "done" only when you believe the change is complete and correct; your workspace is graded exactly as you leave it.
+
+When you are finished, do not commit. From the directory that contains `workspace`, run `tar -czf result-route-pickup-then-dropoff-groundwork.tgz workspace` (keep the .git directory in it), attach that file to your final message, and make the final message the single word "done". Do not ask questions; if something is unclear, make your best choice.

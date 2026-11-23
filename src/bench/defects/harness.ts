@@ -5,7 +5,7 @@ import path from 'node:path';
 import * as z from 'zod';
 import { grade, GRADER_VERSION, type Grade } from './grade.js';
 import { dataRoot, loadManifest, projectRoot, taskSetHash, type Repo, type Task } from './tasks.js';
-import { git, materialize, snapshotSetup, taskPrompt, writeJson } from './workspaces.js';
+import { findMirror, git, materialize, snapshotSetup, taskPrompt, writeJson } from './workspaces.js';
 
 const id = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const mcpServer = z.object({ name: id, command: z.string().min(1), args: z.array(z.string()).default([]), env: z.record(z.string(), z.string()).default({}) });
@@ -40,6 +40,12 @@ export function loadAgent(name: string, root = dataRoot): Agent {
   return agent;
 }
 /** Why an arm cannot run yet, or null when it can. */
+function onPath(tool: string): boolean {
+  if (tool.includes(path.sep)) return existsSync(tool);
+  const exts = process.platform === 'win32' ? (process.env.PATHEXT ?? '.EXE;.CMD;.BAT').split(';') : [''];
+  return (process.env.PATH ?? '').split(path.delimiter).some((dir) => dir && exts.some((ext) => existsSync(path.join(dir, tool + ext))));
+}
+
 export function armBlocker(arm: Arm): string | null {
   if (arm.kind === 'mcp' && (!arm.version || !arm.mcp)) return `${arm.id} has no pinned version and launch command in arms.json (install per ${arm.docs})`;
   if (arm.kind === 'groundwork' && !existsSync(path.join(projectRoot, 'dist/cli/main.js'))) return 'GroundWork is not built: run npm run build';
@@ -175,6 +181,15 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
     agentHash: sha(agent),
     preregistration: options.prereg ? registered(options.prereg) : null,
     replicates: options.replicates, maxTurns: options.maxTurns ?? 60, timeoutMs: options.timeoutMs ?? 1_200_000, tasks: tasks.map((t) => t.id) };
+  // Checked before the run is recorded, so that a run nothing started in can be retried under the same id.
+  // A missing toolchain would only show up at grading, after the agent had run and the record was already kept as invalid.
+  for (const id of new Set(tasks.map((t) => t.repo))) {
+    const tool = manifest.repos.find((r) => r.id === id)!.test[0]!;
+    if (!onPath(tool)) throw new Error(`${tool} is not on PATH; it is needed to grade ${id} tasks`);
+    // Likewise a missing mirror: its records would be kept as invalid and skipped on resume.
+    const repo = manifest.repos.find((r) => r.id === id)!;
+    if (repo.source.kind !== 'fixture' && !findMirror(repo, options.cache)) throw new Error(`No local mirror of ${id}; clone ${repo.source.url} and pass --cache, or leave its tasks out with --tasks`);
+  }
   if (existsSync(meta)) {
     const previous = JSON.parse(readFileSync(meta, 'utf8')) as Record<string, unknown>;
     for (const key of Object.keys(header) as (keyof typeof header)[])

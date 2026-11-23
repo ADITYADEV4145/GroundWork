@@ -86,6 +86,27 @@ export function runSession({ suite: name, arm, run, model, out, maxTurns = 40, t
   if (outDir === source || outDir.startsWith(source + path.sep)) throw new Error('Session state must live outside the GroundWork checkout');
   const dir = path.join(outDir, name, arm, String(run)), metaFile = path.join(dir, 'metadata.json');
   mkdirSync(dir, { recursive: true });
+  const release = lockSession(dir);
+  try { return runLocked({ suite, name, tasks, arm, run, model, dir, metaFile, treatment, maxTurns, timeoutMs, claude, log }); } finally { release(); }
+}
+
+/** One process per session: a second launch would delete the live workspace and bill the task twice. A lock whose process is gone is taken over. */
+function lockSession(dir) {
+  const lock = path.join(dir, 'session.lock');
+  for (let attempt = 0; ; attempt++) {
+    try { writeFileSync(lock, String(process.pid), { flag: 'wx' }); break; } catch (err) {
+      if (err.code !== 'EEXIST' || attempt) throw err;
+      const pid = Number(readFileSync(lock, 'utf8'));
+      let alive = false;
+      try { process.kill(pid, 0); alive = true; } catch (e) { alive = e.code === 'EPERM'; }
+      if (alive) throw new Error(`Session is already running in process ${pid}`);
+      rmSync(lock, { force: true });
+    }
+  }
+  return () => rmSync(lock, { force: true });
+}
+
+function runLocked({ suite, name, tasks, arm, run, model, dir, metaFile, treatment, maxTurns, timeoutMs, claude, log }) {
   const captureRevision = git(source, 'rev-parse', 'HEAD').trim();
   const meta = existsSync(metaFile) ? readJson(metaFile) : { protocol: PROTOCOL, suite: name, revision: suite.revision, condition: arm, run,
     agent: 'claude-code', agentVersion: spawnSync(claude[0], [...claude.slice(1), '--version'], { encoding: 'utf8' }).stdout?.trim() || null,

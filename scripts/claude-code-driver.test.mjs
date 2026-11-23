@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { billedTokens, parseAnswer, parseResult, reduction, report, runSession } from '../bench/claude-code/driver.mjs';
@@ -66,6 +66,13 @@ else console.log(JSON.stringify({ result: 'done', usage: { input_tokens: 7, outp
     assert.equal(readFileSync(calls, 'utf8').length, before);
     assert.throws(() => runSession({ ...options, model: 'other' }), /different model/);
     assert.throws(() => runSession({ ...options, run: 17 }), /Run must be/);
+    const lock = path.join(session, 'session.lock');
+    assert.equal(existsSync(lock), false);
+    writeFileSync(lock, String(process.ppid));
+    assert.throws(() => runSession(options), /already running/);
+    writeFileSync(lock, '2147483646');
+    runSession(options);
+    assert.equal(existsSync(lock), false);
 
     const nav = (await report(path.join(dir, 'out'))).suites.nav;
     assert.equal(nav.confirmatory, false);

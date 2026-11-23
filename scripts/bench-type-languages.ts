@@ -258,7 +258,7 @@ export function markdown(results: { manifestSha256: string; checkerCommit: strin
     for (const [e, n] of count) { any = true; lines.push(`- ${NAMES[r.language]}: ${n} x ${e}`); }
   }
   if (!any) lines.push('None.');
-  lines.push('', '## Environment', '', ...Object.entries(results.environment).map(([k, v]) => `- ${k}: ${v}`), '', 'Raw rows: `results.json`. Protocol and limitations: `../PREREGISTRATION.md`.', '');
+  lines.push('', '## Environment', '', ...Object.entries(results.environment).map(([k, v]) => `- ${k}: ${v}`), '', 'Raw rows: `<language>.cases.json` and `<language>.latency.json`. Protocol and limitations: `../PREREGISTRATION.md`.', '');
   return lines.join('\n');
 }
 

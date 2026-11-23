@@ -279,7 +279,10 @@ never the project's `bin`/`obj`). Only undefined names, unknown members, wrong a
 counts and unresolved imports on changed lines can block; everything else, and everything
 `javac` reports with an incomplete classpath, is informational. A missing toolchain or
 project file leaves grounding unchanged. These four have no `def|impl|refs` navigation.
-Measured results, including the rules that fail: `bench/type-languages/results/RESULTS.md`.
+On the preregistered gate (two pinned real repositories per language, seeded one-line errors,
+100 real commits each) Java passes; Go, Rust and C# fail, because checks on the large
+repositories (Hugo, rust-analyzer, Polly) often exceed the 4 s budget and fail open, and Rust
+recall is 60%: `bench/type-languages/results/RESULTS.md`.
 
 The optional `types` config section defaults to
 `{ "enabled": true, "stopGate": true, "postToolHook": false, "timeoutMs": 4000,

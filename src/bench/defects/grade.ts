@@ -70,9 +70,11 @@ function tscDiagnostics(root: string): { items: { file: string; line: number; co
   return { items, infra: !r.ok && !items.length ? `tsc failed without diagnostics: ${r.output.slice(0, 300)}` : null };
 }
 
+type Declaration = { name: string; body: string; imported: boolean; line: string; file: string };
+
 /** Added lines split at each top-level declaration, so that a helper is credited only through code that is actually called. */
-function declarations(lines: { text: string }[]): { name: string; body: string; imported: boolean }[] {
-  const out: { name: string; body: string; imported: boolean }[] = [];
+function declarations(file: string, lines: { text: string }[]): Declaration[] {
+  const out: Declaration[] = [];
   for (const l of lines) {
     // A top-level comment documents the declaration after it, not the one before.
     if (/^(\/\/|#|\/\*| \*)/.test(l.text)) continue;
@@ -81,19 +83,26 @@ function declarations(lines: { text: string }[]): { name: string; body: string; 
     // An import is a declaration of each name it binds, so an alias re-exported by an earlier step still leads to the helper.
     if (bound !== undefined) for (const part of bound.replace(/[{}()]/g, '').split(',')) {
       const alias = /([\w$]+)\s*$/.exec(part)?.[1];
-      if (alias) out.push({ name: alias, body: part, imported: true });
+      if (alias) out.push({ name: alias, body: part, imported: true, line: l.text, file });
     }
-    else if (name) out.push({ name, body: l.text, imported: false });
+    else if (name) out.push({ name, body: l.text, imported: false, line: l.text, file });
     else if (out.length) out[out.length - 1]!.body += '\n' + l.text;
   }
   return out;
 }
 
-/** The bodies of the declarations `own` calls, directly or through one another. */
-function reached(own: string, all: { name: string; body: string }[]): string {
-  let text = '', rest = all;
+/** The bodies of the earlier declarations the last step's `own` code calls, directly or through one another. */
+function reached(own: string, mine: Declaration[], earlier: Declaration[]): string {
+  const imports = [...mine, ...earlier].filter((d) => d.imported);
+  const bare = (d: Declaration, text: string) => new RegExp(`(?<![\\w$.])${escape(d.name)}(?![\\w$])`).test(text);
+  // `q.name` is the earlier declaration only when q is an import of the module that declares it; `math.ceil` is not an earlier `ceil`.
+  const qualified = (d: Declaration, text: string) => [...text.matchAll(new RegExp(`([\\w$]+)\\s*\\.\\s*${escape(d.name)}(?![\\w$])`, 'g'))]
+    .some((m) => imports.some((i) => i.name === m[1] && [path.basename(d.file).replace(/\.[^.]+$/, ''), path.basename(path.dirname(d.file))].some((module) => module && word(module).test(i.line))));
+  // A bare name the last step declares itself is its own, not the earlier step's.
+  const shadowed = new Set(mine.filter((d) => !d.imported).map((d) => d.name));
+  let text = '', rest = earlier;
   for (;;) {
-    const hit = rest.filter((d) => word(d.name).test(own + '\n' + text));
+    const hit = rest.filter((d) => qualified(d, own + '\n' + text) || bare(d, text) || (bare(d, own) && !shadowed.has(d.name)));
     if (!hit.length) return text;
     text += hit.map((d) => d.body).join('\n') + '\n';
     rest = rest.filter((d) => !hit.includes(d));
@@ -157,9 +166,8 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
     const join = (lines: { text: string }[]) => lines.map((l) => l.text).join('\n');
     // After compaction only the last step's file counts: it must use each helper itself, or call an earlier added declaration that does.
     const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());
-    const through = task.category !== 'compaction' ? '' : reached(own, [...added].filter(([file]) => file !== task.entry).flatMap(([, lines]) => declarations(lines))
-      // A name the last step declares itself is its own, not the earlier step's, unless it reaches the earlier one through a qualifier.
-      .filter((d) => new RegExp(`\\.\\s*${escape(d.name)}(?![\\w$])`).test(own) || !declarations(added.get(task.entry) ?? []).some((mine) => mine.name === d.name && !mine.imported)));
+    const through = task.category !== 'compaction' ? '' : reached(own, declarations(task.entry, added.get(task.entry) ?? []),
+      [...added].filter(([file]) => file !== task.entry).flatMap(([file, lines]) => declarations(file, lines)));
     for (const ref of task.trap.existing) {
       const name = ref.split('#')[1]!.split('.').pop()!;
       if (!word(name).test(own) && !word(name).test(through)) items.push({ defect: 'duplicates', file: task.entry, name, evidence: `existing ${ref} is not used by the added code` });

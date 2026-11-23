@@ -364,6 +364,7 @@ describe('DefectsAtDone harness and report', () => {
     await expect(runSuite({ ...options, arms: ['native'], model: 'other' })).rejects.toThrow(/different model/);
     await expect(runSuite({ ...options, arms: ['native'], out: path.join(process.cwd(), 'x') })).rejects.toThrow(/outside/);
     await expect(runSuite({ ...options, run: 'unmirrored', arms: ['native'], tasks: ['mux-host-port-vars'] })).rejects.toThrow(/No local mirror/);
+    expect(existsSync(path.join(out, 'unmirrored', 'run.json'))).toBe(false);
     // The blocked arm survives a later report rebuild, and a changed arm definition cannot resume the run.
     expect(buildReport(path.join(out, 'unit')).notRun.map((b) => b.arm)).toEqual(['serena']);
     const root = path.join(work, 'data');

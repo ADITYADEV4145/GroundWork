@@ -181,6 +181,15 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
     agentHash: sha(agent),
     preregistration: options.prereg ? registered(options.prereg) : null,
     replicates: options.replicates, maxTurns: options.maxTurns ?? 60, timeoutMs: options.timeoutMs ?? 1_200_000, tasks: tasks.map((t) => t.id) };
+  // Checked before the run is recorded, so that a run nothing started in can be retried under the same id.
+  // A missing toolchain would only show up at grading, after the agent had run and the record was already kept as invalid.
+  for (const id of new Set(tasks.map((t) => t.repo))) {
+    const tool = manifest.repos.find((r) => r.id === id)!.test[0]!;
+    if (!onPath(tool)) throw new Error(`${tool} is not on PATH; it is needed to grade ${id} tasks`);
+    // Likewise a missing mirror: its records would be kept as invalid and skipped on resume.
+    const repo = manifest.repos.find((r) => r.id === id)!;
+    if (repo.source.kind !== 'fixture' && !findMirror(repo, options.cache)) throw new Error(`No local mirror of ${id}; clone ${repo.source.url} and pass --cache, or leave its tasks out with --tasks`);
+  }
   if (existsSync(meta)) {
     const previous = JSON.parse(readFileSync(meta, 'utf8')) as Record<string, unknown>;
     for (const key of Object.keys(header) as (keyof typeof header)[])
@@ -194,14 +203,6 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
     writeJson(meta, { ...previous, arms });
   } else writeJson(meta, { ...header, arms: Object.fromEntries(wanted.map((a) => [a.id, sha(a)])), startedAt: new Date().toISOString() });
 
-  // A missing toolchain would only show up at grading, after the agent had run and the record was already kept as invalid.
-  for (const id of new Set(tasks.map((t) => t.repo))) {
-    const tool = manifest.repos.find((r) => r.id === id)!.test[0]!;
-    if (!onPath(tool)) throw new Error(`${tool} is not on PATH; it is needed to grade ${id} tasks`);
-    // Likewise a missing mirror: its records would be kept as invalid and skipped on resume.
-    const repo = manifest.repos.find((r) => r.id === id)!;
-    if (repo.source.kind !== 'fixture' && !findMirror(repo, options.cache)) throw new Error(`No local mirror of ${id}; clone ${repo.source.url} and pass --cache, or leave its tasks out with --tasks`);
-  }
   let records = 0, skipped = 0;
   for (const arm of wanted) {
     const reason = armBlocker(arm);

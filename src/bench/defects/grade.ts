@@ -28,6 +28,8 @@ const TS_INVENTED = new Set([2304, 2305, 2307, 2339, 2551, 2552, 2614, 2724]);
 const TS_ARGUMENTS = new Set([2554, 2555, 2556, 2575, 2353]);
 /** Tool state an arm may leave behind; never part of the agent's change. */
 const TOOL_STATE = /(^|\/)(\.groundwork|\.serena|\.claude|\.codex|\.cursor|\.augment|\.codebase-memory|node_modules|__pycache__|\.git)\//;
+/** A top-level declaration in an added file, and its name. Go functions may carry a receiver. */
+const DECLARED = /^\s*(?:export\s+)?(?:async\s+)?(?:function|def|const|class|func)\s+(?:\([^)]*\)\s*)?([\w$]+)/;
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const word = (name: string) => new RegExp(`(?<![\\w$])${escape(name)}(?![\\w$])`);
 
@@ -68,6 +70,14 @@ function tscDiagnostics(root: string): { items: { file: string; line: number; co
   return { items, infra: !r.ok && !items.length ? `tsc failed without diagnostics: ${r.output.slice(0, 300)}` : null };
 }
 
+function goDiagnostics(root: string): { items: { file: string; line: number; message: string }[]; infra: string | null } {
+  const r = run(root, ['go', 'vet', './...'], { GOFLAGS: '-mod=mod', GOWORK: 'off' });
+  if (r.infra) return { items: [], infra: r.infra };
+  const items = [...r.output.matchAll(/^(?:vet: )?(?:\.\/)?([^\s:#]+\.go):(\d+):(?:\d+:)? (.*)$/gm)]
+    .map((m) => ({ file: m[1]!.split(path.sep).join('/'), line: Number(m[2]), message: m[3]! }));
+  return { items, infra: !r.ok && !items.length ? `go vet failed without diagnostics: ${r.output.slice(0, 300)}` : null };
+}
+
 async function grounding(root: string, base: string): Promise<DefectItem[]> {
   await initSqlBackend();
   await refreshIndex(root);
@@ -100,6 +110,12 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
       items.push({ defect: TS_INVENTED.has(d.code) ? 'inventedCalls' : TS_ARGUMENTS.has(d.code) ? 'wrongArguments' : 'typeErrors',
         file: d.file, line: d.line, name: `TS${d.code}`, evidence: `tsc: ${d.message}` });
   }
+  if (repo.language === 'go') {
+    const diagnostics = goDiagnostics(root);
+    if (diagnostics.infra) invalid.push(diagnostics.infra);
+    for (const d of diagnostics.items) if (onAdded(d.file, d.line))
+      items.push({ defect: 'typeErrors', file: d.file, line: d.line, name: 'go vet', evidence: `go vet: ${d.message}` });
+  }
   try {
     for (const g of await grounding(root, base))
       if (!items.some((i) => i.file === g.file && i.line === g.line && i.defect !== 'typeErrors')) items.push(g);
@@ -112,8 +128,8 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
     // After compaction only the last step's file counts: it must use each helper itself, or go through an earlier added file that does.
     const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());
     const through = task.category !== 'compaction' ? '' : [...added].filter(([file, lines]) => file !== task.entry
-      && lines.some((l) => /^\s*(export\s+)?(async\s+)?(function|def|const|class)\s/.test(l.text))
-      && word(path.basename(file).replace(/\.[^.]+$/, '')).test(own)).map(([, lines]) => join(lines)).join('\n');
+      && [path.basename(file).replace(/\.[^.]+$/, ''), ...lines.flatMap((l) => DECLARED.exec(l.text)?.[1] ?? [])].some((name) => word(name).test(own)))
+      .map(([, lines]) => join(lines)).join('\n');
     for (const ref of task.trap.existing) {
       const name = ref.split('#')[1]!.split('.').pop()!;
       if (!word(name).test(own) && !word(name).test(through)) items.push({ defect: 'duplicates', file: task.entry, name, evidence: `existing ${ref} is not used by the added code` });

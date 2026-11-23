@@ -72,6 +72,57 @@ export function refundCents(invoice: Invoice, feeFraction: number): number {
     expect(firstStepOnly.defects.duplicates).toBe(0);
   }, 120_000);
 
+  it('counts Go compile errors and accepts a Go helper shared across compaction', async () => {
+    const broken = await graded('stock-parcel-weight', { 'shipping/weight.go': `package shipping
+
+import (
+	"stockroom/internal/units"
+	"stockroom/model"
+)
+
+func TotalGrams(parcels []model.Parcel) (float64, error) {
+	total := 0
+	for _, p := range parcels {
+		grams, err := units.ToGrams(p.Weight, p.Unit)
+		if err != nil {
+			return 0, err
+		}
+		total += grams
+	}
+	return float64(total), nil
+}
+` });
+    expect(broken.defects.typeErrors).toBeGreaterThan(0);
+    const shared = await graded('stock-restock-then-late', {
+      'orders/restock_fee.go': `package orders
+
+import (
+	"stockroom/model"
+	"stockroom/money"
+)
+
+func feeCents(item model.Item, num int, den int) int {
+	return money.RoundHalfEven(LineCents(item)*num, den)
+}
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return feeCents(item, percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import "stockroom/model"
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	return feeCents(item, days*5, 1000)
+}
+`,
+    });
+    expect(shared.success).toBe(true);
+    expect(shared.totalDefects).toBe(0);
+  }, 120_000);
   it('does not count files written by arm setup as the agent\'s change', async () => {
     const { task, repo } = find('ledger-invoice-slug'), dir = path.join(work, 'setup-only');
     materialize(repo, dir);

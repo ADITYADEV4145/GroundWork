@@ -40,6 +40,12 @@ export function loadAgent(name: string, root = dataRoot): Agent {
   return agent;
 }
 /** Why an arm cannot run yet, or null when it can. */
+function onPath(tool: string): boolean {
+  if (tool.includes(path.sep)) return existsSync(tool);
+  const exts = process.platform === 'win32' ? (process.env.PATHEXT ?? '.EXE;.CMD;.BAT').split(';') : [''];
+  return (process.env.PATH ?? '').split(path.delimiter).some((dir) => dir && exts.some((ext) => existsSync(path.join(dir, tool + ext))));
+}
+
 export function armBlocker(arm: Arm): string | null {
   if (arm.kind === 'mcp' && (!arm.version || !arm.mcp)) return `${arm.id} has no pinned version and launch command in arms.json (install per ${arm.docs})`;
   if (arm.kind === 'groundwork' && !existsSync(path.join(projectRoot, 'dist/cli/main.js'))) return 'GroundWork is not built: run npm run build';
@@ -188,6 +194,11 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
     writeJson(meta, { ...previous, arms });
   } else writeJson(meta, { ...header, arms: Object.fromEntries(wanted.map((a) => [a.id, sha(a)])), startedAt: new Date().toISOString() });
 
+  // A missing toolchain would only show up at grading, after the agent had run and the record was already kept as invalid.
+  for (const id of new Set(tasks.map((t) => t.repo))) {
+    const tool = manifest.repos.find((r) => r.id === id)!.test[0]!;
+    if (!onPath(tool)) throw new Error(`${tool} is not on PATH; it is needed to grade ${id} tasks`);
+  }
   let records = 0, skipped = 0;
   for (const arm of wanted) {
     const reason = armBlocker(arm);

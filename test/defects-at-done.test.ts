@@ -168,6 +168,43 @@ func LateFeeCents(item model.Item, days int) int {
 `,
     });
     expect(masked.defects.duplicates).toBe(1);
+    const packaged = await graded('stock-restock-then-late', {
+      'fees/fees.go': `package fees
+
+import "stockroom/money"
+
+// Cents is num/den of a value in cents.
+func Cents(value int, num int, den int) int {
+	return money.RoundHalfEven(value*num, den)
+}
+`,
+      'orders/restock_fee.go': `package orders
+
+import (
+	"stockroom/fees"
+	"stockroom/model"
+)
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return fees.Cents(LineCents(item), percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import (
+	"stockroom/fees"
+	"stockroom/model"
+)
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	return fees.Cents(LineCents(item), days*5, 1000)
+}
+`,
+    });
+    expect(packaged.success).toBe(true);
+    expect(packaged.totalDefects).toBe(0);
   }, 120_000);
   it('follows a helper alias imported by an earlier step', async () => {
     const g = await graded('route-pickup-then-dropoff', {

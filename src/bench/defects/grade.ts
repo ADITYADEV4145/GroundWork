@@ -81,7 +81,10 @@ function declarations(file: string, lines: { text: string }[]): Declaration[] {
     const name = /^\S/.test(l.text) ? DECLARED.exec(l.text)?.[1] : undefined;
     const bound = /^(?:from\s+\S+\s+)?import\s+(?:type\s+)?(.*?)(?:\s+from\s.*)?;?\s*$/.exec(l.text)?.[1];
     // An import is a declaration of each name it binds, so an alias re-exported by an earlier step still leads to the helper.
-    if (bound !== undefined) for (const part of bound.replace(/[{}()]/g, '').split(',')) {
+    // A Go import binds its alias, or else the last segment of the package path, alone or inside an import block.
+    const pkg = /^\s*(?:import\s+)?(?:([\w.]+)\s+)?"([^"]+)"\s*$/.exec(l.text);
+    if (pkg) out.push({ name: pkg[1] ?? pkg[2]!.split('/').pop()!, body: '', imported: true, line: l.text, file });
+    else if (bound !== undefined) for (const part of bound.replace(/[{}()]/g, '').split(',')) {
       const alias = /([\w$]+)\s*$/.exec(part)?.[1];
       if (alias) out.push({ name: alias, body: part, imported: true, line: l.text, file });
     }

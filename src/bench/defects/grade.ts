@@ -106,7 +106,8 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
   } catch (e) { invalid.push(`index check failed: ${(e as Error).message}`); }
 
   // Reuse: each existing helper named by the trap must be referenced from added code, otherwise the agent re-implemented it.
-  if (added.size && (task.category === 'hidden-helper' || task.category === 'compaction')) {
+  // A compaction task whose last step was never written has nothing that could duplicate a helper.
+  if (task.category === 'compaction' ? added.has(task.entry) : added.size && task.category === 'hidden-helper') {
     const join = (lines: { text: string }[]) => lines.map((l) => l.text).join('\n');
     // After compaction only the last step's file counts: it must use each helper itself, or go through an earlier added file that does.
     const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());

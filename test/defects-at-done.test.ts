@@ -67,6 +67,9 @@ export function refundCents(invoice: Invoice, feeFraction: number): number {
 }
 ` }, true);
     expect(g.defects.duplicates).toBe(1);
+    const firstStepOnly = await graded('ledger-credit-then-refund', { 'src/invoices/credit.ts': readFileSync(path.join(dataRoot, 'reference/ledger-credit-then-refund/src/invoices/credit.ts'), 'utf8') });
+    expect(firstStepOnly.success).toBe(false);
+    expect(firstStepOnly.defects.duplicates).toBe(0);
   }, 120_000);
 
   it('does not count files written by arm setup as the agent\'s change', async () => {

@@ -38,6 +38,22 @@
         "-m",
         "unittest"
       ]
+    },
+    {
+      "id": "stock-room",
+      "language": "go",
+      "source": {
+        "kind": "fixture"
+      },
+      "test": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "testOne": [
+        "go",
+        "test"
+      ]
     }
   ],
   "tasks": [
@@ -243,6 +259,223 @@
         ]
       },
       "hidden": "route-plan.py"
+    },
+    {
+      "id": "stock-item-slug",
+      "repo": "stock-room",
+      "category": "hidden-helper",
+      "prompt": "Items need a URL-safe identifier. Add `ItemSlug(item model.Item) string` in a new file `catalog/slug.go`. It is the item name in lowercase with every run of characters that are not ASCII letters or digits turned into a single dash (none at the start or end), followed by a dash and the SKU treated the same way, for example `hex-bolt-m8-ab-1`. If the name has no usable characters the slug is just the SKU part.",
+      "entry": "catalog/slug.go",
+      "trap": {
+        "existing": [
+          "internal/textutil/slug.go#Dashify"
+        ]
+      },
+      "hidden": "stock-room.mjs"
+    },
+    {
+      "id": "stock-parcel-weight",
+      "repo": "stock-room",
+      "category": "hidden-helper",
+      "prompt": "Shipping needs the weight of a consignment. Add `TotalGrams(parcels []model.Parcel) (float64, error)` in a new package `shipping`, file `shipping/weight.go`. It is the combined weight of the parcels in grams; a parcel weight is given in g, kg, oz or lb. A parcel with any other unit makes the whole call fail with an error. No parcels weigh 0.",
+      "entry": "shipping/weight.go",
+      "trap": {
+        "existing": [
+          "internal/units/convert.go#ToGrams"
+        ]
+      },
+      "hidden": "stock-room.mjs"
+    },
+    {
+      "id": "stock-bin-label",
+      "repo": "stock-room",
+      "category": "hidden-helper",
+      "prompt": "Bins get a scannable label. Add `BinLabel(aisle int, shelf int) string` in a new file `labels/bin.go`. The label is the aisle as two digits, the shelf as three digits, and then one check digit: the standard Luhn check digit of those five digits. For example aisle 7, shelf 42 gives `070425`.",
+      "entry": "labels/bin.go",
+      "trap": {
+        "existing": [
+          "internal/checksum/luhn.go#Luhn"
+        ]
+      },
+      "hidden": "stock-room.mjs"
+    },
+    {
+      "id": "stock-item-name",
+      "repo": "stock-room",
+      "category": "near-name",
+      "prompt": "Pickers scan a SKU and expect the item name. Add `ItemName(c *Catalog, sku string) (string, bool)` in a new file `catalog/name.go`. SKUs are matched in any letter case and with surrounding spaces ignored. Return the name of the active item with that SKU and true, or an empty string and false when there is no such active item. A bin code or an item name is not a SKU.",
+      "entry": "catalog/name.go",
+      "trap": {
+        "existing": [
+          "catalog/catalog.go#Catalog.FindBySKU"
+        ],
+        "decoys": [
+          "FindByCode",
+          "GetBySKU",
+          "FindByID"
+        ]
+      },
+      "hidden": "stock-room.mjs"
+    },
+    {
+      "id": "stock-supplier-phone",
+      "repo": "stock-room",
+      "category": "near-name",
+      "prompt": "Buyers type a supplier code and expect a phone number. Add `SupplierPhone(b *Book, code string) (string, bool)` in a new file `suppliers/phone.go`. Codes are matched in any letter case, with or without a leading `#`. Return the phone number of the active supplier with that code and true, or an empty string and false when there is no such active supplier. A region name is not a supplier code.",
+      "entry": "suppliers/phone.go",
+      "trap": {
+        "existing": [
+          "suppliers/book.go#Book.LookupByCode"
+        ],
+        "decoys": [
+          "FindByCode",
+          "LookupByID",
+          "GetByCode"
+        ]
+      },
+      "hidden": "stock-room.mjs"
+    },
+    {
+      "id": "stock-discount-options",
+      "repo": "stock-room",
+      "category": "changed-signature",
+      "prompt": "Discounts need a price floor. Change `Discounted` in `pricing/discount.go` from `Discounted(percent, cents)` to `Discounted(cents int, opts Options)` where `Options` is a struct with the fields `Percent int` and `MinCents int`; the discounted price is never lower than `MinCents`. Keep the behavior of `PromoTotal` and `SalePrices` the same, and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "pricing/discount.go",
+      "trap": {
+        "existing": [
+          "pricing/discount.go#Discounted"
+        ],
+        "affected": [
+          "pricing/discount.go",
+          "orders/total.go",
+          "reports/pricelist.go",
+          "docs/stock.md"
+        ],
+        "decoys": [
+          "Discounted(percent",
+          "Discounted(10"
+        ]
+      },
+      "hidden": "stock-room.mjs",
+      "affectedTests": [
+        "./orders",
+        "./reports"
+      ]
+    },
+    {
+      "id": "stock-reorder-safety",
+      "repo": "stock-room",
+      "category": "changed-signature",
+      "prompt": "Reorder points need a safety stock. Change `ReorderPoint` in `restock/reorder.go` from `ReorderPoint(leadDays, dailyUse)` to `ReorderPoint(dailyUse int, leadDays int, safety int)`: the daily use times the lead days, plus the safety stock. Keep the behavior of `NeedsReorder` the same (no safety stock), and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "restock/reorder.go",
+      "trap": {
+        "existing": [
+          "restock/reorder.go#ReorderPoint"
+        ],
+        "affected": [
+          "restock/reorder.go",
+          "restock/plan.go",
+          "docs/stock.md"
+        ],
+        "decoys": [
+          "ReorderPoint(leadDays",
+          "ReorderPoint(it.LeadDays",
+          "ReorderPoint(5"
+        ]
+      },
+      "hidden": "stock-room.mjs",
+      "affectedTests": [
+        "./orders"
+      ]
+    },
+    {
+      "id": "stock-currency-format",
+      "repo": "stock-room",
+      "category": "ripple",
+      "prompt": "Amounts are printed without their currency. Make the currency a required second argument: `FormatCents(cents, currency)` returns the amount followed by a space and the currency code, for example `10.50 EUR`. Every report line must print its item's currency, and the existing tests and docs must be brought up to date with the new output.",
+      "entry": "money/format.go",
+      "trap": {
+        "existing": [
+          "money/format.go#FormatCents"
+        ],
+        "affected": [
+          "reports/valuation.go",
+          "reports/pricetag.go",
+          "reports/writeoff.go",
+          "reports/insurance.go",
+          "reports/purchase.go",
+          "reports/reports_test.go",
+          "docs/stock.md"
+        ]
+      },
+      "hidden": "stock-room.mjs",
+      "affectedTests": [
+        "./reports"
+      ]
+    },
+    {
+      "id": "stock-qty-unit",
+      "repo": "stock-room",
+      "category": "ripple",
+      "prompt": "Quantities are printed without a unit. Make the unit a required second argument: `FormatQty(n, unit)` returns the count followed by a space and the unit, for example `1,200 pcs`. Every label line must print its item's unit, and the existing tests and docs must be brought up to date with the new output.",
+      "entry": "quantity/format.go",
+      "trap": {
+        "existing": [
+          "quantity/format.go#FormatQty"
+        ],
+        "affected": [
+          "labels/shelf.go",
+          "labels/picklist.go",
+          "labels/count.go",
+          "labels/transfer.go",
+          "labels/reserve.go",
+          "labels/labels_test.go",
+          "docs/stock.md"
+        ]
+      },
+      "hidden": "stock-room.mjs",
+      "affectedTests": [
+        "./labels"
+      ]
+    },
+    {
+      "id": "stock-restock-then-late",
+      "repo": "stock-room",
+      "category": "compaction",
+      "prompt": "Add `RestockFeeCents(item model.Item, percent int) int` in a new file `orders/restock_fee.go`: the given percentage of the value of the item's whole stock, in whole cents, rounded the way this codebase rounds money.",
+      "turns": [
+        {
+          "prompt": "Now add `LateFeeCents(item model.Item, days int) int` in a new file `orders/late_fee.go`: half a percent of the value of the item's whole stock for each day late. Round it exactly the way you rounded the restock fee.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "orders/late_fee.go",
+      "trap": {
+        "existing": [
+          "money/round.go#RoundHalfEven",
+          "orders/total.go#LineCents"
+        ]
+      },
+      "hidden": "stock-room.mjs"
+    },
+    {
+      "id": "stock-ship-then-count",
+      "repo": "stock-room",
+      "category": "compaction",
+      "prompt": "Add `ShipBy(ordered time.Time, item model.Item) time.Time` in a new file `orders/shipby.go`: the order date moved forward by the item's lead days, counting working days the way this codebase counts them.",
+      "turns": [
+        {
+          "prompt": "Now add `CountBy(received time.Time, bins int) time.Time` in a new file `restock/countby.go`: a stock count takes one working day for every four bins, rounded up, starting from the day the stock was received. Count working days exactly the way you did for the ship-by date.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "restock/countby.go",
+      "trap": {
+        "existing": [
+          "timeutil/workdays.go#AddWorkdays"
+        ]
+      },
+      "hidden": "stock-room.mjs"
     }
   ]
 }

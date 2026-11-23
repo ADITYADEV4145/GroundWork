@@ -33,7 +33,8 @@ gw bench pr-study --suite defects-at-done --list prs.json --cache <mirrors>
 
 ## Known gaps
 
-- 10 tasks on TypeScript and Python in five categories. There is no real-failure task yet; the preregistration requires 60 tasks with all six categories before a confirmatory run.
+- 21 tasks on TypeScript, Python and Go in five categories. There is no real-failure task yet; the preregistration requires 60 tasks with all six categories before a confirmatory run.
+- An exploratory pilot on five of these tasks tied at zero defects in both arms (`bench/pilots/2026-11-23-devin/`), so the current fixture tasks are not expected to separate arms on a strong agent.
 - Competitor arms are unpinned, so they are reported as not run.
 - Sessions run in fresh local workspaces, not containers.
 - The grader has unit tests but no human-label audit yet; the preregistration requires one.

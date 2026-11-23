@@ -1,0 +1,866 @@
+{
+  "groundworkCommit": "6d2c8dd5c55c8a53f40664e1643855e000fc803a",
+  "groundworkDirty": false,
+  "node": "v24.22.2",
+  "platform": "linux x64",
+  "tokenizer": "cl100k_base",
+  "embeddings": "not installed (lexical search only)",
+  "manifest": {
+    "version": 1,
+    "tokenizer": "cl100k_base",
+    "source": "Repositories, commits and queries are the public task corpus of the jcodemunch-mcp token-efficiency benchmark (benchmarks/tasks.json, read 2026-11-23), reused so the grep-top-3 baseline is defined the same way. No jcodemunch code is used and jcodemunch is not run.",
+    "repos": [
+      {
+        "id": "expressjs/express",
+        "url": "https://github.com/expressjs/express",
+        "sha": "1faf228935aa0a13111f92c28ee795be64ce3f0f"
+      },
+      {
+        "id": "fastapi/fastapi",
+        "url": "https://github.com/fastapi/fastapi",
+        "sha": "a64dfbbd21a445288ff583d58e1f646fe6baf3af"
+      },
+      {
+        "id": "gin-gonic/gin",
+        "url": "https://github.com/gin-gonic/gin",
+        "sha": "75ccf94d605a05fe24817fc2f166f6f2959d5cea"
+      }
+    ],
+    "queries": [
+      "router route handler",
+      "middleware",
+      "error exception",
+      "request response",
+      "param bind"
+    ],
+    "searchLimit": 5,
+    "symbolsFetched": 3,
+    "grepFilesRead": 3
+  },
+  "summary": {
+    "lookups": 15,
+    "lookupsWithFullHits": 15,
+    "meanReductionVsGrep": 0.9716702576950593,
+    "pooledReductionVsGrep": 0.98478877361914,
+    "pooledReductionVsReadAll": 0.9980095594298735,
+    "meanReductionVsGrepFirstPageOnly": 0.9716702576950593,
+    "groundworkTokens": 10186,
+    "grepTokens": 669637,
+    "readAllTokens": 5117460,
+    "meanToolCalls": 4,
+    "symbolsFetched": 45,
+    "symbolsInSupportPaths": 19,
+    "symbolsOfThreeLinesOrFewer": 10,
+    "symbolsIncomplete": 0
+  },
+  "repos": [
+    {
+      "id": "expressjs/express",
+      "sha": "1faf228935aa0a13111f92c28ee795be64ce3f0f",
+      "indexMs": 473,
+      "files": 152,
+      "filesByLanguage": {
+        "javascript": 152
+      },
+      "filesSkipped": 0,
+      "symbols": 328,
+      "readAllTokens": 147433,
+      "lookups": [
+        {
+          "query": "router route handler",
+          "readAllTokens": 147433,
+          "grep": {
+            "tokens": 9887,
+            "listTokens": 246,
+            "readTokens": 9641,
+            "filesMatched": 38,
+            "filesRead": [
+              "test/Router.js",
+              "lib/router/index.js",
+              "test/Route.js"
+            ]
+          },
+          "groundwork": {
+            "tokens": 1061,
+            "searchTokens": 164,
+            "fetchTokens": 897,
+            "firstPageOnlyTokens": 1061,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "efcda2f46c258ebf",
+                "title": "[efcda2f46c258ebf] router (function) — lib/router/index.js:46 (definition lines 46-48; source offset 0)",
+                "file": "lib/router/index.js",
+                "lines": 3,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "50f4964b23ecee90",
+                "title": "[50f4964b23ecee90] next (function) — lib/router/index.js:177 (definition lines 177-291; source offset 0)",
+                "file": "lib/router/index.js",
+                "lines": 115,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "aace29ef8427592a",
+                "title": "[aace29ef8427592a] next (function) — lib/router/route.js:121 (definition lines 121-153; source offset 0)",
+                "file": "lib/router/route.js",
+                "lines": 33,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.8926873672499241,
+          "reductionVsReadAll": 0.9928035107472547
+        },
+        {
+          "query": "middleware",
+          "readAllTokens": 147433,
+          "grep": {
+            "tokens": 11777,
+            "listTokens": 164,
+            "readTokens": 11613,
+            "filesMatched": 29,
+            "filesRead": [
+              "test/app.use.js",
+              "test/Router.js",
+              "lib/router/index.js"
+            ]
+          },
+          "groundwork": {
+            "tokens": 360,
+            "searchTokens": 157,
+            "fetchTokens": 203,
+            "firstPageOnlyTokens": 360,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "b121551a3dcbbb2f",
+                "title": "[b121551a3dcbbb2f] removedMiddlewares (variable) — lib/express.js:89 (definition lines 89-107; source offset 0)",
+                "file": "lib/express.js",
+                "lines": 19,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "2f9981c406ae198e",
+                "title": "[2f9981c406ae198e] n (variable) — benchmarks/middleware.js:7 (definition lines 7-7; source offset 0)",
+                "file": "benchmarks/middleware.js",
+                "lines": 1,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "875557ef73061aec",
+                "title": "[875557ef73061aec] app (variable) — benchmarks/middleware.js:3 (definition lines 3-3; source offset 0)",
+                "file": "benchmarks/middleware.js",
+                "lines": 1,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9694319436189183,
+          "reductionVsReadAll": 0.9975582128831402
+        },
+        {
+          "query": "error exception",
+          "readAllTokens": 147433,
+          "grep": {
+            "tokens": 18890,
+            "listTokens": 302,
+            "readTokens": 18588,
+            "filesMatched": 53,
+            "filesRead": [
+              "test/express.json.js",
+              "lib/router/index.js",
+              "test/res.sendFile.js"
+            ]
+          },
+          "groundwork": {
+            "tokens": 384,
+            "searchTokens": 161,
+            "fetchTokens": 223,
+            "firstPageOnlyTokens": 384,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "0720bbcc26ccd125",
+                "title": "[0720bbcc26ccd125] error (function) — examples/error/index.js:20 (definition lines 20-27; source offset 0)",
+                "file": "examples/error/index.js",
+                "lines": 8,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "1d9ccd8ace11b171",
+                "title": "[1d9ccd8ace11b171] error (function) — examples/web-service/index.js:15 (definition lines 15-19; source offset 0)",
+                "file": "examples/web-service/index.js",
+                "lines": 5,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "e04f5e17abd73c9b",
+                "title": "[e04f5e17abd73c9b] parseError (function) — test/express.json.js:769 (definition lines 769-775; source offset 0)",
+                "file": "test/express.json.js",
+                "lines": 7,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9796717840127052,
+          "reductionVsReadAll": 0.9973954270753494
+        },
+        {
+          "query": "request response",
+          "readAllTokens": 147433,
+          "grep": {
+            "tokens": 21599,
+            "listTokens": 662,
+            "readTokens": 20937,
+            "filesMatched": 106,
+            "filesRead": [
+              "test/express.static.js",
+              "test/res.sendFile.js",
+              "test/app.router.js"
+            ]
+          },
+          "groundwork": {
+            "tokens": 751,
+            "searchTokens": 158,
+            "fetchTokens": 593,
+            "firstPageOnlyTokens": 751,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "2c3a179156af2ecd",
+                "title": "[2c3a179156af2ecd] createApplication (function) — lib/express.js:37 (definition lines 37-57; source offset 0)",
+                "file": "lib/express.js",
+                "lines": 21,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "711d90d859bde787",
+                "title": "[711d90d859bde787] init (function) — lib/middleware/init.js:28 (definition lines 28-42; source offset 0)",
+                "file": "lib/middleware/init.js",
+                "lines": 15,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "c4393035240bf5ea",
+                "title": "[c4393035240bf5ea] testRequestedRedirect (function) — test/res.location.js:199 (definition lines 199-228; source offset 0)",
+                "file": "test/res.location.js",
+                "lines": 30,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9652298717533219,
+          "reductionVsReadAll": 0.9949061607645506
+        },
+        {
+          "query": "param bind",
+          "readAllTokens": 147433,
+          "grep": {
+            "tokens": 12954,
+            "listTokens": 243,
+            "readTokens": 12711,
+            "filesMatched": 42,
+            "filesRead": [
+              "test/app.router.js",
+              "lib/router/index.js",
+              "test/app.param.js"
+            ]
+          },
+          "groundwork": {
+            "tokens": 646,
+            "searchTokens": 152,
+            "fetchTokens": 494,
+            "firstPageOnlyTokens": 646,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "2f9d060fa40862ff",
+                "title": "[2f9d060fa40862ff] param (function) — lib/router/index.js:359 (definition lines 359-396; source offset 0)",
+                "file": "lib/router/index.js",
+                "lines": 38,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "27bf07618a8f6894",
+                "title": "[27bf07618a8f6894] paramCallback (function) — lib/router/index.js:399 (definition lines 399-419; source offset 0)",
+                "file": "lib/router/index.js",
+                "lines": 21,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "68c3faf8494081c1",
+                "title": "[68c3faf8494081c1] decode_param (function) — lib/router/layer.js:166 (definition lines 166-181; source offset 0)",
+                "file": "lib/router/layer.js",
+                "lines": 16,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9501312335958005,
+          "reductionVsReadAll": 0.9956183486736349
+        }
+      ]
+    },
+    {
+      "id": "fastapi/fastapi",
+      "sha": "a64dfbbd21a445288ff583d58e1f646fe6baf3af",
+      "indexMs": 2364,
+      "files": 1131,
+      "filesByLanguage": {
+        "javascript": 4,
+        "python": 1127
+      },
+      "filesSkipped": 0,
+      "symbols": 6776,
+      "readAllTokens": 722999,
+      "lookups": [
+        {
+          "query": "router route handler",
+          "readAllTokens": 722999,
+          "grep": {
+            "tokens": 97475,
+            "listTokens": 739,
+            "readTokens": 96736,
+            "filesMatched": 83,
+            "filesRead": [
+              "fastapi/routing.py",
+              "tests/test_router_include_context.py",
+              "tests/test_include_router_defaults_overrides.py"
+            ]
+          },
+          "groundwork": {
+            "tokens": 551,
+            "searchTokens": 242,
+            "fetchTokens": 309,
+            "firstPageOnlyTokens": 551,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "1d3d4550041d53f2",
+                "title": "[1d3d4550041d53f2] GzipRoute.get_route_handler.custom_route_handler (function) — docs_src/custom_request_and_route/tutorial001_an_py310.py:23 (definition lines 23-25; source offset 0)",
+                "file": "docs_src/custom_request_and_route/tutorial001_an_py310.py",
+                "lines": 3,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "286e30a0f9eda3fb",
+                "title": "[286e30a0f9eda3fb] GzipRoute.get_route_handler (method) — docs_src/custom_request_and_route/tutorial001_py310.py:19 (definition lines 19-26; source offset 0)",
+                "file": "docs_src/custom_request_and_route/tutorial001_py310.py",
+                "lines": 8,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "4e7a93ba491c6d25",
+                "title": "[4e7a93ba491c6d25] ValidationErrorLoggingRoute.get_route_handler.custom_route_handler (function) — docs_src/custom_request_and_route/tutorial002_an_py310.py:13 (definition lines 13-19; source offset 0)",
+                "file": "docs_src/custom_request_and_route/tutorial002_an_py310.py",
+                "lines": 7,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9943472685303925,
+          "reductionVsReadAll": 0.999237896594601
+        },
+        {
+          "query": "middleware",
+          "readAllTokens": 722999,
+          "grep": {
+            "tokens": 36563,
+            "listTokens": 227,
+            "readTokens": 36336,
+            "filesMatched": 24,
+            "filesRead": [
+              "fastapi/applications.py",
+              "tests/test_ws_router.py",
+              "tests/test_custom_middleware_exception.py"
+            ]
+          },
+          "groundwork": {
+            "tokens": 695,
+            "searchTokens": 187,
+            "fetchTokens": 508,
+            "firstPageOnlyTokens": 695,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "ae1b0b2c74416191",
+                "title": "[ae1b0b2c74416191] FastAPI.middleware (method) — fastapi/applications.py:4677 (definition lines 4677-4721; source offset 0)",
+                "file": "fastapi/applications.py",
+                "lines": 45,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "bb9f8d71d0c9dabd",
+                "title": "[bb9f8d71d0c9dabd] middleware (function) — tests/test_dependency_contextmanager.py:206 (definition lines 206-210; source offset 0)",
+                "file": "tests/test_dependency_contextmanager.py",
+                "lines": 5,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "018505d0c22f223b",
+                "title": "[018505d0c22f223b] websocket_middleware.middleware_constructor (function) — tests/test_ws_router.py:193 (definition lines 193-205; source offset 0)",
+                "file": "tests/test_ws_router.py",
+                "lines": 13,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9809917129338402,
+          "reductionVsReadAll": 0.9990387261946421
+        },
+        {
+          "query": "error exception",
+          "readAllTokens": 722999,
+          "grep": {
+            "tokens": 100927,
+            "listTokens": 3814,
+            "readTokens": 97113,
+            "filesMatched": 342,
+            "filesRead": [
+              "tests/test_include_router_defaults_overrides.py",
+              "fastapi/routing.py",
+              "tests/test_application.py"
+            ]
+          },
+          "groundwork": {
+            "tokens": 339,
+            "searchTokens": 178,
+            "fetchTokens": 161,
+            "firstPageOnlyTokens": 339,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "3003e5c72ad6b010",
+                "title": "[3003e5c72ad6b010] ValidationException.errors (method) — fastapi/exceptions.py:190 (definition lines 190-191; source offset 0)",
+                "file": "fastapi/exceptions.py",
+                "lines": 2,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "15ff22cd68616c5f",
+                "title": "[15ff22cd68616c5f] Error (class) — tests/test_additional_responses_response_class.py:14 (definition lines 14-16; source offset 0)",
+                "file": "tests/test_additional_responses_response_class.py",
+                "lines": 3,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "67f4130c9a4a8cc9",
+                "title": "[67f4130c9a4a8cc9] Error (class) — tests/test_response_class_no_mediatype.py:14 (definition lines 14-16; source offset 0)",
+                "file": "tests/test_response_class_no_mediatype.py",
+                "lines": 3,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9966411366631328,
+          "reductionVsReadAll": 0.9995311196834297
+        },
+        {
+          "query": "request response",
+          "readAllTokens": 722999,
+          "grep": {
+            "tokens": 130283,
+            "listTokens": 6724,
+            "readTokens": 123559,
+            "filesMatched": 609,
+            "filesRead": [
+              "fastapi/routing.py",
+              "fastapi/applications.py",
+              "tests/test_include_router_defaults_overrides.py"
+            ]
+          },
+          "groundwork": {
+            "tokens": 1291,
+            "searchTokens": 196,
+            "fetchTokens": 1095,
+            "firstPageOnlyTokens": 1291,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "f0d7f93a9bc656eb",
+                "title": "[f0d7f93a9bc656eb] request_response (function) — fastapi/routing.py:114 (definition lines 114-153; source offset 0)",
+                "file": "fastapi/routing.py",
+                "lines": 40,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "6de6e9019bea6e2e",
+                "title": "[6de6e9019bea6e2e] _FrontendStaticFiles.get_response (method) — fastapi/routing.py:1908 (definition lines 1908-1934; source offset 0)",
+                "file": "fastapi/routing.py",
+                "lines": 27,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "db895f5b5a718b1b",
+                "title": "[db895f5b5a718b1b] get_graphql_response (function) — scripts/notify_translations.py:198 (definition lines 198-236; source offset 0)",
+                "file": "scripts/notify_translations.py",
+                "lines": 39,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9900908023303117,
+          "reductionVsReadAll": 0.9982143820392559
+        },
+        {
+          "query": "param bind",
+          "readAllTokens": 722999,
+          "grep": {
+            "tokens": 68030,
+            "listTokens": 3937,
+            "readTokens": 64093,
+            "filesMatched": 333,
+            "filesRead": [
+              "fastapi/dependencies/utils.py",
+              "tests/test_include_router_defaults_overrides.py",
+              "fastapi/param_functions.py"
+            ]
+          },
+          "groundwork": {
+            "tokens": 1271,
+            "searchTokens": 177,
+            "fetchTokens": 1094,
+            "firstPageOnlyTokens": 1271,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "99cd5abeb17eed52",
+                "title": "[99cd5abeb17eed52] Param (class) — fastapi/params.py:26 (definition lines 26-134; source offset 0)",
+                "file": "fastapi/params.py",
+                "lines": 109,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "3ed30cf7ce0c4049",
+                "title": "[3ed30cf7ce0c4049] ParamTypes (class) — fastapi/params.py:19 (definition lines 19-23; source offset 0)",
+                "file": "fastapi/params.py",
+                "lines": 5,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "123d6ed1400f7a62",
+                "title": "[123d6ed1400f7a62] FilterParams (class) — docs_src/query_param_models/tutorial002_py310.py:9 (definition lines 9-15; source offset 0)",
+                "file": "docs_src/query_param_models/tutorial002_py310.py",
+                "lines": 7,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.981317066000294,
+          "reductionVsReadAll": 0.9982420445948058
+        }
+      ]
+    },
+    {
+      "id": "gin-gonic/gin",
+      "sha": "75ccf94d605a05fe24817fc2f166f6f2959d5cea",
+      "indexMs": 588,
+      "files": 92,
+      "filesByLanguage": {
+        "go": 92
+      },
+      "filesSkipped": 1,
+      "symbols": 1313,
+      "readAllTokens": 153060,
+      "lookups": [
+        {
+          "query": "router route handler",
+          "readAllTokens": 153060,
+          "grep": {
+            "tokens": 18789,
+            "listTokens": 115,
+            "readTokens": 18674,
+            "filesMatched": 28,
+            "filesRead": [
+              "routes_test.go",
+              "gin_test.go",
+              "gin_integration_test.go"
+            ]
+          },
+          "groundwork": {
+            "tokens": 588,
+            "searchTokens": 238,
+            "fetchTokens": 350,
+            "firstPageOnlyTokens": 588,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "d156f68bddb96252",
+                "title": "[d156f68bddb96252] IRoutes (interface) — routergroup.go:33 (definition lines 33-51; source offset 0)",
+                "file": "routergroup.go",
+                "lines": 19,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "2af49cf1b6ff1280",
+                "title": "[2af49cf1b6ff1280] RouterGroup.PATCH (method) — routergroup.go:126 (definition lines 126-128; source offset 0)",
+                "file": "routergroup.go",
+                "lines": 3,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "70b2fac4cf7c57c5",
+                "title": "[70b2fac4cf7c57c5] RouterGroup.PUT (method) — routergroup.go:131 (definition lines 131-133; source offset 0)",
+                "file": "routergroup.go",
+                "lines": 3,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9687050934057161,
+          "reductionVsReadAll": 0.9961583692669541
+        },
+        {
+          "query": "middleware",
+          "readAllTokens": 153060,
+          "grep": {
+            "tokens": 13190,
+            "listTokens": 66,
+            "readTokens": 13124,
+            "filesMatched": 17,
+            "filesRead": [
+              "gin_test.go",
+              "middleware_test.go",
+              "gin.go"
+            ]
+          },
+          "groundwork": {
+            "tokens": 789,
+            "searchTokens": 160,
+            "fetchTokens": 629,
+            "firstPageOnlyTokens": 789,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "23ca0e673b018837",
+                "title": "[23ca0e673b018837] TestMiddlewareAbort (function) — middleware_test.go:159 (definition lines 159-183; source offset 0)",
+                "file": "middleware_test.go",
+                "lines": 25,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "641d2c30e23c6f86",
+                "title": "[641d2c30e23c6f86] TestMiddlewareWrite (function) — middleware_test.go:229 (definition lines 229-253; source offset 0)",
+                "file": "middleware_test.go",
+                "lines": 25,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "070a85eecbd07c90",
+                "title": "[070a85eecbd07c90] TestBindMiddleware (function) — utils_test.go:114 (definition lines 114-134; source offset 0)",
+                "file": "utils_test.go",
+                "lines": 21,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9401819560272934,
+          "reductionVsReadAll": 0.9948451587612701
+        },
+        {
+          "query": "error exception",
+          "readAllTokens": 153060,
+          "grep": {
+            "tokens": 44023,
+            "listTokens": 367,
+            "readTokens": 43656,
+            "filesMatched": 74,
+            "filesRead": [
+              "binding/binding_test.go",
+              "context_test.go",
+              "context.go"
+            ]
+          },
+          "groundwork": {
+            "tokens": 406,
+            "searchTokens": 212,
+            "fetchTokens": 194,
+            "firstPageOnlyTokens": 406,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "2e3f9d753488bd81",
+                "title": "[2e3f9d753488bd81] Error.Error (method) — errors.go:84 (definition lines 84-86; source offset 0)",
+                "file": "errors.go",
+                "lines": 3,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "5352e34b97747083",
+                "title": "[5352e34b97747083] Error (class) — errors.go:34 (definition lines 34-38; source offset 0)",
+                "file": "errors.go",
+                "lines": 5,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "d669d5aea3b90c4d",
+                "title": "[d669d5aea3b90c4d] errorMsgs.Errors (method) — errors.go:132 (definition lines 132-141; source offset 0)",
+                "file": "errors.go",
+                "lines": 10,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9907775480998569,
+          "reductionVsReadAll": 0.9973474454462302
+        },
+        {
+          "query": "request response",
+          "readAllTokens": 153060,
+          "grep": {
+            "tokens": 39916,
+            "listTokens": 277,
+            "readTokens": 39639,
+            "filesMatched": 57,
+            "filesRead": [
+              "context_test.go",
+              "gin_integration_test.go",
+              "context.go"
+            ]
+          },
+          "groundwork": {
+            "tokens": 635,
+            "searchTokens": 213,
+            "fetchTokens": 422,
+            "firstPageOnlyTokens": 635,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "6d9ad8b500fb5d96",
+                "title": "[6d9ad8b500fb5d96] ResponseWriter (interface) — response_writer.go:20 (definition lines 20-44; source offset 0)",
+                "file": "response_writer.go",
+                "lines": 25,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "410cda9b8437b569",
+                "title": "[410cda9b8437b569] Redirect.Render (method) — render/redirect.go:20 (definition lines 20-26; source offset 0)",
+                "file": "render/redirect.go",
+                "lines": 7,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "4743ab552e8a0bbb",
+                "title": "[4743ab552e8a0bbb] TestResponseWriterFlush (function) — response_writer_test.go:126 (definition lines 126-140; source offset 0)",
+                "file": "response_writer_test.go",
+                "lines": 15,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9840915923439222,
+          "reductionVsReadAll": 0.9958513001437345
+        },
+        {
+          "query": "param bind",
+          "readAllTokens": 153060,
+          "grep": {
+            "tokens": 45334,
+            "listTokens": 257,
+            "readTokens": 45077,
+            "filesMatched": 52,
+            "filesRead": [
+              "binding/binding_test.go",
+              "tree_test.go",
+              "context_test.go"
+            ]
+          },
+          "groundwork": {
+            "tokens": 419,
+            "searchTokens": 228,
+            "fetchTokens": 191,
+            "firstPageOnlyTokens": 419,
+            "toolCalls": 4,
+            "hits": 3,
+            "symbols": [
+              {
+                "id": "c87bb7b9f6ab4c03",
+                "title": "[c87bb7b9f6ab4c03] BindUnmarshaler (interface) — binding/form_mapping.go:169 (definition lines 169-172; source offset 0)",
+                "file": "binding/form_mapping.go",
+                "lines": 4,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "3762702fa6b877e7",
+                "title": "[3762702fa6b877e7] BindingUri (interface) — binding/binding.go:45 (definition lines 45-48; source offset 0)",
+                "file": "binding/binding.go",
+                "lines": 4,
+                "pages": 1,
+                "complete": true
+              },
+              {
+                "id": "df027d9598d4fbc0",
+                "title": "[df027d9598d4fbc0] BindingUri (interface) — binding/binding_nomsgpack.go:43 (definition lines 43-46; source offset 0)",
+                "file": "binding/binding_nomsgpack.go",
+                "lines": 4,
+                "pages": 1,
+                "complete": true
+              }
+            ]
+          },
+          "reductionVsGrep": 0.9907574888604579,
+          "reductionVsReadAll": 0.9972625114334248
+        }
+      ]
+    }
+  ]
+}

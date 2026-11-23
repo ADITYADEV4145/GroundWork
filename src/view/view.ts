@@ -114,7 +114,7 @@ ul{padding:0;margin:0}
 line{stroke:#b9bcc2;stroke-opacity:.6}
 circle{stroke:#fff;stroke-width:1}
 circle.hit{stroke:#c0392b;stroke-width:3}
-text{font-size:10px;fill:#333;pointer-events:none}
+text{font-size:var(--label,10px);fill:#333;pointer-events:none}
 </style></head><body>
 <div id="graph"><svg id="svg"><g id="world"><g id="edges"></g><g id="nodes"></g></g></svg></div>
 <aside>
@@ -166,7 +166,8 @@ for (const n of nodes) {
   if (nodes.length <= 120 || n.blocks) el('text', { x: n.x + 8, y: n.y + 3 }, document.getElementById('nodes')).textContent = label(n.id);
 }
 let tx = 0, ty = 0, scale = 1, drag = null;
-const apply = () => world.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + scale + ')');
+// Labels keep their size on screen, so zooming in separates the ones that overlap.
+const apply = () => { world.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + scale + ')'); world.style.setProperty('--label', 10 / scale + 'px'); };
 svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; tx = e.offsetX - (e.offsetX - tx) * f; ty = e.offsetY - (e.offsetY - ty) * f; scale *= f; apply(); }, { passive: false });
 svg.addEventListener('mousedown', (e) => { drag = { x: e.clientX - tx, y: e.clientY - ty }; });
 window.addEventListener('mousemove', (e) => { if (drag) { tx = e.clientX - drag.x; ty = e.clientY - drag.y; apply(); } });

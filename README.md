@@ -382,6 +382,46 @@ The check is tested on 20 scripted pull requests (`test/ci-replay.ts`): every re
 
 ## Benchmark results
 
+<!-- phase-a-v9:start -->
+
+### v9 Phase A (PR #41: one-turn answers + batching guidance, measured, not shipped)
+
+Navigation engineering gate passed with fewer actions per session (compliant 51.8 vs 60.3 baseline), no speed win (session-time CI includes zero, point estimate slower), tool-side time higher (−389% reduction), success 480/480 each arm. PR #41 was measured, not shipped. These navigation-only results are not an overall Phase A pass.
+
+Stable-v1; collector/product source pin 36f54a0845fe2bf4184549cf5cef8f216a8957ab. There are 16 sessions per arm, 30 tasks per navigation session. Positive reduction favors GroundWork; all intervals are nominal 95% whole-session bootstrap CIs (10,000 draws, seed 0x51ab17ed). Captured actions are wrapper tool calls, not model conversation turns. Bytes are emitted tool output, not billed tokens or dollars.
+
+The protocol-compliant v9c GroundWork arm is the official navigation gate. The regenerated-skill v9 arm is shown next to it as a disclosed deviation, never in its place. Both engineering gates pass: mean actions/session is no higher than baseline and the session-time reduction CI includes zero or better. Neither arm has a confirmatory latency win. The same 16 baseline sessions are reused; these are 48 unique navigation captures, not independent replications of the baseline. Success guardrails pass in every category.
+
+| Navigation arm | Estimand | Baseline mean | GroundWork mean | Reduction [95% CI] | Success guardrail |
+| --- | --- | --- | --- | --- | --- |
+| Compliant v9c — official | Session elapsed/task (ms) | 5701.72 | 5782.44 | -1.42% [-9.81, 6.53] | met: 480/480 / 480/480 |
+| Compliant v9c — official | Emitted bytes/session | 32680.50 | 34459.38 | -5.44% [-13.59, 1.79] | met: 480/480 / 480/480 |
+| Compliant v9c — official | Tool-side ms/session | 1501.69 | 7336.66 | -388.56% [-475.34, -313.35] | met: 480/480 / 480/480 |
+| Regenerated-skill v9 — deviation | Session elapsed/task (ms) | 5701.72 | 6005.23 | -5.32% [-13.94, 2.48] | met: 480/480 / 480/480 |
+| Regenerated-skill v9 — deviation | Emitted bytes/session | 32680.50 | 35862.25 | -9.74% [-17.78, -2.07] | met: 480/480 / 480/480 |
+| Regenerated-skill v9 — deviation | Tool-side ms/session | 1501.69 | 7895.47 | -425.77% [-545.32, -330.11] | met: 480/480 / 480/480 |
+
+| Navigation arm | Baseline actions/session | GroundWork actions/session | GW − baseline [95% CI] | Navigation engineering gate |
+| --- | --- | --- | --- | --- |
+| Compliant v9c — official | 60.31 | 51.81 | -8.50 [-11.25, -5.69] | PASS |
+| Regenerated-skill v9 — deviation | 60.31 | 52.19 | -8.12 [-11.00, -5.44] | PASS |
+
+Long-horizon: no confirmatory verdict (incomplete collection under PROTOCOL.md). The grader rejected lh-09 run 6 for a malformed outline action: the agent omitted the mcp subcommand, and the wrapper recorded the failed invocation as action="outline". All raw exports remain unchanged. Exploratory analysis alone adapts that rejected action into a generic schema bucket, retaining its one-action count, 30 bytes and duration. The following normalized numbers are EXPLORATORY ONLY, with no confirmatory claim.
+
+| EXPLORATORY ONLY — LH | Baseline mean | GroundWork mean | Reduction [95% CI] | Exploratory acceptance |
+| --- | --- | --- | --- | --- |
+| Session elapsed/task (ms) | 9738.61 | 11303.73 | -16.07% [-25.07, -7.46] | 160/160 / 160/160; exploratory |
+| Emitted bytes/session | 5627.19 | 7017.44 | -24.71% [-54.00, -2.14] | 160/160 / 160/160; exploratory |
+| Tool-side ms/session | 559.80 | 1554.04 | -177.60% [-330.25, -73.96] | 160/160 / 160/160; exploratory |
+
+Exploratory captured actions/session: baseline 19.56, GroundWork 18.31; GW − baseline -1.25 [-5.38, 2.62]. No long-horizon gate verdict or overall Phase A pass. Equal success is not a correctness win; engineering-gate passage is not proof of equivalence or speed superiority.
+
+All 80 raw captures are retained: 32 navigation v9 (including deviation GroundWork), 16 compliant navigation v9c GroundWork, and 32 long-horizon v9. Navigation validates 48/48; original capture schema validates 79/80 overall. Exports record the collector revision, not an independent product-binary hash; the product source pin relies on the frozen same-checkout build instructions.
+
+[Full v9 analysis, provenance and normalization disclosure](bench/V9-ANALYSIS.md).
+
+<!-- phase-a-v9:end -->
+
 <!-- stable-protocol:start -->
 ### v8 (PR #39: fresh-root index cloning + bundled service, not shipped)
 

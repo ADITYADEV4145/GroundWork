@@ -34,5 +34,21 @@ const readGuard: HookHandler = {
   },
 };
 
+const impactEvidence: HookHandler = {
+  name: 'impact_evidence', events: ['post_tool'],
+  async run(ev, { root, config }) {
+    if (!config.impact.enabled || !['Read', 'Edit', 'Write', 'MultiEdit', 'Bash'].includes(ev.tool ?? '')) return null;
+    try { (await import('../../impact/evidence.js')).recordImpactEvidence(root, ev); } catch { /* Evidence collection fails open. */ }
+    return null;
+  },
+};
+const impactStop: HookHandler = {
+  name: 'impact', events: ['stop'],
+  async run(ev, ctx) {
+    if (!ctx.config.impact.enabled || !ctx.config.impact.stopGate) return null;
+    return (await import('../../impact/stop.js')).impactStop.run(ev, ctx);
+  },
+};
+
 // Register hook handlers here (one import + one entry). Order matters: the first 'deny' wins.
-export const HANDLERS: HookHandler[] = [wasteGuards, refreshOnEdit, readGuard, groundingOnEdit, typesOnEdit, duplicateGate];
+export const HANDLERS: HookHandler[] = [wasteGuards, refreshOnEdit, readGuard, impactEvidence, groundingOnEdit, typesOnEdit, impactStop, duplicateGate];

@@ -288,7 +288,10 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   for (const l of literalsIn(base.state, base.root)) { const key = literalKey(l); beforeLiterals.set(key, (beforeLiterals.get(key) ?? 0) + 1); }
   const isConstant = (l: Literal, owners: Map<string, IndexedSymbol>): boolean => {
     const owner = l.symbolId ? owners.get(l.symbolId) : null;
-    return !!l.constName && owner?.kind === 'constant' && owner.parentId === null;
+    const language = languageForPath(l.file);
+    const containerKinds = language === 'java' ? ['class', 'interface'] : language === 'ruby' || language === 'csharp' ? ['class'] : [];
+    const classConstant = owner?.parentId && containerKinds.includes(owners.get(owner.parentId)?.kind ?? '');
+    return !!l.constName && owner?.kind === 'constant' && (owner.parentId === null || !!classConstant);
   };
   const baseConstants = new Set(base.state.literals.filter((l) => isConstant(l, baseSymbols)).map((l) => `${l.file}\0${l.constName}\0${literalValue(l)}`));
   const constants = state.literals.filter((l) => isConstant(l, symbols) && usableFile(l.file) && baseConstants.has(`${l.file}\0${l.constName}\0${literalValue(l)}`));

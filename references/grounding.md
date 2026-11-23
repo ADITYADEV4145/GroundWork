@@ -1,5 +1,7 @@
 # Grounding checks
 
+Grounding call verification supports TypeScript, JavaScript and Python only. Go, Rust, Java, C# and Ruby support indexing, navigation, impact analysis and the reuse gate; their grounding results remain unchecked.
+
 An optional type layer also uses the target project's TypeScript compiler or Pyright.
 Use `gw types check [files...] [--base ref]` or MCP `check_types` with
 `files: [{file, lines?}]`. CLI commands support `--json`; TypeScript navigation is

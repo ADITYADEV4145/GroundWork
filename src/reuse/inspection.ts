@@ -1,4 +1,5 @@
 import type { Node } from 'web-tree-sitter';
+import { assignmentLabel } from '../lang/assignment-label.js';
 import { parse } from '../lang/parser.js';
 import type { Language } from '../types.js';
 
@@ -14,7 +15,7 @@ export function inspectSource(source: string, language: Language) {
   const plainReference = (n: Node | null): boolean => !!n && (['identifier', 'this', 'self'].includes(n.type) ||
     (['member_expression', 'attribute'].includes(n.type) && n.namedChildren.every((c) => !c || plainReference(c) || c.type === 'property_identifier')));
   const visit = (n: Node) => {
-    if (n.type === 'comment') { comments.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, text: n.text }); return; }
+    if (['comment', 'line_comment', 'block_comment'].includes(n.type)) { comments.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, text: n.text }); return; }
     const body = n.childForFieldName('body');
     const accessor = n.type === 'method_definition' && n.children.some((c) => c?.type === 'get' || c?.type === 'set');
     const property = n.type === 'function_definition' && n.parent?.type === 'decorated_definition' &&
@@ -28,17 +29,18 @@ export function inspectSource(source: string, language: Language) {
           plainReference(expression.childForFieldName('left')) && plainReference(expression.childForFieldName('right')))))
         trivialAccessors.push({ start: n.startIndex, end: n.endIndex });
     }
-    if (['number', 'integer', 'float', 'string'].includes(n.type)) {
+    if (['number', 'integer', 'float', 'string', 'int_literal', 'float_literal', 'integer_literal', 'real_literal', 'decimal_integer_literal', 'decimal_floating_point_literal', 'hex_integer_literal', 'octal_integer_literal', 'binary_integer_literal'].includes(n.type)) {
       let context = n.parent;
-      while (context && !['variable_declarator', 'assignment', 'pair', 'keyword_argument', 'call', 'call_expression', 'return_statement',
+      while (context && !['variable_declarator', 'var_spec', 'const_spec', 'short_var_declaration', 'assignment_statement', 'let_declaration', 'assignment', 'pair', 'keyword_argument', 'call', 'call_expression', 'return_statement',
         'required_parameter', 'optional_parameter', 'default_parameter', 'typed_default_parameter'].includes(context.type)) context = context.parent;
-      const label = context?.childForFieldName('name') ?? context?.childForFieldName('pattern') ?? context?.childForFieldName('left') ??
+      const label = ['go', 'rust', 'java', 'csharp', 'ruby'].includes(language) ? assignmentLabel(context, n) :
+        context?.childForFieldName('name') ?? context?.childForFieldName('pattern') ?? context?.childForFieldName('left') ??
         context?.childForFieldName('key') ?? context?.childForFieldName('function');
       const string = n.type === 'string';
       const signed = !string && ['unary_expression', 'unary_operator'].includes(n.parent?.type ?? '') && /^[+-]\s*[\d.]/.test(n.parent!.text);
       const value = string ? n.text.replace(/^[rubf]*(?:"""|'''|"|')/i, '').replace(/(?:"""|'''|"|')$/, '') : signed ? n.parent!.text.replace(/\s/g, '') : n.text;
       if (!string || !n.namedChildren.some((c) => c?.type === 'interpolation' || c?.type === 'string_interpolation'))
-        literals.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, value, kind: string ? 'string' : 'number', configish: !!label && configName(label.text) });
+        literals.push({ start: n.startIndex, end: n.endIndex, line: n.startPosition.row + 1, value, kind: string ? 'string' : 'number', configish: !!label && configName(typeof label === 'string' ? label : label.text) });
       return;
     }
     for (const child of n.namedChildren) if (child) visit(child);

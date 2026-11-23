@@ -1,0 +1,40 @@
+{
+  "symbols": [
+    "main.go | main | function | 0..0 | local |  |  | func main()",
+    "main.go | Join | function | 1..* | exported |  |  | func Join(prefix string, names ...string) string",
+    "store/format.go | Format | function | 1..1 | exported |  |  | func Format(name string) string",
+    "store/store.go | Store | class | 0..0 | exported |  |  | Store struct { Names []string }",
+    "store/store.go | Reader | interface | 0..0 | exported |  |  | Reader interface { List() []string }",
+    "store/store.go | Key | type | 0..0 | exported |  |  | Key string",
+    "store/store.go | DefaultKey | constant | 0..0 | exported |  |  | DefaultKey = \"APP_STORE_KEY\"",
+    "store/store.go | Endpoint | variable | 0..0 | exported |  |  | Endpoint = \"https://example.com/store\"",
+    "store/store.go | Store.Add | method | 0..* | exported |  |  | func (s *Store) Add(names ...string) int",
+    "store/store.go | Store.List | method | 0..0 | exported |  |  | func (s Store) List() []string",
+    "store/store.go | Normalize | function | 1..1 | exported |  |  | func Normalize(name string) string",
+    "store/store.go | cleanName | function | 1..1 | local |  |  | func cleanName(value string) string"
+  ],
+  "imports": [
+    "main.go | 4 | fmt | fmt | - | module | external",
+    "main.go | 5 | example.com/go-app/store | store | storage | module | store/format.go",
+    "store/store.go | 3 | strings | strings | - | module | external"
+  ],
+  "calls": [
+    "main.go | 10 | s.Add | 2 | [] | - | -",
+    "main.go | 11 | fmt.Println | 1 | [] | - | -",
+    "main.go | 11 | s.List | 0 | [] | - | -",
+    "main.go | 12 | fmt.Println | 1 | [] | - | -",
+    "main.go | 12 | storage.Format | 1 | [] | Format | import-resolved",
+    "store/format.go | 4 | Normalize | 1 | [] | Normalize | name-only",
+    "store/store.go | 17 | append | 2 | [] | - | -",
+    "store/store.go | 18 | len | 1 | [] | - | -",
+    "store/store.go | 25 | strings.TrimSpace | 1 | [] | - | -",
+    "store/store.go | 28 | strings.ToLower | 1 | [] | - | -",
+    "store/store.go | 28 | strings.TrimSpace | 1 | [] | - | -",
+    "store/store.go | 32 | strings.ToLower | 1 | [] | - | -",
+    "store/store.go | 32 | strings.TrimSpace | 1 | [] | - | -"
+  ],
+  "literals": [
+    "store/store.go | 12 | env | APP_STORE_KEY | DefaultKey",
+    "store/store.go | 13 | url | https://example.com/store | -"
+  ]
+}

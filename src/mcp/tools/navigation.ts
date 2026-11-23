@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { fileOutline, findCode, mapFiles, navigationSymbols, sourceLocation, symbolCalls, whereUsed, type NavigationSymbol } from '../../index/navigation.js';
-import { sha1 } from '../../util/hash.js';
-import { readRepoFile, repoRelative } from '../../util/repo-file.js';
+import { fileOutline, findCode, mapFiles, navigationSymbols, symbolCalls, whereUsed, type NavigationSymbol } from '../../index/navigation.js';
+import { repoRelative } from '../../util/repo-file.js';
 import { estimateTokens, fitToBudget } from '../../util/tokens.js';
 import { defineTool, type GwTool, type ToolContext } from '../registry.js';
+import { indexedSource } from '../symbol-source.js';
 
 export const NAVIGATION_BUDGETS = { find_code: 600, outline: 400, read_symbol: 1200, explore: 1800, callers: 600, callees: 600, where_used: 600, repo_map: 1200 } as const;
 
@@ -76,13 +76,10 @@ function oneSymbol<T extends { symbol: string; offset: number }>(
 export function readSource(args: { symbol: string; context_lines: number; offset: number }, ctx: ToolContext, budget: number = NAVIGATION_BUDGETS.read_symbol, brief = false): string {
   const s = oneSymbol('read_symbol', args, ctx, budget);
   if (typeof s === 'string') return s;
-  const loc = sourceLocation(ctx.db, s.id);
-  let raw: Buffer | null;
-  try { raw = readRepoFile(ctx.root, s.file, ctx.config.index.maxFileBytes); }
-  catch { raw = null; }
-  if (!raw || !loc || sha1(raw) !== loc.hash) return 'Source is unavailable or changed after indexing. Retry read_symbol or use a ranged Read.';
-  const source = raw.toString('utf8');
-  let { start, end } = loc;
+  const indexed = indexedSource(ctx, s);
+  if (!indexed) return 'Source is unavailable or changed after indexing. Retry read_symbol or use a ranged Read.';
+  const { source } = indexed;
+  let { start, end } = indexed;
   if (args.context_lines) {
     let newline = start > 0 ? source.lastIndexOf('\n', start - 1) : -1;
     for (let i = 0; i < args.context_lines && newline >= 0; i++) newline = newline > 0 ? source.lastIndexOf('\n', newline - 1) : -1;

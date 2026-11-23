@@ -30,7 +30,12 @@ interface Loaded {
   surface: ModuleSurface;
   /** npm only: the types describe a possibly different version than the installed code. */
   looseTypes?: boolean;
+  /** A sibling package in this repo's workspace rather than an installed version. */
+  workspace?: boolean;
 }
+
+const isWorkspace = (l: Loaded): boolean => l.workspace === true || l.ref.version === 'workspace';
+const versionLabel = (l: Loaded): string => (isWorkspace(l) ? 'workspace package' : `${l.ref.name === '@types/node' ? '@types/node ' : ''}${shortVersion(l.ref.version)}`);
 
 type Lang = 'js' | 'ts' | 'python' | 'go' | 'java' | 'rust';
 
@@ -99,7 +104,7 @@ export class DependencyChecker {
           continue;
         }
         const cached = mod.workspace ? null : this.fromCache(mod.ref, mod.ambient ?? mod.subpath);
-        if (cached) this.surfaces.set(key, { ref: mod.ref, surface: cached, ...(mod.separateTypes ? { looseTypes: true } : {}) });
+        if (cached) this.surfaces.set(key, { ref: mod.ref, surface: cached, ...(mod.separateTypes ? { looseTypes: true } : {}), ...(mod.workspace ? { workspace: true } : {}) });
         else pending.push({ key, mod });
       }
     }
@@ -108,7 +113,7 @@ export class DependencyChecker {
     pending.forEach(({ key, mod }, i) => {
       const surface = built[i]!;
       this.store(mod.ref, mod.ambient ?? mod.subpath, surface, !mod.workspace);
-      this.surfaces.set(key, { ref: mod.ref, surface, ...(mod.separateTypes ? { looseTypes: true } : {}) });
+      this.surfaces.set(key, { ref: mod.ref, surface, ...(mod.separateTypes ? { looseTypes: true } : {}), ...(mod.workspace ? { workspace: true } : {}) });
     });
   }
 
@@ -515,7 +520,7 @@ export class DependencyChecker {
       if ((loaded.surface.mentions ?? []).includes(name)) continue;
       ctx.findings.push({
         file: ctx.rel, line: imp.line, kind: 'unknown-export', name,
-        message: `crate \`${loaded.ref.name}\` (${shortVersion(loaded.ref.version)}) never mentions \`${name}\`; check the import path.`,
+        message: `crate \`${loaded.ref.name}\` (${versionLabel(loaded)}) never mentions \`${name}\`; check the import path.`,
         blocking: false, suggestions: [],
       });
     }
@@ -534,16 +539,12 @@ export class DependencyChecker {
     return scored.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)).slice(0, 3);
   }
 
-  private pkgLabel(module: string, loaded: Loaded): string {
-    return loaded.ref.ecosystem === 'npm' && loaded.ref.name === '@types/node' ? module : module;
-  }
-
   private missing(ctx: Ctx, line: number, kind: 'unknown-export' | 'unknown-member', name: string, module: string, loaded: Loaded, pool: Record<string, ExportInfo>, definite: boolean): Finding {
     const suggestions = this.alternatives(name, pool, loaded);
-    const version = loaded.ref.version === 'workspace' ? 'workspace package' : `${loaded.ref.name === '@types/node' ? '@types/node ' : ''}${shortVersion(loaded.ref.version)}`;
+    const version = versionLabel(loaded);
     const message = suggestions.length
-      ? `${this.pkgLabel(module, loaded)} has no \`${name}\`; ${loaded.ref.version === 'workspace' ? 'the workspace package' : 'installed version'} has ${suggestions.map((s) => `\`${s.name}\``).join(', ')} (${version}).`
-      : `${this.pkgLabel(module, loaded)} (${version}) has no \`${name}\`.`;
+      ? `${module} has no \`${name}\`; ${isWorkspace(loaded) ? 'it' : 'installed version'} has ${suggestions.map((s) => `\`${s.name}\``).join(', ')} (${version}).`
+      : `${module} (${version}) has no \`${name}\`.`;
     return { file: ctx.rel, line, kind, name, message, blocking: definite, suggestions };
   }
 
@@ -551,7 +552,7 @@ export class DependencyChecker {
     if (call.hasSpread || !info.arities?.length) return null;
     const given = ctx.lang === 'python' ? call.argCount + call.keywordArgs.length : call.argCount;
     if (arityAllows(info.arities, given)) return null;
-    const version = loaded.ref.version === 'workspace' ? 'workspace package' : shortVersion(loaded.ref.version);
+    const version = versionLabel(loaded);
     const expects = arityText(info.arities);
     return {
       file: ctx.rel, line: call.line, column: call.column, kind: 'arity', name: shown,
@@ -564,7 +565,7 @@ export class DependencyChecker {
     const note = info.deprecated ? ` ${info.deprecated.replace(/\.$/, '')}.` : '';
     return {
       file: ctx.rel, line, ...(column !== undefined ? { column } : {}), kind: 'deprecated', name,
-      message: `\`${name}\` is deprecated in ${module} ${shortVersion(loaded.ref.version)}.${note}`,
+      message: `\`${name}\` is deprecated in ${module} ${versionLabel(loaded)}.${note}`,
       blocking: false, suggestions: [],
     };
   }

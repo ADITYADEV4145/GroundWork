@@ -101,6 +101,8 @@ var (
 	exportErr   = map[string]error{}
 	sourcedMemo = map[string]string{}
 	arch        = runtime.GOARCH
+	// What go env says of the build target, which go env -w sets without the environment.
+	buildTarget string
 	reachMu     sync.Mutex
 	reach       = map[string]map[string]bool{}
 	outMu       sync.Mutex
@@ -172,12 +174,13 @@ func load() {
 	}
 	cache := ""
 	// The sizes of the build target, which need not be this machine's.
-	if output, err := exec.Command("go", "env", "GOMODCACHE", "GOARCH").Output(); err == nil {
-		if lines := strings.Split(strings.TrimSpace(string(output)), "\n"); len(lines) == 2 {
+	if output, err := exec.Command("go", "env", "GOMODCACHE", "GOARCH", "GOOS", "GOFLAGS", "CGO_ENABLED").Output(); err == nil {
+		if lines := strings.Split(strings.TrimRight(string(output), "\r\n"), "\n"); len(lines) == 5 {
 			cache = strings.TrimSpace(lines[0])
 			if types.SizesFor("gc", strings.TrimSpace(lines[1])) != nil {
 				arch = strings.TrimSpace(lines[1])
 			}
+			buildTarget = strings.Join(lines[1:], "\x00")
 		}
 	}
 	for _, p := range goList(args...) {
@@ -206,7 +209,7 @@ func load() {
 
 // The directory names the module version, so another version of a dependency never reuses a file.
 func exportKey(p *listed) string {
-	return strings.Join([]string{p.ImportPath, p.Dir, os.Getenv("GOFLAGS"), os.Getenv("GOOS"), os.Getenv("GOARCH"), os.Getenv("CGO_ENABLED")}, "\x00")
+	return strings.Join([]string{p.ImportPath, p.Dir, buildTarget}, "\x00")
 }
 
 // Export data of the packages that cannot change. The file names are kept between runs.

@@ -26,7 +26,7 @@ await build({
   format: 'cjs',
   target: 'node22',
   minify: true,
-  external: ['web-tree-sitter', 'tree-sitter-*', 'sql.js', '@huggingface/*'],
+  external: ['web-tree-sitter', 'tree-sitter-*', 'sql.js', '@huggingface/*', 'typescript'],
   define: { 'import.meta.url': '__gwImportMetaUrl', 'import.meta.resolve': '__gwImportMetaResolve' },
   banner: { js: "const __gwImportMetaUrl = require('node:url').pathToFileURL(__filename).href; const __gwImportMetaResolve = id => { const target = require.resolve(id); return require('node:module').isBuiltin(target) ? 'node:' + target.replace(/^node:/, '') : require('node:url').pathToFileURL(target).href; };" },
   logLevel: 'warning',

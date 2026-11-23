@@ -12,6 +12,8 @@ const PROFILE_PRESETS: Record<string, Json> = {
   minimal: {
     reuse: { duplicateGate: false },
     grounding: { enabled: false },
+    types: { enabled: false },
+    impact: { enabled: false },
     guards: { repeatCommand: { enabled: false }, outputTrimmer: { enabled: false }, explorationHint: { enabled: false } },
   },
 };

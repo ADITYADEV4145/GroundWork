@@ -9,6 +9,11 @@ const GRAMMARS: Record<Language, string> = {
   tsx: 'tree-sitter-typescript/tree-sitter-tsx.wasm',
   javascript: 'tree-sitter-javascript/tree-sitter-javascript.wasm',
   python: 'tree-sitter-python/tree-sitter-python.wasm',
+  go: 'tree-sitter-go/tree-sitter-go.wasm',
+  rust: 'tree-sitter-rust/tree-sitter-rust.wasm',
+  java: 'tree-sitter-java/tree-sitter-java.wasm',
+  csharp: 'tree-sitter-c-sharp/tree-sitter-c_sharp.wasm',
+  ruby: 'tree-sitter-ruby/tree-sitter-ruby.wasm',
 };
 
 let initPromise: Promise<void> | null = null;
@@ -57,6 +62,12 @@ const EXT: Record<string, Language> = {
   '.mjs': 'javascript',
   '.cjs': 'javascript',
   '.jsx': 'javascript',
+  '.go': 'go',
+  '.rs': 'rust',
+  '.java': 'java',
+  '.cs': 'csharp',
+  '.rb': 'ruby',
+  '.rake': 'ruby',
   '.py': 'python',
   '.pyi': 'python',
 };

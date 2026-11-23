@@ -183,7 +183,12 @@ describe('git-scripted reuse check scenarios (also exercised by selftest)', () =
       expect(inspectSource(validating, 'python').trivialAccessors).toHaveLength(1);
       expect(inspectSource('class Empty:\n    pass\n', 'python').trivialAccessors).toEqual([]);
       writeScenarioFile(root, 'settings.py', source + '\n' + source.replace('class Settings:', 'class OtherSettings:'));
-      expect((await checkRepository(root)).findings.filter((f) => f.added.file === 'settings.py')).toEqual([]);
+      const report = await checkRepository(root);
+      expect(report.findings.filter((f) => f.added.file === 'settings.py' && f.kind !== 'grounding')).toEqual([]);
+      if (report.types?.available.python === true) {
+        expect(report.types.findings).toHaveLength(4);
+        expect(report.types.findings.every((f) => f.code === 'reportAttributeAccessIssue' && f.name === 'workspace')).toBe(true);
+      }
     });
   });
 

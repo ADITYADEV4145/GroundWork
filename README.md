@@ -7,6 +7,17 @@
 
 <h1 align="center">Less searching. More building.</h1>
 
+### Search by intent
+
+Use `gw search "where do we retry failed requests" --limit 5` (or `--json`)
+and MCP `search_code` when you know what code does but not its name. Results
+include symbol IDs, locations, a short doc line and match evidence. Use
+`find_code` for known names; it is unchanged. Search normalizes English filler,
+inflections and a small code vocabulary. After explicit `gw init --embeddings`
+setup, installed local source embeddings augment lexical ranking; otherwise
+search silently stays lexical. Runtime never downloads models. The frozen
+retrieval evaluation and limitations live in `bench/search/`.
+
 <p align="center">
   A live, local map of your codebase for coding agents.<br>
   Find the right symbol. Reuse the right helper. Call code that actually exists.
@@ -14,7 +25,7 @@
 
 <p align="center">
   <strong>Claude Code · Codex · Cursor</strong><br>
-  TypeScript · JavaScript · Python &nbsp; / &nbsp; Node.js 22+ &nbsp; / &nbsp; MIT
+  TypeScript · JavaScript · Python · Go · Rust · Java · C# · Ruby &nbsp; / &nbsp; Node.js 22+ &nbsp; / &nbsp; MIT
 </p>
 
 <p align="center">
@@ -143,7 +154,7 @@ These integrations use the `gw` on your PATH from any install above. One-off run
 
 Waste guards also catch repeated commands, suggest more focused exploration, and trim noisy command output while retaining failures and a full local log. See [waste guards](docs/waste-guards.md) for the agent-specific behavior and limits.
 
-**Languages:** TypeScript, JavaScript (including JSX and CommonJS), and Python. Other files fall back to the agent's normal tools.
+**Languages:** Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript (including JSX and CommonJS), Python, Go, Rust, Java, C# and Ruby. Grounding call verification remains limited to TypeScript, JavaScript and Python. Other files fall back to the agent's normal tools.
 
 ## See a real check
 
@@ -233,6 +244,38 @@ Or edit `.groundwork/config.json`. Explicit settings override profile defaults:
 
 Commit `config.json` to share your team's preferences. Everything else in `.groundwork/` is git-ignored.
 
+### Change impact
+
+`gw impact [--base ref] [--depth n] [--json]` and MCP `change_impact` list changed
+symbols, unchanged callers and reaching tests, with simple high/medium/low risk.
+Session evidence marks callers not observed opened/edited and tests not observed
+running. Stop adds nonblocking, deduplicated context only; timeouts fail open.
+`complete: true` means no further lookup changes the indexed static answer for that
+snapshot; ambiguity, stale/unparsed files or depth truncation keep it false.
+Configure `impact` (`enabled`, `stopGate`, `depth`, `budgetTokens`, `timeoutMs`).
+See [impact rules and limitations](references/impact.md). The deterministic tool
+benchmark is not an agent run; the planted-caller agent gate remains pending.
+
+### Optional type checking
+
+`gw types check [files...] [--base ref]` checks changed lines using the target project's
+own TypeScript compiler or Pyright (the project's binary, then PATH). Nothing is downloaded;
+missing compilers leave syntax/import grounding unchanged and are reported only in explicit
+CLI/MCP output. `check_types` accepts `files: [{file, lines?}]` and returns budgeted findings.
+`gw check` and Stop include type findings; strict Stop can block new definite errors,
+while standard reports context. Existing diagnostics in the base file are informational.
+Missing-module TS 2307 diagnostics and diagnostics in files with grounding's
+dynamic-patching signals are informational; grounding owns missing-module blocking.
+The TypeScript blocking allowlist is 2304, 2305, 2724, 2339, 2551, 2349, 2554,
+2555, 2556, 2345, 2353, 2561.
+`gw types def|impl|refs file:line:col` provides TypeScript navigation. All support `--json`.
+
+The optional `types` config section defaults to
+`{ "enabled": true, "stopGate": true, "postToolHook": false, "timeoutMs": 4000,
+"budgetTokens": 400, "typescript": "auto", "python": "auto" }`.
+Set `enabled: false` to disable it, or set either language to `"off"`.
+Timeouts fail open; type checking is not enabled after individual edits by default.
+
 > The profile controls the **Stop gate**, not every possible intervention. Read and repeat-command guards can deny redundant actions in the profiles where they are enabled; each has an override.
 
 ## Commands
@@ -253,6 +296,25 @@ Every command accepts `--json`.
 ## Benchmark results
 
 <!-- stable-protocol:start -->
+### v8 (PR #39: fresh-root index cloning + bundled service, not shipped)
+
+V8 publishes the completed v8b recollection: 16 sessions per arm per suite, product and unchanged stable-v1 collector/grader pinned to 243bb549e352ee4a63e968230055cda0c165bbe5. The earlier 3e804c9 run was killed and discarded; none of its captures are included.
+
+| Suite | Estimand | Baseline mean | GroundWork mean | Reduction [95% CI] | Success guardrail |
+| --- | --- | --- | --- | --- | --- |
+| nav | Session elapsed/task (ms) | 5349.62 | 6321.17 | -18.2% [-27.1, -10.4] | met: 480/480 / 480/480 |
+| nav | Emitted bytes/session | 34848.31 | 33048.69 | 5.2% [-3.8, 13.2] | met: 480/480 / 480/480 |
+| nav | Tool-side ms/session | 1604.53 | 8739.16 | -444.7% [-501.5, -395.3] | met: 480/480 / 480/480 |
+| long-horizon | Session elapsed/task (ms) | 9308.21 | 10814.69 | -16.2% [-28.7, -4.7] | met: 160/160 / 160/160 |
+| long-horizon | Emitted bytes/session | 5858.75 | 6774.69 | -15.6% [-40.5, 8.2] | met: 160/160 / 160/160 |
+| long-horizon | Tool-side ms/session | 504.32 | 1561.25 | -209.6% [-324.3, -129.9] | met: 160/160 / 160/160 |
+
+Tool-level find_code fell from 434 to 285ms mean per call and LH repo_map from 616 to 337ms (descriptive cross-round), but end to end GroundWork was still significantly slower in both suites: navigation −18.2% [−27.1, −10.4], long-horizon −16.2% [−28.7, −4.7]. Output CIs cross zero in both suites; tool-side time is significantly higher in both. Navigation’s elapsed gap is about 29s per session versus about 7s of additional tool time: most of the loss is outside captured dispatch, in the agent-turn/inter-action portion of the envelope. This residual does not identify model thinking, provider latency or a causal product effect. These product changes were measured and not shipped on main.
+
+Success guardrails are met (480/480 each navigation, 160/160 each LH). Neither suite meets the confirmatory latency-win rule: adjusted 97.5% per-suite lower bounds are −28.35% navigation and −30.45% LH. Positive reduction favors GW; all nominal 95% intervals use the frozen whole-session bootstrap. Equal success is not a correctness win. LH GW16’s 86.216s envelope is complete and valid under the timing rules; it is retained. Tool bytes are not billed tokens or dollar savings.
+
+[Full v8 analysis and tool totals](bench/V8-ANALYSIS.md).
+
 ### Stable protocol (v7)
 
 Completed: 16 sessions per arm per suite (64 total), collector 01b1426; product main at e0cad99, experimental read paths off. All submitted sessions are retained.

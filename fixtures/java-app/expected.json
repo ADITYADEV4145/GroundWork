@@ -1,0 +1,42 @@
+{
+  "symbols": [
+    "src/demo/App.java | App | class | 0..0 | exported |  |  | public class App",
+    "src/demo/App.java | App.display | method | 1..1 | exported |  |  | public static String display(String name)",
+    "src/demo/App.java | App.label | method | 1..1 | exported |  |  | public static String label(String name)",
+    "src/demo/Reader.java | Reader | interface | 0..0 | exported |  |  | public interface Reader",
+    "src/demo/Reader.java | Reader.list | method | 0..0 | local |  |  | List<String> list()",
+    "src/demo/Store.java | Store | class | 0..0 | exported |  |  | public class Store",
+    "src/demo/Store.java | Store.ENV_KEY | constant | 0..0 | exported |  |  | public static final String ENV_KEY = \"APP_STORE_KEY\"",
+    "src/demo/Store.java | Store.Store | method | 0..0 | exported |  |  | public Store()",
+    "src/demo/Store.java | Store.add | method | 0..* | exported |  |  | public int add(String... values)",
+    "src/demo/Store.java | Store.list | method | 0..0 | exported |  |  | public List<String> list()",
+    "src/demo/Store.java | Store.normalize | method | 1..1 | exported |  |  | public static String normalize(String name)",
+    "src/demo/Store.java | Store.cleanName | method | 1..1 | local |  |  | private static String cleanName(String value)",
+    "src/demo/Store.java | Store.Entry | class | 0..0 | exported |  |  | public record Entry(String name)",
+    "src/demo/Store.java | Store.State | enum | 0..0 | exported |  |  | public enum State"
+  ],
+  "imports": [
+    "src/demo/App.java | 3 | demo | Store | - | named | src/demo/Store.java",
+    "src/demo/App.java | 4 | demo.Store | normalize | - | named | src/demo/Store.java",
+    "src/demo/Reader.java | 3 | java.util | List | - | named | external",
+    "src/demo/Store.java | 3 | java.util | ArrayList | - | named | external",
+    "src/demo/Store.java | 4 | java.util | List | - | named | external",
+    "src/demo/Store.java | 5 | java.util.Collections | emptyList | - | named | external"
+  ],
+  "calls": [
+    "src/demo/App.java | 8 | Store.normalize | 1 | [] | Store.normalize | import-resolved",
+    "src/demo/App.java | 11 | normalize | 1 | [] | Store.normalize | import-resolved",
+    "src/demo/Store.java | 10 | ArrayList<> | 0 | [] | - | -",
+    "src/demo/Store.java | 16 | names.add | 1 | [] | - | -",
+    "src/demo/Store.java | 17 | names.size | 0 | [] | - | -",
+    "src/demo/Store.java | 23 | name.trim().isEmpty | 0 | [] | - | -",
+    "src/demo/Store.java | 23 | name.trim | 0 | [] | - | -",
+    "src/demo/Store.java | 24 | name.trim().toLowerCase | 0 | [] | - | -",
+    "src/demo/Store.java | 24 | name.trim | 0 | [] | - | -",
+    "src/demo/Store.java | 28 | value.trim().toLowerCase | 0 | [] | - | -",
+    "src/demo/Store.java | 28 | value.trim | 0 | [] | - | -"
+  ],
+  "literals": [
+    "src/demo/Store.java | 9 | env | APP_STORE_KEY | ENV_KEY"
+  ]
+}

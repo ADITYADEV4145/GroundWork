@@ -1,0 +1,182 @@
+{
+  "version": 3,
+  "seed": "impact-v3-2026-11-22-js-oracle",
+  "checkerCommit": "386539ebc8714791c7cf73e7ecb9951a9b66ef7c",
+  "sourceCommit": "386539ebc8714791c7cf73e7ecb9951a9b66ef7c",
+  "targets": [
+    {
+      "repo": "customer-desk",
+      "file": "src/mail.ts",
+      "name": "renderReminder",
+      "rank": "1602328a672688bc1697af339621da0a27a79061909b6272c483c6be8083e314",
+      "candidates": 8
+    },
+    {
+      "repo": "parcel-ops",
+      "file": "src/labels.ts",
+      "name": "formatDispatch",
+      "rank": "1ba137fdaa644865dabd73b48154e01debdb40039e304b27469d2e00ab7107b5",
+      "candidates": 8
+    },
+    {
+      "repo": "dispatch-desk",
+      "file": "dispatch/contacts.py",
+      "name": "get_billing_email",
+      "rank": "39ba5a1be99f66c2623211c9905b2653f94dc0d7bd4a121128cb8b72aaae6046",
+      "candidates": 8
+    },
+    {
+      "repo": "groundwork",
+      "file": "src/util/hash.ts",
+      "name": "fnv1a",
+      "rank": "059d217036153365bb895337d744e10e773ea757ba5340e0b270749f0be49f83",
+      "candidates": 11
+    }
+  ],
+  "tasks": [
+    {
+      "id": "customer-desk/required-param",
+      "repo": "customer-desk",
+      "file": "src/mail.ts",
+      "name": "renderReminder",
+      "operator": "required-param",
+      "before": "export function renderReminder(name: string): string ",
+      "after": "export function renderReminder(impactRequired: number, name: string): string "
+    },
+    {
+      "id": "customer-desk/rename",
+      "repo": "customer-desk",
+      "file": "src/mail.ts",
+      "name": "renderReminder",
+      "operator": "rename",
+      "before": "export function renderReminder(name: string): string ",
+      "after": "export function renderReminderRenamedV3(name: string): string "
+    },
+    {
+      "id": "customer-desk/delete",
+      "repo": "customer-desk",
+      "file": "src/mail.ts",
+      "name": "renderReminder",
+      "operator": "delete",
+      "before": "export function renderReminder(name: string): string { return `Reminder for ${name}`; }",
+      "after": ""
+    },
+    {
+      "id": "customer-desk/return-shape",
+      "repo": "customer-desk",
+      "file": "src/mail.ts",
+      "name": "renderReminder",
+      "operator": "return-shape",
+      "before": "export function renderReminder(name: string): string ",
+      "after": "export function renderReminder(name: string): number "
+    },
+    {
+      "id": "parcel-ops/required-param",
+      "repo": "parcel-ops",
+      "file": "src/labels.ts",
+      "name": "formatDispatch",
+      "operator": "required-param",
+      "before": "export function formatDispatch(order: Order, shippingCents: number): string ",
+      "after": "export function formatDispatch(impactRequired: number, order: Order, shippingCents: number): string "
+    },
+    {
+      "id": "parcel-ops/rename",
+      "repo": "parcel-ops",
+      "file": "src/labels.ts",
+      "name": "formatDispatch",
+      "operator": "rename",
+      "before": "export function formatDispatch(order: Order, shippingCents: number): string ",
+      "after": "export function formatDispatchRenamedV3(order: Order, shippingCents: number): string "
+    },
+    {
+      "id": "parcel-ops/delete",
+      "repo": "parcel-ops",
+      "file": "src/labels.ts",
+      "name": "formatDispatch",
+      "operator": "delete",
+      "before": "export function formatDispatch(order: Order, shippingCents: number): string { return `${order.reference}:${order.sku}x${order.quantity}:${shippingCents}`; }",
+      "after": ""
+    },
+    {
+      "id": "parcel-ops/return-shape",
+      "repo": "parcel-ops",
+      "file": "src/labels.ts",
+      "name": "formatDispatch",
+      "operator": "return-shape",
+      "before": "export function formatDispatch(order: Order, shippingCents: number): string ",
+      "after": "export function formatDispatch(order: Order, shippingCents: number): number "
+    },
+    {
+      "id": "dispatch-desk/required-param",
+      "repo": "dispatch-desk",
+      "file": "dispatch/contacts.py",
+      "name": "get_billing_email",
+      "operator": "required-param",
+      "before": "def get_billing_email(customer: Customer) -> str:",
+      "after": "def get_billing_email(impact_required: int, customer: Customer) -> str:"
+    },
+    {
+      "id": "dispatch-desk/rename",
+      "repo": "dispatch-desk",
+      "file": "dispatch/contacts.py",
+      "name": "get_billing_email",
+      "operator": "rename",
+      "before": "def get_billing_email(customer: Customer) -> str:",
+      "after": "def get_billing_emailRenamedV3(customer: Customer) -> str:"
+    },
+    {
+      "id": "dispatch-desk/delete",
+      "repo": "dispatch-desk",
+      "file": "dispatch/contacts.py",
+      "name": "get_billing_email",
+      "operator": "delete",
+      "before": "def get_billing_email(customer: Customer) -> str:\n    return customer.billing_email.strip().lower()\n",
+      "after": ""
+    },
+    {
+      "id": "dispatch-desk/return-shape",
+      "repo": "dispatch-desk",
+      "file": "dispatch/contacts.py",
+      "name": "get_billing_email",
+      "operator": "return-shape",
+      "before": "def get_billing_email(customer: Customer) -> str:",
+      "after": "def get_billing_email(customer: Customer) -> int:"
+    },
+    {
+      "id": "groundwork/required-param",
+      "repo": "groundwork",
+      "file": "src/util/hash.ts",
+      "name": "fnv1a",
+      "operator": "required-param",
+      "before": "export function fnv1a(str: string, seed = 0x811c9dc5): number ",
+      "after": "export function fnv1a(impactRequired: number, str: string, seed = 0x811c9dc5): number "
+    },
+    {
+      "id": "groundwork/rename",
+      "repo": "groundwork",
+      "file": "src/util/hash.ts",
+      "name": "fnv1a",
+      "operator": "rename",
+      "before": "export function fnv1a(str: string, seed = 0x811c9dc5): number ",
+      "after": "export function fnv1aRenamedV3(str: string, seed = 0x811c9dc5): number "
+    },
+    {
+      "id": "groundwork/delete",
+      "repo": "groundwork",
+      "file": "src/util/hash.ts",
+      "name": "fnv1a",
+      "operator": "delete",
+      "before": "export function fnv1a(str: string, seed = 0x811c9dc5): number {\n  let h = seed >>> 0;\n  for (let i = 0; i < str.length; i++) {\n    h ^= str.charCodeAt(i);\n    h = Math.imul(h, 0x01000193) >>> 0;\n  }\n  return h >>> 0;\n}",
+      "after": ""
+    },
+    {
+      "id": "groundwork/return-shape",
+      "repo": "groundwork",
+      "file": "src/util/hash.ts",
+      "name": "fnv1a",
+      "operator": "return-shape",
+      "before": "export function fnv1a(str: string, seed = 0x811c9dc5): number ",
+      "after": "export function fnv1a(str: string, seed = 0x811c9dc5): string "
+    }
+  ]
+}

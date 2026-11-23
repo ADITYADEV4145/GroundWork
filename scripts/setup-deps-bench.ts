@@ -1,6 +1,6 @@
 // Dev-only setup for bench/deps: downloads the pinned packages into an external cache. Not shipped with the tool.
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -58,9 +58,17 @@ writeFileSync(path.join(project, 'pom.xml'), `<project><modelVersion>4.0.0</mode
 // Control corpora: real code that builds against the same installed packages.
 const control = path.join(project, 'control');
 const site = path.join(project, '.venv', 'lib', readdirSync(path.join(project, '.venv', 'lib'))[0]!, 'site-packages');
+// The Python sources live in a repo of their own: inside the case project they would shadow the installed
+// packages of the same name (v1 of this gate made that mistake, see bench/deps/PREREGISTRATION-v2.md).
+rmSync(path.join(control, 'py'), { recursive: true, force: true });
+const controlPy = path.join(CACHE, 'control-py');
+mkdirSync(controlPy, { recursive: true });
+writeFileSync(path.join(controlPy, '.gitignore'), '.venv\n.groundwork/\n');
+if (!existsSync(path.join(controlPy, '.git'))) run('git', ['init', '-q'], controlPy);
+if (!existsSync(path.join(controlPy, '.venv'))) symlinkSync(path.join(project, '.venv'), path.join(controlPy, '.venv'));
 for (const pkg of ['requests', 'click', 'jinja2']) {
   // Copied under their own names so their intra-package imports resolve inside the repo.
-  cpSync(path.join(site, pkg), path.join(control, 'py', pkg), { recursive: true });
+  cpSync(path.join(site, pkg), path.join(controlPy, pkg), { recursive: true });
 }
 const goCache = execFileSync('go', ['env', 'GOMODCACHE'], { encoding: 'utf8' }).trim();
 for (const [mod, version] of Object.entries(spec.packages.go!)) {

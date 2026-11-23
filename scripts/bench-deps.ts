@@ -1,4 +1,4 @@
-// Seeded dependency-hallucination gate. Protocol: bench/deps/PREREGISTRATION.md. Run `npm run setup:deps-bench` first.
+// Seeded dependency-hallucination gate. Protocol: bench/deps/PREREGISTRATION-v2.md (v1 result: bench/deps/results). Run `npm run setup:deps-bench` first.
 import { execFileSync, spawnSync } from 'node:child_process';
 import dns from 'node:dns';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -28,7 +28,7 @@ const spec = JSON.parse(readFileSync(path.join(repo, 'bench', 'deps', 'cases.jso
 const CACHE = process.env.GROUNDWORK_DEPS_BENCH ?? path.join(os.homedir(), '.cache', 'groundwork-bench', 'deps');
 const project = path.join(CACHE, 'project');
 const timing = path.join(CACHE, 'timing');
-if (!existsSync(path.join(project, 'node_modules')) || !existsSync(path.join(timing, 'node_modules'))) {
+if (!existsSync(path.join(project, 'node_modules')) || !existsSync(path.join(timing, 'node_modules')) || !existsSync(path.join(CACHE, 'control-py'))) {
   console.error('bench:deps: run `npm run setup:deps-bench` first');
   process.exit(2);
 }
@@ -208,7 +208,12 @@ async function control(name: string, c: DependencyChecker, root: string, files: 
   corpora.push({ name, files: files.length, checks: c.stats.checks - before, falseBlocks: blocks, warnings });
 }
 await control('good-only variants', checker, project, valid.map((c) => casePath(c, 'valid')));
-await control('requests, click, jinja2 sources', checker, project, listed(project, ['control/py']));
+{
+  const root = path.join(CACHE, 'control-py');
+  const py = await open(root);
+  await control('requests, click, jinja2 sources', new DependencyChecker(py.db, root, { ...py.config, deps: { ...py.config.deps, cache: false } }), root, listed(root, ['.']));
+  py.db.close();
+}
 await control('uuid, pflag sources', checker, project, listed(project, ['control/go']));
 await control('commons-text sources', checker, project, listed(project, ['control/java']));
 db.close();
@@ -258,7 +263,7 @@ const gates = {
   network: network === 0,
 };
 const result = {
-  preregistration: 'bench/deps/PREREGISTRATION.md',
+  preregistration: 'bench/deps/PREREGISTRATION-v2.md',
   commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim(),
   node: process.version,
   pass: Object.values(gates).every(Boolean),
@@ -271,14 +276,14 @@ const result = {
   misses: rows.filter((r) => !r.caught).map((r) => r.id),
   rows,
 };
-const outDir = path.join(repo, 'bench', 'deps', 'results');
+const outDir = path.join(repo, 'bench', 'deps', 'results-v2');
 mkdirSync(outDir, { recursive: true });
 writeFileSync(path.join(outDir, 'result.json'), JSON.stringify(result, null, 1) + '\n');
 const bad = new Map(spec.cases.map((c) => [c.id, c.bad]));
 const md = [
-  '# Dependency-hallucination gate: result',
+  '# Dependency-hallucination gate: result (v2)',
   '',
-  `Protocol: [PREREGISTRATION.md](../PREREGISTRATION.md). Commit \`${result.commit.slice(0, 10)}\`, Node ${process.version}. Raw data: [result.json](result.json).`,
+  `Protocol: [PREREGISTRATION-v2.md](../PREREGISTRATION-v2.md); the first run is in [../results](../results/RESULTS.md). Commit \`${result.commit.slice(0, 10)}\`, Node ${process.version}. Raw data: [result.json](result.json).`,
   '',
   `**Gate: ${result.pass ? 'PASS' : 'FAIL'}**`,
   '',

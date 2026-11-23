@@ -99,7 +99,10 @@ export function architecture(db: Db, root: string): Architecture {
 
   const functions: Record<string, string> = {};
   const byLanguage = new Map<string, string[]>();
-  for (const f of facts.functions) byLanguage.set(f.language, [...(byLanguage.get(f.language) ?? []), f.name]);
+  for (const f of facts.functions) {
+    const names = byLanguage.get(f.language);
+    if (names) names.push(f.name); else byLanguage.set(f.language, [f.name]);
+  }
   for (const [language, names] of [...byLanguage].sort()) { const m = majority(names); if (m) functions[language] = m; }
   const tests = files.filter((f) => f.test).map((f) => path.posix.basename(f.path));
   const testShapes = ([['*.test.*', /\.test\.[^.]+$/], ['*.spec.*', /\.spec\.[^.]+$/], ['test_*', /^test_/], ['*_test.*', /_test\.[^.]+$/]] as const)

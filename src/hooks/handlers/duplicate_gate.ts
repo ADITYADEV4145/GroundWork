@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { bumpCounter } from '../../guards/ledger.js';
 import { sha1 } from '../../util/hash.js';
 import { log } from '../../util/log.js';
 import { ensureGwDir } from '../../util/paths.js';
@@ -27,6 +28,7 @@ export const duplicateGate: HookHandler = {
         log(root, 'info', 'duplicate_gate', { status: 'ignored', sessionId: ev.sessionId, findingSet });
         return { action: 'allow' };
       }
+      bumpCounter(root, ev.sessionId, 'duplicatesPrevented', blocks.filter((f) => f.kind.startsWith('duplicate')).length);
       const strict = config.profile === 'strict' && blocks.some((f) => f.severity === 'BLOCK');
       log(root, 'info', 'duplicate_gate', { status: strict ? 'blocked' : 'warned', sessionId: ev.sessionId, findingSet });
       const budgeted = fitToBudget(blocks, formatFinding, 500);

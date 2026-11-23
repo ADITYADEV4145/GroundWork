@@ -44,6 +44,8 @@ export interface VerifyResult {
   /** Set when the file could not be checked (and so nothing in it was flagged). */
   unchecked: string | null;
   findings: Finding[];
+  /** Imports and calls examined in the requested ranges. */
+  checked?: number;
 }
 
 export type LineRange = [number, number];
@@ -331,7 +333,7 @@ export class Grounder {
 
   verify(rel: string, opts: VerifyOptions = {}): VerifyResult {
     const f = fileFacts(this.db, rel);
-    const res: VerifyResult = { file: rel, unchecked: null, findings: [] };
+    const res: VerifyResult = { file: rel, unchecked: null, findings: [], checked: 0 };
     if (!f) return { ...res, unchecked: 'not indexed' };
     if (f.status !== 'ok') return { ...res, unchecked: f.status === 'partial' ? 'parse errors' : `index status ${f.status}` };
     if (f.isGenerated) return { ...res, unchecked: 'generated file' };
@@ -344,12 +346,14 @@ export class Grounder {
     const lines = text.split('\n');
     for (const imp of this.importsOf(f.id)) {
       if (!inRanges(imp.line, opts.ranges, importEnd(lines, imp.line))) continue;
+      res.checked!++;
       const finding = this.checkImport(f, imp, lines);
       if (finding) res.findings.push(finding);
     }
     for (const call of callFacts(this.db, f.id)) {
       if (!inRanges(call.line, opts.ranges)) continue;
       if (suppressed(lines, call.line)) continue;
+      res.checked!++;
       const finding = this.checkCall(f, call, text);
       if (finding) res.findings.push({ ...finding, column: call.column });
     }

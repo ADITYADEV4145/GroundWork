@@ -1,7 +1,7 @@
 # Head-to-head registration: h2h-v1
 
 2026-11-22. Registered before any data collection. This PR collects no data.
-GroundWork product pin: `10fc7493ed024d817b5cabf7cbf4aaa97533825c` (main).
+GroundWork product pin: `0dbb82e4680efe149cf1bd472ef8bfd97da60fc8` (origin/main after the merge).
 Use the committed collector revision consistently for all arms; record it in exports.
 
 ## Arms and installation
@@ -9,9 +9,21 @@ Use the committed collector revision consistently for all arms; record it in exp
 | Arm | Available tools and instructions |
 | --- | --- |
 | baseline | Native shell + read, unchanged baseline prompt |
-| groundwork | Unchanged v8 prompt text, MCP and read hooks |
+| groundwork | Frozen protocol-compliant prompt text (sources below), MCP and read hooks |
 | serena | Native tools + Serena MCP; no GroundWork hooks or skill |
 | codebase-memory | Native tools + Codebase Memory MCP; no GroundWork hooks or skill |
+
+GroundWork retains the v8-compliant text used by v9c navigation and v9 LH, then
+registered again as the official compliant arms in `bench/V10-ARMS-NOTE.md`.
+Exact registered source files are `prompts/nav-groundwork.v10.tmpl.txt` and
+`prompts/lh-groundwork.v10.tmpl.txt` under the note's external preparation directory
+`/home/ubuntu/bench-rerun` (not standalone files tracked in this checkout).
+The archived `bench/v10/workflow/v10-prompt-diff.diff` names those sources on its
+minus side and records the changes to the v10d deviation templates on its plus
+side. v9/v10 regenerated guidance differs (default-body/batched find_code,
+known-helper guidance and the single-file outline example); those are explicitly
+disclosed deviations, not replacements for this arm. Keep the compliant guidance
+unchanged; update only the product/fetch pin and collection labels for h2h-v1.
 
 Latest GitHub releases checked using the releases/latest API and git ls-remote:
 Serena `v2.1.0`, commit `5e4f5cd173c7ff3eed37ee3f1de6c266b937c5dc`;
@@ -95,9 +107,16 @@ provider key. Serena is a local MCP extension to an existing client/LLM, not a
 hosted model (README, MCP integration and language-server sections); CBM explicitly
 states “Indexing and graph queries need no hosted service or API key” in its pinned
 README. Use local language-server backends and no optional hosted integrations.
-Claude Code and Codex agent variants each require a provider key; none is connected,
-so those variants are registered but not runnable. Analyze agent variants separately;
-never mix their sessions to fill an arm.
+Main now includes `bench/claude-code/driver.mjs`, registered separately in
+`bench/prereg/claude-code-speed-v1.md`. It invokes the external `claude` CLI and
+does not supply provider authentication: usable Claude Code credentials (an API
+key or supported authenticated account) are still required. It currently supports
+only baseline/groundwork under its own protocol, not all four h2h-v1 arms; its
+per-task conversations and setup are not a substitute for stable-v1 collection.
+No provider credential is connected for the registered Claude Code or Codex agent
+variants, so they remain not runnable here; adding the driver does not remove that
+prerequisite. Analyze agent variants separately; never mix their sessions to fill
+an arm.
 
 ## Not comparable
 

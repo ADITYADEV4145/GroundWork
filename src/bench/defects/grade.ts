@@ -120,6 +120,21 @@ function goDiagnostics(root: string): { items: { file: string; line: number; mes
   return { items, infra: !r.ok && !items.length ? `go vet failed without diagnostics: ${r.output.slice(0, 300)}` : null };
 }
 
+/** Index of the colon that ends a one-line Python block header: the first one outside brackets and string literals. */
+function headerColon(line: string): number {
+  let depth = 0, quote = '';
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i]!;
+    if (quote) { if (c === '\\') i++; else if (c === quote) quote = ''; }
+    else if (c === '"' || c === "'") quote = c;
+    else if ('([{'.includes(c)) depth++;
+    else if (')]}'.includes(c)) depth--;
+    else if (c === '#') return -1;
+    else if (c === ':' && depth === 0) return i;
+  }
+  return -1;
+}
+
 /** A Python call a test makes in order to see it raise (`assertRaises`, `pytest.raises`) is the test's point, not a wrong call. */
 function expectedToRaise(root: string, file: string, line: number): boolean {
   if (!file.endsWith('.py')) return false;
@@ -130,7 +145,10 @@ function expectedToRaise(root: string, file: string, line: number): boolean {
   // Only a deferred call counts: `assertRaises(TypeError, f(1))` runs `f(1)` before the assertion starts.
   if (raises.test(own) && /\blambda\b/.test(own)) return true;
   // `with self.assertRaises(TypeError): f(1)` keeps the call on the header line; a header with no body after its colon only holds eager calls.
-  if (/^\s*with\b/.test(own) && raises.test(own) && /\)\s*(as\s+\w+\s*)?:\s*[^\s#]/.test(own)) return true;
+  if (/^\s*with\b/.test(own)) {
+    const colon = headerColon(own);
+    if (colon >= 0 && raises.test(own.slice(0, colon)) && /^\s*[^\s#]/.test(own.slice(colon + 1))) return true;
+  }
   let depth = indent(own);
   for (let i = line - 2; i >= 0 && depth > 0; i--) {
     const l = lines[i]!;

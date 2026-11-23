@@ -364,6 +364,9 @@ ${body}
   expect(wrapped.items).toEqual([]);
   const inline = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(TypeError): format_weight(12.34)`) }, true);
   expect(inline.items).toEqual([]);
+  const named = await graded('route-weight-unit', { 'tests/test_required.py': test(`        ctx = self.subTest()
+        with self.assertRaises(TypeError), ctx: format_weight(12.34)`) }, true);
+  expect(named.items).toEqual([]);
   const header = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(format_weight(12.34)):
             pass`) }, true);
   expect(header.defects.wrongArguments).toBe(1);

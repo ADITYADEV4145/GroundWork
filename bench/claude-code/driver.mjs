@@ -23,8 +23,9 @@ export const loadSuite = (suite) => {
 
 /** The last JSON array of strings in the agent's reply, or null when it gave none. */
 export function parseAnswer(text) {
-  for (let end = text.lastIndexOf(']'); end >= 0; end = text.lastIndexOf(']', end - 1)) {
-    for (let start = text.lastIndexOf('[', end); start >= 0; start = text.lastIndexOf('[', start - 1)) {
+  // lastIndexOf clamps a negative start to 0, so each loop stops by hand at index 0.
+  for (let end = text.lastIndexOf(']'); end >= 0; end = end > 0 ? text.lastIndexOf(']', end - 1) : -1) {
+    for (let start = text.lastIndexOf('[', end); start >= 0; start = start > 0 ? text.lastIndexOf('[', start - 1) : -1) {
       try {
         const value = JSON.parse(text.slice(start, end + 1));
         if (Array.isArray(value) && value.every((v) => typeof v === 'string')) return value;

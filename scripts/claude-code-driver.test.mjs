@@ -9,6 +9,8 @@ test('reads the last JSON string array from a reply', () => {
   assert.deepEqual(parseAnswer('See [1] and [x].\n["src/a.ts:f", "src/b.ts:C.m"]'), ['src/a.ts:f', 'src/b.ts:C.m']);
   assert.deepEqual(parseAnswer('first ["a:b"] then\n["c:d"]\n'), ['c:d']);
   assert.equal(parseAnswer('no answer [1, 2]'), null);
+  assert.equal(parseAnswer('[1, 2] and nothing else'), null);
+  assert.equal(parseAnswer(']['), null);
 });
 
 test('takes billed usage only from the provider result', () => {

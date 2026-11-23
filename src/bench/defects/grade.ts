@@ -158,8 +158,8 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
     // After compaction only the last step's file counts: it must use each helper itself, or call an earlier added declaration that does.
     const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());
     const through = task.category !== 'compaction' ? '' : reached(own, [...added].filter(([file]) => file !== task.entry).flatMap(([, lines]) => declarations(lines))
-      // A name the last step declares or imports itself is its own, not the earlier step's.
-      .filter((d) => !declarations(added.get(task.entry) ?? []).some((mine) => mine.name === d.name && !mine.imported)));
+      // A name the last step declares itself is its own, not the earlier step's, unless it reaches the earlier one through a qualifier.
+      .filter((d) => new RegExp(`\\.\\s*${escape(d.name)}(?![\\w$])`).test(own) || !declarations(added.get(task.entry) ?? []).some((mine) => mine.name === d.name && !mine.imported)));
     for (const ref of task.trap.existing) {
       const name = ref.split('#')[1]!.split('.').pop()!;
       if (!word(name).test(own) && !word(name).test(through)) items.push({ defect: 'duplicates', file: task.entry, name, evidence: `existing ${ref} is not used by the added code` });

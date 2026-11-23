@@ -77,7 +77,13 @@ function declarations(lines: { text: string }[]): { name: string; body: string }
     // A top-level comment documents the declaration after it, not the one before.
     if (/^(\/\/|#|\/\*| \*)/.test(l.text)) continue;
     const name = /^\S/.test(l.text) ? DECLARED.exec(l.text)?.[1] : undefined;
-    if (name) out.push({ name, body: l.text });
+    const bound = /^(?:from\s+\S+\s+)?import\s+(?:type\s+)?(.*?)(?:\s+from\s.*)?;?\s*$/.exec(l.text)?.[1];
+    // An import is a declaration of each name it binds, so an alias re-exported by an earlier step still leads to the helper.
+    if (bound !== undefined) for (const part of bound.replace(/[{}()]/g, '').split(',')) {
+      const alias = /([\w$]+)\s*$/.exec(part)?.[1];
+      if (alias) out.push({ name: alias, body: l.text });
+    }
+    else if (name) out.push({ name, body: l.text });
     else if (out.length) out[out.length - 1]!.body += '\n' + l.text;
   }
   return out;

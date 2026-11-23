@@ -169,6 +169,24 @@ func LateFeeCents(item model.Item, days int) int {
     });
     expect(masked.defects.duplicates).toBe(1);
   }, 120_000);
+  it('follows a helper alias imported by an earlier step', async () => {
+    const g = await graded('route-pickup-then-dropoff', {
+      'routeplan/windows.py': `from routeplan.rounding import round_up_to_five as round_time
+
+
+def pickup_window(distance_km: float, speed_kph: float) -> int:
+    return round_time(distance_km / speed_kph * 60 + 10)
+`,
+      'routeplan/dropoff.py': `from routeplan.windows import round_time
+
+
+def dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int:
+    return round_time(distance_km / speed_kph * 60 + 3 * parcels)
+`,
+    });
+    expect(g.success).toBe(true);
+    expect(g.defects.duplicates).toBe(0);
+  });
   it('does not count files written by arm setup as the agent\'s change', async () => {
     const { task, repo } = find('ledger-invoice-slug'), dir = path.join(work, 'setup-only');
     materialize(repo, dir);

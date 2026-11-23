@@ -362,6 +362,8 @@ ${body}
         ):
             format_weight(12.34)`) }, true);
   expect(wrapped.items).toEqual([]);
+  const inline = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(TypeError): format_weight(12.34)`) }, true);
+  expect(inline.items).toEqual([]);
   }, 120_000);
   it('counts stale docs after a signature change and callers missed by a ripple change', async () => {
     const { repo } = find('ledger-tax-options');

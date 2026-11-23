@@ -3,7 +3,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, write
 import os from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { grade } from '../src/bench/defects/grade.js';
+import { addedLines, grade } from '../src/bench/defects/grade.js';
 import { armBlocker, loadArms, parseUsage, registered, runSuite } from '../src/bench/defects/harness.js';
 import { prStudy } from '../src/bench/defects/pr-study.js';
 import { buildReport, leaderboard, markdown, pairedBootstrap, tasksNeeded, verdicts, writeReport } from '../src/bench/defects/report.js';
@@ -244,6 +244,15 @@ func LateFeeCents(item model.Item, days int) int {
     expect(appended.success).toBe(true);
     expect(appended.totalDefects).toBe(0);
   }, 120_000);
+  it('reads a staged file whose name has a space under its real name', () => {
+    const repo = mkdtempSync(path.join(work, 'spaced-'));
+    const git = (...args: string[]) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@localhost', ...args], { cwd: repo, encoding: 'utf8', stdio: 'pipe' }).trim();
+    git('init', '-q'); git('commit', '-qm', 'base', '--allow-empty');
+    const base = git('rev-parse', 'HEAD');
+    writeFileSync(path.join(repo, 'fee notes.txt'), 'one\n');
+    git('add', '-A');
+    expect([...addedLines(repo, base).keys()]).toEqual(['fee notes.txt']);
+  });
   it('follows a helper alias imported by an earlier step', async () => {
     const g = await graded('route-pickup-then-dropoff', {
       'routeplan/windows.py': `from routeplan.rounding import round_up_to_five as round_time

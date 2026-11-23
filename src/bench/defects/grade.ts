@@ -49,7 +49,7 @@ export function addedLines(root: string, base: string): Map<string, { line: numb
   const out = new Map<string, { line: number; text: string }[]>();
   let file = '', line = 0;
   for (const row of git(root, 'diff', '--unified=0', '--no-color', '--no-renames', base, '--').split('\n')) {
-    if (row.startsWith('+++ ')) { file = row.slice(4).replace(/^b\//, ''); continue; }
+    if (row.startsWith('+++ ')) { file = row.slice(4).replace(/^b\//, '').replace(/\t$/, ''); continue; }
     const hunk = /^@@ -\d+(?:,\d+)? \+(\d+)/.exec(row);
     if (hunk) { line = Number(hunk[1]); continue; }
     if (row.startsWith('+') && file && file !== '/dev/null' && !TOOL_STATE.test(file)) {
@@ -170,7 +170,7 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
     // After compaction only the last step's file counts: it must use each helper itself, or call an earlier added declaration that does.
     const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());
     // Imports are read from the whole file: a step that edits an existing file may call through an import it did not add.
-    const imports = () => [...added.keys()].flatMap((file) => declarations(file, readFileSync(path.join(root, file), 'utf8').split('\n').map((text) => ({ text }))).filter((d) => d.imported));
+    const imports = () => [...added.keys()].filter((file) => existsSync(path.join(root, file))).flatMap((file) => declarations(file, readFileSync(path.join(root, file), 'utf8').split('\n').map((text) => ({ text }))).filter((d) => d.imported));
     const through = task.category !== 'compaction' ? '' : reached(own, declarations(task.entry, added.get(task.entry) ?? []),
       [...added].filter(([file]) => file !== task.entry).flatMap(([file, lines]) => declarations(file, lines)), imports());
     for (const ref of task.trap.existing) {

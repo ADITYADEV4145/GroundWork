@@ -6,7 +6,7 @@ import { defineTool } from '../registry.js';
 export const verifyCallsTool = defineTool({
   name: 'verify_calls',
   description:
-    'Never re-read only to satisfy verification. After edits are ready, use at most once per task: one batched call instead of rereads, only for new cross-file targets unconfirmed by unchanged evidence in context. Reuse evidence carried across continuing steps/sessions; reassess after changes. Use files: [{file, lines?}]; skip if none remain. Fix findings using tests and automatic feedback. Checks imports, repo calls/members, argument counts/keywords. Clean: ok.',
+    'Never re-read only to satisfy verification. After edits are ready, use at most once per task: one batched call instead of rereads, only for new cross-file targets unconfirmed by unchanged evidence in context. Reuse evidence carried across continuing steps/sessions; reassess after changes. Use files: [{file, lines?}]; skip if none remain. Fix findings using tests and automatic feedback. Checks imports, repo and installed-dependency calls/members, argument counts/keywords. Clean: ok.',
   inputSchema: {
     file: z.string().min(1).optional().describe('single file, relative to the repo root'),
     lines: z.string().optional().describe('only these lines, e.g. "10-40,52"'),

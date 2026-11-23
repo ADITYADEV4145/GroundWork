@@ -1372,7 +1372,7 @@
       "id": "itertools-running-min-stability",
       "repo": "more-itertools-cb75bb9",
       "category": "real-failure",
-      "prompt": "In more_itertools, running_min and running_max with `maxlen` do not agree with the built-in min() and max() when values compare equal but are different objects: for `[0, 0.0, Fraction(0)]` with `maxlen=2` they yield the later of two equal values, while min(x, y) and max(x, y) return the first. Make the windowed forms return, for every window, the same object the built-in would return for that window.",
+      "prompt": "In more_itertools, running_min and running_max with `maxlen` do not agree with the built-in min() and max() when values compare equal but are different objects: for `[0, 0.0, Fraction(0)]` with `maxlen=2` they yield the later of two equal values, while min(x, y) and max(x, y) return the first. Make the windowed forms return, for every window whose values are totally ordered, the first of the equal smallest (or largest) values, as the built-in does.",
       "entry": "more_itertools/recipes.py",
       "hidden": "more-itertools.py",
       "provenance": "https://github.com/more-itertools/more-itertools/commit/d992be0de9383ddcaae3a24866a2d96b52132b07"

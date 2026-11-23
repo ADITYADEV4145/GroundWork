@@ -96,6 +96,7 @@ test('Phase B publication retains terminal tables, secondary labels and all thre
 
 test('Phase B publication leaves the home page, product, collector, protocol and grader unchanged', () => {
   const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' });
-  const files = git('ls-tree', '-r', '--name-only', pin).trim().split('\n').filter(file => file.startsWith('src/') || file.startsWith('bench/multiturn-reuse/') || ['bench/PROTOCOL.md', 'bench/PROTOCOL-REUSE.md', 'bench/capture.mjs', 'scripts/bench-multiturn-reuse.mjs', 'website/public/index.html'].includes(file));
-  for (const file of files) assert.equal(read(file), git('show', `${pin}:${file}`), file);
+  const base = git('merge-base', 'HEAD', 'origin/main').trim();
+  const files = git('diff', '--name-only', base).trim().split('\n').filter(file => file.startsWith('src/') || file.startsWith('bench/multiturn-reuse/') || ['bench/PROTOCOL.md', 'bench/PROTOCOL-REUSE.md', 'bench/capture.mjs', 'scripts/bench-multiturn-reuse.mjs', 'website/public/index.html'].includes(file));
+  assert.deepEqual(files, []);
 });

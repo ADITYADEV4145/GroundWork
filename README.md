@@ -158,7 +158,18 @@ These integrations use the `gw` on your PATH from any install above. One-off run
 
 Waste guards also catch repeated commands, suggest more focused exploration, and trim noisy command output while retaining failures and a full local log. See [waste guards](docs/waste-guards.md) for the agent-specific behavior and limits.
 
-**Languages:** Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript (including JSX and CommonJS), Python, Go, Rust, Java, C# and Ruby. Grounding call verification remains limited to TypeScript, JavaScript and Python. Other files fall back to the agent's normal tools.
+**Language coverage:** Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript (including JSX and CommonJS), Python, Go, Rust, Java, C# and Ruby.
+
+| Languages | In-repo grounding | Type gate |
+| --- | --- | --- |
+| TypeScript, Python | Imports, calls and arguments | TypeScript compiler; optional Pyright for Python |
+| JavaScript | Imports, calls and arguments | No separate type gate |
+| Go | Unqualified package calls and calls through imports within the same module; checks arity when unambiguous | Go toolchain; published gate passed on the rerun and held-out set |
+| Java | — | Java toolchain; published gate passed |
+| Rust, C# | — | Rust and .NET toolchains, respectively; published gates failed |
+| Ruby | — | — |
+
+Go in-repo grounding skips methods on values, external packages, test files and ambiguous packages or calls. Dependency checks are separate. Files in other languages fall back to the agent's normal tools.
 
 ## See a real check
 

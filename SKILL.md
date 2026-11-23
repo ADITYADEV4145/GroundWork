@@ -5,7 +5,7 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 # Groundwork
 
-Groundwork keeps a live local index of this repository and exposes it as MCP tools. Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript, Python, Go, Rust, Java, C# and Ruby. Grounding call verification remains limited to TypeScript, JavaScript and Python.
+Groundwork keeps a live local index of this repository and exposes it as MCP tools. Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript, Python, Go, Rust, Java, C# and Ruby. In-repo grounding checks TypeScript, JavaScript and Python imports and calls, plus unambiguous Go calls within the same package or module.
 
 After API edits, use `change_impact` (or `gw impact --json`) for unchanged callers,
 reaching tests and session coverage. High/medium-risk Stop context is evidence,

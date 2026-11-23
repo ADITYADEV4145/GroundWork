@@ -1,4 +1,5 @@
 import type { GroundworkConfig } from '../config/schema.js';
+import { initParsersFor } from '../lang/parser.js';
 import type { Db } from '../store/db.js';
 import { estimateTokens } from '../util/tokens.js';
 import { changedFromGit, type ChangedFile } from './ranges.js';
@@ -17,6 +18,7 @@ export function verifyChanged(db: Db, root: string, changed: ChangedFile[], conf
  * service contracts. Fails open: any error in the dependency pass leaves the in-repo result untouched.
  */
 export async function verifyChangedDeep(db: Db, root: string, changed: ChangedFile[], config?: GroundworkConfig): Promise<VerifyResult[]> {
+  if (changed.some((c) => c.file.endsWith('.go'))) await initParsersFor(['go']).catch(() => {});
   const results = verifyChanged(db, root, changed, config);
   if (config && !config.deps.enabled) return results;
   try {

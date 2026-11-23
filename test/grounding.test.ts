@@ -60,6 +60,20 @@ describe('grounding', () => {
     });
   }
 
+  it('grounding-go catches planted local calls and arity errors with no extra findings', async () => {
+    await withIndexedFixture('grounding-go', (db, dir) => {
+      const findings = groundAll(db, dir);
+      expect(plantedReport(dir, findings)).toEqual({ planted: 5, missed: [], extra: [] });
+      expect(findings.every((f) => f.blocking)).toBe(true);
+      const [result] = verifyChanged(db, dir, [{ file: 'app/check.go', ranges: [[15, 15]] }]);
+      expect(result?.findings.map((f) => [f.line, f.name])).toEqual([[15, 'toolkit.Missing']]);
+
+      const newFile = path.join(dir, 'app/not-indexed.go');
+      writeFileSync(newFile, 'package app\nfunc Absent() {}\n');
+      expect(verifyChanged(db, dir, [{ file: 'app/check.go', ranges: null }])[0]?.findings).toEqual([]);
+    });
+  });
+
   it('clean fixtures produce zero findings', async () => {
     for (const fx of ['ts-app', 'py-app']) expect(await withIndexedFixture(fx, (db, dir) => groundAll(db, dir))).toEqual([]);
   });

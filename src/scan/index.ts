@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { GroundworkConfig } from '../config/schema.js';
-import { verifyChanged, verifyFile, type ChangedFile, type Finding, type LineRange } from '../grounding/index.js';
+import { verifyChanged, type ChangedFile, type Finding, type LineRange } from '../grounding/index.js';
 import { readFingerprintedSymbols, readReuseState } from '../index/query.js';
+import { initParsersFor } from '../lang/parser.js';
 import { configName } from '../reuse/inspection.js';
 import type { Db } from '../store/db.js';
 import { VERSION } from '../util/version.js';
@@ -106,7 +107,9 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
   const ranges = changed ? new Map(changed.map((c) => [c.file, c.ranges])) : null;
   /** In a diff scan only what the change itself touches is reported; the rest of the repository was like that before. */
   const touched = (file: string, from: number, to = from) => !ranges || (ranges.has(file) && (ranges.get(file) ?? [[0, Infinity]]).some(([a, b]) => from <= b && to >= a));
-  const results = changed ? verifyChanged(db, root, changed, config) : state.files.filter(usable).map((f) => verifyFile(db, root, f.file, { config }));
+  const files = changed ?? state.files.filter(usable).map(({ file }) => ({ file, ranges: null }));
+  if (files.some((f) => f.file.endsWith('.go'))) await initParsersFor(['go']).catch(() => {});
+  const results = verifyChanged(db, root, files, config);
   for (const result of results) all.push(...result.findings.map(fromGrounding));
 
   if (changed) {

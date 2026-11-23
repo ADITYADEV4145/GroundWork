@@ -170,6 +170,15 @@ describe('compiled-language type checks', () => {
     expect(result.findings.every((f) => !f.blocking)).toBe(true);
   }, 180_000);
 
+  it.skipIf(!toolchain.java)('does not block Java errors in a project that generates code with annotation processors', async () => {
+    const c = cases.find((x) => x.language === 'java')!;
+    const root = repo({ ...c.files, 'build.gradle': "dependencies { annotationProcessor 'org.projectlombok:lombok:1.18.30' }\n" });
+    edit(root, c.file, 'Store.normalize("a")', 'Store.builder()');
+    const result = await typeCheck(root, [{ file: c.file, ranges: null }], config());
+    expect(result.findings.length).toBeGreaterThan(0);
+    expect(result.findings.every((f) => !f.blocking)).toBe(true);
+  }, 180_000);
+
   it.skipIf(!toolchain.go)('blocks a call to a function whose file was deleted', async () => {
     const root = repo({
       'go.mod': 'module demo\n\ngo 1.21\n',

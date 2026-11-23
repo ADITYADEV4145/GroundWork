@@ -221,16 +221,19 @@ function javaRoot(absolute: string, text: string): string {
   for (const part of parts.reverse()) { if (path.basename(directory) !== part) return path.dirname(absolute); directory = path.dirname(directory); }
   return directory;
 }
-function javaMultiModule(root: string, project: string): boolean {
+/** Whether a build file from the project up to the repository root matches: the module list, or a code generator. */
+function javaBuild(root: string, project: string, files: string[], pattern: RegExp): boolean {
   const top = path.resolve(root);
   for (let directory = project; ; directory = path.dirname(directory)) {
-    try { if (/<modules>/.test(readFileSync(path.join(directory, 'pom.xml'), 'utf8'))) return true; } catch { /* not Maven */ }
-    for (const settings of ['settings.gradle', 'settings.gradle.kts']) {
-      try { if (/\binclude\b/.test(readFileSync(path.join(directory, settings), 'utf8'))) return true; } catch { /* not Gradle */ }
+    for (const file of files) {
+      try { if (pattern.test(readFileSync(path.join(directory, file), 'utf8'))) return true; } catch { /* absent */ }
     }
     if (directory === top || path.dirname(directory) === directory || path.relative(top, directory).startsWith('..')) return false;
   }
 }
+const javaMultiModule = (root: string, project: string) => javaBuild(root, project, ['pom.xml'], /<modules>/) || javaBuild(root, project, ['settings.gradle', 'settings.gradle.kts'], /\binclude\b/);
+// javac runs here without annotation processors, so names they generate (Lombok accessors and builders, mappers, factories) look undefined.
+const javaGenerates = (root: string, project: string) => javaBuild(root, project, ['pom.xml', 'build.gradle', 'build.gradle.kts'], /lombok|annotationProcessor|<annotationProcessorPaths>|\bkapt\b|mapstruct|auto-value|immutables|dagger/i);
 function javaDiagnostics(root: string, file: string, deadline: number, base?: BaseTexts): Raw[] {
   const absolute = path.resolve(root, file);
   const current = readFileSync(absolute, 'utf8');
@@ -284,7 +287,7 @@ function javaDiagnostics(root: string, file: string, deadline: number, base?: Ba
     const own = javaPackage(text).split('.').slice(0, 2).join('.');
     const modules = javaMultiModule(root, project);
     const lines = text.split('\n');
-    const incomplete = found.some((f) => {
+    const incomplete = javaGenerates(root, project) || found.some((f) => {
       const match = /^\s*import\s+(static\s+)?([\w.]+)/.exec(lines[f.line - 1] ?? '');
       if (!match) return false;
       const imported = match[2]!;

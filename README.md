@@ -277,7 +277,8 @@ Go, Rust, Java and C# files are checked with the toolchain already on the machin
 `dotnet build --no-restore` (needs a restored `.csproj`; outputs go to a scratch directory,
 never the project's `bin`/`obj`). Only undefined names, unknown members, wrong argument
 counts and unresolved imports on changed lines can block; everything else, and everything
-`javac` reports with an incomplete classpath, is informational. A missing toolchain or
+`javac` reports with an incomplete classpath or in a project that uses annotation
+processors (Lombok and the like), is informational. A missing toolchain or
 project file leaves grounding unchanged. These four have no `def|impl|refs` navigation.
 On the preregistered gate (two pinned real repositories per language, seeded one-line errors,
 100 real commits each) Java passes; Go, Rust and C# fail, because checks on the large

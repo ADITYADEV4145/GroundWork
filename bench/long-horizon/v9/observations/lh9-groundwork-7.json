@@ -1,0 +1,309 @@
+{
+  "suite": "long-horizon",
+  "revision": "f2d5514fd96dac166b8e57c1790949fe67e65b05",
+  "condition": "groundwork",
+  "run": 7,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795341149994,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "36f54a0845fe2bf4184549cf5cef8f216a8957ab",
+  "sessionEndedAt": 1795341268977,
+  "observations": [
+    {
+      "task": "lh-01",
+      "startedAt": 1795341152395,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 132,
+          "startedAt": 1795341152557,
+          "endedAt": 1795341152578,
+          "durationMs": 20.882855000000006
+        },
+        {
+          "action": "mcp",
+          "name": "outline",
+          "bytes": 371,
+          "startedAt": 1795341154474,
+          "endedAt": 1795341154820,
+          "durationMs": 344.72983999999997
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 547,
+          "startedAt": 1795341157733,
+          "endedAt": 1795341158123,
+          "durationMs": 388.44650199999995
+        },
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 12,
+          "startedAt": 1795341158517,
+          "endedAt": 1795341158645,
+          "durationMs": 127.52221000000003
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795341164956,
+          "endedAt": 1795341164998,
+          "durationMs": 40.828900000000004
+        }
+      ],
+      "endedAt": 1795341165156,
+      "wallMs": 12761,
+      "patch": "diff --git a/src/features/event-card.js b/src/features/event-card.js\nnew file mode 100644\nindex 0000000..cc2b997\n--- /dev/null\n+++ b/src/features/event-card.js\n@@ -0,0 +1,8 @@\n+import { formatDate } from '../lib/date.js';\n+import { slugify } from '../lib/text.js';\n+\n+export function createEventCard(event) {\n+  const title = event.title.trim();\n+  if (!title) throw new TypeError('Event title must not be empty');\n+  return { id: slugify(title), title, dateLabel: formatDate(event.startsAt) };\n+}\n"
+    },
+    {
+      "task": "lh-02",
+      "startedAt": 1795341168348,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 572,
+          "startedAt": 1795341168521,
+          "endedAt": 1795341168696,
+          "durationMs": 173.424878
+        },
+        {
+          "action": "shell",
+          "bytes": 64,
+          "startedAt": 1795341173865,
+          "endedAt": 1795341173905,
+          "durationMs": 39.85959100000002
+        }
+      ],
+      "endedAt": 1795341174077,
+      "wallMs": 5729,
+      "patch": "diff --git a/src/features/invitation.js b/src/features/invitation.js\nnew file mode 100644\nindex 0000000..72d67c7\n--- /dev/null\n+++ b/src/features/invitation.js\n@@ -0,0 +1,11 @@\n+import { normalizeEmail } from '../lib/validation.js';\n+import { createEventCard } from './event-card.js';\n+\n+export function buildInvitation(event, guest) {\n+  const card = createEventCard(event);\n+  return {\n+    to: normalizeEmail(guest.email),\n+    subject: `Invitation: ${card.title}`,\n+    url: `/events/${card.id}`,\n+  };\n+}\n"
+    },
+    {
+      "task": "lh-03",
+      "startedAt": 1795341176503,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "outline",
+          "bytes": 134,
+          "startedAt": 1795341176704,
+          "endedAt": 1795341176826,
+          "durationMs": 120.98923900000003
+        },
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 12,
+          "startedAt": 1795341180669,
+          "endedAt": 1795341180797,
+          "durationMs": 127.39846499999999
+        },
+        {
+          "action": "shell",
+          "bytes": 127,
+          "startedAt": 1795341186243,
+          "endedAt": 1795341186280,
+          "durationMs": 36.368326999999994
+        }
+      ],
+      "endedAt": 1795341186589,
+      "wallMs": 10086,
+      "patch": "diff --git a/src/features/agenda.js b/src/features/agenda.js\nnew file mode 100644\nindex 0000000..b5b17ed\n--- /dev/null\n+++ b/src/features/agenda.js\n@@ -0,0 +1,8 @@\n+import { createEventCard } from './event-card.js';\n+\n+export function buildAgenda(events) {\n+  return events\n+    .map(event => ({ card: createEventCard(event), startsAt: new Date(event.startsAt).getTime() }))\n+    .sort((a, b) => a.startsAt - b.startsAt)\n+    .map(({ card }) => card);\n+}\n"
+    },
+    {
+      "task": "lh-04",
+      "startedAt": 1795341188917,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 585,
+          "startedAt": 1795341189071,
+          "endedAt": 1795341189180,
+          "durationMs": 108.34030199999998
+        },
+        {
+          "action": "shell",
+          "bytes": 78,
+          "startedAt": 1795341195353,
+          "endedAt": 1795341195392,
+          "durationMs": 38.44567000000001
+        }
+      ],
+      "endedAt": 1795341195561,
+      "wallMs": 6644,
+      "patch": "diff --git a/src/features/reminders.js b/src/features/reminders.js\nnew file mode 100644\nindex 0000000..ddbfcbd\n--- /dev/null\n+++ b/src/features/reminders.js\n@@ -0,0 +1,7 @@\n+import { retry } from '../lib/retry.js';\n+import { buildInvitation } from './invitation.js';\n+\n+export async function sendReminder(event, guest, deliver) {\n+  const invitation = buildInvitation(event, guest);\n+  return retry(() => deliver(invitation), 3);\n+}\n"
+    },
+    {
+      "task": "lh-05",
+      "startedAt": 1795341198153,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 549,
+          "startedAt": 1795341198327,
+          "endedAt": 1795341198446,
+          "durationMs": 117.942555
+        },
+        {
+          "action": "shell",
+          "bytes": 100,
+          "startedAt": 1795341205531,
+          "endedAt": 1795341205568,
+          "durationMs": 36.88117300000002
+        }
+      ],
+      "endedAt": 1795341205870,
+      "wallMs": 7717,
+      "patch": "diff --git a/src/features/roster.js b/src/features/roster.js\nnew file mode 100644\nindex 0000000..85dfe3d\n--- /dev/null\n+++ b/src/features/roster.js\n@@ -0,0 +1,11 @@\n+import { uniqueBy } from '../lib/collections.js';\n+import { normalizeEmail } from '../lib/validation.js';\n+\n+export function buildRoster(signups) {\n+  const normalized = signups.map(({ name, email }) => ({\n+    name: name.trim(),\n+    email: normalizeEmail(email),\n+  }));\n+  return uniqueBy(normalized, signup => signup.email)\n+    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));\n+}\n"
+    },
+    {
+      "task": "lh-06",
+      "startedAt": 1795341208511,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 582,
+          "startedAt": 1795341208673,
+          "endedAt": 1795341208814,
+          "durationMs": 140.89511600000003
+        },
+        {
+          "action": "shell",
+          "bytes": 83,
+          "startedAt": 1795341215198,
+          "endedAt": 1795341215237,
+          "durationMs": 38.047090999999995
+        }
+      ],
+      "endedAt": 1795341215404,
+      "wallMs": 6893,
+      "patch": "diff --git a/src/features/attendance.js b/src/features/attendance.js\nnew file mode 100644\nindex 0000000..b74ef3d\n--- /dev/null\n+++ b/src/features/attendance.js\n@@ -0,0 +1,12 @@\n+import { positiveInteger } from '../lib/validation.js';\n+import { buildRoster } from './roster.js';\n+\n+export function summarizeAttendance(event, signups) {\n+  const capacity = positiveInteger(event.capacity);\n+  const count = buildRoster(signups).length;\n+  return {\n+    confirmed: Math.min(count, capacity),\n+    remaining: Math.max(capacity - count, 0),\n+    waitlisted: Math.max(count - capacity, 0),\n+  };\n+}\n"
+    },
+    {
+      "task": "lh-07",
+      "startedAt": 1795341218273,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 264,
+          "file": "src/lib/text.js",
+          "readBytes": 162,
+          "startedAt": 1795341218434,
+          "endedAt": 1795341218557,
+          "durationMs": 123.17927200000003
+        },
+        {
+          "action": "shell",
+          "bytes": 80,
+          "startedAt": 1795341225122,
+          "endedAt": 1795341225160,
+          "durationMs": 37.19351900000001
+        }
+      ],
+      "endedAt": 1795341225335,
+      "wallMs": 7062,
+      "patch": "diff --git a/src/features/export.js b/src/features/export.js\nnew file mode 100644\nindex 0000000..057551c\n--- /dev/null\n+++ b/src/features/export.js\n@@ -0,0 +1,12 @@\n+import { csvCell } from '../lib/text.js';\n+import { createEventCard } from './event-card.js';\n+import { buildRoster } from './roster.js';\n+\n+export function exportRosterCsv(event, signups) {\n+  const { title, dateLabel } = createEventCard(event);\n+  const lines = ['event,date,name,email'];\n+  for (const { name, email } of buildRoster(signups)) {\n+    lines.push([title, dateLabel, name, email].map(csvCell).join(','));\n+  }\n+  return lines.join('\\n') + '\\n';\n+}\n"
+    },
+    {
+      "task": "lh-08",
+      "startedAt": 1795341230174,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 671,
+          "startedAt": 1795341230473,
+          "endedAt": 1795341230604,
+          "durationMs": 130.22932199999997
+        },
+        {
+          "action": "mcp",
+          "name": "find_similar",
+          "bytes": 12,
+          "startedAt": 1795341232866,
+          "endedAt": 1795341233057,
+          "durationMs": 190.689636
+        },
+        {
+          "action": "shell",
+          "bytes": 113,
+          "startedAt": 1795341243631,
+          "endedAt": 1795341243672,
+          "durationMs": 40.776658999999995
+        },
+        {
+          "action": "mcp",
+          "name": "verify_calls",
+          "bytes": 3,
+          "startedAt": 1795341243865,
+          "endedAt": 1795341243959,
+          "durationMs": 92.50017399999999
+        }
+      ],
+      "endedAt": 1795341246579,
+      "wallMs": 16405,
+      "patch": "diff --git a/src/features/agenda.js b/src/features/agenda.js\nindex b5b17ed..bbbefd9 100644\n--- a/src/features/agenda.js\n+++ b/src/features/agenda.js\n@@ -1,8 +1,11 @@\n import { createEventCard } from './event-card.js';\n \n-export function buildAgenda(events) {\n+export function sortEventCards(events) {\n   return events\n-    .map(event => ({ card: createEventCard(event), startsAt: new Date(event.startsAt).getTime() }))\n-    .sort((a, b) => a.startsAt - b.startsAt)\n-    .map(({ card }) => card);\n+    .map(event => ({ event, card: createEventCard(event), startsAt: new Date(event.startsAt).getTime() }))\n+    .sort((a, b) => a.startsAt - b.startsAt);\n+}\n+\n+export function buildAgenda(events) {\n+  return sortEventCards(events).map(({ card }) => card);\n }\ndiff --git a/src/features/digest.js b/src/features/digest.js\nnew file mode 100644\nindex 0000000..de06771\n--- /dev/null\n+++ b/src/features/digest.js\n@@ -0,0 +1,9 @@\n+import { sortEventCards } from './agenda.js';\n+import { summarizeAttendance } from './attendance.js';\n+\n+export function buildOrganizerDigest(events, signupsByEvent) {\n+  return sortEventCards(events).map(({ event, card }) => {\n+    const signups = Object.hasOwn(signupsByEvent, card.id) ? signupsByEvent[card.id] : [];\n+    return { ...card, ...summarizeAttendance(event, signups) };\n+  });\n+}\n"
+    },
+    {
+      "task": "lh-09",
+      "startedAt": 1795341246903,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 398,
+          "file": "src/features/digest.js",
+          "readBytes": 277,
+          "startedAt": 1795341247072,
+          "endedAt": 1795341247239,
+          "durationMs": 165.60465200000002
+        },
+        {
+          "action": "shell",
+          "bytes": 85,
+          "startedAt": 1795341255613,
+          "endedAt": 1795341255654,
+          "durationMs": 40.09535600000001
+        }
+      ],
+      "endedAt": 1795341255804,
+      "wallMs": 8901,
+      "patch": "diff --git a/src/features/delivery.js b/src/features/delivery.js\nnew file mode 100644\nindex 0000000..0690fe9\n--- /dev/null\n+++ b/src/features/delivery.js\n@@ -0,0 +1,15 @@\n+import { retry } from '../lib/retry.js';\n+import { normalizeEmail } from '../lib/validation.js';\n+import { buildOrganizerDigest } from './digest.js';\n+\n+export async function deliverDigest(events, signupsByEvent, organizer, send) {\n+  const to = normalizeEmail(organizer.email);\n+  const digest = buildOrganizerDigest(events, signupsByEvent);\n+  const payload = {\n+    to,\n+    subject: 'Event digest',\n+    eventIds: digest.map(({ id }) => id),\n+    totalConfirmed: digest.reduce((total, { confirmed }) => total + confirmed, 0),\n+  };\n+  return retry(() => send(payload), 3);\n+}\n"
+    },
+    {
+      "task": "lh-10",
+      "startedAt": 1795341258493,
+      "tools": [
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 405,
+          "file": "src/lib/collections.js",
+          "readBytes": 293,
+          "startedAt": 1795341258730,
+          "endedAt": 1795341258845,
+          "durationMs": 113.580165
+        },
+        {
+          "action": "shell",
+          "bytes": 99,
+          "startedAt": 1795341268750,
+          "endedAt": 1795341268792,
+          "durationMs": 41.63777200000001
+        }
+      ],
+      "endedAt": 1795341268968,
+      "wallMs": 10475,
+      "patch": "diff --git a/src/features/dashboard.js b/src/features/dashboard.js\nnew file mode 100644\nindex 0000000..fd83409\n--- /dev/null\n+++ b/src/features/dashboard.js\n@@ -0,0 +1,9 @@\n+import { paginate } from '../lib/collections.js';\n+import { buildOrganizerDigest } from './digest.js';\n+\n+export function buildDashboard(events, signupsByEvent, query = {}) {\n+  const digest = buildOrganizerDigest(events, signupsByEvent);\n+  const search = query.search?.trim().toLowerCase();\n+  const items = search ? digest.filter(({ title }) => title.toLowerCase().includes(search)) : digest;\n+  return paginate(items, query.page, query.pageSize);\n+}\n"
+    }
+  ]
+}

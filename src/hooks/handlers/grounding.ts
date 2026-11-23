@@ -2,6 +2,7 @@ import { changedFromToolInput, renderResults, verifyChanged } from '../../ground
 import { indexDbPath } from '../../index/store.js';
 import { openDb } from '../../store/db.js';
 import { log } from '../../util/log.js';
+import { updateLedger } from '../../guards/ledger.js';
 import { hookTiming } from '../../util/hook-timing.js';
 import type { HookHandler } from '../types.js';
 import { EDIT_TOOLS } from '../edit-tools.js';
@@ -28,6 +29,7 @@ export const groundingOnEdit: HookHandler = {
       hookTiming('groundingUnchecked', results.filter((r) => r.unchecked).length);
       hookTiming('groundingFindings', n);
       log(root, 'info', 'grounding_checked', { files: changed.length, findings: n, ms: Math.round(performance.now() - t) });
+      updateLedger(root, ev.sessionId, (l) => { l.callsChecked += results.reduce((a, r) => a + (r.checked ?? 0), 0); l.inventedCallsCaught += n; });
       if (!n) return null;
       return { action: 'context', message: renderResults(results, config.grounding.budgetTokens, { header: 'Groundwork: {n} grounding issue(s) in the lines you just changed — these names/arguments do not match the code:' }) };
     } finally {

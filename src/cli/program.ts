@@ -24,6 +24,7 @@ const groups = [
   { names: ['similar'], load: () => import('./commands/similar.js') },
   { names: ['refactor'], load: () => import('./commands/refactor.js') },
   { names: ['check'], load: () => import('./commands/check.js') },
+  { names: ['scan', 'receipt'], load: () => import('./commands/scan.js') },
   { names: ['bench'], load: () => import('./commands/bench.js') },
 ];
 let command: string | undefined;

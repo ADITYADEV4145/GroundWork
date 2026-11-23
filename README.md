@@ -287,6 +287,8 @@ Timeouts fail open; type checking is not enabled after individual edits by defau
 | `gw symbols <query>` / `gw show <symbol>` | Search symbols; show a signature, callers and callees. |
 | `gw similar "<description>"` | Find existing code to reuse. |
 | `gw check [--base <ref>]` | Check changed code for duplicates and grounding errors; exit 1 on BLOCK. |
+| `gw scan [dir \| diff \| -] [--base <ref>] [--json \| --sarif]` | One-screen report with no setup: invented calls, wrong arguments, duplicated logic, duplicate constants and dead code, plus type errors on the changed lines of a diff. Each finding carries a confidence; low-confidence ones are listed separately under "Check". Exit 1 on a high-confidence finding. |
+| `gw receipt [--session <id>] [--png <file>]` | Counts for one agent session: calls checked, invented calls caught, duplicates prevented, callers updated, affected tests run, time added. Counts only, never file names or code. |
 | `gw verify [files...]` | Check grounding alone; exit 1 on definite errors. |
 | `gw refactor <symbol> --rename <name>` / `--body-file <path>` | Preview a TS/JS symbol rename or body replacement; use `--apply <preview-id>` to revalidate and write. |
 | `gw run -- <cmd>` | Keep the full command log locally and print a trimmed summary. |

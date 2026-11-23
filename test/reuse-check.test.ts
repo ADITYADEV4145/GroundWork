@@ -542,6 +542,7 @@ describe('check command and Stop gate', () => {
       const timedOut = hook(root, { cwd: root, session_id: 'locked-process' });
       expect(timedOut.status).toBe(0); expect(timedOut.stdout).toBe('');
       rmSync(lock);
+      rmSync(path.join(root, '.groundwork/sessions'), { recursive: true, force: true });
       writeFileSync(path.join(root, '.groundwork/sessions'), 'not a directory');
       expect((await duplicateGate.run(event, ctx))?.action).toBe('allow');
       renameSync(path.join(root, '.git'), path.join(root, 'saved-git'));

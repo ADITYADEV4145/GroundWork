@@ -273,6 +273,8 @@ describe('review regressions', () => {
       write(dir, 'src/req.cjs', "const { clamp } = require('mathkit');\nif (clamp) {\n  clamp();\n}\n");
       expect(await run(dir, [{ file: 'src/opt.py', ranges: null }, { file: 'src/ignored.ts', ranges: null }])).toEqual([]);
       expect(await run(dir, [{ file: 'src/req.cjs', ranges: null }])).toEqual(['src/req.cjs:3:arity:clamp']);
+      write(dir, 'src/reassign.cjs', "let { clamp } = require('mathkit');\nclamp = () => 0;\nclamp();\n");
+      expect(await run(dir, [{ file: 'src/reassign.cjs', ranges: null }])).toEqual([]);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

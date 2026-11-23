@@ -386,6 +386,8 @@ export class DependencyChecker {
         `\\bfunction\\b[^(]*\\(${params}\\)`,
         `\\(${params}\\)\\s*(?::[^=;{]+)?=>`,
         `\\b${n}\\s*=>`,
+        // A plain reassignment of a `let`/`var` binding.
+        `(?<![.\\w$])${n}\\s*=(?![=>])`,
         `[(,]\\s*(?:public |private |protected |readonly )*${n}\\s*\\??:`,
         `(?<!\\b(?:if|while|for|switch|with)\\s*)\\(${params}\\)\\s*(?::[^=;{]+)?\\{`,
       ].join('|'),

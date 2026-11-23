@@ -205,6 +205,44 @@ func LateFeeCents(item model.Item, days int) int {
     });
     expect(packaged.success).toBe(true);
     expect(packaged.totalDefects).toBe(0);
+    // The earlier step adds an import to a block that was already there, so the added lines do not include the block's opening.
+    const total = readFileSync(path.join(process.cwd(), 'bench/defects-at-done/repos/stock-room/orders/total.go'), 'utf8');
+    const appended = await graded('stock-restock-then-late', {
+      'fees/fees.go': `package fees
+
+import "stockroom/money"
+
+// Cents is num/den of a value in cents.
+func Cents(value int, num int, den int) int {
+	return money.RoundHalfEven(value*num, den)
+}
+`,
+      'orders/total.go': total.replace('\t"stockroom/model"', '\t"stockroom/fees"\n\t"stockroom/model"') + `
+func feeOf(item model.Item, num int, den int) int {
+	return fees.Cents(LineCents(item), num, den)
+}
+`,
+      'orders/restock_fee.go': `package orders
+
+import "stockroom/model"
+
+// RestockFeeCents is a percentage of the item's stock value.
+func RestockFeeCents(item model.Item, percent int) int {
+	return feeOf(item, percent, 100)
+}
+`,
+      'orders/late_fee.go': `package orders
+
+import "stockroom/model"
+
+// LateFeeCents is half a percent of the item's stock value per day late.
+func LateFeeCents(item model.Item, days int) int {
+	return feeOf(item, days*5, 1000)
+}
+`,
+    });
+    expect(appended.success).toBe(true);
+    expect(appended.totalDefects).toBe(0);
   }, 120_000);
   it('follows a helper alias imported by an earlier step', async () => {
     const g = await graded('route-pickup-then-dropoff', {
@@ -325,6 +363,7 @@ describe('DefectsAtDone harness and report', () => {
     expect([again.records, again.skipped]).toEqual([0, 2]);
     await expect(runSuite({ ...options, arms: ['native'], model: 'other' })).rejects.toThrow(/different model/);
     await expect(runSuite({ ...options, arms: ['native'], out: path.join(process.cwd(), 'x') })).rejects.toThrow(/outside/);
+    await expect(runSuite({ ...options, run: 'unmirrored', arms: ['native'], tasks: ['mux-host-port-vars'] })).rejects.toThrow(/No local mirror/);
     // The blocked arm survives a later report rebuild, and a changed arm definition cannot resume the run.
     expect(buildReport(path.join(out, 'unit')).notRun.map((b) => b.arm)).toEqual(['serena']);
     const root = path.join(work, 'data');

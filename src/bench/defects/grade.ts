@@ -75,17 +75,15 @@ type Declaration = { name: string; body: string; imported: boolean; line: string
 /** Added lines split at each top-level declaration, so that a helper is credited only through code that is actually called. */
 function declarations(file: string, lines: { text: string }[]): Declaration[] {
   const out: Declaration[] = [], go = file.endsWith('.go');
-  let block = false;
   for (const l of lines) {
     // A top-level comment documents the declaration after it, not the one before.
     if (/^(\/\/|#|\/\*| \*)/.test(l.text)) continue;
     const name = /^\S/.test(l.text) ? DECLARED.exec(l.text)?.[1] : undefined;
     const bound = /^(?:from\s+\S+\s+)?import\s+(?:type\s+)?(.*?)(?:\s+from\s.*)?;?\s*$/.exec(l.text)?.[1];
     // An import is a declaration of each name it binds, so an alias re-exported by an earlier step still leads to the helper.
-    // A Go import binds its alias, or else the last segment of the package path, alone or inside an import block.
-    if (go && /^import\s*\(\s*$/.test(l.text)) { block = true; continue; }
-    if (block && /^\)/.test(l.text)) { block = false; continue; }
-    const pkg = !go ? null : (block ? /^\s*(?:([\w.]+)\s+)?"([^"]+)"\s*$/ : /^import\s+(?:([\w.]+)\s+)?"([^"]+)"\s*$/).exec(l.text);
+    // A Go import binds its alias, or else the last segment of the package path. Inside a block it is an indented quoted path;
+    // the block's opening line may be an unchanged line that the added lines do not include.
+    const pkg = go ? /^(?:import\s+|\s+)(?:([\w.]+)\s+)?"([^"]+)"\s*$/.exec(l.text) : null;
     if (pkg) out.push({ name: pkg[1] ?? pkg[2]!.split('/').pop()!, body: '', imported: true, line: l.text, file });
     else if (bound !== undefined) for (const part of bound.replace(/[{}()]/g, '').split(',')) {
       const alias = /([\w$]+)\s*$/.exec(part)?.[1];
@@ -98,8 +96,7 @@ function declarations(file: string, lines: { text: string }[]): Declaration[] {
 }
 
 /** The bodies of the earlier declarations the last step's `own` code calls, directly or through one another. */
-function reached(own: string, mine: Declaration[], earlier: Declaration[]): string {
-  const imports = [...mine, ...earlier].filter((d) => d.imported);
+function reached(own: string, mine: Declaration[], earlier: Declaration[], imports: Declaration[]): string {
   const bare = (d: Declaration, text: string) => new RegExp(`(?<![\\w$.])${escape(d.name)}(?![\\w$])`).test(text);
   // `q.name` is the earlier declaration only when q is an import of the module that declares it; `math.ceil` is not an earlier `ceil`.
   const qualified = (d: Declaration, text: string) => [...text.matchAll(new RegExp(`([\\w$]+)\\s*\\.\\s*${escape(d.name)}(?![\\w$])`, 'g'))]
@@ -172,8 +169,10 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
     const join = (lines: { text: string }[]) => lines.map((l) => l.text).join('\n');
     // After compaction only the last step's file counts: it must use each helper itself, or call an earlier added declaration that does.
     const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());
+    // Imports are read from the whole file: a step that edits an existing file may call through an import it did not add.
+    const imports = () => [...added.keys()].flatMap((file) => declarations(file, readFileSync(path.join(root, file), 'utf8').split('\n').map((text) => ({ text }))).filter((d) => d.imported));
     const through = task.category !== 'compaction' ? '' : reached(own, declarations(task.entry, added.get(task.entry) ?? []),
-      [...added].filter(([file]) => file !== task.entry).flatMap(([file, lines]) => declarations(file, lines)));
+      [...added].filter(([file]) => file !== task.entry).flatMap(([file, lines]) => declarations(file, lines)), imports());
     for (const ref of task.trap.existing) {
       const name = ref.split('#')[1]!.split('.').pop()!;
       if (!word(name).test(own) && !word(name).test(through)) items.push({ defect: 'duplicates', file: task.entry, name, evidence: `existing ${ref} is not used by the added code` });

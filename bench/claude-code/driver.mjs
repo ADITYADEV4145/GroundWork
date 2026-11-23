@@ -50,6 +50,8 @@ export const billedTokens = (u) => u.inputTokens + u.outputTokens + u.cacheReadT
 
 function prepare(suite, tasks, task, dir, treatment) {
   const root = path.join(dir, task.id);
+  // A task interrupted before its record was saved left its workspace behind; start it again from the pin.
+  rmSync(root, { recursive: true, force: true });
   unpackWorkspace(source, suite.revision, task.repo, root);
   for (const prior of tasks.filter((t) => task.sequence && t.sequence === task.sequence && t.step < task.step).sort((a, b) => a.step - b.step)) {
     const record = readJson(path.join(dir, prior.id + '.json'));

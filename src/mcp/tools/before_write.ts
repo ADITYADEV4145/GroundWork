@@ -17,19 +17,32 @@ export const beforeWriteTool = defineTool({
       language: similarInputSchema.shape.language.removeDefault().optional() }).strict().optional().describe('helper you are about to add'),
     calls: z.array(ref).max(20).optional().describe('symbols you will call: name, file:qualifiedName or symbol ID'),
     changes: z.array(ref).max(10).optional().describe('symbols you will change'),
+    decision: z.object({ choice: z.enum(['reuse', 'extend', 'new']), reason: z.string().trim().min(1).max(200) }).strict().optional()
+      .describe('after a reuse answer: what you chose and why, in one line; recorded for the session report'),
     expand: z.enum(['reuse', 'callers']).optional().describe('repeat the same call with this to get the full section'),
     offset: z.number().int().min(0).optional().describe('with expand "callers": skip this many call sites, to page past the first answer'),
   },
   async handler(args, { root, db, config }) {
-    if (!args.new && !args.calls?.length && !args.changes?.length) throw new Error('Provide new, calls or changes.');
+    if (!args.new && !args.calls?.length && !args.changes?.length && !args.decision) throw new Error('Provide new, calls, changes or decision.');
     const sections: string[] = [];
+    if (args.decision) {
+      const { recordReuseDecision } = await import('../../guards/ledger.js');
+      const saved = recordReuseDecision(root, process.env.GW_SESSION_ID, args.decision.choice, args.decision.reason);
+      sections.push(`Decision ${saved ? 'recorded' : 'not recorded (no session)'}: ${args.decision.choice.toUpperCase()}`);
+    }
     if (args.new) {
       const { cachedCandidates } = await import('../../reuse/candidate-cache.js');
       const { findSimilar } = await import('../../reuse/similar.js');
       const index = await cachedCandidates(db, root, config);
       await index.prepareMeaning(root, config);
       const { matches } = await findSimilar(index, { ...args.new, detail: args.expand === 'reuse' ? 'full' : 'compact' });
-      const rows = matches.map((m) => `${m.verdict}: ${m.symbol} (${m.file}:${m.line}) — ${one(m.why, 120)}`);
+      const rows = matches.map((m) => {
+        const symbol = navigationSymbols(db, `${m.file}:${m.symbol}`).find((s) => s.line === m.line);
+        const sites = symbol ? symbolCalls(db, symbol.id, 'callers') : [];
+        // Signature, how widely it is already used, and one real call to copy.
+        return `${m.verdict}: ${one(symbol?.signature || m.symbol, 140)} (${m.file}:${m.line}) — ${one(m.why, 80)}; `
+          + (sites.length ? `${sites.length} call(s), e.g. ${sites[0]!.file}:${sites[0]!.line}` : 'no indexed calls');
+      });
       const shown = args.expand === 'reuse' ? rows : rows.slice(0, 3);
       sections.push('Reuse\n' + (shown.length ? shown.join('\n') : 'nothing to reuse; write it new')
         + (rows.length > shown.length ? `\n… ${rows.length - shown.length} more: expand "reuse"` : ''));

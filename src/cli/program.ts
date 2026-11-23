@@ -10,6 +10,7 @@ const program = new Command()
   .option('--root <dir>', 'repository root (default: git toplevel of cwd)');
 
 const groups = [
+  { names: ['architecture'], load: () => import('./commands/architecture.js') },
   { names: ['search'], load: () => import('./commands/search.js') },
   { names: ['impact'], load: () => import('./commands/impact.js') },
   { names: ['types'], load: () => import('./commands/types.js') },

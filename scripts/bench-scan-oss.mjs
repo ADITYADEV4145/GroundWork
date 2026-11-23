@@ -10,6 +10,11 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const suite = path.join(here, '..', 'bench', 'scan-oss');
 const gw = path.join(here, '..', 'dist', 'cli', 'main.js');
 const cache = process.env.GW_REAL_REPOS_CACHE ?? path.join(os.homedir(), 'work', 'gw-real-repos', 'scan-oss');
+const label = process.argv[2];
+if (!label || !/^[\w.-]+$/.test(label)) { console.error('usage: node scripts/bench-scan-oss.mjs <run-label>'); process.exit(2); }
+const outDir = path.join(suite, 'runs', label);
+if (existsSync(outDir)) { console.error(`${outDir} exists; a measured run is never overwritten`); process.exit(2); }
+mkdirSync(outDir, { recursive: true });
 const RUNS = 3, SEED = 20261123, SAMPLE = 100, TIMEOUT_MS = 120_000;
 const SOURCE = /\.(js|jsx|mjs|cjs|ts|tsx|mts|cts|py|go|java|rs|cs|rb)$/;
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -79,7 +84,7 @@ for (const repo of repos) {
     console.error(`${repo.id} scan ${run}: ${r.ms} ms exit ${r.status}${ok ? '' : ' FAILED'}`);
   }
   if (first) {
-    writeFileSync(path.join(cache, `${repo.id}.scan.json`), JSON.stringify(first, null, 2));
+    writeFileSync(path.join(cache, `${label}.${repo.id}.scan.json`), JSON.stringify(first, null, 2));
     for (const f of first.findings) pool.push({ repo: repo.id, ...f });
   }
   // Receipt: one reported edit gives the checkout a session; the index from the last scan is still there.
@@ -106,6 +111,6 @@ const next = rng(SEED), order = pool.map((_, i) => i);
 for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(next() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
 const sample = order.slice(0, SAMPLE).sort((a, b) => a - b).map((i, n) => ({ id: n + 1, ...pool[i] }));
 out.pool = { findings: pool.length, seed: SEED, sampled: sample.length };
-writeFileSync(path.join(suite, 'results.json'), JSON.stringify(out, null, 2) + '\n');
-writeFileSync(path.join(suite, 'sample.json'), JSON.stringify(sample, null, 2) + '\n');
+writeFileSync(path.join(outDir, 'results.json'), JSON.stringify(out, null, 2) + '\n');
+writeFileSync(path.join(outDir, 'sample.json'), JSON.stringify(sample, null, 2) + '\n');
 console.error(`pool ${pool.length}, sampled ${sample.length}`);

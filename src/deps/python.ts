@@ -53,6 +53,10 @@ export function sitePackages(root: string, extra: string[] = []): string[] {
 
 const versions = new Map<string, Map<string, string>>();
 
+export function resetPyVersions(): void {
+  versions.clear();
+}
+
 /** Top-level import name -> installed version, from `*.dist-info` (never by running pip). */
 function installedVersions(site: string): Map<string, string> {
   const cached = versions.get(site);

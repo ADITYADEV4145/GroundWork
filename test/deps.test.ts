@@ -1,6 +1,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { deflateRawSync } from 'node:zlib';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { defaultConfig } from '../src/config/load.js';
 import { DependencyChecker } from '../src/deps/check.js';
@@ -233,6 +234,115 @@ describe('dependency metadata readers', () => {
       expect(member('old').deprecated).toBe(true);
       expect(member('<init>').params).toBe(1);
       expect(info.members.some((m) => m.name === 'hidden')).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('review regressions', () => {
+  const write = (dir: string, rel: string, text: string): void => {
+    mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true });
+    writeFileSync(path.join(dir, rel), text);
+  };
+  const run = async (dir: string, files: { file: string; ranges: [number, number][] | null }[]) => {
+    await initSqlBackend();
+    await refreshIndex(dir);
+    const db = openDb(indexDbPath(dir), { readonly: true });
+    try {
+      return (await verifyChangedDeep(db, dir, files, defaultConfig())).flatMap((r) => r.findings.map((f) => `${f.file}:${f.line}:${f.kind}:${f.name}`));
+    } finally {
+      db.close();
+    }
+  };
+
+  it('leaves shadowed imports, monkeypatched modules and multi-line imports right', async () => {
+    const dir = tempDir('gw-deps-review-');
+    try {
+      writeDepsFixture(dir);
+      write(dir, 'src/shadow.ts', "import { clamp } from 'mathkit';\nexport const a = (clamp: (n: number) => number) => clamp(1);\nexport function b(clamp: () => number) {\n  return clamp();\n}\n");
+      write(dir, 'src/patch.py', 'import textkit\n\ntextkit.whisper = lambda s: s.lower()\na = textkit.whisper("X")\n');
+      write(dir, 'src/multi.ts', "import {\n  clamp,\n  clampEvery,\n} from 'mathkit';\nexport const a = [clamp, clampEvery];\n");
+      expect(await run(dir, [{ file: 'src/shadow.ts', ranges: null }, { file: 'src/patch.py', ranges: null }])).toEqual([]);
+      expect(await run(dir, [{ file: 'src/multi.ts', ranges: [[3, 3]] }])).toEqual(['src/multi.ts:3:unknown-export:clampEvery']);
+      expect(await run(dir, [{ file: 'src/multi.ts', ranges: [[1, 2]] }])).toEqual([]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('prefers the installed copy over a workspace of the same name, and the require branch for CommonJS', async () => {
+    const dir = tempDir('gw-deps-review-');
+    try {
+      write(dir, '.gitignore', 'node_modules/\n');
+      write(dir, 'package.json', '{"name":"root","private":true,"workspaces":["packages/*"]}');
+      write(dir, 'packages/shared/package.json', '{"name":"shared","version":"2.0.0","types":"index.ts"}');
+      write(dir, 'packages/shared/index.ts', 'export function fresh(): number {\n  return 1;\n}\n');
+      write(dir, 'packages/app/package.json', '{"name":"app","version":"1.0.0","dependencies":{"shared":"1.0.0","dual":"1.0.0"}}');
+      write(dir, 'packages/app/node_modules/shared/package.json', '{"name":"shared","version":"1.0.0","types":"index.d.ts"}');
+      write(dir, 'packages/app/node_modules/shared/index.d.ts', 'export declare function old(): number;\n');
+      write(dir, 'packages/app/node_modules/dual/package.json', '{"name":"dual","version":"1.0.0","exports":{".":{"import":{"types":"./esm.d.ts"},"require":{"types":"./cjs.d.cts"}}}}');
+      write(dir, 'packages/app/node_modules/dual/esm.d.ts', 'export declare function esmOnly(): void;\n');
+      write(dir, 'packages/app/node_modules/dual/cjs.d.cts', 'export declare function cjsOnly(): void;\n');
+      write(dir, 'packages/app/a.ts', "import { old, fresh } from 'shared';\nimport { esmOnly, cjsOnly } from 'dual';\nexport const x = [old, fresh, esmOnly, cjsOnly];\n");
+      write(dir, 'packages/app/b.cjs', "const dual = require('dual');\ndual.cjsOnly();\ndual.esmOnly();\n");
+      expect(await run(dir, [{ file: 'packages/app/a.ts', ranges: null }, { file: 'packages/app/b.cjs', ranges: null }])).toEqual([
+        'packages/app/a.ts:1:unknown-export:fresh',
+        'packages/app/a.ts:2:unknown-export:cjsOnly',
+        'packages/app/b.cjs:3:unknown-member:esmOnly',
+      ]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('drops a cached surface when a package it re-exports from changes version', async () => {
+    const dir = tempDir('gw-deps-review-');
+    try {
+      write(dir, '.gitignore', 'node_modules/\n');
+      write(dir, 'package.json', '{"name":"root","private":true}');
+      write(dir, 'node_modules/wrap/package.json', '{"name":"wrap","version":"1.0.0","types":"index.d.ts"}');
+      write(dir, 'node_modules/wrap/index.d.ts', "export * from 'inner';\n");
+      write(dir, 'node_modules/inner/package.json', '{"name":"inner","version":"1.0.0","types":"index.d.ts"}');
+      write(dir, 'node_modules/inner/index.d.ts', 'export declare function one(): void;\n');
+      write(dir, 'a.ts', "import { one, two } from 'wrap';\nexport const x = [one, two];\n");
+      const files = [{ file: 'a.ts', ranges: null }];
+      expect(await run(dir, files)).toEqual(['a.ts:1:unknown-export:two']);
+      write(dir, 'node_modules/inner/package.json', '{"name":"inner","version":"1.1.0","types":"index.d.ts"}');
+      write(dir, 'node_modules/inner/index.d.ts', 'export declare function one(): void;\nexport declare function two(): void;\n');
+      expect(await run(dir, files)).toEqual([]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('caps what a JAR entry may inflate to', () => {
+    const dir = tempDir('gw-jar-bomb-');
+    try {
+      const name = Buffer.from('p/Big.class');
+      const data = deflateRawSync(Buffer.alloc(32 * 1024 * 1024));
+      const local = Buffer.alloc(30);
+      local.writeUInt32LE(0x04034b50, 0);
+      local.writeUInt16LE(8, 8);
+      local.writeUInt32LE(data.length, 18);
+      local.writeUInt32LE(10, 22); // understated size
+      local.writeUInt16LE(name.length, 26);
+      const central = Buffer.alloc(46);
+      central.writeUInt32LE(0x02014b50, 0);
+      central.writeUInt16LE(8, 10);
+      central.writeUInt32LE(data.length, 20);
+      central.writeUInt32LE(10, 24);
+      central.writeUInt16LE(name.length, 28);
+      const end = Buffer.alloc(22);
+      end.writeUInt32LE(0x06054b50, 0);
+      end.writeUInt16LE(1, 8);
+      end.writeUInt16LE(1, 10);
+      end.writeUInt32LE(46 + name.length, 12);
+      end.writeUInt32LE(30 + name.length + data.length, 16);
+      writeFileSync(path.join(dir, 'bomb.jar'), Buffer.concat([local, name, data, central, name, end]));
+      const jar = openJar(path.join(dir, 'bomb.jar'))!;
+      expect(jar.entries.has('p/Big.class')).toBe(true);
+      expect(readJarEntry(jar, 'p/Big.class')).toBeNull();
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

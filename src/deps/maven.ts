@@ -115,6 +115,10 @@ function inheritedProperties(root: string, dir: string): Map<string, string> {
   return props;
 }
 
+export function resetJavaProjects(): void {
+  projects.clear();
+}
+
 export function javaProject(root: string, relFile: string): JavaProject | null {
   const dir = buildDirFor(root, relFile);
   if (!dir) return null;
@@ -166,10 +170,6 @@ export function javaProject(root: string, relFile: string): JavaProject | null {
   const result = project.jars.length ? project : null;
   projects.set(dir, result);
   return result;
-}
-
-export function resetJavaProjects(): void {
-  projects.clear();
 }
 
 export interface JavaClassHit {

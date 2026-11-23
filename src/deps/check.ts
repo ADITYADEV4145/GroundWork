@@ -7,9 +7,9 @@ import { callFacts, fileFacts, importFacts, type CallFact, type FileFacts, type 
 import type { Db } from '../store/db.js';
 import { buildCrateSurface, cargoLock, locateCrate } from './cargo.js';
 import { buildGoSurface, goModFor, locateGoPackage, type GoModuleRoot } from './go.js';
-import { findJavaClass, javaClassSurface, javaProject } from './maven.js';
+import { findJavaClass, javaClassSurface, javaProject, resetJavaProjects } from './maven.js';
 import { buildNpmSurfaces, locateNpmModule, splitSpecifier, type NpmModule } from './npm.js';
-import { buildPySurface, locatePyModule, sitePackages } from './python.js';
+import { buildPySurface, locatePyModule, resetPyVersions, sitePackages } from './python.js';
 import { arityAllows, arityText, readCachedSurface, shortVersion, writeCachedSurface, type ExportInfo, type ModuleSurface, type PackageRef } from './surface.js';
 import { discoverWorkspaces, type Workspaces } from './workspaces.js';
 
@@ -64,6 +64,22 @@ function inRanges(line: number, ranges: [number, number][] | null | undefined): 
   return !ranges || ranges.some(([a, b]) => line >= a && line <= b);
 }
 
+/** The index records a multi-line import at its first line; a changed-lines check needs the line that names the symbol. */
+function nameLine(lines: string[], imp: ImportFact): number {
+  if ((imp.kind !== 'named' && imp.kind !== 'reexport') || !imp.name || imp.name === '*') return imp.line;
+  const name = new RegExp(`(?<![\\w$])${escapeRe(imp.name)}(?![\\w$])`);
+  if (name.test(lines[imp.line - 1] ?? '')) return imp.line;
+  for (let i = imp.line; i < Math.min(lines.length, imp.line + 200); i++) {
+    if (name.test(lines[i]!)) return i + 1;
+    if (/^\s*[})]/.test(lines[i]!)) break;
+  }
+  return imp.line;
+}
+
+function npmKey(file: string, spec: string, cjs: boolean): string {
+  return `npm:${path.dirname(file)}:${spec}${cjs ? ':require' : ''}`;
+}
+
 export class DependencyChecker {
   readonly stats: DepStats = { checks: 0, built: 0, cached: 0 };
   private readonly surfaces = new Map<string, Loaded | null>();
@@ -72,7 +88,10 @@ export class DependencyChecker {
   private readonly goMods = new Map<string, GoModuleRoot | null>();
 
   constructor(private readonly db: Db, private readonly root: string, private readonly config?: GroundworkConfig) {
-    this.workspaces = discoverWorkspaces(root);
+    // A long-lived process (the MCP server) must see installs and manifest edits made since the last check.
+    resetJavaProjects();
+    resetPyVersions();
+    this.workspaces = discoverWorkspaces(root, true);
   }
 
   private pySites(): string[] {
@@ -92,18 +111,18 @@ export class DependencyChecker {
   }
 
   /** Load the npm surfaces a set of files import, building the uncached ones with a single TypeScript program. */
-  async prepareNpm(files: { file: string; specifiers: string[] }[]): Promise<void> {
+  async prepareNpm(files: { file: string; specifiers: string[]; cjs?: boolean }[]): Promise<void> {
     const pending: { key: string; mod: NpmModule }[] = [];
-    for (const { file, specifiers } of files) {
+    for (const { file, specifiers, cjs = false } of files) {
       for (const spec of specifiers) {
-        const key = `npm:${path.dirname(file)}:${spec}`;
+        const key = npmKey(file, spec, cjs);
         if (this.surfaces.has(key) || pending.some((p) => p.key === key)) continue;
-        const mod = ASSET.test(spec) ? null : locateNpmModule(this.root, file, spec, this.workspaces.npm);
+        const mod = ASSET.test(spec) ? null : locateNpmModule(this.root, file, spec, this.workspaces.npm, cjs);
         if (!mod) {
           this.surfaces.set(key, null);
           continue;
         }
-        const cached = mod.workspace ? null : this.fromCache(mod.ref, mod.ambient ?? mod.subpath);
+        const cached = mod.workspace ? null : this.fromCache(mod.ref, mod.cacheKey ?? mod.ambient ?? mod.subpath);
         if (cached) this.surfaces.set(key, { ref: mod.ref, surface: cached, ...(mod.separateTypes ? { looseTypes: true } : {}), ...(mod.workspace ? { workspace: true } : {}) });
         else pending.push({ key, mod });
       }
@@ -112,13 +131,13 @@ export class DependencyChecker {
     const built = await buildNpmSurfaces(pending.map((p) => p.mod));
     pending.forEach(({ key, mod }, i) => {
       const surface = built[i]!;
-      this.store(mod.ref, mod.ambient ?? mod.subpath, surface, !mod.workspace);
+      this.store(mod.ref, mod.cacheKey ?? mod.ambient ?? mod.subpath, surface, !mod.workspace);
       this.surfaces.set(key, { ref: mod.ref, surface, ...(mod.separateTypes ? { looseTypes: true } : {}), ...(mod.workspace ? { workspace: true } : {}) });
     });
   }
 
-  private npm(file: string, spec: string): Loaded | null {
-    return this.surfaces.get(`npm:${path.dirname(file)}:${spec}`) ?? null;
+  private npm(file: string, spec: string, cjs = false): Loaded | null {
+    return this.surfaces.get(npmKey(file, spec, cjs)) ?? null;
   }
 
   private async python(module: string): Promise<Loaded | null> {
@@ -293,7 +312,7 @@ export class DependencyChecker {
         return none;
       }
       const lines = text.split('\n');
-      const imports = importFacts(this.db, f.id).filter((i) => i.resolvedFileId === null);
+      const imports = importFacts(this.db, f.id).filter((i) => i.resolvedFileId === null).map((i) => ({ ...i, line: nameLine(lines, i) }));
       const calls = callFacts(this.db, f.id).filter((c) => inRanges(c.line, ranges) && !suppressed(lines, c.line));
       const ctx: Ctx = { f, rel, lang, text, lines, imports, calls, ranges, findings: [] };
       if (lang === 'js' || lang === 'ts') await this.checkJs(ctx);
@@ -316,9 +335,11 @@ export class DependencyChecker {
 
   private async checkJs(ctx: Ctx): Promise<void> {
     const external = ctx.imports.filter((i) => splitSpecifier(i.module.startsWith('node:') ? i.module.slice(5) : i.module) !== null);
-    await this.prepareNpm([{ file: ctx.rel, specifiers: [...new Set(external.map((i) => i.module))] }]);
+    // A CommonJS consumer resolves a dual package's `require` declarations.
+    const cjs = /\.c[jt]s$/.test(ctx.rel) || (/\brequire\s*\(/.test(ctx.text) && !/^\s*(?:import\s[^(]|export\s)/m.test(ctx.text));
+    await this.prepareNpm([{ file: ctx.rel, specifiers: [...new Set(external.map((i) => i.module))], cjs }]);
     for (const imp of external) {
-      const loaded = this.npm(ctx.rel, imp.module);
+      const loaded = this.npm(ctx.rel, imp.module, cjs);
       if (!loaded || loaded.surface.open) continue;
       const { surface } = loaded;
       // Types from @types/* can lag the installed JavaScript, and plain JS tolerates loose argument counts:
@@ -343,7 +364,20 @@ export class DependencyChecker {
   private checkJsCalls(ctx: Ctx, local: string, module: string, loaded: Loaded, info: ExportInfo, definite: boolean, viaRequire: boolean): void {
     // A second binding of the same name (a parameter, a local) means calls may not refer to the import.
     const rebinds = [...ctx.text.matchAll(new RegExp(`\\b(?:const|let|var|function|class)\\s+${escapeRe(local)}\\b|[(,]\\s*${escapeRe(local)}\\s*[,):=]`, 'g'))].length;
-    const usedAsArg = new RegExp(`\\b(?:const|let|var|function|class)\\s+${escapeRe(local)}\\b`).test(ctx.text);
+    const n = escapeRe(local);
+    const params = `[^()]*\\b${n}\\b[^()]*`;
+    const usedAsArg = new RegExp(
+      [
+        `\\b(?:const|let|var|function|class)\\s+${n}\\b`,
+        // Destructured locals, parameters of functions, arrows and methods, catch bindings.
+        `\\b(?:const|let|var)\\s*[{[][^=;]*\\b${n}\\b`,
+        `\\bfunction\\b[^(]*\\(${params}\\)`,
+        `\\(${params}\\)\\s*(?::[^=;{]+)?=>`,
+        `\\b${n}\\s*=>`,
+        `[(,]\\s*(?:public |private |protected |readonly )*${n}\\s*\\??:`,
+        `\\(${params}\\)\\s*(?::[^=;{]+)?\\{`,
+      ].join('|'),
+    ).test(ctx.text);
     if (viaRequire ? rebinds > 1 : usedAsArg) return;
     for (const call of ctx.calls) {
       if (call.calleeText === local) {
@@ -398,6 +432,8 @@ export class DependencyChecker {
         if (this.pyRebound(ctx, local.split('.')[0]!)) continue;
         for (const call of ctx.calls) {
           if (call.calleeText !== `${local}.${call.calleeName}`) continue;
+          // The file sets this attribute on the module itself (a monkeypatch): it exists by the time it is called.
+          if (new RegExp(`\\b${escapeRe(local)}\\.${escapeRe(call.calleeName)}\\s*(?::[^=\\n]+)?=(?!=)|\\bsetattr\\(\\s*${escapeRe(local)}\\s*,`).test(ctx.text)) continue;
           this.stats.checks++;
           const info = surface.exports[call.calleeName];
           if (!known(call.calleeName)) ctx.findings.push({ ...this.missing(ctx, call.line, 'unknown-member', call.calleeName, imp.module, loaded, surface.exports, true), column: call.column });
@@ -495,7 +531,8 @@ export class DependencyChecker {
             const { new: _ctor, ...members } = surface.exports;
             ctx.findings.push({ ...this.missing(ctx, call.line, 'unknown-member', call.calleeName, qualified, cls, members, true), column: call.column });
           } else if (info.arities) {
-            const f = this.arity(ctx, call, `${imp.name}.${call.calleeName}`, qualified, cls, info, true);
+            // An unlisted parent may add overloads, so the known arities are not the whole set.
+            const f = surface.open ? null : this.arity(ctx, call, `${imp.name}.${call.calleeName}`, qualified, cls, info, true);
             if (f) ctx.findings.push(f);
             else if (info.deprecated !== undefined) ctx.findings.push(this.deprecated(ctx, call.line, call.calleeName, qualified, cls, info, call.column));
           }

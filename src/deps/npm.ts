@@ -17,6 +17,8 @@ export interface NpmModule {
   entry: string | null;
   /** Ambient module name to look up instead of a file (`declare module "fs"` in @types/node). */
   ambient?: string;
+  /** Cache entry name when it differs from the subpath (the `require` declarations of a dual package). */
+  cacheKey?: string;
   /** Workspace source: read live, never cached. */
   workspace?: boolean;
   /** Types come from a separate `@types/*` package, which may describe a different version than the one installed. */
@@ -62,37 +64,38 @@ function typeFileFor(target: string, allowSource: boolean): string | null {
 }
 
 /** First string reachable through an `exports` condition object, preferring type conditions. */
-function conditionTarget(node: unknown, depth = 0): string[] {
+function conditionTarget(node: unknown, cjs: boolean, depth = 0): string[] {
   if (typeof node === 'string') return [node];
   if (!node || typeof node !== 'object' || depth > 6) return [];
-  if (Array.isArray(node)) return node.flatMap((n) => conditionTarget(n, depth + 1));
+  if (Array.isArray(node)) return node.flatMap((n) => conditionTarget(n, cjs, depth + 1));
   const obj = node as Record<string, unknown>;
-  const order = ['types', 'typings', 'import', 'require', 'node', 'default'];
+  // A `require()` consumer gets the require branch, whose declarations may differ from the import branch.
+  const order = cjs ? ['types', 'typings', 'require', 'node', 'default', 'import'] : ['types', 'typings', 'import', 'require', 'node', 'default'];
   const keys = [...order.filter((k) => k in obj), ...Object.keys(obj).filter((k) => !order.includes(k) && !k.startsWith('.'))];
-  return keys.flatMap((k) => conditionTarget(obj[k], depth + 1));
+  return keys.flatMap((k) => conditionTarget(obj[k], cjs, depth + 1));
 }
 
-function exportsTargets(exportsField: unknown, subpath: string): string[] | null {
+function exportsTargets(exportsField: unknown, subpath: string, cjs: boolean): string[] | null {
   if (exportsField === undefined || exportsField === null) return null;
   const key = subpath ? `./${subpath}` : '.';
-  if (typeof exportsField === 'string' || Array.isArray(exportsField)) return key === '.' ? conditionTarget(exportsField) : [];
+  if (typeof exportsField === 'string' || Array.isArray(exportsField)) return key === '.' ? conditionTarget(exportsField, cjs) : [];
   const obj = exportsField as Record<string, unknown>;
   const subpaths = Object.keys(obj).filter((k) => k.startsWith('.'));
-  if (!subpaths.length) return key === '.' ? conditionTarget(obj) : [];
-  if (key in obj) return conditionTarget(obj[key]);
+  if (!subpaths.length) return key === '.' ? conditionTarget(obj, cjs) : [];
+  if (key in obj) return conditionTarget(obj[key], cjs);
   for (const pattern of subpaths.filter((k) => k.includes('*')).sort((a, b) => b.length - a.length)) {
     const [pre, post] = pattern.split('*') as [string, string];
     if (key.startsWith(pre) && key.endsWith(post) && key.length >= pre.length + post.length) {
       const star = key.slice(pre.length, key.length - post.length);
-      return conditionTarget(obj[pattern]).map((t) => t.replaceAll('*', star));
+      return conditionTarget(obj[pattern], cjs).map((t) => t.replaceAll('*', star));
     }
   }
   return [];
 }
 
-function entryIn(dir: string, pkg: Record<string, unknown>, subpath: string, allowSource: boolean): string | null {
+function entryIn(dir: string, pkg: Record<string, unknown>, subpath: string, allowSource: boolean, cjs = false): string | null {
   const candidates: string[] = [];
-  const mapped = exportsTargets(pkg.exports, subpath);
+  const mapped = exportsTargets(pkg.exports, subpath, cjs);
   if (mapped) candidates.push(...mapped);
   if (!subpath) {
     for (const field of ['types', 'typings', 'module', 'main']) if (typeof pkg[field] === 'string') candidates.push(pkg[field] as string);
@@ -124,7 +127,7 @@ function findPackageDir(fromDir: string, name: string, stopAt: string): string |
 }
 
 /** Locate the installed (or workspace) package an import names. Null: not installed here, so nothing to check. */
-export function locateNpmModule(root: string, fromFile: string, specifier: string, workspaces: Map<string, string>): NpmModule | null {
+export function locateNpmModule(root: string, fromFile: string, specifier: string, workspaces: Map<string, string>, cjs = false): NpmModule | null {
   const bare = specifier.startsWith('node:') ? specifier.slice(5) : specifier;
   if (isBuiltin(specifier)) {
     const types = findPackageDir(path.dirname(path.resolve(root, fromFile)), '@types/node', root);
@@ -135,8 +138,10 @@ export function locateNpmModule(root: string, fromFile: string, specifier: strin
   }
   const split = splitSpecifier(specifier);
   if (!split) return null;
-  const workspaceDir = workspaces.get(split.name);
-  const dir = workspaceDir ?? findPackageDir(path.dirname(path.resolve(root, fromFile)), split.name, root);
+  // What the consumer has installed wins: a workspace name only stands in when node_modules has no copy, or
+  // links to the workspace itself.
+  const installed = findPackageDir(path.dirname(path.resolve(root, fromFile)), split.name, root);
+  const dir = installed ?? workspaces.get(split.name);
   if (!dir) return null;
   const pkg = readJson(path.join(dir, 'package.json'));
   if (!pkg) return null;
@@ -146,20 +151,21 @@ export function locateNpmModule(root: string, fromFile: string, specifier: strin
   } catch {
     // keep the unresolved path
   }
-  const isWorkspace = workspaceDir !== undefined || !real.split(path.sep).includes('node_modules');
+  const isWorkspace = !real.split(path.sep).includes('node_modules');
   const ref: PackageRef = { ecosystem: 'npm', name: split.name, version: String(pkg.version ?? '0.0.0'), location: real };
-  let entry = entryIn(real, pkg, split.subpath, isWorkspace);
+  let entry = entryIn(real, pkg, split.subpath, isWorkspace, cjs);
+  const condition = cjs && entry !== entryIn(real, pkg, split.subpath, isWorkspace, false);
   let separateTypes = false;
   if (!entry && !isWorkspace) {
     const typesName = `@types/${split.name.startsWith('@') ? split.name.slice(1).replace('/', '__') : split.name}`;
     const typesDir = findPackageDir(path.dirname(path.resolve(root, fromFile)), typesName, root);
     const typesPkg = typesDir ? readJson(path.join(typesDir, 'package.json')) : null;
-    if (typesDir && typesPkg) entry = entryIn(typesDir, typesPkg, split.subpath, false);
+    if (typesDir && typesPkg) entry = entryIn(typesDir, typesPkg, split.subpath, false, cjs);
     separateTypes = entry !== null;
     // The cached surface is only valid for this pairing of package and types versions.
     if (separateTypes) ref.location = `${real} + ${typesName}@${String(typesPkg!.version ?? '')}`;
   }
-  return { ref, subpath: split.subpath, entry, ...(isWorkspace ? { workspace: true } : {}), ...(separateTypes ? { separateTypes: true } : {}) };
+  return { ref, subpath: split.subpath, entry, ...(isWorkspace ? { workspace: true } : {}), ...(separateTypes ? { separateTypes: true } : {}), ...(condition ? { cacheKey: `${split.subpath}#require` } : {}) };
 }
 
 let tsModule: Ts | null = null;
@@ -353,5 +359,28 @@ function surfaceOf(ts: Ts, program: import('typescript').Program, checker: impor
     open = true;
     why ??= 'type definitions export nothing';
   }
-  return { exports, open, ...(why ? { why } : {}) };
+  // Declarations taken from other packages: the cached surface is only valid while those stay at this version.
+  const files = new Set(seen);
+  for (const sym of checker.getExportsOfModule(moduleSymbol)) {
+    const target = sym.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(sym) : sym;
+    for (const d of target.declarations ?? []) files.add(d.getSourceFile().fileName);
+  }
+  const via: Record<string, string> = {};
+  const dirs = new Map<string, string | null>();
+  for (const file of files) {
+    const manifest = nearestManifest(path.dirname(file), dirs);
+    if (!manifest || path.dirname(manifest) === mod.ref.location || path.dirname(manifest) === path.dirname(nearestManifest(path.dirname(mod.entry), dirs) ?? '')) continue;
+    via[manifest] = String(readJson(manifest)?.version ?? '');
+  }
+  return { exports, open, ...(why ? { why } : {}), ...(Object.keys(via).length ? { via } : {}) };
+}
+
+function nearestManifest(dir: string, memo: Map<string, string | null>): string | null {
+  const hit = memo.get(dir);
+  if (hit !== undefined) return hit;
+  const here = path.join(dir, 'package.json');
+  const parent = path.dirname(dir);
+  const found = typeof readJson(here)?.version === 'string' ? here : parent === dir ? null : nearestManifest(parent, memo);
+  memo.set(dir, found);
+  return found;
 }

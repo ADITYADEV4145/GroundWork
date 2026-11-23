@@ -30,6 +30,8 @@ export interface ModuleSurface {
   name?: string;
   /** Identifiers the module's source mentions without a listed definition: such a name is never proven missing. */
   mentions?: string[];
+  /** Other packages this listing was read from (`package.json` path -> version); the cache entry dies when one changes. */
+  via?: Record<string, string>;
 }
 
 export interface PackageRef {
@@ -40,7 +42,7 @@ export interface PackageRef {
   location: string;
 }
 
-export const SURFACE_FORMAT = 1;
+export const SURFACE_FORMAT = 2;
 
 function cacheFile(root: string, ref: PackageRef, module: string): string {
   const safe = (s: string) => s.replace(/[^\w.@+-]+/g, '_').slice(0, 120);
@@ -52,7 +54,11 @@ interface Stored { format: number; location: string; surface: ModuleSurface }
 export function readCachedSurface(root: string, ref: PackageRef, module: string): ModuleSurface | null {
   try {
     const stored = JSON.parse(readFileSync(cacheFile(root, ref, module), 'utf8')) as Stored;
-    return stored.format === SURFACE_FORMAT && stored.location === ref.location ? stored.surface : null;
+    if (stored.format !== SURFACE_FORMAT || stored.location !== ref.location) return null;
+    for (const [manifest, version] of Object.entries(stored.surface.via ?? {})) {
+      if (String((JSON.parse(readFileSync(manifest, 'utf8')) as { version?: unknown }).version ?? '') !== version) return null;
+    }
+    return stored.surface;
   } catch {
     return null;
   }

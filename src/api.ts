@@ -1,4 +1,5 @@
 // Public library API. Feature streams import from these modules rather than reaching into internals.
+export { searchCode, type CodeSearchOptions, type CodeSearchHit } from './search/index.js';
 export { refreshIndex, type RefreshResult, type RefreshOptions } from './index/refresh.js';
 export { openIndex, indexDbPath, symbolId } from './index/store.js';
 export { searchSymbols, findSymbols, getSymbolDetail, indexStats, type SymbolHit, type SymbolDetail, type IndexStats } from './index/query.js';

@@ -3,6 +3,25 @@ import type { Db, Row } from '../store/db.js';
 import { splitWords } from '../extract/fingerprint.js';
 import type { Param, SymbolKind } from '../types.js';
 
+export function searchDocuments(db: Db) {
+  const evidence = new Map<string, string[]>();
+  for (const row of db.prepare(`SELECT caller_id symbol_id, callee_name value FROM calls WHERE caller_id IS NOT NULL
+    UNION ALL SELECT symbol_id, value FROM literals WHERE symbol_id IS NOT NULL`).all()) {
+    const id = String(row.symbol_id);
+    const values = evidence.get(id) ?? [];
+    values.push(String(row.value));
+    evidence.set(id, values);
+  }
+  return db.prepare(`SELECT s.id, s.name, s.qualified_name, s.kind, f.path, s.start_line,
+    s.end_line, s.signature, s.docstring, s.start_byte, s.end_byte, f.hash
+    FROM symbols s JOIN files f ON f.id = s.file_id ORDER BY f.path, s.start_line, s.id`).all().map((r) => ({
+    id: String(r.id), name: String(r.name), qualifiedName: String(r.qualified_name),
+    kind: String(r.kind) as SymbolKind, file: String(r.path), line: Number(r.start_line),
+    endLine: Number(r.end_line), signature: String(r.signature), doc: String(r.docstring ?? ''),
+    body: (evidence.get(String(r.id)) ?? []).join(' '), start: Number(r.start_byte), end: Number(r.end_byte), hash: String(r.hash),
+  }));
+}
+
 // Read-side API over the index. Every later phase (MCP tools, hooks, gates) should go through here.
 
 export interface SymbolHit {

@@ -1,0 +1,706 @@
+{
+  "version": 2,
+  "anchor": "10fc7493ed024d817b5cabf7cbf4aaa97533825c",
+  "tasks": [
+    {
+      "id": "v2-p1",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "enforce owner-only filesystem permissions for sensitive local state",
+      "target": {
+        "file": "src/util/user-cache.ts",
+        "name": "privateDirectory",
+        "kind": "function"
+      },
+      "expected": [
+        "0ae9be8c052e175c"
+      ]
+    },
+    {
+      "id": "v2-p2",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "choose the XDG storage location with a home-folder fallback",
+      "target": {
+        "file": "src/util/user-cache.ts",
+        "name": "userCacheDirectory",
+        "kind": "function"
+      },
+      "expected": [
+        "198109fdf86d046b"
+      ]
+    },
+    {
+      "id": "v2-p3",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "turn schema validation issues into readable dotted-field diagnostics",
+      "target": {
+        "file": "src/util/zod.ts",
+        "name": "formatZodError",
+        "kind": "function"
+      },
+      "expected": [
+        "bc15ddd50930a183"
+      ]
+    },
+    {
+      "id": "v2-p4",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "append structured events as newline-delimited JSON without propagating I/O failures",
+      "target": {
+        "file": "src/util/log.ts",
+        "name": "log",
+        "kind": "function"
+      },
+      "expected": [
+        "0fa55d4c561f7ae4"
+      ]
+    },
+    {
+      "id": "v2-p5",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "accumulate named elapsed milliseconds only when instrumentation is enabled",
+      "target": {
+        "file": "src/util/hook-timing.ts",
+        "name": "hookTiming",
+        "kind": "function"
+      },
+      "expected": [
+        "32993d811d18e5a9"
+      ]
+    },
+    {
+      "id": "v2-p6",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "emit accumulated instrumentation plus CPU usage to standard error",
+      "target": {
+        "file": "src/util/hook-timing.ts",
+        "name": "printHookTimings",
+        "kind": "function"
+      },
+      "expected": [
+        "1e6e9b6fe0d5f61b"
+      ]
+    },
+    {
+      "id": "v2-p7",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "enumerate eligible tracked and untracked sources while honoring ignore rules and symlink boundaries",
+      "target": {
+        "file": "src/index/discover.ts",
+        "name": "discoverFiles",
+        "kind": "function"
+      },
+      "expected": [
+        "e194cf4655449da1"
+      ]
+    },
+    {
+      "id": "v2-p8",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "compile configured globs that recognize spec filenames",
+      "target": {
+        "file": "src/index/discover.ts",
+        "name": "makeTestMatcher",
+        "kind": "function"
+      },
+      "expected": [
+        "ec0ea8ea7152fd81"
+      ]
+    },
+    {
+      "id": "v2-p9",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "skip parsing minified bundles and machine-produced artifacts",
+      "target": {
+        "file": "src/index/discover.ts",
+        "name": "looksGenerated",
+        "kind": "function"
+      },
+      "expected": [
+        "1c1560c79ce39b5b"
+      ]
+    },
+    {
+      "id": "v2-p10",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "derive a content-addressed parser-result identity including language and tool version",
+      "target": {
+        "file": "src/index/extraction-cache.ts",
+        "name": "extractionKey",
+        "kind": "function"
+      },
+      "expected": [
+        "4faca33917f8b9c5"
+      ]
+    },
+    {
+      "id": "v2-p11",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "recover serialized parser results after checking ownership size and checksum",
+      "target": {
+        "file": "src/index/extraction-cache.ts",
+        "name": "readExtraction",
+        "kind": "function"
+      },
+      "expected": [
+        "87c9fbf1fa5e58c4"
+      ]
+    },
+    {
+      "id": "v2-p12",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "atomically persist disposable parser results with a checksum envelope",
+      "target": {
+        "file": "src/index/extraction-cache.ts",
+        "name": "cacheExtraction",
+        "kind": "function"
+      },
+      "expected": [
+        "20ba934f393f1494"
+      ]
+    },
+    {
+      "id": "v2-p13",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "serialize database mutations through a workspace-wide exclusive guard",
+      "target": {
+        "file": "src/index/lock.ts",
+        "name": "withWriteLock",
+        "kind": "function"
+      },
+      "expected": [
+        "b2f83065e0c1e6b3"
+      ]
+    },
+    {
+      "id": "v2-p14",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "retry exclusive filesystem acquisition and reclaim abandoned process ownership",
+      "target": {
+        "file": "src/index/lock.ts",
+        "name": "withFileLock",
+        "kind": "function"
+      },
+      "expected": [
+        "0817d32e53169757"
+      ]
+    },
+    {
+      "id": "v2-p15",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "approximate shingle sets using seeded minimum integer signatures",
+      "target": {
+        "file": "src/extract/fingerprint.ts",
+        "name": "minhash",
+        "kind": "function"
+      },
+      "expected": [
+        "b7281290e30f7eda"
+      ]
+    },
+    {
+      "id": "v2-p16",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "calculate the fraction of matching sketch positions",
+      "target": {
+        "file": "src/extract/fingerprint.ts",
+        "name": "minhashSimilarity",
+        "kind": "function"
+      },
+      "expected": [
+        "a61050a8647e5f71"
+      ]
+    },
+    {
+      "id": "v2-p17",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "break mixed-case and underscore identifiers at letter-number boundaries",
+      "target": {
+        "file": "src/extract/fingerprint.ts",
+        "name": "splitWords",
+        "kind": "function"
+      },
+      "expected": [
+        "e26ba63f1b90be10"
+      ]
+    },
+    {
+      "id": "v2-p18",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "reduce plural and participle suffixes for vocabulary comparison",
+      "target": {
+        "file": "src/extract/fingerprint.ts",
+        "name": "stem",
+        "kind": "function"
+      },
+      "expected": [
+        "d210c4b4dc0c778a"
+      ]
+    },
+    {
+      "id": "v2-p19",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "build frequency counts from normalized identifier components",
+      "target": {
+        "file": "src/extract/fingerprint.ts",
+        "name": "vocabulary",
+        "kind": "function"
+      },
+      "expected": [
+        "c85de80c04a54516"
+      ]
+    },
+    {
+      "id": "v2-p20",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "construct a body sketch containing normalized digest and identifier frequencies",
+      "target": {
+        "file": "src/extract/fingerprint.ts",
+        "name": "fingerprint",
+        "kind": "function"
+      },
+      "expected": [
+        "4120548bda7f9bb8"
+      ]
+    },
+    {
+      "id": "v2-p21",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "combine body identifier frequencies with documentation vocabulary",
+      "target": {
+        "file": "src/reuse/signals.ts",
+        "name": "wordsOf",
+        "kind": "function"
+      },
+      "expected": [
+        "0c663d35a47a6276"
+      ]
+    },
+    {
+      "id": "v2-p22",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "assign rarity weights using corpus occurrence counts",
+      "target": {
+        "file": "src/reuse/signals.ts",
+        "name": "buildIdf",
+        "kind": "function"
+      },
+      "expected": [
+        "b749c30ffeda7a85"
+      ]
+    },
+    {
+      "id": "v2-p23",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "measure structural lexical parameter and return-shape agreement between implementations",
+      "target": {
+        "file": "src/reuse/signals.ts",
+        "name": "pairSignals",
+        "kind": "function"
+      },
+      "expected": [
+        "336961a325f011c5"
+      ]
+    },
+    {
+      "id": "v2-p24",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "compare numeric arrays by normalized dot product",
+      "target": {
+        "file": "src/reuse/signals.ts",
+        "name": "vectorCosine",
+        "kind": "function"
+      },
+      "expected": [
+        "18171d0b90f5a1fc"
+      ]
+    },
+    {
+      "id": "v2-p25",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "detect ancestor and descendant declarations occupying nested byte spans",
+      "target": {
+        "file": "src/reuse/policy.ts",
+        "name": "relatedSymbols",
+        "kind": "function"
+      },
+      "expected": [
+        "128f0b871bc3d4f7"
+      ]
+    },
+    {
+      "id": "v2-p26",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "decide whether two declarations belong to the same callable or class family",
+      "target": {
+        "file": "src/reuse/policy.ts",
+        "name": "compatibleKinds",
+        "kind": "function"
+      },
+      "expected": [
+        "2b77c70e6c2d9f26"
+      ]
+    },
+    {
+      "id": "v2-p27",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "require independent duplicate candidates with sufficient structural overlap",
+      "target": {
+        "file": "src/reuse/policy.ts",
+        "name": "canBlock",
+        "kind": "function"
+      },
+      "expected": [
+        "915838ec99a62af1"
+      ]
+    },
+    {
+      "id": "v2-p28",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "apply logistic coefficients to duplicate evidence",
+      "target": {
+        "file": "src/reuse/model.ts",
+        "name": "probability",
+        "kind": "function"
+      },
+      "expected": [
+        "7c5456d3c8b998b9"
+      ]
+    },
+    {
+      "id": "v2-p29",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "select calibrated classifier weights depending on semantic model availability",
+      "target": {
+        "file": "src/reuse/model.ts",
+        "name": "scoreSignals",
+        "kind": "function"
+      },
+      "expected": [
+        "f2ead5e46321fcba"
+      ]
+    },
+    {
+      "id": "v2-p30",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "select the most precise semantic option satisfying a safety floor with recall and size tiebreaks",
+      "target": {
+        "file": "src/reuse/embedding-evaluation.ts",
+        "name": "chooseEmbeddingCandidate",
+        "kind": "function"
+      },
+      "expected": [
+        "9216f68fc894ab77"
+      ]
+    },
+    {
+      "id": "v2-p31",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "recognize timeout retry port and capacity identifiers as tunable knobs",
+      "target": {
+        "file": "src/reuse/inspection.ts",
+        "name": "configName",
+        "kind": "function"
+      },
+      "expected": [
+        "1d0a4ded90da81a7"
+      ]
+    },
+    {
+      "id": "v2-p32",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "collect syntax-tree comments constants and trivial property accessors",
+      "target": {
+        "file": "src/reuse/inspection.ts",
+        "name": "inspectSource",
+        "kind": "function"
+      },
+      "expected": [
+        "06314a859b3c3f1b"
+      ]
+    },
+    {
+      "id": "v2-p33",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "validate a nearby duplicate-suppression justification has meaningful specific wording",
+      "target": {
+        "file": "src/reuse/inspection.ts",
+        "name": "allowReason",
+        "kind": "function"
+      },
+      "expected": [
+        "3a08613028335cbb"
+      ]
+    },
+    {
+      "id": "v2-p34",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "augment parsed declarations with binding-sensitive hashes and behavioral contracts",
+      "target": {
+        "file": "src/reuse/source.ts",
+        "name": "extractReuseSource",
+        "kind": "function"
+      },
+      "expected": [
+        "de09c1369d6574f8"
+      ]
+    },
+    {
+      "id": "v2-p35",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "display reuse recommendations with locations and supporting evidence",
+      "target": {
+        "file": "src/reuse/similar.ts",
+        "name": "renderSimilar",
+        "kind": "function"
+      },
+      "expected": [
+        "6cef9faa51a28bce"
+      ]
+    },
+    {
+      "id": "v2-p36",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "compare an unfinished implementation against existing helpers and return reuse recommendations",
+      "target": {
+        "file": "src/reuse/similar.ts",
+        "name": "findSimilar",
+        "kind": "function"
+      },
+      "expected": [
+        "d76477f2602b8923"
+      ]
+    },
+    {
+      "id": "v2-p37",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "fill missing settings from a named preset without overriding explicit values",
+      "target": {
+        "file": "src/config/load.ts",
+        "name": "applyProfile",
+        "kind": "function"
+      },
+      "expected": [
+        "5673f601e0ee3cba"
+      ]
+    },
+    {
+      "id": "v2-p38",
+      "set": "paraphrase",
+      "corpus": "groundwork",
+      "query": "select a syntax extractor supporting the requested programming dialect",
+      "target": {
+        "file": "src/lang/index.ts",
+        "name": "adapterFor",
+        "kind": "function"
+      },
+      "expected": [
+        "a061c300f95a5d13"
+      ]
+    },
+    {
+      "id": "v2-p39",
+      "set": "paraphrase",
+      "corpus": "python",
+      "query": "evaluate regional percentages in an asynchronous batch",
+      "target": {
+        "file": "app/services/tax.py",
+        "name": "fetch_rates",
+        "kind": "function"
+      },
+      "expected": [
+        "7b3c0bea3d507913"
+      ]
+    },
+    {
+      "id": "v2-p40",
+      "set": "paraphrase",
+      "corpus": "python",
+      "query": "instantiate a client record from raw input with an optional strict flag",
+      "target": {
+        "file": "app/models.py",
+        "name": "Customer.parse",
+        "kind": "method"
+      },
+      "expected": [
+        "e5ff4e586989155d"
+      ]
+    },
+    {
+      "id": "v2-c1",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "privateDirectory",
+      "target": {
+        "file": "src/util/user-cache.ts",
+        "name": "privateDirectory",
+        "kind": "function"
+      },
+      "expected": [
+        "0ae9be8c052e175c"
+      ]
+    },
+    {
+      "id": "v2-c2",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "userCacheDirectory",
+      "target": {
+        "file": "src/util/user-cache.ts",
+        "name": "userCacheDirectory",
+        "kind": "function"
+      },
+      "expected": [
+        "198109fdf86d046b"
+      ]
+    },
+    {
+      "id": "v2-c3",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "formatZodError",
+      "target": {
+        "file": "src/util/zod.ts",
+        "name": "formatZodError",
+        "kind": "function"
+      },
+      "expected": [
+        "bc15ddd50930a183"
+      ]
+    },
+    {
+      "id": "v2-c4",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "log",
+      "target": {
+        "file": "src/util/log.ts",
+        "name": "log",
+        "kind": "function"
+      },
+      "expected": [
+        "0fa55d4c561f7ae4"
+      ]
+    },
+    {
+      "id": "v2-c5",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "hookTiming",
+      "target": {
+        "file": "src/util/hook-timing.ts",
+        "name": "hookTiming",
+        "kind": "function"
+      },
+      "expected": [
+        "32993d811d18e5a9"
+      ]
+    },
+    {
+      "id": "v2-c6",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "printHookTimings",
+      "target": {
+        "file": "src/util/hook-timing.ts",
+        "name": "printHookTimings",
+        "kind": "function"
+      },
+      "expected": [
+        "1e6e9b6fe0d5f61b"
+      ]
+    },
+    {
+      "id": "v2-c7",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "discoverFiles",
+      "target": {
+        "file": "src/index/discover.ts",
+        "name": "discoverFiles",
+        "kind": "function"
+      },
+      "expected": [
+        "e194cf4655449da1"
+      ]
+    },
+    {
+      "id": "v2-c8",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "makeTestMatcher",
+      "target": {
+        "file": "src/index/discover.ts",
+        "name": "makeTestMatcher",
+        "kind": "function"
+      },
+      "expected": [
+        "ec0ea8ea7152fd81"
+      ]
+    },
+    {
+      "id": "v2-c9",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "looksGenerated",
+      "target": {
+        "file": "src/index/discover.ts",
+        "name": "looksGenerated",
+        "kind": "function"
+      },
+      "expected": [
+        "1c1560c79ce39b5b"
+      ]
+    },
+    {
+      "id": "v2-c10",
+      "set": "exact",
+      "corpus": "groundwork",
+      "query": "extractionKey",
+      "target": {
+        "file": "src/index/extraction-cache.ts",
+        "name": "extractionKey",
+        "kind": "function"
+      },
+      "expected": [
+        "4faca33917f8b9c5"
+      ]
+    }
+  ]
+}

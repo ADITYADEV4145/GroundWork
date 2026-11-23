@@ -82,7 +82,7 @@ test('generation is idempotent, preserves other content and validates both desti
 });
 
 test('saved sections are fresh, precede all old benchmark tables and preserve every previously published byte', () => {
-  const content = sections(report, loadV7(root));
+  const content = sections(report, loadV7(root), loadV7(root, 'v8', '243bb549e352ee4a63e968230055cda0c165bbe5'));
   for (const [file, section, oldStart] of [['README.md', content.markdown, 'Recorded pre-fix Devin-agent'], ['website/public/benchmarks.html', content.html, '<h2>Pre-fix results</h2>']]) {
     const page = read(path.join(root, file));
     const before = execFileSync('git', ['show', `HEAD:${file}`], { cwd: root, encoding: 'utf8' });
@@ -117,5 +117,25 @@ test('completed v7 renders six primary intervals and rejects partial, wrong-pin 
     bad[0].summary.sessionPrimary.elapsedMsPerTask.baselineMean++;
     writeFileSync(file, JSON.stringify(bad));
     assert.throws(() => loadV7(dir), /Inconsistent/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('v8 preserves v7, validates its pin and publishes measured-not-shipped primary results', () => {
+  const pin = '243bb549e352ee4a63e968230055cda0c165bbe5';
+  const v7 = sections(report, loadV7(root));
+  const v8 = loadV7(root, 'v8', pin);
+  const completed = sections(report, loadV7(root), v8);
+  assert.ok(completed.markdown.endsWith(v7.markdown));
+  assert.ok(completed.html.endsWith(v7.html));
+  assert.equal([...completed.html.matchAll(/<td>met:/g)].length, 12);
+  for (const text of ['not shipped', pin, '434 to 285ms', '616 to 337ms', '29s', '7s', '86.216s', '−28.35%', '−30.45%']) assert.ok(completed.markdown.includes(text), text);
+  assert.throws(() => loadV7(root, 'v8', 'wrong'), /provenance/);
+  const dir = mkdtempSync(path.join(os.homedir(), 'bench-v8-empty-'));
+  try {
+    assert.equal(loadV7(dir, 'v8', pin), null);
+    const file = 'bench/nav/v8/results/combined.json';
+    mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
+    cpSync(path.join(root, file), path.join(dir, file));
+    assert.throws(() => loadV7(dir, 'v8', pin), /Both v7/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

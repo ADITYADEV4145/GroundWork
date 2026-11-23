@@ -5,9 +5,20 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 # Groundwork
 
-Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
+Groundwork keeps a live local index of this repository and exposes it as MCP tools. Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript, Python, Go, Rust, Java, C# and Ruby. Grounding call verification remains limited to TypeScript, JavaScript and Python.
+
+After API edits, use `change_impact` (or `gw impact --json`) for unchanged callers,
+reaching tests and session coverage. High/medium-risk Stop context is evidence,
+never a block. A `complete: true` answer needs no further impact lookup for that
+snapshot; edits invalidate it. Incomplete reasons and test commands guide follow-up.
+See [impact](references/impact.md). Tool-level benchmark results are not agent runs.
 
 ## 1. Navigate: use the cheapest sufficient evidence
+
+Use `search_code({ "query": "where do we retry failed requests", "limit": 5 })`
+for plain-English intent when the symbol name is unknown (`gw search "..." --json`
+in the CLI). Hits explain lexical/semantic evidence; semantic search only uses
+an already installed local model. Prefer unchanged `find_code` for known names.
 
 1. Use `rg` for a trivial literal or filename lookup. Use the index for symbol, behavior and structure questions: `find_code({ "query": "what you need" })`. Exact names return exact matches; use `breadth: "all"` only when broader results are needed. Set `locations_only: false` for signatures or docs. The top matches come back with their source (`include_body` defaults on), so answer from that reply instead of following it with `read_symbol` or Read; pass `include_body: false` when only locations are needed. Send independent lookups together in one call, never one per turn: `find_code({ "queries": ["first thing", "second thing"] })` (up to 8; pass `query` or `queries`, not both). Stop when the request is resolved.
 2. For a known helper you need to recall, use `read_symbol({ "symbol": "exact name or ID" })` instead of a whole-file Read; batch several with `read_symbol({ "symbols": ["name or ID", "another name or ID"] })`. Pass either `symbol` or `symbols`, not both. If only files are known, outline several files in one call, at most once per orientation: `outline({ "files": ["src/a.ts", "src/b.ts"] })`. Keep `file` for one file. Choose symbols and read only needed bodies, not whole files. Skip outline when the symbol is known. Outline defaults to locations/ranges; set `locations_only: false` for signatures.
@@ -70,4 +81,5 @@ Forces and allows are counted and logged. If you force often, you are fighting t
 - [Navigation examples](references/navigation.md)
 - [Reuse protocol and gate findings](references/reuse.md)
 - [Grounding checks](references/grounding.md)
+- Optional types: `check_types({files: [{file, lines?}]})` uses the project's compiler when available. `gw types check` and TypeScript-only `gw types def|impl|refs file:line:col` also support `--json`. Missing compilers leave grounding unchanged. Configure `types.enabled`, `stopGate`, `postToolHook` (default false), `timeoutMs`, `budgetTokens`, `typescript` and `python` (`auto`/`off`).
 - [Troubleshooting](references/troubleshooting.md)

@@ -11,11 +11,11 @@ export const duplicateGate: HookHandler = {
   events: ['stop'],
   async run(ev, { root, config }) {
     const raw = ev.raw as { stop_hook_active?: unknown } | null;
-    if (!config.reuse.duplicateGate || raw?.stop_hook_active === true) return { action: 'allow' };
+    if ((!config.reuse.duplicateGate && !(config.types.enabled && config.types.stopGate)) || raw?.stop_hook_active === true) return { action: 'allow' };
     try {
       const { checkRepository, formatFinding } = await import('../../reuse/check.js');
-      const report = await checkRepository(root, { config, timeoutMs: 1500 });
-      const blocks = report.findings.filter((f) => f.severity === 'BLOCK');
+      const report = await checkRepository(root, { config, timeoutMs: 1500, stopHook: true });
+      const blocks = report.findings.filter((f) => (config.reuse.duplicateGate || f.grounding?.kind === 'type' || f.grounding?.typeBlocking === true) && f.severity === 'BLOCK');
       if (!blocks.length) return { action: 'allow' };
       const findingSet = sha1(JSON.stringify(blocks.map((f) => f.id).sort()));
       const session = sha1(`${ev.agent}:${ev.sessionId ?? '<anonymous>'}`);
@@ -27,7 +27,7 @@ export const duplicateGate: HookHandler = {
         log(root, 'info', 'duplicate_gate', { status: 'ignored', sessionId: ev.sessionId, findingSet });
         return { action: 'allow' };
       }
-      const strict = config.profile === 'strict';
+      const strict = config.profile === 'strict' && blocks.some((f) => f.severity === 'BLOCK');
       log(root, 'info', 'duplicate_gate', { status: strict ? 'blocked' : 'warned', sessionId: ev.sessionId, findingSet });
       const budgeted = fitToBudget(blocks, formatFinding, 500);
       // Only the strict profile blocks the stop; standard reports the same findings without holding the agent.

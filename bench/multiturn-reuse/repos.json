@@ -1,0 +1,12 @@
+{
+  "repositories": [
+    {"id":"click","url":"https://github.com/pallets/click.git","pin":"528fd7a798abe0077060c5720e13791a34167f66","license":"BSD-3-Clause"},
+    {"id":"pytest","url":"https://github.com/pytest-dev/pytest.git","pin":"1b1375ff57b8c2f1d666306fee1fa81747156218","license":"MIT"}
+  ],
+  "chains": [
+    {"id":"click-summary","repo":"click","package":"reusebench_click_summary","capability":"Condense help text using the repository's default short-help semantics with maximum length 20. Input values are strings."},
+    {"id":"click-values","repo":"click","package":"reusebench_click_values","capability":"Convert values to display strings using the repository's make-string semantics: bytes use the filesystem encoding with UTF-8 replacement fallback; other values use str."},
+    {"id":"pytest-escape","repo":"pytest","package":"reusebench_pytest_escape","capability":"Escape string or bytes values using the repository's ASCII-escaped diagnostic semantics, including control characters, non-ASCII Unicode and invalid bytes."},
+    {"id":"pytest-async","repo":"pytest","package":"reusebench_pytest_async","capability":"Render a callable value as a boolean using the repository's asynchronous-function detection semantics, covering coroutine functions and async generators, not ordinary functions or arbitrary values."}
+  ]
+}

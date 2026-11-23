@@ -1,0 +1,196 @@
+{
+  "revision": "aa5d233f3a080d149c4cd3f9c7ff271257a1e50a",
+  "mcpTools": [
+    "repo_map",
+    "find_code",
+    "outline",
+    "read_symbol",
+    "callers",
+    "callees",
+    "where_used",
+    "find_similar",
+    "verify_calls"
+  ],
+  "tasks": [
+    {
+      "id": "click-summary-1",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-summary",
+      "step": 1,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_summary/steps.py. Implement prepare(record) in steps.py. record must be a dict with a nonempty trimmed string key and a value entry; enabled defaults to True and, if supplied, must be bool. Invalid records raise ValueError. Return a new dict with exactly key (trimmed), value (unchanged), display (the capability described below applied to value), and enabled. Never mutate input. Expose this reusable preparation capability for subsequent requirements. Display capability: Condense help text using the repository's default short-help semantics with maximum length 20. Input values are strings. Work only in src/reusebench_click_summary/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-summary-2",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-summary",
+      "step": 2,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_summary/steps.py. Add batch(records): records must be a list (otherwise ValueError). Return prepared records in input order using the same validation/display behavior as turn 1. Duplicate trimmed keys raise ValueError, including disabled entries. Empty list returns []. Never mutate inputs and preserve prepare. Display capability: Condense help text using the repository's default short-help semantics with maximum length 20. Input values are strings. Work only in src/reusebench_click_summary/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-summary-3",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-summary",
+      "step": 3,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_summary/steps.py. Add group(records): apply the same list/record/duplicate validation, then include enabled records only. Return a dict mapping the first character of each trimmed key to the list of their display values in input order; group insertion order follows first enabled occurrence. Empty input returns {}. Preserve all prior contracts. Display capability: Condense help text using the repository's default short-help semantics with maximum length 20. Input values are strings. Work only in src/reusebench_click_summary/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-summary-4",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-summary",
+      "step": 4,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_summary/steps.py. Add merge(left, right): independently validate both lists with earlier semantics. Right records replace left records with the same trimmed key; left key order is retained and new right keys append in order. Return prepared record dicts, including disabled ones. Empty inputs work. Never mutate either input; preserve all prior contracts. Display capability: Condense help text using the repository's default short-help semantics with maximum length 20. Input values are strings. Work only in src/reusebench_click_summary/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-summary-5",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-summary",
+      "step": 5,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_summary/steps.py. Add report(left, right): return exactly {\"items\": merged records with turn-4 semantics, \"groups\": the turn-3 grouping of those merged records, \"count\": number of merged records, \"enabled\": number of enabled merged records}. Empty lists yield {\"items\":[],\"groups\":{},\"count\":0,\"enabled\":0}. Preserve validation and all earlier behavior, including right replacement, disabled entries, display normalization and non-mutation. Display capability: Condense help text using the repository's default short-help semantics with maximum length 20. Input values are strings. Work only in src/reusebench_click_summary/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-values-1",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-values",
+      "step": 1,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_values/steps.py. Implement prepare(record) in steps.py. record must be a dict with a nonempty trimmed string key and a value entry; enabled defaults to True and, if supplied, must be bool. Invalid records raise ValueError. Return a new dict with exactly key (trimmed), value (unchanged), display (the capability described below applied to value), and enabled. Never mutate input. Expose this reusable preparation capability for subsequent requirements. Display capability: Convert values to display strings using the repository's make-string semantics: bytes use the filesystem encoding with UTF-8 replacement fallback; other values use str. Work only in src/reusebench_click_values/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-values-2",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-values",
+      "step": 2,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_values/steps.py. Add batch(records): records must be a list (otherwise ValueError). Return prepared records in input order using the same validation/display behavior as turn 1. Duplicate trimmed keys raise ValueError, including disabled entries. Empty list returns []. Never mutate inputs and preserve prepare. Display capability: Convert values to display strings using the repository's make-string semantics: bytes use the filesystem encoding with UTF-8 replacement fallback; other values use str. Work only in src/reusebench_click_values/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-values-3",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-values",
+      "step": 3,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_values/steps.py. Add group(records): apply the same list/record/duplicate validation, then include enabled records only. Return a dict mapping the first character of each trimmed key to the list of their display values in input order; group insertion order follows first enabled occurrence. Empty input returns {}. Preserve all prior contracts. Display capability: Convert values to display strings using the repository's make-string semantics: bytes use the filesystem encoding with UTF-8 replacement fallback; other values use str. Work only in src/reusebench_click_values/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-values-4",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-values",
+      "step": 4,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_values/steps.py. Add merge(left, right): independently validate both lists with earlier semantics. Right records replace left records with the same trimmed key; left key order is retained and new right keys append in order. Return prepared record dicts, including disabled ones. Empty inputs work. Never mutate either input; preserve all prior contracts. Display capability: Convert values to display strings using the repository's make-string semantics: bytes use the filesystem encoding with UTF-8 replacement fallback; other values use str. Work only in src/reusebench_click_values/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "click-values-5",
+      "repo": "reuse-click",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "click-values",
+      "step": 5,
+      "prompt": "In this pinned click repository, add or extend src/reusebench_click_values/steps.py. Add report(left, right): return exactly {\"items\": merged records with turn-4 semantics, \"groups\": the turn-3 grouping of those merged records, \"count\": number of merged records, \"enabled\": number of enabled merged records}. Empty lists yield {\"items\":[],\"groups\":{},\"count\":0,\"enabled\":0}. Preserve validation and all earlier behavior, including right replacement, disabled entries, display normalization and non-mutation. Display capability: Convert values to display strings using the repository's make-string semantics: bytes use the filesystem encoding with UTF-8 replacement fallback; other values use str. Work only in src/reusebench_click_values/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-escape-1",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-escape",
+      "step": 1,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_escape/steps.py. Implement prepare(record) in steps.py. record must be a dict with a nonempty trimmed string key and a value entry; enabled defaults to True and, if supplied, must be bool. Invalid records raise ValueError. Return a new dict with exactly key (trimmed), value (unchanged), display (the capability described below applied to value), and enabled. Never mutate input. Expose this reusable preparation capability for subsequent requirements. Display capability: Escape string or bytes values using the repository's ASCII-escaped diagnostic semantics, including control characters, non-ASCII Unicode and invalid bytes. Work only in src/reusebench_pytest_escape/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-escape-2",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-escape",
+      "step": 2,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_escape/steps.py. Add batch(records): records must be a list (otherwise ValueError). Return prepared records in input order using the same validation/display behavior as turn 1. Duplicate trimmed keys raise ValueError, including disabled entries. Empty list returns []. Never mutate inputs and preserve prepare. Display capability: Escape string or bytes values using the repository's ASCII-escaped diagnostic semantics, including control characters, non-ASCII Unicode and invalid bytes. Work only in src/reusebench_pytest_escape/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-escape-3",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-escape",
+      "step": 3,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_escape/steps.py. Add group(records): apply the same list/record/duplicate validation, then include enabled records only. Return a dict mapping the first character of each trimmed key to the list of their display values in input order; group insertion order follows first enabled occurrence. Empty input returns {}. Preserve all prior contracts. Display capability: Escape string or bytes values using the repository's ASCII-escaped diagnostic semantics, including control characters, non-ASCII Unicode and invalid bytes. Work only in src/reusebench_pytest_escape/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-escape-4",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-escape",
+      "step": 4,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_escape/steps.py. Add merge(left, right): independently validate both lists with earlier semantics. Right records replace left records with the same trimmed key; left key order is retained and new right keys append in order. Return prepared record dicts, including disabled ones. Empty inputs work. Never mutate either input; preserve all prior contracts. Display capability: Escape string or bytes values using the repository's ASCII-escaped diagnostic semantics, including control characters, non-ASCII Unicode and invalid bytes. Work only in src/reusebench_pytest_escape/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-escape-5",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-escape",
+      "step": 5,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_escape/steps.py. Add report(left, right): return exactly {\"items\": merged records with turn-4 semantics, \"groups\": the turn-3 grouping of those merged records, \"count\": number of merged records, \"enabled\": number of enabled merged records}. Empty lists yield {\"items\":[],\"groups\":{},\"count\":0,\"enabled\":0}. Preserve validation and all earlier behavior, including right replacement, disabled entries, display normalization and non-mutation. Display capability: Escape string or bytes values using the repository's ASCII-escaped diagnostic semantics, including control characters, non-ASCII Unicode and invalid bytes. Work only in src/reusebench_pytest_escape/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-async-1",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-async",
+      "step": 1,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_async/steps.py. Implement prepare(record) in steps.py. record must be a dict with a nonempty trimmed string key and a value entry; enabled defaults to True and, if supplied, must be bool. Invalid records raise ValueError. Return a new dict with exactly key (trimmed), value (unchanged), display (the capability described below applied to value), and enabled. Never mutate input. Expose this reusable preparation capability for subsequent requirements. Display capability: Render a callable value as a boolean using the repository's asynchronous-function detection semantics, covering coroutine functions and async generators, not ordinary functions or arbitrary values. Work only in src/reusebench_pytest_async/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-async-2",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-async",
+      "step": 2,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_async/steps.py. Add batch(records): records must be a list (otherwise ValueError). Return prepared records in input order using the same validation/display behavior as turn 1. Duplicate trimmed keys raise ValueError, including disabled entries. Empty list returns []. Never mutate inputs and preserve prepare. Display capability: Render a callable value as a boolean using the repository's asynchronous-function detection semantics, covering coroutine functions and async generators, not ordinary functions or arbitrary values. Work only in src/reusebench_pytest_async/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-async-3",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-async",
+      "step": 3,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_async/steps.py. Add group(records): apply the same list/record/duplicate validation, then include enabled records only. Return a dict mapping the first character of each trimmed key to the list of their display values in input order; group insertion order follows first enabled occurrence. Empty input returns {}. Preserve all prior contracts. Display capability: Render a callable value as a boolean using the repository's asynchronous-function detection semantics, covering coroutine functions and async generators, not ordinary functions or arbitrary values. Work only in src/reusebench_pytest_async/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-async-4",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-async",
+      "step": 4,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_async/steps.py. Add merge(left, right): independently validate both lists with earlier semantics. Right records replace left records with the same trimmed key; left key order is retained and new right keys append in order. Return prepared record dicts, including disabled ones. Empty inputs work. Never mutate either input; preserve all prior contracts. Display capability: Render a callable value as a boolean using the repository's asynchronous-function detection semantics, covering coroutine functions and async generators, not ordinary functions or arbitrary values. Work only in src/reusebench_pytest_async/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    },
+    {
+      "id": "pytest-async-5",
+      "repo": "reuse-pytest",
+      "category": "reuse",
+      "edit": true,
+      "sequence": "pytest-async",
+      "step": 5,
+      "prompt": "In this pinned pytest repository, add or extend src/reusebench_pytest_async/steps.py. Add report(left, right): return exactly {\"items\": merged records with turn-4 semantics, \"groups\": the turn-3 grouping of those merged records, \"count\": number of merged records, \"enabled\": number of enabled merged records}. Empty lists yield {\"items\":[],\"groups\":{},\"count\":0,\"enabled\":0}. Preserve validation and all earlier behavior, including right replacement, disabled entries, display normalization and non-mutation. Display capability: Render a callable value as a boolean using the repository's asynchronous-function detection semantics, covering coroutine functions and async generators, not ordinary functions or arbitrary values. Work only in src/reusebench_pytest_async/; do not modify existing repository files. Requirements arrive one turn at a time; only implement the current requirement."
+    }
+  ]
+}

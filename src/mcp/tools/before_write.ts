@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { navigationSymbols, symbolCalls } from '../../index/navigation.js';
+import { similarInputSchema } from '../../reuse/similar-input.js';
 import { fitToBudget } from '../../util/tokens.js';
 import { defineTool } from '../registry.js';
 
@@ -13,7 +14,7 @@ export const beforeWriteTool = defineTool({
   description: 'One call before writing non-trivial code, instead of find_similar + read_symbol + callers. Give any of: new (a helper you are about to add: existing code to reuse), calls (symbols you will call: exact signatures), changes (symbols whose signature or behavior you will change: every caller to update). Skip for small edits, docs, config and symbols already confirmed in context.',
   inputSchema: {
     new: z.object({ description: z.string().trim().min(1).max(10000), name: z.string().max(300).optional(), signature: z.string().max(10000).optional(),
-      language: z.enum(['typescript', 'tsx', 'javascript', 'python']).optional() }).strict().optional().describe('helper you are about to add'),
+      language: similarInputSchema.shape.language.removeDefault().optional() }).strict().optional().describe('helper you are about to add'),
     calls: z.array(ref).max(20).optional().describe('symbols you will call: name, file:qualifiedName or symbol ID'),
     changes: z.array(ref).max(10).optional().describe('symbols you will change'),
     expand: z.enum(['reuse', 'callers']).optional().describe('repeat the same call with this to get the full section'),

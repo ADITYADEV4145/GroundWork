@@ -1,0 +1,114 @@
+name: GroundWork check
+description: Scan a pull request for invented calls, wrong arguments and duplicated code. Runs in the runner; no code leaves CI.
+branding:
+  icon: check-circle
+  color: green
+inputs:
+  only-ai:
+    description: Check only pull requests that look agent-written (label, bot author, or agent commit trailer); others pass untouched.
+    default: 'false'
+  block:
+    description: Finding kinds that fail the check, comma-separated. Default is invented-call and wrong-arguments, or the repository's .groundwork/config.json.
+    default: ''
+  warn:
+    description: Finding kinds reported without failing the check, comma-separated.
+    default: ''
+  'off':
+    description: Finding kinds that are not reported, comma-separated.
+    default: ''
+  ignore:
+    description: Paths (globs) whose findings are not reported, comma-separated.
+    default: ''
+  comment:
+    description: Post one grouped comment on the pull request when there are findings.
+    default: 'true'
+  sarif:
+    description: Upload the findings to GitHub code scanning (needs security-events write).
+    default: 'true'
+  token:
+    description: Token used to post the comment.
+    default: ${{ github.token }}
+  comment-author:
+    description: Login that posts the comment, such as my-app[bot]. Set it with a GitHub App token, whose login cannot be looked up; otherwise leave empty.
+    default: ''
+outputs:
+  conclusion:
+    description: pass, fail or skipped.
+    value: ${{ steps.check.outputs.conclusion }}
+  blocking:
+    description: Number of blocking findings.
+    value: ${{ steps.check.outputs.blocking }}
+  warnings:
+    description: Number of warnings.
+    value: ${{ steps.check.outputs.warnings }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Build GroundWork
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: |
+        if [ ! -f dist/cli/main.js ]; then
+          npm ci --no-audit --no-fund
+          npm run build
+        fi
+    - name: Check the pull request
+      id: check
+      shell: bash
+      env:
+        GW_ONLY_AI: ${{ inputs.only-ai }}
+        GW_BLOCK: ${{ inputs.block }}
+        GW_WARN: ${{ inputs.warn }}
+        GW_OFF: ${{ inputs.off }}
+        GW_IGNORE: ${{ inputs.ignore }}
+        GW_MAIN: ${{ github.action_path }}/dist/cli/main.js
+      run: |
+        args=(ci --comment-file "$RUNNER_TEMP/groundwork-comment.md" --sarif-file "$RUNNER_TEMP/groundwork.sarif" --summary-file "$GITHUB_STEP_SUMMARY" --output-file "$GITHUB_OUTPUT")
+        [ "$GW_ONLY_AI" = "true" ] && args+=(--only-ai)
+        [ -n "$GW_BLOCK" ] && args+=(--block "$GW_BLOCK")
+        [ -n "$GW_WARN" ] && args+=(--warn "$GW_WARN")
+        [ -n "$GW_OFF" ] && args+=(--off "$GW_OFF")
+        [ -n "$GW_IGNORE" ] && args+=(--ignore "$GW_IGNORE")
+        rm -f "$RUNNER_TEMP/groundwork-comment.md" "$RUNNER_TEMP/groundwork.sarif"
+        code=0
+        node "$GW_MAIN" "${args[@]}" || code=$?
+        # 1 is a failed check, reported by the last step after the comment and SARIF are out; anything else is a broken run.
+        if [ "$code" -gt 1 ] || { [ "$code" -eq 1 ] && ! grep -q '^conclusion=fail$' "$GITHUB_OUTPUT"; }; then exit "$code"; fi
+        if [ -s "$RUNNER_TEMP/groundwork.sarif" ]; then echo "sarif=$RUNNER_TEMP/groundwork.sarif" >> "$GITHUB_OUTPUT"; fi
+    - name: Comment on the pull request
+      if: inputs.comment == 'true' && github.event.pull_request.number
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GW_PR: ${{ github.event.pull_request.number }}
+        GW_REPO: ${{ github.repository }}
+        GW_AUTHOR: ${{ inputs.comment-author }}
+      run: |
+        file="$RUNNER_TEMP/groundwork-comment.md"
+        # One comment per pull request: update ours when it exists, remove it when the findings are gone.
+        # Ours means written by this token's account; anyone can paste the marker into a comment of their own.
+        me="$GW_AUTHOR"
+        [ -n "$me" ] || me=$(gh api user --jq .login 2>/dev/null) || me="github-actions[bot]"
+        existing=$(gh api "repos/$GW_REPO/issues/$GW_PR/comments" --paginate | jq -r --arg me "$me" '.[] | select(.user.login == $me and (.body | startswith("<!-- groundwork-check -->"))) | .id' | head -n 1) || existing=""
+        if [ -s "$file" ]; then
+          if [ -n "$existing" ]; then gh api -X PATCH "repos/$GW_REPO/issues/comments/$existing" -F body=@"$file" > /dev/null
+          else gh api -X POST "repos/$GW_REPO/issues/$GW_PR/comments" -F body=@"$file" > /dev/null; fi
+        elif [ -n "$existing" ]; then
+          gh api -X DELETE "repos/$GW_REPO/issues/comments/$existing" > /dev/null
+        fi || echo "::warning::GroundWork could not write the pull request comment (the token needs pull-requests: write; pull requests from forks get a read-only token)."
+    - name: Upload SARIF
+      if: inputs.sarif == 'true' && steps.check.outputs.sarif != ''
+      continue-on-error: true
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ steps.check.outputs.sarif }}
+        category: groundwork
+    - name: Check status
+      if: steps.check.outputs.conclusion == 'fail'
+      shell: bash
+      run: |
+        echo "::error::GroundWork found ${{ steps.check.outputs.blocking }} blocking finding(s). See the pull request comment or the job summary."
+        exit 1

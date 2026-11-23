@@ -26,6 +26,7 @@ const groups = [
   { names: ['refactor'], load: () => import('./commands/refactor.js') },
   { names: ['check'], load: () => import('./commands/check.js') },
   { names: ['scan', 'receipt'], load: () => import('./commands/scan.js') },
+  { names: ['ci', 'badge'], load: () => import('./commands/ci.js') },
   { names: ['bench'], load: () => import('./commands/bench.js') },
 ];
 let command: string | undefined;

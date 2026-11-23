@@ -100,7 +100,7 @@ export function clientTargets(opts: TargetOptions): AgentTarget[] {
 
 /** Clients that look installed on this machine, or already have a project config in `root`. */
 export function detectClients(home = os.homedir(), root?: string, hasBin: (bin: string) => boolean = onPath): ClientName[] {
-  const projectDirs: Partial<Record<ClientName, string[]>> = { gemini: ['.gemini'], copilot: ['.vscode'], zed: ['.zed'], kiro: ['.kiro'], opencode: ['opencode.json', '.opencode'] };
+  const projectDirs: Partial<Record<ClientName, string[]>> = { claude: ['.claude'], codex: ['.codex'], cursor: ['.cursor'], gemini: ['.gemini'], copilot: ['.vscode'], zed: ['.zed'], kiro: ['.kiro'], opencode: ['opencode.json', '.opencode'] };
   return CLIENTS.filter((c) => c.bins.some(hasBin) || c.homePaths.some((p) => existsSync(path.join(home, p))) || (root !== undefined && (projectDirs[c.name] ?? []).some((p) => existsSync(path.join(root, p))))).map((c) => c.name);
 }
 

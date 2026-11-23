@@ -378,6 +378,7 @@ export class DependencyChecker {
     const rebinds = [...ctx.text.matchAll(new RegExp(`\\b(?:const|let|var|function|class)\\s+${escapeRe(local)}\\b|[(,]\\s*${escapeRe(local)}\\s*[,):=]`, 'g'))].length;
     const n = escapeRe(local);
     const params = `[^()]*\\b${n}\\b[^()]*`;
+    const reassignable = own !== undefined && /^\s*(?:let|var)\b/.test(ctx.lines[own.stmtLine - 1] ?? '');
     const usedAsArg = new RegExp(
       [
         `\\b(?:const|let|var|function|class)\\s+${n}\\b`,
@@ -386,8 +387,8 @@ export class DependencyChecker {
         `\\bfunction\\b[^(]*\\(${params}\\)`,
         `\\(${params}\\)\\s*(?::[^=;{]+)?=>`,
         `\\b${n}\\s*=>`,
-        // A plain reassignment of a `let`/`var` binding.
-        `(?<![.\\w$])${n}\\s*=(?![=>])`,
+        // A plain reassignment, which only a `let`/`var` binding (never an ES import) allows.
+        ...(reassignable ? [`(?<![.\\w$])${n}\\s*=(?![=>])`] : []),
         `[(,]\\s*(?:public |private |protected |readonly )*${n}\\s*\\??:`,
         `(?<!\\b(?:if|while|for|switch|with)\\s*)\\(${params}\\)\\s*(?::[^=;{]+)?\\{`,
       ].join('|'),

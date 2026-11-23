@@ -356,6 +356,208 @@
       "hidden": "ledger-kit.mjs"
     },
     {
+      "id": "ledger-due-date",
+      "repo": "ledger-kit",
+      "category": "hidden-helper",
+      "prompt": "Invoices need a due date. Add `dueDate(issued: string, terms: 'net7' | 'net15' | 'net30'): string` in a new file `src/invoices/due.ts`. Dates are ISO `yyyy-mm-dd` strings. The due date is the issue date plus 7, 15 or 30 working days; Saturdays and Sundays are not working days, and counting starts on the day after the issue date. For example an invoice issued on Monday 2026-03-02 with `net7` is due on 2026-03-11.",
+      "entry": "src/invoices/due.ts",
+      "trap": {
+        "existing": [
+          "src/internal/dates/business.ts#addBusinessDays"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "ledger-card-on-file",
+      "repo": "ledger-kit",
+      "category": "hidden-helper",
+      "prompt": "The account page shows which card is on file. Add `cardOnFile(number: string): string | null` in a new file `src/accounts/card.ts`. The number may contain spaces and dashes, which are ignored. If what is left is 12 to 19 digits that pass the Luhn check, return four bullet characters, a space and the last four digits, for example `\u2022\u2022\u2022\u2022 4242`. Otherwise return null.",
+      "entry": "src/accounts/card.ts",
+      "trap": {
+        "existing": [
+          "src/internal/ids/checksum.ts#luhnCheck"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "ledger-invoice-status",
+      "repo": "ledger-kit",
+      "category": "near-name",
+      "prompt": "Support pastes an invoice reference and needs its status. Add `invoiceStatus(book: InvoiceBook, reference: string): 'open' | 'paid' | null` in a new file `src/invoices/status.ts`. A reference is written `INV-0042`, `#42` or `42`, in any letter case and with surrounding spaces ignored. Return the status of the invoice with that number, or null when there is no such invoice or it is void. An account id is not an invoice reference.",
+      "entry": "src/invoices/status.ts",
+      "trap": {
+        "existing": [
+          "src/invoices/book.ts#InvoiceBook.findByReference"
+        ],
+        "decoys": [
+          "findByNumber",
+          "findByRef",
+          "getByReference",
+          "findById"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "ledger-sku-price",
+      "repo": "ledger-kit",
+      "category": "near-name",
+      "prompt": "Order entry types a SKU and needs its price. Add `unitPrice(catalog: Catalog, sku: string): number | null` in a new file `src/catalog/price.ts`. SKUs are matched in any letter case, ignoring dashes and spaces. Return the unit price in cents of the product with that SKU, or null when there is no such product or it is retired. A product name is not a SKU.",
+      "entry": "src/catalog/price.ts",
+      "trap": {
+        "existing": [
+          "src/catalog/catalog.ts#Catalog.lookupSku"
+        ],
+        "decoys": [
+          "lookupName",
+          "findBySku",
+          "getSku",
+          "lookupBySku"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "ledger-discount-options",
+      "repo": "ledger-kit",
+      "category": "changed-signature",
+      "prompt": "Discounts need a cap. Change `applyDiscount` in `src/billing/discount.ts` from `applyDiscount(percent, amountCents)` to `applyDiscount(amountCents, options)` where options is `{ percent: number; capCents?: number }`. With `capCents` the discount never takes off more than that many cents. Keep the behavior of the existing callers the same, and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "src/billing/discount.ts",
+      "trap": {
+        "existing": [
+          "src/billing/discount.ts#applyDiscount"
+        ],
+        "affected": [
+          "src/billing/discount.ts",
+          "src/invoices/promo.ts",
+          "src/reports/promo-summary.ts",
+          "docs/discounts.md"
+        ],
+        "decoys": [
+          "applyDiscount(percent",
+          "applyDiscount(10"
+        ]
+      },
+      "hidden": "ledger-kit.mjs",
+      "affectedTests": [
+        "test/billing.test.mjs"
+      ]
+    },
+    {
+      "id": "ledger-late-fee-options",
+      "repo": "ledger-kit",
+      "category": "changed-signature",
+      "prompt": "Late fees need a grace period. Change `lateFee` in `src/billing/late.ts` from `lateFee(daysLate, amountCents)` to `lateFee(amountCents, options)` where options is `{ daysLate: number; graceDays?: number }`. Days inside the grace period are not charged: the fee is computed on `daysLate - graceDays`, never below zero days. Keep the behavior of the existing callers the same, and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "src/billing/late.ts",
+      "trap": {
+        "existing": [
+          "src/billing/late.ts#lateFee"
+        ],
+        "affected": [
+          "src/billing/late.ts",
+          "src/invoices/overdue.ts",
+          "src/reports/dunning.ts",
+          "docs/discounts.md"
+        ],
+        "decoys": [
+          "lateFee(daysLate",
+          "lateFee(30"
+        ]
+      },
+      "hidden": "ledger-kit.mjs",
+      "affectedTests": [
+        "test/billing.test.mjs"
+      ]
+    },
+    {
+      "id": "ledger-date-style",
+      "repo": "ledger-kit",
+      "category": "ripple",
+      "prompt": "Notices print every date as `2026-03-05`, which customers outside engineering misread. Make the style a required second argument: `formatDate(iso, style)` returns `2026-03-05` for the style `iso`, `05.03.2026` for `eu` and `03/05/2026` for `us`. Every notice must print the date in its invoice's `dateStyle`, and the existing tests and docs must be brought up to date.",
+      "entry": "src/internal/dates/format.ts",
+      "trap": {
+        "existing": [
+          "src/internal/dates/format.ts#formatDate"
+        ],
+        "affected": [
+          "src/notices/issued.ts",
+          "src/notices/due.ts",
+          "src/notices/paid.ts",
+          "src/notices/voided.ts",
+          "test/notices.test.mjs",
+          "docs/discounts.md"
+        ]
+      },
+      "hidden": "ledger-kit.mjs",
+      "affectedTests": [
+        "test/notices.test.mjs"
+      ]
+    },
+    {
+      "id": "ledger-percent-digits",
+      "repo": "ledger-kit",
+      "category": "ripple",
+      "prompt": "Rates such as 7.25% are printed as `7%`. Make the number of decimals a required second argument: `formatPercent(fraction, digits)` returns the percentage with exactly that many decimals, for example `7.25%` for 0.0725 at 2 and `20.0%` for 0.2 at 1. The tax and interest rate lines print two decimals, the discount and fee rate lines print one, and the existing tests and docs must be brought up to date with the new output.",
+      "entry": "src/money/percent.ts",
+      "trap": {
+        "existing": [
+          "src/money/percent.ts#formatPercent"
+        ],
+        "affected": [
+          "src/rates/tax-line.ts",
+          "src/rates/interest-line.ts",
+          "src/rates/discount-line.ts",
+          "src/rates/fee-line.ts",
+          "test/notices.test.mjs",
+          "docs/discounts.md"
+        ]
+      },
+      "hidden": "ledger-kit.mjs",
+      "affectedTests": [
+        "test/notices.test.mjs"
+      ]
+    },
+    {
+      "id": "ledger-instalments-then-shared",
+      "repo": "ledger-kit",
+      "category": "compaction",
+      "prompt": "Add `instalments(invoice: Invoice, count: number): number[]` in a new file `src/invoices/instalments.ts`: the invoice subtotal in cents divided into `count` payments that add up exactly, split the way this codebase splits money.",
+      "turns": [
+        {
+          "prompt": "Now add `sharedCost(totalCents: number, accountIds: string[]): Record<string, number>` in a new file `src/accounts/shared.ts`: the total divided between the accounts, keyed by account id in the order given. Split it exactly the way you split the instalments.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "src/accounts/shared.ts",
+      "trap": {
+        "existing": [
+          "src/money/split.ts#splitEvenly"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "ledger-period-then-totals",
+      "repo": "ledger-kit",
+      "category": "compaction",
+      "prompt": "Add `invoicePeriod(invoice: Dated): string` in a new file `src/invoices/period.ts`: the billing period label this codebase uses for the invoice's date, then a space, `#` and the invoice number.",
+      "turns": [
+        {
+          "prompt": "Now add `periodTotals(items: { date: string; cents: number }[]): Record<string, number>` in a new file `src/reports/periods.ts`: the cents added up per billing period, keyed by the period label. Label the periods exactly the way you did for `invoicePeriod`.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "src/reports/periods.ts",
+      "trap": {
+        "existing": [
+          "src/internal/dates/period.ts#billingPeriod"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
       "id": "route-stop-key",
       "repo": "route-plan",
       "category": "hidden-helper",

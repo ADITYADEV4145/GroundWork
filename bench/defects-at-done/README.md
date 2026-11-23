@@ -33,7 +33,7 @@ gw bench pr-study --suite defects-at-done --list prs.json --cache <mirrors>
 
 ## Known gaps
 
-- 30 of the 60 tasks the preregistration requires, on TypeScript, Python and Go. All six categories are present, but only real-failure (9) has the required eight; the others have four or five. No confirmatory run is possible yet.
+- 50 of the 60 tasks the preregistration requires, on TypeScript, Python and Go. Each of the six categories has the required eight or more (hidden-helper 9, real-failure 9, the others 8). Ten tasks are still missing, so no confirmatory run is possible yet. The 20 fixture tasks added after the pilot have had no agent run.
 - The real-failure tasks are past bugs in more-itertools (MIT) and gorilla/mux (BSD-3-Clause), each pinned to the commit before its upstream fix; `reference/<task>.patch` is that upstream fix and `provenance` links it. They need local mirrors: `validate --cache <mirrors>` checks them and plain `validate` lists them as skipped. No agent has been run on them.
 - An exploratory pilot on five of these tasks tied at zero defects in both arms (`bench/pilots/2026-11-23-devin/`), so the current fixture tasks are not expected to separate arms on a strong agent.
 - Competitor arms are unpinned, so they are reported as not run.

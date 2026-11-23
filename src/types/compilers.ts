@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, realpathSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import type { TypeFinding } from './index.js';
@@ -59,7 +59,7 @@ function baseTree(root: string, base: BaseTexts): string {
   rmSync(top, { recursive: true, force: true });
   const overrides = new Map([...base].map(([f, text]) => [path.resolve(root, f), text]));
   const parents = new Set<string>();
-  for (const f of overrides.keys()) for (let d = path.dirname(f); !path.relative(root, d).startsWith('..'); d = path.dirname(d)) { parents.add(d); if (d === path.resolve(root)) break; }
+  for (const f of overrides.keys()) for (let d = path.dirname(f); d.startsWith(path.resolve(root)); d = path.dirname(d)) { parents.add(d); if (d === path.resolve(root)) break; }
   const mirror = (from: string, to: string) => {
     mkdirSync(to, { recursive: true });
     for (const name of readdirSync(from)) {
@@ -74,6 +74,11 @@ function baseTree(root: string, base: BaseTexts): string {
   for (const [f, text] of overrides) {
     const target = path.join(top, path.relative(path.resolve(root), f));
     if (typeof text !== 'string' || existsSync(target)) continue;
+    // Never write through a link that leaves the scratch tree.
+    let ancestor = path.dirname(target);
+    while (!existsSync(ancestor)) ancestor = path.dirname(ancestor);
+    const inside = path.relative(realpathSync(top), realpathSync(ancestor));
+    if (inside === '..' || inside.startsWith(`..${path.sep}`) || path.isAbsolute(inside)) continue;
     mkdirSync(path.dirname(target), { recursive: true });
     writeFileSync(target, text);
   }
@@ -242,8 +247,11 @@ function javaDiagnostics(root: string, file: string, deadline: number, base?: Ba
       for (const [f, t] of base) {
         if (t === null) continue;
         const copy = path.join(baseRoot, ...javaPackage(t).split('.').filter(Boolean), path.basename(f));
+        const checked = path.resolve(root, f) === absolute;
+        // Two modules can hold the same package and file name: the checked file's base text wins.
+        if (!checked && existsSync(copy)) continue;
         mkdirSync(path.dirname(copy), { recursive: true }); writeFileSync(copy, t);
-        if (path.resolve(root, f) === absolute) { target = copy; text = t; }
+        if (checked) { target = copy; text = t; }
       }
       if (target === absolute) return [];
       sourcepath.unshift(baseRoot);
@@ -284,7 +292,8 @@ function javaDiagnostics(root: string, file: string, deadline: number, base?: Ba
       if (!modules) return false;
       const names = imported.split('.').filter(Boolean);
       const parts = names.slice(0, names.length - (match[1] ? 2 : 1) + (imported.endsWith('.') ? 1 : 0));
-      return !sourcepath.some((r) => existsSync(path.join(r, ...parts)));
+      // The import names a package, or a type nested in a class of one.
+      return !sourcepath.some((r) => existsSync(path.join(r, ...parts)) || parts.some((name, i) => i > 0 && existsSync(path.join(r, ...parts.slice(0, i), `${name}.java`))));
     });
     if (incomplete) for (const f of found) { f.blocking = false; if (!f.message.endsWith('(classpath incomplete)')) f.message += ' (classpath incomplete)'; }
     return found;

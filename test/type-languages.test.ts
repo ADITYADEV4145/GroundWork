@@ -151,6 +151,25 @@ describe('compiled-language type checks', () => {
     expect(result.findings.every((f) => !f.blocking)).toBe(true);
   }, 180_000);
 
+  it.skipIf(!toolchain.java)('blocks a broken nested-type import of a local class in a multi-module build', async () => {
+    const c = cases.find((x) => x.language === 'java')!;
+    const root = repo({ ...c.files, 'settings.gradle': "include 'app', 'sibling'\n" });
+    edit(root, c.file, 'import demo.store.Store;', 'import demo.store.Store;\nimport demo.store.Store.Missing;');
+    const result = await typeCheck(root, [{ file: c.file, ranges: null }], config());
+    expect(result.findings.some((f) => f.blocking)).toBe(true);
+  }, 180_000);
+
+  it.skipIf(!toolchain.java)('keeps a Java error pre-existing when the edit removes an unresolved import', async () => {
+    const c = cases.find((x) => x.language === 'java')!;
+    const text = c.files[c.file]!.replace('import demo.store.Store;', 'import demo.store.Store;\nimport com.example.absent.Thing;').replace('Store.normalize("a")', 'Store.normalise("a")');
+    const root = repo({ ...c.files, [c.file]: text });
+    edit(root, c.file, 'import com.example.absent.Thing;\n', '');
+    edit(root, c.file, 'Store.normalise("a")', 'Store.normalise("b")');
+    const result = await typeCheck(root, [{ file: c.file, ranges: null }], config());
+    expect(result.findings.length).toBeGreaterThan(0);
+    expect(result.findings.every((f) => !f.blocking)).toBe(true);
+  }, 180_000);
+
   it.skipIf(!toolchain.go)('blocks a call to a function whose file was deleted', async () => {
     const root = repo({
       'go.mod': 'module demo\n\ngo 1.21\n',

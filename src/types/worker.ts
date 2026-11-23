@@ -9,7 +9,8 @@ import { tsDiagnostics, navigate } from './typescript.js';
 import { pythonDiagnostics } from './pyright.js';
 import { compiledLanguage, compilerDiagnostics, resetCompilerMemo, type BaseTexts } from './compilers.js';
 
-const signature = (f: TypeFinding) => `${f.code}:${f.message.replace(/\s+/g, ' ').trim()}`;
+// The classpath note is about the file as a whole, not the error, so it is not part of an error's identity.
+const signature = (f: TypeFinding) => `${f.code}:${f.message.replace(/ \(classpath incomplete\)$/, '').replace(/\s+/g, ' ').trim()}`;
 process.on('message', (request: { root: string; changed: ChangedFile[]; config: GroundworkConfig; base?: string; target?: string; operation?: 'def' | 'impl' | 'refs'; deadline: number }) => {
   try {
     if (request.target && request.operation) { process.send?.(navigate(request.root, request.target, request.operation)); return; }

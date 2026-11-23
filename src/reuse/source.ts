@@ -33,7 +33,9 @@ function bindingHash(body: Node, symbol: ExtractedSymbol): string {
       return;
     }
     if (['string', 'template_string', 'concatenated_string'].includes(node.type)) {
-      tokens.push(node.text);
+      // 'x' and "x" are the same literal, with or without a Python prefix; a literal holding a quote is compared as written.
+      const plain = node.type === 'string' ? /^([A-Za-z]{0,2})(['"])([^'"]*)\2$/.exec(node.text) : null;
+      tokens.push(plain ? `${plain[1]!.toLowerCase()}"${plain[3]}"` : node.text);
       return;
     }
     if (node.childCount === 0) { if (node.text.trim()) tokens.push(node.text); return; }

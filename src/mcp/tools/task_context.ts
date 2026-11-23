@@ -20,10 +20,17 @@ function rank(task: string, hints: string[], files: string[], { db }: ToolContex
   const exact = new Map<string, NavigationSymbol>();
   const words = task.match(/[\p{L}\p{N}_$]+(?:\.[\p{L}\p{N}_$]+)*/gu) ?? [];
   const names = [...new Set(words.filter((w) => !ignored.has(w.toLowerCase())).slice(0, 24))];
-  for (const ref of [...hints, ...names]) {
+  const selections = hints.map((ref) => {
+    const found = navigationSymbols(db, ref);
+    return { found, specific: found.length === 1 || ref.includes(':') };
+  });
+  for (const { found } of [...selections.filter((s) => s.specific), ...selections.filter((s) => !s.specific)]) {
+    for (const s of [...found.filter((s) => files.includes(s.file)), ...found]) exact.set(s.id, s);
+  }
+  for (const ref of names) {
     const found = navigationSymbols(db, ref);
     for (const s of [...found.filter((s) => files.includes(s.file)), ...found]) {
-      if (hints.includes(ref) || functions.has(s.kind)) exact.set(s.id, s);
+      if (functions.has(s.kind)) exact.set(s.id, s);
     }
   }
   if (!names.length) return [...exact.values()];

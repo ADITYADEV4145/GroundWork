@@ -49,7 +49,7 @@ export function register(program: Command): void {
       await withIndex(opts, async ({ db, root, config }) => {
         const id = options.session ?? process.env.GW_SESSION_ID ?? sessionIds(root)[0];
         if (!id) fail(opts, 'no recorded session in this repository');
-        const receipt = await buildReceipt(db, root, id, config);
+        const receipt = await buildReceipt(db, root, id, config, id === sessionIds(root)[0]);
         if (options.png) {
           const { textPng } = await import('../../scan/png.js');
           writeFileSync(options.png, textPng(receiptLines(receipt)));

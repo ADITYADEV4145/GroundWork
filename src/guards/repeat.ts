@@ -14,8 +14,17 @@ export function workspaceFingerprint(root: string): string {
   try {
     const hash = createHash('sha256');
     hash.update(git(['rev-parse', 'HEAD']));
-    hash.update(git(['status', '--porcelain', '-z', '--untracked-files=all']));
-    const names = Buffer.concat([git(['diff', '--name-only', '-z', 'HEAD']), git(['ls-files', '--others', '--exclude-standard', '-z'])]).toString().split('\0').filter(Boolean);
+    // One status call lists every modified, staged, renamed and untracked path; a rename is followed by its old path.
+    const status = git(['status', '--porcelain', '-z', '--untracked-files=all']);
+    hash.update(status);
+    const names: string[] = [];
+    const entries = status.toString().split('\0');
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i]!;
+      if (entry.length < 4) continue;
+      names.push(entry.slice(3));
+      if (entry[0] === 'R' || entry[0] === 'C') i++;
+    }
     if (names.length > 2000) return 'unknown';
     let bytes = 0;
     for (const name of [...new Set(names)].sort()) {

@@ -7,6 +7,7 @@ import { guardsConfigSchema } from './sections/guards.js';
 import { typesConfigSchema } from './sections/types.js';
 import { impactConfigSchema } from './sections/impact.js';
 import { depsConfigSchema } from './sections/deps.js';
+import { ciConfigSchema } from './sections/ci.js';
 
 // Each section lives in its own file so feature streams can extend their part without touching the others.
 export const configSchema = z
@@ -21,6 +22,7 @@ export const configSchema = z
     types: typesConfigSchema.default(typesConfigSchema.parse({})),
     impact: impactConfigSchema.default(impactConfigSchema.parse({})),
     deps: depsConfigSchema.default(depsConfigSchema.parse({})),
+    ci: ciConfigSchema.default(ciConfigSchema.parse({})),
   })
   .strict();
 

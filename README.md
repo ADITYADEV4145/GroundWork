@@ -7,6 +7,10 @@
 
 <h1 align="center">Less searching. More building.</h1>
 
+<p align="center">
+  <a href="https://github.com/ADITYADEV4145/GroundWork/actions/workflows/groundwork.yml"><img src="https://github.com/ADITYADEV4145/GroundWork/actions/workflows/groundwork.yml/badge.svg" alt="agent-checked"></a>
+</p>
+
 ### Search by intent
 
 Use `gw search "where do we retry failed requests" --limit 5` (or `--json`)
@@ -192,6 +196,8 @@ Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): strin
 | `outline` | A file's symbols and signatures without their bodies. |
 | `read_symbol` | One symbol's source, not the whole file. |
 | `callers` / `callees` / `where_used` | Who calls a symbol, what it calls, and its references. |
+| `before_write` | One call before writing: code to reuse, exact signatures to call, and callers to update. |
+| `architecture` | Once per session in an unfamiliar repo: packages, entry points, which package depends on which, the most-called helpers, and naming conventions. |
 | `find_similar` | Existing code to consider before writing something new. |
 | `refactor_symbol` | Read-only preview of a guarded TS/JS symbol rename or function body edit. |
 | `verify_calls` | Whether snippet imports and calls exist, and their argument counts. |
@@ -286,6 +292,10 @@ Timeouts fail open; type checking is not enabled after individual edits by defau
 | `gw symbols <query>` / `gw show <symbol>` | Search symbols; show a signature, callers and callees. |
 | `gw similar "<description>"` | Find existing code to reuse. |
 | `gw check [--base <ref>]` | Check changed code for duplicates and grounding errors; exit 1 on BLOCK. |
+| `gw scan [dir \| diff \| -] [--base <ref>] [--json \| --sarif]` | One-screen report with no setup: invented calls, wrong arguments, duplicated logic, duplicate constants and dead code, plus type errors on the changed lines of a diff. Each finding carries a confidence; low-confidence ones are listed separately under "Check". Exit 1 on a high-confidence finding. |
+| `gw ci [--base <ref>] [--only-ai] [--block \| --warn \| --off <kinds>] [--ignore <globs>]` | The pull request check behind the GitHub Action: scans what the pull request changed, exits 1 on a blocking finding, and writes the comment (`--comment-file`) and SARIF (`--sarif-file`). |
+| `gw badge [--repo <owner/name>] [--workflow <file>]` | Print the `agent-checked` README badge for the workflow that runs the check. |
+| `gw receipt [--session <id>] [--png <file>]` | Counts for one agent session: calls checked, invented calls caught, duplicates prevented, callers updated, affected tests run, time added. Counts only, never file names or code. |
 | `gw verify [files...]` | Check grounding alone; exit 1 on definite errors. |
 | `gw deps [build\|show <module>]` | Inspect what is known about installed dependencies, workspace packages and local contracts. |
 | `gw refactor <symbol> --rename <name>` / `--body-file <path>` | Preview a TS/JS symbol rename or body replacement; use `--apply <preview-id>` to revalidate and write. |
@@ -307,6 +317,48 @@ gw refactor src/math.ts:formatSum --body-file /path/to/new-body.txt --json
 Use an exact symbol ID (from `gw symbols --json`), qualified name, or repo-relative `file:name`. The body file contains the full replacement body, including braces for a block. Groundwork preserves the declaration and edits only the selected body. Rename follows TypeScript's static references, including imports and re-exports, without replacing unrelated names, ordinary strings or comments. It does not update dynamic references or external consumers.
 
 Preview returns a patch in JSON without modifying tracked or untracked source. Groundwork checks for compiler errors and changed bindings, then runs the reuse and grounding checks against isolated copies of the current working tree. A blocking finding, uncheckable target, or stale preview prevents apply; warnings are reported. Apply requires the same request and preview ID, rechecks the candidate, and leaves the patch unstaged. This works in Git repositories with an indexed TS/JS declaration in a compiler project. Rename stops if a source file outside the compiler project may reference the symbol. A body edit must preserve the callable type if the compiler project does not cover all repository TS/JS files. Use ordinary edits and tests for other languages or dynamic references.
+
+## GitHub Action
+
+Check every pull request in CI. The scan runs inside the runner; no code leaves it.
+
+```yaml
+# .github/workflows/groundwork.yml
+name: agent-checked
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]  # labels matter for only-ai
+permissions:
+  contents: read
+  pull-requests: write    # the comment
+  security-events: write  # code scanning (SARIF)
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ADITYADEV4145/GroundWork@v1
+        with:
+          only-ai: false   # true checks only agent-written pull requests
+```
+
+The action is not tagged yet: until a `v1` tag exists, pin a commit SHA.
+
+- The check fails on high-confidence invented calls and wrong arguments. Duplicated logic, duplicate constants and dead code are warnings. Type errors are not checked in CI, because the type checker would run tools from the pull request's checkout. Low-confidence findings never appear and never fail the check.
+- Findings go into one comment, grouped by kind, at most 10, each with the real symbol to use when there is one. The comment is updated on each push and removed when the findings are gone. A pull request with no findings gets no comment. With a GitHub App token in `token`, set `comment-author` to the app's login (`my-app[bot]`) so the action finds its own comment.
+- Findings are uploaded as SARIF to code scanning (`sarif: false` turns it off).
+- `only-ai: true` skips pull requests that do not look agent-written: a label (`ai`, `agent`, `devin`, `copilot`, `claude`, `codex`, `cursor`, `ai-generated`), a bot author other than dependency bots, or an agent commit author or `Co-Authored-By` trailer.
+- Inputs `block`, `warn`, `off` (finding kinds) and `ignore` (globs) override the defaults per workflow. The same settings live in `.groundwork/config.json`:
+
+```json
+{ "ci": { "severity": { "duplicate-logic": "block", "dead-code": "off" }, "ignore": ["vendor/**"], "onlyAi": true } }
+```
+
+Add the badge with `gw badge`; it shows the latest run of the workflow and links to it.
+
+The check is tested on 20 scripted pull requests (`test/ci-replay.ts`): every reported finding was expected, the 8 clean ones got no comment, and one seeded defect (a missing member of a namespace import) was missed because it is only low confidence. These are hand-written cases, not real agent-written pull requests; that replay has not been run.
 
 ## Benchmark results
 

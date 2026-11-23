@@ -13,6 +13,17 @@ never a block. A `complete: true` answer needs no further impact lookup for that
 snapshot; edits invalidate it. Incomplete reasons and test commands guide follow-up.
 See [impact](references/impact.md). Tool-level benchmark results are not agent runs.
 
+## 0. When not to call Groundwork
+
+Skip every Groundwork tool call when the task does not need one. Each call costs a turn.
+
+- Tiny edits: a typo, a rename inside one function, a constant, a log line, a one-line fix in code you have already read.
+- Docs, comments, changelogs and other prose.
+- Config, lockfiles, CI files, JSON/YAML/TOML and generated files.
+- Symbols whose definition or signature is already in your context and unchanged.
+
+The automatic checks after edits and at the end of the turn still run, so skipping a call does not skip the safety net.
+
 ## 1. Navigate: use the cheapest sufficient evidence
 
 Use `search_code({ "query": "where do we retry failed requests", "limit": 5 })`
@@ -34,6 +45,10 @@ Fall back to ordinary search and ranged reads for docs, logs, config, unsupporte
 ## 2. Reuse first: look before you write
 
 Before writing a genuinely new non-trivial helper/function (including a class, hook or component with new reusable logic), check for existing code. Skip `find_similar` for small edits, inline code, simple constants and already-confirmed helpers; reuse known symbols directly. Reuse unchanged search evidence across continuing steps and sessions when it is carried into your current context; repeat only if the relevant code changed or the evidence is missing. Default results are actionable reuse/extend matches; request `detail: "full"` only when related matches are useful.
+
+Prefer one combined call when you need more than one answer: `before_write({ "new": { "description": "what it does", "name": "planned name" }, "calls": ["helperYouWillCall"], "changes": ["symbolYouWillChange"] })` returns code to reuse, exact signatures and the callers to update together. Pass only the parts you need; repeat with `expand: "reuse"` or `expand: "callers"` only when the short answer is cut. It replaces separate `find_similar`, `read_symbol` and `callers` calls for that step.
+
+In a repository you do not know yet, call `architecture` once before the first write: it lists the packages, entry points, most-called helpers and naming conventions. When `before_write` shows candidates, record what you did with them: `before_write({ "decision": { "choice": "reuse" | "extend" | "new", "reason": "one line" } })`.
 
 1. Call `find_similar({ "description": "what it does", "name": "planned name", "signature": "planned signature" })`. Pass `code` once you have a draft.
 2. State your decision in one line:

@@ -20,6 +20,8 @@ export interface ImpactTest { file: string; command: string | null; ran: boolean
 export interface ImpactSymbol {
   id: string; name: string; file: string; line: number; deleted: boolean; signatureChanged: boolean;
   risk: 'high' | 'medium' | 'low'; callers: ImpactCaller[]; tests: ImpactTest[];
+  /** Direct call sites inside symbols this change also edited; they are left out of `callers`. */
+  callersEdited: number;
 }
 export interface ImpactReport { symbols: ImpactSymbol[]; complete: boolean; incompleteBecause: string[]; evidenceKnown: boolean; commandsObserved: number; ms: number }
 export const isTestPath = (file: string) => /(^|\/)(__tests__|tests?)(\/|$)|\.(test|spec)\.[^.]+$|(^|\/)test_[^/]*\.py$|_test\.py$/.test(file);
@@ -110,6 +112,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
     for (const { symbol: s, deleted, signatureChanged, exportNames, publicMethod } of selected) {
       check();
       const callers = new Map<string, ImpactCaller>(), tests = new Set<string>();
+      const edited = new Set<string>();
       const seen = new Set([s.id]);
       let frontier = [s];
       const incoming = (target: typeof s) => state.calls.filter((c) => {
@@ -124,7 +127,8 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
           const caller = c.callerId ? byId.get(c.callerId) : undefined;
           involved.add(c.file);
           if (caller) names.add(caller.name.split('.').at(-1)!);
-          if (!c.callerId || !selectedIds.has(c.callerId)) callers.set(`${c.file}:${c.line}`, {
+          if (c.callerId && selectedIds.has(c.callerId)) { if (depth === 1) edited.add(`${c.file}:${c.line}`); }
+          else callers.set(`${c.file}:${c.line}`, {
             file: c.file, line: c.line, symbol: caller?.qualifiedName ?? '<module>', depth,
             confidence: c.calleeId === target.id ? c.confidence ?? 'unknown' : 'name-only', changedFile: paths.has(c.file), lookedAt: evidence.opened.has(c.file) || paths.has(c.file),
           });
@@ -149,7 +153,7 @@ export async function changeImpact(db: Db, root: string, options: { base?: strin
       const publicSymbol = s.kind === 'method' ? publicMethod : s.exported;
       const high = publicSymbol && (signatureChanged || deleted) && list.some((c) => !c.changedFile);
       report.symbols.push({ id: s.id, name: s.qualifiedName, file: s.file, line: s.line, deleted, signatureChanged,
-        risk: high ? 'high' : list.length ? 'medium' : 'low', callers: list, tests: [...tests].sort().map(test) });
+        risk: high ? 'high' : list.length ? 'medium' : 'low', callers: list, tests: [...tests].sort().map(test), callersEdited: edited.size });
     }
     for (const file of involved) {
       check(); const indexed = files.get(file);

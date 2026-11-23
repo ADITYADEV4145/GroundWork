@@ -28,12 +28,15 @@ export async function readHookInput(): Promise<string> {
   });
 }
 
-export async function forwardHook(agent: AgentName, event: HookEventName, input: string, timeoutMs = 300): Promise<string | null> {
+export async function forwardHook(agent: AgentName, event: HookEventName, input: string, timeoutMs = 300, stopTimeoutMs = 30_000): Promise<string | null> {
   if (process.env.GW_HOOK_IN_PROCESS === '1' || process.platform === 'win32') return null;
   try {
     const raw = input.trim() ? JSON.parse(input) : {};
     if (!raw || typeof raw !== 'object') return '';
-    if (!['pre_tool', 'post_tool'].includes(event) || !/^(Read|Edit|Write|MultiEdit|Delete|mcp__(?:plugin_groundwork_)?groundwork__find_code|MCP:find_code)$/.test(raw.tool_name ?? '')) return null;
+    const stop = event === 'stop';
+    // Stop runs in the service so its type checker and index stay warm between turns; a broken service reruns it in-process, a timeout allows.
+    if (!stop && (!['pre_tool', 'post_tool'].includes(event) || !/^(Read|Edit|Write|MultiEdit|Delete|mcp__(?:plugin_groundwork_)?groundwork__find_code|MCP:find_code)$/.test(raw.tool_name ?? ''))) return null;
+    const failed = stop ? null : '';
     let cwd: string, info: ReturnType<typeof serviceInfo>;
     try {
       cwd = realpathSync(typeof raw.cwd === 'string' ? raw.cwd :
@@ -43,8 +46,8 @@ export async function forwardHook(agent: AgentName, event: HookEventName, input:
     } catch { return null; }
     try {
       const st = lstatSync(info.socket);
-      if (!st.isSocket() || st.uid !== process.getuid!()) return '';
-    } catch (error) { return (error as NodeJS.ErrnoException).code === 'ENOENT' ? null : ''; }
+      if (!st.isSocket() || st.uid !== process.getuid!()) return failed;
+    } catch (error) { return (error as NodeJS.ErrnoException).code === 'ENOENT' ? null : failed; }
     return await new Promise((resolve) => {
       let buffer = '', greeted = false, done = false;
       const socket = connect(info.socket);
@@ -55,13 +58,13 @@ export async function forwardHook(agent: AgentName, event: HookEventName, input:
         socket.destroy();
         resolve(output);
       };
-      const timer = setTimeout(() => finish(''), timeoutMs);
+      const timer = setTimeout(() => finish(''), stop ? stopTimeoutMs : timeoutMs);
       socket.setEncoding('utf8');
-      socket.on('error', (error: NodeJS.ErrnoException) => finish(!greeted && ['ENOENT', 'ECONNREFUSED'].includes(error.code ?? '') ? null : ''));
-      socket.on('close', () => finish(''));
+      socket.on('error', (error: NodeJS.ErrnoException) => finish(!greeted && ['ENOENT', 'ECONNREFUSED'].includes(error.code ?? '') ? null : failed));
+      socket.on('close', () => finish(failed));
       socket.on('data', (chunk: string) => {
         buffer += chunk;
-        if (Buffer.byteLength(buffer) > (greeted ? 256 * 1024 : 4096)) return finish('');
+        if (Buffer.byteLength(buffer) > (greeted ? 256 * 1024 : 4096)) return finish(failed);
         const end = buffer.indexOf('\n');
         if (end < 0) return;
         try {
@@ -73,11 +76,11 @@ export async function forwardHook(agent: AgentName, event: HookEventName, input:
             socket.write(JSON.stringify({ groundworkRoot: info.root, groundworkCwd: cwd, groundworkHook: 1, agent, event, raw }) + '\n');
           } else {
             if (value.fallback === true) return finish(null);
-            if (typeof value.output !== 'string') return finish('');
-            if (value.output && (!JSON.parse(value.output) || typeof JSON.parse(value.output) !== 'object')) return finish('');
+            if (typeof value.output !== 'string') return finish(failed);
+            if (value.output && (!JSON.parse(value.output) || typeof JSON.parse(value.output) !== 'object')) return finish(failed);
             finish(value.output);
           }
-        } catch { finish(''); }
+        } catch { finish(failed); }
       });
     });
   } catch { return ''; }

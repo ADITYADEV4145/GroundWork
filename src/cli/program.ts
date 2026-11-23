@@ -10,6 +10,7 @@ const program = new Command()
   .option('--root <dir>', 'repository root (default: git toplevel of cwd)');
 
 const groups = [
+  { names: ['architecture'], load: () => import('./commands/architecture.js') },
   { names: ['search'], load: () => import('./commands/search.js') },
   { names: ['impact'], load: () => import('./commands/impact.js') },
   { names: ['types'], load: () => import('./commands/types.js') },
@@ -25,6 +26,8 @@ const groups = [
   { names: ['similar'], load: () => import('./commands/similar.js') },
   { names: ['refactor'], load: () => import('./commands/refactor.js') },
   { names: ['check'], load: () => import('./commands/check.js') },
+  { names: ['scan', 'receipt'], load: () => import('./commands/scan.js') },
+  { names: ['ci', 'badge'], load: () => import('./commands/ci.js') },
   { names: ['bench'], load: () => import('./commands/bench.js') },
 ];
 let command: string | undefined;

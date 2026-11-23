@@ -500,3 +500,21 @@ export function readImpactState(db: Db) {
     })),
   };
 }
+
+/** Aggregate rows for the architecture report: source files, resolved file-to-file imports, helpers called from other files, and function names. */
+export function architectureFacts(db: Db) {
+  const files = db.prepare("SELECT id, path, language, lines, is_test FROM files WHERE status != 'skipped' AND is_generated = 0").all()
+    .map((r) => ({ id: Number(r.id), path: String(r.path), language: r.language ? String(r.language) : null, lines: Number(r.lines), test: Number(r.is_test) === 1 }));
+  const imports = db.prepare('SELECT DISTINCT file_id, resolved_file_id FROM imports WHERE resolved_file_id IS NOT NULL').all()
+    .map((r) => ({ from: Number(r.file_id), to: Number(r.resolved_file_id) }));
+  // A helper is hot when other files call it through a resolved import; same-file and name-only calls say nothing about reuse.
+  const hot = db.prepare(`SELECT s.qualified_name, s.signature, s.start_line, f.id file_id, f.path, COUNT(DISTINCT c.file_id) callers
+    FROM calls c JOIN symbols s ON s.id = c.callee_id JOIN files f ON f.id = s.file_id
+    WHERE c.file_id != s.file_id AND c.confidence IN ('exact', 'import-resolved') AND f.is_test = 0 AND f.is_generated = 0 AND s.kind IN ('function', 'method', 'class', 'component')
+    GROUP BY s.id HAVING callers >= 2 ORDER BY callers DESC, f.path, s.start_line`).all()
+    .map((r) => ({ symbol: String(r.qualified_name), signature: String(r.signature), line: Number(r.start_line), fileId: Number(r.file_id), file: String(r.path), callers: Number(r.callers) }));
+  const functions = db.prepare(`SELECT s.name, f.language FROM symbols s JOIN files f ON f.id = s.file_id
+    WHERE s.kind IN ('function', 'method') AND f.is_test = 0 AND f.is_generated = 0 AND f.language IS NOT NULL`).all()
+    .map((r) => ({ name: String(r.name), language: String(r.language) }));
+  return { files, imports, hot, functions };
+}

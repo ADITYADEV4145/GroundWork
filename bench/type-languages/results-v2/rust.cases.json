@@ -1,0 +1,8417 @@
+{
+ "language": "rust",
+ "seeds": [
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3914,
+   "mutation": {
+    "id": "rust-analyzer-invented-function-1",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/hir-def/src/builtin_type.rs",
+    "line": 97,
+    "before": "                BuiltinInt::I64 => Name::new_symbol_root(sym::i64),",
+    "after": "                BuiltinInt::I64 => Name::new_symbol_root_gw(sym::i64),"
+   },
+   "caughtA": false,
+   "caughtB": false
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide/src/join_lines.rs",
+     "line": 174,
+     "name": "join_single_expr_block_gw",
+     "message": "cannot find function `join_single_expr_block_gw` in this scope",
+     "code": "E0425",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide/src/join_lines.rs",
+      "line": 174,
+      "column": 12,
+      "name": "join_single_expr_block_gw",
+      "message": "cannot find function `join_single_expr_block_gw` in this scope",
+      "code": "E0425",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 599,
+   "mutation": {
+    "id": "rust-analyzer-invented-function-2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/ide/src/join_lines.rs",
+    "line": 174,
+    "before": "        if join_single_expr_block(edit, token).is_some() {",
+    "after": "        if join_single_expr_block_gw(edit, token).is_some() {"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/hir-def/src/import_map.rs",
+     "line": 88,
+     "name": "collect_import_map_gw",
+     "message": "no associated function or constant named `collect_import_map_gw` found for struct `ImportMap` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-def/src/import_map.rs",
+      "line": 88,
+      "column": 25,
+      "name": "collect_import_map_gw",
+      "message": "no associated function or constant named `collect_import_map_gw` found for struct `ImportMap` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1478,
+   "mutation": {
+    "id": "rust-analyzer-invented-function-3",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/hir-def/src/import_map.rs",
+    "line": 88,
+    "before": "        let map = Self::collect_import_map(db, krate);",
+    "after": "        let map = Self::collect_import_map_gw(db, krate);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide-assists/src/handlers/auto_import.rs",
+     "line": 236,
+     "name": "expected_gw",
+     "message": "cannot find function `expected_gw` in this scope",
+     "code": "E0425",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide-assists/src/handlers/auto_import.rs",
+      "line": 236,
+      "column": 24,
+      "name": "expected_gw",
+      "message": "cannot find function `expected_gw` in this scope",
+      "code": "E0425",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 623,
+   "mutation": {
+    "id": "rust-analyzer-invented-function-4",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/ide-assists/src/handlers/auto_import.rs",
+    "line": 236,
+    "before": "        let expected = expected(Either::Right(pat.clone().into()));",
+    "after": "        let expected = expected_gw(Either::Right(pat.clone().into()));"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/rust-analyzer/src/cli/analysis_stats.rs",
+     "line": 1173,
+     "name": "hidden_gw",
+     "message": "no associated function or constant named `hidden_gw` found for struct `ProgressReport<'a>` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/rust-analyzer/src/cli/analysis_stats.rs",
+      "line": 1173,
+      "column": 59,
+      "name": "hidden_gw",
+      "message": "no associated function or constant named `hidden_gw` found for struct `ProgressReport<'a>` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1334,
+   "mutation": {
+    "id": "rust-analyzer-invented-function-5",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/rust-analyzer/src/cli/analysis_stats.rs",
+    "line": 1173,
+    "before": "            _ if self.output.is_some() => ProgressReport::hidden(),",
+    "after": "            _ if self.output.is_some() => ProgressReport::hidden_gw(),"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/rust-analyzer/src/main_loop.rs",
+     "line": 625,
+     "name": "should_start_op_gw",
+     "message": "no method named `should_start_op_gw` found for struct `OpQueue<Args, Output>` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/rust-analyzer/src/main_loop.rs",
+      "line": 625,
+      "column": 60,
+      "name": "should_start_op_gw",
+      "message": "no method named `should_start_op_gw` found for struct `OpQueue<Args, Output>` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1303,
+   "mutation": {
+    "id": "rust-analyzer-invented-method-1",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/rust-analyzer/src/main_loop.rs",
+    "line": 625,
+    "before": "        if let Some((cause, ())) = self.prime_caches_queue.should_start_op() {",
+    "after": "        if let Some((cause, ())) = self.prime_caches_queue.should_start_op_gw() {"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/hir-ty/src/mir/eval.rs",
+     "line": 2329,
+     "name": "field_types_gw",
+     "message": "no method named `field_types_gw` found for reference `&'db (dyn HirDatabase + 'static)` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-ty/src/mir/eval.rs",
+      "line": 2329,
+      "column": 51,
+      "name": "field_types_gw",
+      "message": "no method named `field_types_gw` found for reference `&'db (dyn HirDatabase + 'static)` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2027,
+   "mutation": {
+    "id": "rust-analyzer-invented-method-2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/hir-ty/src/mir/eval.rs",
+    "line": 2329,
+    "before": "                        let field_types = this.db.field_types(s.into());",
+    "after": "                        let field_types = this.db.field_types_gw(s.into());"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "lib/lsp-server/src/msg.rs",
+     "line": 192,
+     "name": "_write_gw",
+     "message": "no method named `_write_gw` found for reference `&Message` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "lib/lsp-server/src/msg.rs",
+      "line": 192,
+      "column": 14,
+      "name": "_write_gw",
+      "message": "no method named `_write_gw` found for reference `&Message` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 324,
+   "mutation": {
+    "id": "rust-analyzer-invented-method-3",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "lib/lsp-server/src/msg.rs",
+    "line": 192,
+    "before": "        self._write(w)",
+    "after": "        self._write_gw(w)"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/parser/src/grammar/types.rs",
+     "line": 72,
+     "name": "err_recover_gw",
+     "message": "no method named `err_recover_gw` found for mutable reference `&mut parser::Parser<'_>` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/parser/src/grammar/types.rs",
+      "line": 72,
+      "column": 15,
+      "name": "err_recover_gw",
+      "message": "no method named `err_recover_gw` found for mutable reference `&mut parser::Parser<'_>` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 503,
+   "mutation": {
+    "id": "rust-analyzer-invented-method-4",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/parser/src/grammar/types.rs",
+    "line": 72,
+    "before": "            p.err_recover(\"expected type\", TYPE_RECOVERY_SET);",
+    "after": "            p.err_recover_gw(\"expected type\", TYPE_RECOVERY_SET);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide-completion/src/render/const_.rs",
+     "line": 27,
+     "name": "set_deprecated_gw",
+     "message": "no method named `set_deprecated_gw` found for mutable reference `&mut item::Builder` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide-completion/src/render/const_.rs",
+      "line": 27,
+      "column": 10,
+      "name": "set_deprecated_gw",
+      "message": "no method named `set_deprecated_gw` found for mutable reference `&mut item::Builder` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 439,
+   "mutation": {
+    "id": "rust-analyzer-invented-method-5",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/ide-completion/src/render/const_.rs",
+    "line": 27,
+    "before": "        .set_deprecated(ctx.is_deprecated(const_, const_.as_assoc_item(db)))",
+    "after": "        .set_deprecated_gw(ctx.is_deprecated(const_, const_.as_assoc_item(db)))"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide-assists/src/handlers/extract_variable.rs",
+     "line": 359,
+     "name": "",
+     "message": "this function takes 2 arguments but 4 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide-assists/src/handlers/extract_variable.rs",
+      "line": 359,
+      "column": 5,
+      "name": "",
+      "message": "this function takes 2 arguments but 4 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 603,
+   "mutation": {
+    "id": "rust-analyzer-wrong-arity-1",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/ide-assists/src/handlers/extract_variable.rs",
+    "line": 359,
+    "before": "    parse_expr_from_str(&text, ctx.edition())",
+    "after": "    parse_expr_from_str(&text, ctx.edition(), 0, 0)"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/mbe/src/expander/transcriber.rs",
+     "line": 404,
+     "name": "",
+     "message": "this method takes 0 arguments but 2 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/mbe/src/expander/transcriber.rs",
+      "line": 404,
+      "column": 53,
+      "name": "",
+      "message": "this method takes 0 arguments but 2 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 472,
+   "mutation": {
+    "id": "rust-analyzer-wrong-arity-2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/mbe/src/expander/transcriber.rs",
+    "line": 404,
+    "before": "                    builder.extend_with_tt_alone(tt.view().strip_invisible())",
+    "after": "                    builder.extend_with_tt_alone(tt.view(0, 0).strip_invisible())"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/hir-ty/src/next_solver/infer/mod.rs",
+     "line": 1152,
+     "name": "",
+     "message": "this method takes 0 arguments but 2 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-ty/src/next_solver/infer/mod.rs",
+      "line": 1152,
+      "column": 55,
+      "name": "",
+      "message": "this method takes 0 arguments but 2 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1874,
+   "mutation": {
+    "id": "rust-analyzer-wrong-arity-3",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/hir-ty/src/next_solver/infer/mod.rs",
+    "line": 1152,
+    "before": "            TyKind::CoroutineClosure(_, args) => args.as_coroutine_closure().kind_ty(),",
+    "after": "            TyKind::CoroutineClosure(_, args) => args.as_coroutine_closure(0, 0).kind_ty(),"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide-db/src/search.rs",
+     "line": 199,
+     "name": "",
+     "message": "this method takes 1 argument but 3 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide-db/src/search.rs",
+      "line": 199,
+      "column": 61,
+      "name": "",
+      "message": "this method takes 1 argument but 3 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 496,
+   "mutation": {
+    "id": "rust-analyzer-wrong-arity-4",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/ide-db/src/search.rs",
+    "line": 199,
+    "before": "        let source_root_id = db.file_source_root(root_file).source_root_id(db);",
+    "after": "        let source_root_id = db.file_source_root(root_file).source_root_id(db, 0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide-db/src/symbol_index.rs",
+     "line": 786,
+     "name": "",
+     "message": "this method takes 0 arguments but 2 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide-db/src/symbol_index.rs",
+      "line": 786,
+      "column": 15,
+      "name": "",
+      "message": "this method takes 0 arguments but 2 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1251,
+   "mutation": {
+    "id": "rust-analyzer-wrong-arity-5",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/ide-db/src/symbol_index.rs",
+    "line": 786,
+    "before": "        query.exclude_imports();",
+    "after": "        query.exclude_imports(0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/hir-ty/src/next_solver/infer/type_variable.rs",
+     "line": 16,
+     "name": "crate::next_solver::Ty_gw",
+     "message": "unresolved import `crate::next_solver::Ty_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-ty/src/next_solver/infer/type_variable.rs",
+      "line": 16,
+      "column": 5,
+      "name": "crate::next_solver::Ty_gw",
+      "message": "unresolved import `crate::next_solver::Ty_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1985,
+   "mutation": {
+    "id": "rust-analyzer-wrong-import-1",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/hir-ty/src/next_solver/infer/type_variable.rs",
+    "line": 16,
+    "before": "use crate::next_solver::Ty;",
+    "after": "use crate::next_solver::Ty_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/hir-def/src/macro_expansion_tests/mbe/meta_syntax.rs",
+     "line": 5,
+     "name": "crate::macro_expansion_tests::check_gw",
+     "message": "unresolved import `crate::macro_expansion_tests::check_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-def/src/macro_expansion_tests/mbe/meta_syntax.rs",
+      "line": 5,
+      "column": 5,
+      "name": "crate::macro_expansion_tests::check_gw",
+      "message": "unresolved import `crate::macro_expansion_tests::check_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1810,
+   "mutation": {
+    "id": "rust-analyzer-wrong-import-2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/hir-def/src/macro_expansion_tests/mbe/meta_syntax.rs",
+    "line": 5,
+    "before": "use crate::macro_expansion_tests::check;",
+    "after": "use crate::macro_expansion_tests::check_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/hir-ty/src/next_solver/infer/snapshot/undo_log.rs",
+     "line": 12,
+     "name": "crate::next_solver::infer::unify_key::ConstVidKey_gw",
+     "message": "unresolved import `crate::next_solver::infer::unify_key::ConstVidKey_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-ty/src/next_solver/infer/snapshot/undo_log.rs",
+      "line": 12,
+      "column": 5,
+      "name": "crate::next_solver::infer::unify_key::ConstVidKey_gw",
+      "message": "unresolved import `crate::next_solver::infer::unify_key::ConstVidKey_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2383,
+   "mutation": {
+    "id": "rust-analyzer-wrong-import-3",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/hir-ty/src/next_solver/infer/snapshot/undo_log.rs",
+    "line": 12,
+    "before": "use crate::next_solver::infer::unify_key::ConstVidKey;",
+    "after": "use crate::next_solver::infer::unify_key::ConstVidKey_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide/src/typing.rs",
+     "line": 32,
+     "name": "crate::SourceChange_gw",
+     "message": "unresolved import `crate::SourceChange_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide/src/typing.rs",
+      "line": 32,
+      "column": 5,
+      "name": "crate::SourceChange_gw",
+      "message": "unresolved import `crate::SourceChange_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 714,
+   "mutation": {
+    "id": "rust-analyzer-wrong-import-4",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/ide/src/typing.rs",
+    "line": 32,
+    "before": "use crate::SourceChange;",
+    "after": "use crate::SourceChange_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3917,
+   "mutation": {
+    "id": "rust-analyzer-wrong-import-5",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/ide/src/inlay_hints/implied_dyn_trait.rs",
+    "line": 77,
+    "before": "    use crate::inlay_hints::InlayHintsConfig;",
+    "after": "    use crate::inlay_hints::InlayHintsConfig_gw;"
+   },
+   "caughtA": false,
+   "caughtB": false
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ignore/src/walk.rs",
+     "line": 2667,
+     "name": "assert_paths_gw",
+     "message": "cannot find function `assert_paths_gw` in this scope",
+     "code": "E0425",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ignore/src/walk.rs",
+      "line": 2667,
+      "column": 9,
+      "name": "assert_paths_gw",
+      "message": "cannot find function `assert_paths_gw` in this scope",
+      "code": "E0425",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1859,
+   "mutation": {
+    "id": "ripgrep-invented-function-1",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/ignore/src/walk.rs",
+    "line": 2667,
+    "before": "        assert_paths(",
+    "after": "        assert_paths_gw("
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ignore/src/incremental.rs",
+     "line": 1103,
+     "name": "one_matcher_gw",
+     "message": "cannot find function `one_matcher_gw` in this scope",
+     "code": "E0425",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ignore/src/incremental.rs",
+      "line": 1103,
+      "column": 21,
+      "name": "one_matcher_gw",
+      "message": "cannot find function `one_matcher_gw` in this scope",
+      "code": "E0425",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2040,
+   "mutation": {
+    "id": "ripgrep-invented-function-2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/ignore/src/incremental.rs",
+    "line": 1103,
+    "before": "        let mut m = one_matcher(&b);",
+    "after": "        let mut m = one_matcher_gw(&b);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/globset/src/lib.rs",
+     "line": 1278,
+     "name": "build_glob_set_gw",
+     "message": "cannot find function `build_glob_set_gw` in this scope",
+     "code": "E0425",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/globset/src/lib.rs",
+      "line": 1278,
+      "column": 19,
+      "name": "build_glob_set_gw",
+      "message": "cannot find function `build_glob_set_gw` in this scope",
+      "code": "E0425",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1721,
+   "mutation": {
+    "id": "ripgrep-invented-function-3",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/globset/src/lib.rs",
+    "line": 1278,
+    "before": "        let set = build_glob_set(&[\"a*\", \"ab*\", \"ab/c*\"]);",
+    "after": "        let set = build_glob_set_gw(&[\"a*\", \"ab*\", \"ab/c*\"]);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/regex/src/strip.rs",
+     "line": 166,
+     "name": "roundtrip_err_gw",
+     "message": "cannot find function `roundtrip_err_gw` in this scope",
+     "code": "E0425",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/regex/src/strip.rs",
+      "line": 166,
+      "column": 17,
+      "name": "roundtrip_err_gw",
+      "message": "cannot find function `roundtrip_err_gw` in this scope",
+      "code": "E0425",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 582,
+   "mutation": {
+    "id": "ripgrep-invented-function-4",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/regex/src/strip.rs",
+    "line": 166,
+    "before": "        assert!(roundtrip_err(r\"\\U0000000A\", b'\\n').is_err());",
+    "after": "        assert!(roundtrip_err_gw(r\"\\U0000000A\", b'\\n').is_err());"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "line": 1036,
+     "name": "usize_gw",
+     "message": "cannot find function `usize_gw` in module `convert`",
+     "code": "E0425",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/core/flags/defs.rs",
+      "line": 1036,
+      "column": 40,
+      "name": "usize_gw",
+      "message": "cannot find function `usize_gw` in module `convert`",
+      "code": "E0425",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 695,
+   "mutation": {
+    "id": "ripgrep-invented-function-5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/core/flags/defs.rs",
+    "line": 1036,
+    "before": "        args.context.set_both(convert::usize(&v.unwrap_value())?);",
+    "after": "        args.context.set_both(convert::usize_gw(&v.unwrap_value())?);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/searcher/src/testutil.rs",
+     "line": 602,
+     "name": "clone_gw",
+     "message": "no method named `clone_gw` found for struct `searcher::SearcherBuilder` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/searcher/src/testutil.rs",
+      "line": 602,
+      "column": 34,
+      "name": "clone_gw",
+      "message": "no method named `clone_gw` found for struct `searcher::SearcherBuilder` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 539,
+   "mutation": {
+    "id": "ripgrep-invented-method-1",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/searcher/src/testutil.rs",
+    "line": 602,
+    "before": "                builder: builder.clone(),",
+    "after": "                builder: builder.clone_gw(),"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/searcher/src/line_buffer.rs",
+     "line": 729,
+     "name": "bstr_gw",
+     "message": "no method named `bstr_gw` found for struct `line_buffer::LineBufferReader<'b, R>` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/searcher/src/line_buffer.rs",
+      "line": 729,
+      "column": 24,
+      "name": "bstr_gw",
+      "message": "no method named `bstr_gw` found for struct `line_buffer::LineBufferReader<'b, R>` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 960,
+   "mutation": {
+    "id": "ripgrep-invented-method-2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/searcher/src/line_buffer.rs",
+    "line": 729,
+    "before": "        assert_eq!(rdr.bstr(), \"m\");",
+    "after": "        assert_eq!(rdr.bstr_gw(), \"m\");"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ignore/src/lib.rs",
+     "line": 234,
+     "name": "into_io_error_gw",
+     "message": "no method named `into_io_error_gw` found for struct `Box<Error>` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ignore/src/lib.rs",
+      "line": 234,
+      "column": 48,
+      "name": "into_io_error_gw",
+      "message": "no method named `into_io_error_gw` found for struct `Box<Error>` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 426,
+   "mutation": {
+    "id": "ripgrep-invented-method-3",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/ignore/src/lib.rs",
+    "line": 234,
+    "before": "            Error::WithPath { err, .. } => err.into_io_error(),",
+    "after": "            Error::WithPath { err, .. } => err.into_io_error_gw(),"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/printer/src/path.rs",
+     "line": 159,
+     "name": "as_ref_gw",
+     "message": "no method named `as_ref_gw` found for reference `&Path` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/printer/src/path.rs",
+      "line": 159,
+      "column": 43,
+      "name": "as_ref_gw",
+      "message": "no method named `as_ref_gw` found for reference `&Path` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 446,
+   "mutation": {
+    "id": "ripgrep-invented-method-4",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/printer/src/path.rs",
+    "line": 159,
+    "before": "        let ppath = PrinterPath::new(path.as_ref())",
+    "after": "        let ppath = PrinterPath::new(path.as_ref_gw())"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/core/flags/hiargs.rs",
+     "line": 747,
+     "name": "clone_gw",
+     "message": "no method named `clone_gw` found for struct `MmapChoice` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/core/flags/hiargs.rs",
+      "line": 747,
+      "column": 42,
+      "name": "clone_gw",
+      "message": "no method named `clone_gw` found for struct `MmapChoice` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 651,
+   "mutation": {
+    "id": "ripgrep-invented-method-5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "invented-method",
+    "file": "crates/core/flags/hiargs.rs",
+    "line": 747,
+    "before": "            .memory_map(self.mmap_choice.clone())",
+    "after": "            .memory_map(self.mmap_choice.clone_gw())"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/searcher/src/searcher/glue.rs",
+     "line": 1323,
+     "name": "",
+     "message": "this method takes 0 arguments but 2 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/searcher/src/searcher/glue.rs",
+      "line": 1323,
+      "column": 14,
+      "name": "",
+      "message": "this method takes 0 arguments but 2 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 957,
+   "mutation": {
+    "id": "ripgrep-wrong-arity-1",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/searcher/src/searcher/glue.rs",
+    "line": 1323,
+    "before": "            .test();",
+    "after": "            .test(0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "line": 2850,
+     "name": "",
+     "message": "this method takes 0 arguments but 2 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/core/flags/defs.rs",
+      "line": 2850,
+      "column": 19,
+      "name": "",
+      "message": "this method takes 0 arguments but 2 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 240,
+   "mutation": {
+    "id": "ripgrep-wrong-arity-2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/core/flags/defs.rs",
+    "line": 2850,
+    "before": "        assert!(v.unwrap_switch(), \"--help has no negation\");",
+    "after": "        assert!(v.unwrap_switch(0, 0), \"--help has no negation\");"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/core/flags/hiargs.rs",
+     "line": 484,
+     "name": "",
+     "message": "this method takes 1 argument but 3 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/core/flags/hiargs.rs",
+      "line": 484,
+      "column": 14,
+      "name": "",
+      "message": "this method takes 1 argument but 3 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 238,
+   "mutation": {
+    "id": "ripgrep-wrong-arity-3",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/core/flags/hiargs.rs",
+    "line": 484,
+    "before": "            .octal(false)",
+    "after": "            .octal(false, 0, 0)"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/printer/src/standard.rs",
+     "line": 1268,
+     "name": "",
+     "message": "this method takes 0 arguments but 2 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/printer/src/standard.rs",
+      "line": 1268,
+      "column": 14,
+      "name": "",
+      "message": "this method takes 0 arguments but 2 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 422,
+   "mutation": {
+    "id": "ripgrep-wrong-arity-4",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/printer/src/standard.rs",
+    "line": 1268,
+    "before": "        self.start_line_highlight()?;",
+    "after": "        self.start_line_highlight(0, 0)?;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/cli/src/pattern.rs",
+     "line": 179,
+     "name": "",
+     "message": "this method takes 0 arguments but 2 arguments were supplied",
+     "code": "E0061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/cli/src/pattern.rs",
+      "line": 179,
+      "column": 27,
+      "name": "",
+      "message": "this method takes 0 arguments but 2 arguments were supplied",
+      "code": "E0061",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 540,
+   "mutation": {
+    "id": "ripgrep-wrong-arity-5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-arity",
+    "file": "crates/cli/src/pattern.rs",
+    "line": 179,
+    "before": "        assert_eq!(3, err.valid_up_to());",
+    "after": "        assert_eq!(3, err.valid_up_to(0, 0));"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ignore/src/types.rs",
+     "line": 501,
+     "name": "super::TypesBuilder_gw",
+     "message": "unresolved import `super::TypesBuilder_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ignore/src/types.rs",
+      "line": 501,
+      "column": 9,
+      "name": "super::TypesBuilder_gw",
+      "message": "unresolved import `super::TypesBuilder_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1839,
+   "mutation": {
+    "id": "ripgrep-wrong-import-1",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/ignore/src/types.rs",
+    "line": 501,
+    "before": "    use super::TypesBuilder;",
+    "after": "    use super::TypesBuilder_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/searcher/src/sink.rs",
+     "line": 520,
+     "name": "crate::searcher::Searcher_gw",
+     "message": "unresolved import `crate::searcher::Searcher_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/searcher/src/sink.rs",
+      "line": 520,
+      "column": 9,
+      "name": "crate::searcher::Searcher_gw",
+      "message": "unresolved import `crate::searcher::Searcher_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 262,
+   "mutation": {
+    "id": "ripgrep-wrong-import-2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/searcher/src/sink.rs",
+    "line": 520,
+    "before": "    use crate::searcher::Searcher;",
+    "after": "    use crate::searcher::Searcher_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/pcre2/src/matcher.rs",
+     "line": 8,
+     "name": "crate::error::Error_gw",
+     "message": "unresolved import `crate::error::Error_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/pcre2/src/matcher.rs",
+      "line": 8,
+      "column": 5,
+      "name": "crate::error::Error_gw",
+      "message": "unresolved import `crate::error::Error_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 146,
+   "mutation": {
+    "id": "ripgrep-wrong-import-3",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/pcre2/src/matcher.rs",
+    "line": 8,
+    "before": "use crate::error::Error;",
+    "after": "use crate::error::Error_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/core/flags/complete/bash.rs",
+     "line": 5,
+     "name": "crate::flags::defs::FLAGS_gw",
+     "message": "unresolved import `crate::flags::defs::FLAGS_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/core/flags/complete/bash.rs",
+      "line": 5,
+      "column": 5,
+      "name": "crate::flags::defs::FLAGS_gw",
+      "message": "unresolved import `crate::flags::defs::FLAGS_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 642,
+   "mutation": {
+    "id": "ripgrep-wrong-import-4",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/core/flags/complete/bash.rs",
+    "line": 5,
+    "before": "use crate::flags::defs::FLAGS;",
+    "after": "use crate::flags::defs::FLAGS_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ignore/src/walk.rs",
+     "line": 2271,
+     "name": "crate::tests::TempDir_gw",
+     "message": "unresolved import `crate::tests::TempDir_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ignore/src/walk.rs",
+      "line": 2271,
+      "column": 9,
+      "name": "crate::tests::TempDir_gw",
+      "message": "unresolved import `crate::tests::TempDir_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 823,
+   "mutation": {
+    "id": "ripgrep-wrong-import-5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/ignore/src/walk.rs",
+    "line": 2271,
+    "before": "    use crate::tests::TempDir;",
+    "after": "    use crate::tests::TempDir_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  }
+ ],
+ "clean": [
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3906,
+   "case": {
+    "id": "rust-analyzer-41add85a27",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "41add85a2757298fe6f99f3e8b943c9383607a06",
+    "parent": "00825977ae82b9bcb984faede1367eff30ad0314",
+    "files": [
+     "crates/hir-ty/src/target_feature/generated.rs",
+     "crates/ide-db/src/generated/lints.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/target_feature/generated.rs",
+     "ranges": [
+      [
+       119,
+       119
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-db/src/generated/lints.rs",
+     "ranges": [
+      [
+       5406,
+       5421
+      ],
+      [
+       8544,
+       8559
+      ],
+      [
+       18138,
+       18153
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2755,
+   "case": {
+    "id": "rust-analyzer-9efc867bd8",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "9efc867bd8b9636d09b6987892635e4dbd7645b0",
+    "parent": "4f3486ac8f07ad504cba63d44d77e64dd3d1bdb7",
+    "files": [
+     "crates/ide-assists/src/handlers/auto_import.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/auto_import.rs",
+     "ranges": [
+      [
+       2096,
+       2135
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2865,
+   "case": {
+    "id": "rust-analyzer-79de93601f",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "79de93601fcdc563ef55be50af8e98423f50797d",
+    "parent": "b61d010f10effb82056959622c0e8f8cff7b1089",
+    "files": [
+     "crates/hir/src/lib.rs",
+     "crates/hir/src/term_search/tactics.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir/src/lib.rs",
+     "ranges": [
+      [
+       4662,
+       4664
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir/src/term_search/tactics.rs",
+     "ranges": [
+      [
+       578,
+       578
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2949,
+   "case": {
+    "id": "rust-analyzer-b61d010f10",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "b61d010f10effb82056959622c0e8f8cff7b1089",
+    "parent": "d25253a339ab4f94c9f307a7757c45d236462863",
+    "files": [
+     "crates/hir/src/lib.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/hir/src/lib.rs",
+     "ranges": [
+      [
+       1533,
+       1533
+      ],
+      [
+       1554,
+       1554
+      ],
+      [
+       4509,
+       4509
+      ],
+      [
+       4628,
+       4630
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3905,
+   "case": {
+    "id": "rust-analyzer-d25253a339",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "d25253a339ab4f94c9f307a7757c45d236462863",
+    "parent": "1565f0865ff93850b63545f97ff11a2619f2862d",
+    "files": [
+     "crates/hir/src/lib.rs",
+     "crates/hir/src/term_search/tactics.rs",
+     "crates/ide-completion/src/context.rs",
+     "crates/ide-completion/src/context/analysis.rs"
+    ],
+    "eligibleFiles": 9
+   },
+   "changed": [
+    {
+     "file": "crates/hir/src/lib.rs",
+     "ranges": [
+      [
+       4527,
+       4528
+      ],
+      [
+       4603,
+       4603
+      ],
+      [
+       4624,
+       4625
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir/src/term_search/tactics.rs",
+     "ranges": [
+      [
+       60,
+       60
+      ],
+      [
+       110,
+       110
+      ],
+      [
+       172,
+       172
+      ],
+      [
+       218,
+       218
+      ],
+      [
+       252,
+       252
+      ],
+      [
+       386,
+       386
+      ],
+      [
+       465,
+       465
+      ],
+      [
+       480,
+       480
+      ],
+      [
+       510,
+       510
+      ],
+      [
+       538,
+       538
+      ],
+      [
+       553,
+       553
+      ],
+      [
+       588,
+       588
+      ],
+      [
+       691,
+       691
+      ],
+      [
+       730,
+       730
+      ],
+      [
+       751,
+       751
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/context.rs",
+     "ranges": [
+      [
+       794,
+       794
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/context/analysis.rs",
+     "ranges": [
+      [
+       661,
+       661
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3403,
+   "case": {
+    "id": "rust-analyzer-1565f0865f",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "1565f0865ff93850b63545f97ff11a2619f2862d",
+    "parent": "a9a08a23cbf507eb8ceeb2d7443b67fd7a25ddbb",
+    "files": [
+     "crates/hir/src/lib.rs",
+     "crates/hir/src/term_search/expr.rs",
+     "crates/ide-assists/src/handlers/wrap_return_type.rs",
+     "crates/ide-diagnostics/src/handlers/type_mismatch.rs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "crates/hir/src/lib.rs",
+     "ranges": [
+      [
+       4541,
+       4546
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir/src/term_search/expr.rs",
+     "ranges": [
+      [
+       313,
+       313
+      ],
+      [
+       316,
+       316
+      ],
+      [
+       318,
+       318
+      ],
+      [
+       321,
+       321
+      ],
+      [
+       324,
+       326
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-assists/src/handlers/wrap_return_type.rs",
+     "ranges": [
+      [
+       95,
+       97
+      ],
+      [
+       260,
+       262
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-diagnostics/src/handlers/type_mismatch.rs",
+     "ranges": [
+      [
+       201,
+       201
+      ],
+      [
+       299,
+       299
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1093,
+   "case": {
+    "id": "rust-analyzer-56ad646d17",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "56ad646d1727bdfb9e4905d638db1373c74bdafd",
+    "parent": "656ecea28ec6cb420c1b7b7e3b49e3dbe02facb2",
+    "files": [
+     "crates/project-model/src/workspace.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/project-model/src/workspace.rs",
+     "ranges": [
+      [
+       794,
+       794
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3880,
+   "case": {
+    "id": "rust-analyzer-95a8a878c2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "95a8a878c26db3766eff8832f874e299f9f1ecb1",
+    "parent": "aa198229289901e5718e7c0a8d4115638cc1900c",
+    "files": [
+     "crates/hir-def/src/lang_item.rs",
+     "crates/intern/src/symbol/symbols.rs",
+     "crates/test-utils/src/minicore.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/lang_item.rs",
+     "ranges": [
+      [
+       111,
+       112
+      ],
+      [
+       398,
+       407
+      ],
+      [
+       866,
+       869
+      ],
+      [
+       1065,
+       1065
+      ]
+     ]
+    },
+    {
+     "file": "crates/intern/src/symbol/symbols.rs",
+     "ranges": [
+      [
+       478,
+       478
+      ]
+     ]
+    },
+    {
+     "file": "crates/test-utils/src/minicore.rs",
+     "ranges": [
+      [
+       1320,
+       1320
+      ],
+      [
+       1328,
+       1328
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3912,
+   "case": {
+    "id": "rust-analyzer-6faf0946af",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "6faf0946af2b1f9d2ce2e71e66761f22ae1b001c",
+    "parent": "946b80a756ac1a1ef8882ec65e4f3199e38a23c7",
+    "files": [
+     "crates/hir-def/src/lang_item.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/lang_item.rs",
+     "ranges": [
+      [
+       5,
+       5
+      ],
+      [
+       133,
+       134
+      ],
+      [
+       1058,
+       1113
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1560,
+   "case": {
+    "id": "rust-analyzer-8b3333ac0a",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "8b3333ac0aef7c691455cc2ab8695ac354b69055",
+    "parent": "aa198229289901e5718e7c0a8d4115638cc1900c",
+    "files": [
+     "crates/project-model/src/cargo_config_file.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/project-model/src/cargo_config_file.rs",
+     "ranges": [
+      [
+       199,
+       200
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3912,
+   "case": {
+    "id": "rust-analyzer-93815ce823",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "93815ce82374ff63954f520c4ac84ede9198432c",
+    "parent": "db89bd286f5dd47c0b38a6ac5a1d04588627725d",
+    "files": [
+     "crates/hir-def/src/attrs.rs",
+     "crates/ide/src/hover/tests.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/attrs.rs",
+     "ranges": [
+      [
+       1414,
+       1414
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide/src/hover/tests.rs",
+     "ranges": [
+      [
+       9583,
+       9583
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3904,
+   "case": {
+    "id": "rust-analyzer-d22086e60f",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "d22086e60f5fe53077dfe460c8b813116440b3e5",
+    "parent": "88dd3e021004e84f0faa9da7dfba138ecfa0ded8",
+    "files": [
+     "crates/hir-ide/src/tests/traits.rs",
+     "crates/hir-ty/src/next_solver/solver.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ide/src/tests/traits.rs",
+     "ranges": [
+      [
+       1425,
+       1425
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/solver.rs",
+     "ranges": [
+      [
+       100,
+       100
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3911,
+   "case": {
+    "id": "rust-analyzer-f7a5bf4c1d",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "f7a5bf4c1daa00c04b126855ad7005ae9634ab25",
+    "parent": "946b80a756ac1a1ef8882ec65e4f3199e38a23c7",
+    "files": [
+     "crates/paths/src/lib.rs",
+     "crates/rust-analyzer/src/main_loop.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/paths/src/lib.rs",
+     "ranges": [
+      [
+       311,
+       316
+      ]
+     ]
+    },
+    {
+     "file": "crates/rust-analyzer/src/main_loop.rs",
+     "ranges": [
+      [
+       1037,
+       1037
+      ],
+      [
+       1042,
+       1045
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 731,
+   "case": {
+    "id": "rust-analyzer-326b55c0ce",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "326b55c0ce6297f6e2cc122a261a641f9229ed00",
+    "parent": "946b80a756ac1a1ef8882ec65e4f3199e38a23c7",
+    "files": [
+     "crates/stdx/src/thread/pool.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/stdx/src/thread/pool.rs",
+     "ranges": [
+      [
+       40,
+       40
+      ],
+      [
+       71,
+       71
+      ],
+      [
+       94,
+       94
+      ],
+      [
+       139,
+       139
+      ],
+      [
+       148,
+       148
+      ],
+      [
+       154,
+       278
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1112,
+   "case": {
+    "id": "rust-analyzer-c25895e6cc",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "c25895e6cc3a4e40c2dfe97f9529d78a6c27da85",
+    "parent": "fdfe2fe648465b33792aec8765a77e43d20cf471",
+    "files": [
+     "crates/parser/src/grammar/items.rs",
+     "crates/parser/src/grammar/patterns.rs",
+     "crates/parser/src/parser.rs",
+     "crates/parser/test_data/parser/inline/ok/deref_pat.rs"
+    ],
+    "eligibleFiles": 9
+   },
+   "changed": [
+    {
+     "file": "crates/parser/src/grammar/items.rs",
+     "ranges": [
+      [
+       296,
+       296
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/src/grammar/patterns.rs",
+     "ranges": [
+      [
+       215,
+       215
+      ],
+      [
+       218,
+       218
+      ],
+      [
+       223,
+       223
+      ],
+      [
+       251,
+       252
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/src/parser.rs",
+     "ranges": [
+      [
+       192,
+       196
+      ],
+      [
+       263,
+       293
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/test_data/parser/inline/ok/deref_pat.rs",
+     "ranges": [
+      [
+       2,
+       2
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3907,
+   "case": {
+    "id": "rust-analyzer-fdfe2fe648",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "fdfe2fe648465b33792aec8765a77e43d20cf471",
+    "parent": "b664fd5c7e7055c9569960f7fe73f21c7d00c9cd",
+    "files": [
+     "crates/hir-def/src/macro_expansion_tests/mbe/regression.rs",
+     "crates/parser/test_data/parser/inline/ok/asm_keyword_name.rs",
+     "crates/parser/test_data/parser/inline/ok/offset_of_parens.rs",
+     "crates/syntax/src/ast/generated/nodes.rs"
+    ],
+    "eligibleFiles": 36
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/macro_expansion_tests/mbe/regression.rs",
+     "ranges": [
+      [
+       1030,
+       1030
+      ],
+      [
+       1064,
+       1064
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/test_data/parser/inline/ok/asm_keyword_name.rs",
+     "ranges": [
+      [
+       2,
+       2
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/test_data/parser/inline/ok/offset_of_parens.rs",
+     "ranges": [
+      [
+       2,
+       2
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/generated/nodes.rs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2407,
+   "case": {
+    "id": "rust-analyzer-40137ad364",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "40137ad3646aa201e8f5a2ff9aaac3d54f0dca58",
+    "parent": "b664fd5c7e7055c9569960f7fe73f21c7d00c9cd",
+    "files": [
+     "crates/ide-db/src/generated/lints.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-db/src/generated/lints.rs",
+     "ranges": [
+      [
+       3634,
+       3649
+      ],
+      [
+       12373,
+       12388
+      ],
+      [
+       13613,
+       13613
+      ],
+      [
+       14166,
+       14166
+      ],
+      [
+       14168,
+       14168
+      ],
+      [
+       17500,
+       17500
+      ],
+      [
+       18148,
+       18148
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3925,
+   "case": {
+    "id": "rust-analyzer-bf74b398f7",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "bf74b398f74f3d208b22b452401168e42e3b5728",
+    "parent": "813278fbf38d68d0fed30d10711ae13e64339c7c",
+    "files": [
+     "crates/hir-ty/src/next_solver.rs",
+     "crates/hir-ty/src/next_solver/consts/int.rs",
+     "crates/hir-ty/src/next_solver/consts/valtree.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/next_solver.rs",
+     "ranges": [
+      [
+       101,
+       105
+      ],
+      [
+       166,
+       171
+      ],
+      [
+       261,
+       261
+      ],
+      [
+       265,
+       266
+      ],
+      [
+       286,
+       286
+      ],
+      [
+       306,
+       315
+      ],
+      [
+       334,
+       334
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/int.rs",
+     "ranges": [
+      [
+       4,
+       5
+      ],
+      [
+       136,
+       136
+      ],
+      [
+       202,
+       202
+      ],
+      [
+       241,
+       266
+      ],
+      [
+       378,
+       437
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/valtree.rs",
+     "ranges": [
+      [
+       13,
+       13
+      ],
+      [
+       326,
+       326
+      ],
+      [
+       343,
+       343
+      ],
+      [
+       349,
+       357
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2914,
+   "case": {
+    "id": "rust-analyzer-9c5d977f6b",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "9c5d977f6b054dde749869c08cb4b4f1a4fe54c0",
+    "parent": "6617c984a114e8189c81905f3b85763f3ed6992a",
+    "files": [
+     "crates/hir-ty/src/infer/closure/analysis.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/infer/closure/analysis.rs",
+     "ranges": [
+      [
+       1459,
+       1461
+      ],
+      [
+       1463,
+       1465
+      ],
+      [
+       1468,
+       1468
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3924,
+   "case": {
+    "id": "rust-analyzer-813278fbf3",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "813278fbf38d68d0fed30d10711ae13e64339c7c",
+    "parent": "2c3ebf6d10266a56e06e7cd6e551aa720d7cd6e8",
+    "files": [
+     "crates/hir-ty/src/next_solver/consts.rs",
+     "crates/hir-ty/src/next_solver/consts/int.rs",
+     "crates/hir-ty/src/next_solver/consts/valtree.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/next_solver/consts.rs",
+     "ranges": [
+      [
+       3,
+       3
+      ],
+      [
+       29,
+       29
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/int.rs",
+     "ranges": [
+      [
+       1,
+       392
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/valtree.rs",
+     "ranges": [
+      [
+       1,
+       1
+      ],
+      [
+       13,
+       13
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2818,
+   "case": {
+    "id": "rust-analyzer-2c3ebf6d10",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "2c3ebf6d10266a56e06e7cd6e551aa720d7cd6e8",
+    "parent": "8cbebb0c2c23562b11e4d56efb85ca457c758b2f",
+    "files": [
+     "crates/hir-ty/src/next_solver/consts.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/next_solver/consts.rs",
+     "ranges": [
+      [
+       51,
+       51
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2192,
+   "case": {
+    "id": "rust-analyzer-19a9829702",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "19a982970240f7c0c8da34d8c709f281772a13de",
+    "parent": "114dcb8d6f50aca1ef14d67b831a7560362f8f69",
+    "files": [
+     "crates/ide-completion/src/completions/postfix.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions/postfix.rs",
+     "ranges": [
+      [
+       308,
+       308
+      ],
+      [
+       312,
+       312
+      ],
+      [
+       546,
+       570
+      ],
+      [
+       1527,
+       1560
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2810,
+   "case": {
+    "id": "rust-analyzer-a359630e7b",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "a359630e7b1aa9aea49b48022d7d4ef10c219c56",
+    "parent": "8cbebb0c2c23562b11e4d56efb85ca457c758b2f",
+    "files": [
+     "crates/hir-ty/src/lower.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/lower.rs",
+     "ranges": [
+      [
+       1263,
+       1268
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3908,
+   "case": {
+    "id": "rust-analyzer-e2b9a8814b",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "e2b9a8814b7124cb92a70a1c7e89d0ccc2aed24f",
+    "parent": "919f0f9ccbb6a7464488aa40fc572757029f3ff5",
+    "files": [
+     "crates/ide-assists/src/handlers/unqualify_method_call.rs",
+     "crates/syntax/src/ast/node_ext.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/unqualify_method_call.rs",
+     "ranges": [
+      [
+       85,
+       85
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/node_ext.rs",
+     "ranges": [
+      [
+       367,
+       367
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3246,
+   "case": {
+    "id": "rust-analyzer-919f0f9ccb",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "919f0f9ccbb6a7464488aa40fc572757029f3ff5",
+    "parent": "7388eeb4c0a96c3c0f5caa305ab0a611ca8fd93d",
+    "files": [
+     "crates/ide-completion/src/completions.rs",
+     "crates/ide-completion/src/context.rs",
+     "crates/ide-completion/src/context/analysis.rs",
+     "crates/ide-completion/src/tests/type_pos.rs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions.rs",
+     "ranges": [
+      [
+       764,
+       764
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/context.rs",
+     "ranges": [
+      [
+       216,
+       217
+      ],
+      [
+       249,
+       249
+      ],
+      [
+       273,
+       273
+      ],
+      [
+       292,
+       298
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/context/analysis.rs",
+     "ranges": [
+      [
+       1347,
+       1349
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/tests/type_pos.rs",
+     "ranges": [
+      [
+       1763,
+       1818
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3907,
+   "case": {
+    "id": "rust-analyzer-7388eeb4c0",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "7388eeb4c0a96c3c0f5caa305ab0a611ca8fd93d",
+    "parent": "8ba7bef996a21ee8157d13f141b0525b092a9872",
+    "files": [
+     "crates/ide-assists/src/utils.rs",
+     "crates/syntax/src/ast/generated/nodes.rs",
+     "crates/syntax/src/ast/node_ext.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/utils.rs",
+     "ranges": [
+      [
+       724,
+       724
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/generated/nodes.rs",
+     "ranges": []
+    },
+    {
+     "file": "crates/syntax/src/ast/node_ext.rs",
+     "ranges": [
+      [
+       368,
+       369
+      ],
+      [
+       553,
+       577
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2921,
+   "case": {
+    "id": "rust-analyzer-562c522aae",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "562c522aae03415538fda0c018c534f718b86638",
+    "parent": "ae3da33e2509fce80c5f2499ea775b7415bbbf59",
+    "files": [
+     "crates/ide-completion/src/completions.rs",
+     "crates/ide-completion/src/completions/item_list.rs",
+     "crates/ide-completion/src/tests/item_list.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions.rs",
+     "ranges": [
+      [
+       687,
+       687
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/completions/item_list.rs",
+     "ranges": [
+      [
+       75,
+       84
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/tests/item_list.rs",
+     "ranges": [
+      [
+       199,
+       230
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 415,
+   "case": {
+    "id": "rust-analyzer-9fc6e21e3b",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "9fc6e21e3bc866a523d1fce174cc7e2158b4d3ab",
+    "parent": "ae3da33e2509fce80c5f2499ea775b7415bbbf59",
+    "files": [
+     "crates/stdx/src/thin_map.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/stdx/src/thin_map.rs",
+     "ranges": [
+      [
+       883,
+       898
+      ],
+      [
+       901,
+       902
+      ],
+      [
+       904,
+       904
+      ],
+      [
+       997,
+       997
+      ],
+      [
+       1004,
+       1004
+      ],
+      [
+       1012,
+       1012
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 693,
+   "case": {
+    "id": "rust-analyzer-c2307aba42",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "c2307aba4203ce3e574df1587ba85c091119a628",
+    "parent": "9e0d1ec24eb81de12160ecfa7f31c89735bda951",
+    "files": [
+     "crates/parser/src/grammar/items.rs",
+     "crates/parser/test_data/generated/runner.rs",
+     "crates/parser/test_data/parser/inline/ok/final_assoc_fn.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/parser/src/grammar/items.rs",
+     "ranges": [
+      [
+       142,
+       149
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/test_data/generated/runner.rs",
+     "ranges": [
+      [
+       268,
+       271
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/test_data/parser/inline/ok/final_assoc_fn.rs",
+     "ranges": [
+      [
+       1,
+       3
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3829,
+   "case": {
+    "id": "rust-analyzer-8e71c85d29",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "8e71c85d297a8d8756bfd25ab8264eb0abf16f18",
+    "parent": "358380cbec3c703074140f9906703f05c6fd89d8",
+    "files": [
+     "crates/hir-ide/src/tests/consteval.rs",
+     "crates/hir-ty/src/mir/eval.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ide/src/tests/consteval.rs",
+     "ranges": [
+      [
+       296,
+       311
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/mir/eval.rs",
+     "ranges": [
+      [
+       1504,
+       1507
+      ],
+      [
+       1512,
+       1519
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1383,
+   "case": {
+    "id": "rust-analyzer-600219b72c",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "600219b72c3493417cb96d0bb83ed8eef0995f2b",
+    "parent": "358380cbec3c703074140f9906703f05c6fd89d8",
+    "files": [
+     "crates/ide-completion/src/completions/attribute/cfg.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions/attribute/cfg.rs",
+     "ranges": [
+      [
+       120,
+       122
+      ],
+      [
+       124,
+       126
+      ],
+      [
+       136,
+       136
+      ],
+      [
+       139,
+       139
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3907,
+   "case": {
+    "id": "rust-analyzer-07d48a905e",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "07d48a905eadce6989af3e087b8cb1bdfa6b6eb6",
+    "parent": "358380cbec3c703074140f9906703f05c6fd89d8",
+    "files": [
+     "crates/hir-ide/src/tests/traits.rs",
+     "crates/hir-ty/src/builtin_derive.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ide/src/tests/traits.rs",
+     "ranges": [
+      [
+       4580,
+       4603
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/builtin_derive.rs",
+     "ranges": [
+      [
+       15,
+       18
+      ],
+      [
+       25,
+       26
+      ],
+      [
+       365,
+       365
+      ],
+      [
+       372,
+       374
+      ],
+      [
+       379,
+       389
+      ],
+      [
+       391,
+       397
+      ],
+      [
+       405,
+       419
+      ],
+      [
+       422,
+       428
+      ],
+      [
+       434,
+       511
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3904,
+   "case": {
+    "id": "rust-analyzer-5bf3425151",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "5bf3425151442e9e7a56d58a2ae4bde652dd395e",
+    "parent": "e5e7830640558e323e89c831488a3172b58dc66d",
+    "files": [
+     "crates/rust-analyzer/src/cli/flags.rs",
+     "crates/rust-analyzer/src/cli/lsif.rs",
+     "crates/rust-analyzer/tests/slow-tests/support.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/rust-analyzer/src/cli/flags.rs",
+     "ranges": [
+      [
+       181,
+       183
+      ],
+      [
+       338,
+       338
+      ]
+     ]
+    },
+    {
+     "file": "crates/rust-analyzer/src/cli/lsif.rs",
+     "ranges": [
+      [
+       296,
+       297
+      ]
+     ]
+    },
+    {
+     "file": "crates/rust-analyzer/tests/slow-tests/support.rs",
+     "ranges": [
+      [
+       122,
+       122
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 499,
+   "case": {
+    "id": "rust-analyzer-ed52f2c552",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "ed52f2c5526d063b9d7f4a6a00cda5ade59d75e6",
+    "parent": "e5e7830640558e323e89c831488a3172b58dc66d",
+    "files": [
+     "crates/ide-completion/src/completions/attribute/repr.rs",
+     "crates/ide-completion/src/tests/attribute.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions/attribute/repr.rs",
+     "ranges": [
+      [
+       59,
+       59
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/tests/attribute.rs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3905,
+   "case": {
+    "id": "rust-analyzer-da0779174b",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "da0779174bcc5eb7acabcd9572b6980852fcc4f1",
+    "parent": "81e052e9627381b681744419ea1cf87e2888bd0d",
+    "files": [
+     "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "crates/syntax/src/ast/syntax_factory/constructors.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "ranges": [
+      [
+       88,
+       88
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/syntax_factory/constructors.rs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3908,
+   "case": {
+    "id": "rust-analyzer-42f4f85858",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "42f4f8585806bdddf81670df6f2321b2e006a9f5",
+    "parent": "fde5133f7d116dd81f33f71bd0d389c768c7bd58",
+    "files": [
+     "crates/hir-ty/src/lower/diagnostics.rs",
+     "crates/hir-ty/src/lower/path.rs",
+     "crates/hir/src/diagnostics.rs",
+     "crates/ide-diagnostics/src/handlers/unresolved_associated_type.rs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/lower/diagnostics.rs",
+     "ranges": [
+      [
+       85,
+       87
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/lower/path.rs",
+     "ranges": [
+      [
+       502,
+       504
+      ],
+      [
+       525,
+       527
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir/src/diagnostics.rs",
+     "ranges": [
+      [
+       214,
+       214
+      ],
+      [
+       743,
+       747
+      ],
+      [
+       2091,
+       2095
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-diagnostics/src/handlers/unresolved_associated_type.rs",
+     "ranges": [
+      [
+       1,
+       51
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3907,
+   "case": {
+    "id": "rust-analyzer-3493a278aa",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "3493a278aafbad2b166338d2ef8db785ff52751a",
+    "parent": "9d693f48a24dad840478c65f04e94f4d7c2be445",
+    "files": [
+     "crates/hir-ty/src/target_feature/generated.rs",
+     "xtask/src/codegen/target_features.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/target_feature/generated.rs",
+     "ranges": [
+      [
+       9,
+       9
+      ]
+     ]
+    },
+    {
+     "file": "xtask/src/codegen/target_features.rs",
+     "ranges": [
+      [
+       30,
+       30
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3906,
+   "case": {
+    "id": "rust-analyzer-9d693f48a2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "9d693f48a24dad840478c65f04e94f4d7c2be445",
+    "parent": "91f2c17c55643bc5e0fff2fb14938fc2da409184",
+    "files": [
+     "crates/hir-ty/src/target_feature/generated.rs",
+     "crates/ide-db/src/generated/lints.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/target_feature/generated.rs",
+     "ranges": [
+      [
+       23,
+       23
+      ],
+      [
+       111,
+       115
+      ],
+      [
+       182,
+       188
+      ],
+      [
+       368,
+       370
+      ],
+      [
+       379,
+       381
+      ],
+      [
+       390,
+       392
+      ],
+      [
+       404,
+       408
+      ],
+      [
+       470,
+       474
+      ],
+      [
+       488,
+       492
+      ],
+      [
+       559,
+       559
+      ],
+      [
+       830,
+       834
+      ],
+      [
+       853,
+       857
+      ],
+      [
+       898,
+       903
+      ],
+      [
+       919,
+       920
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-db/src/generated/lints.rs",
+     "ranges": [
+      [
+       743,
+       749
+      ],
+      [
+       4862,
+       4862
+      ],
+      [
+       7824,
+       7839
+      ],
+      [
+       8075,
+       8090
+      ],
+      [
+       8292,
+       8305
+      ],
+      [
+       9158,
+       9173
+      ],
+      [
+       10147,
+       10162
+      ],
+      [
+       10645,
+       10660
+      ],
+      [
+       12389,
+       12404
+      ],
+      [
+       14687,
+       14702
+      ],
+      [
+       15937,
+       15952
+      ],
+      [
+       17160,
+       17175
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 769,
+   "case": {
+    "id": "rust-analyzer-81e052e962",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "81e052e9627381b681744419ea1cf87e2888bd0d",
+    "parent": "512fcb524f4047026340a27dd816b35d473b5d2b",
+    "files": [
+     "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "ranges": [
+      [
+       4,
+       4
+      ],
+      [
+       81,
+       83
+      ],
+      [
+       85,
+       86
+      ],
+      [
+       88,
+       91
+      ],
+      [
+       93,
+       93
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2511,
+   "case": {
+    "id": "rust-analyzer-512fcb524f",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "512fcb524f4047026340a27dd816b35d473b5d2b",
+    "parent": "b154535426afaa445394e195e5eba3d92c8a326d",
+    "files": [
+     "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "ranges": [
+      [
+       317,
+       384
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1376,
+   "case": {
+    "id": "rust-analyzer-4d09cc0915",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "4d09cc091561dfc32f333e85f89f5960bb63705f",
+    "parent": "f47d3ceadf8e6d1bdf6a4769b95b398931800add",
+    "files": [
+     "crates/ide-completion/src/context.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/context.rs",
+     "ranges": [
+      [
+       248,
+       254
+      ],
+      [
+       264,
+       271
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 871,
+   "case": {
+    "id": "rust-analyzer-f47d3ceadf",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "f47d3ceadf8e6d1bdf6a4769b95b398931800add",
+    "parent": "5998f6f8825550786f9e70f7011aeb7ac5cccc5b",
+    "files": [
+     "crates/ide-completion/src/completions/item_list/trait_impl.rs",
+     "crates/ide-completion/src/completions/type.rs",
+     "crates/ide-completion/src/context.rs",
+     "crates/ide-completion/src/tests/item.rs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions/item_list/trait_impl.rs",
+     "ranges": []
+    },
+    {
+     "file": "crates/ide-completion/src/completions/type.rs",
+     "ranges": [
+      [
+       41,
+       42
+      ],
+      [
+       46,
+       46
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/context.rs",
+     "ranges": [
+      [
+       252,
+       261
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/tests/item.rs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": "timeout",
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3908,
+   "case": {
+    "id": "rust-analyzer-b154535426",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "b154535426afaa445394e195e5eba3d92c8a326d",
+    "parent": "5998f6f8825550786f9e70f7011aeb7ac5cccc5b",
+    "files": [
+     "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "crates/syntax/src/ast/syntax_factory/constructors.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "ranges": [
+      [
+       4,
+       8
+      ],
+      [
+       50,
+       50
+      ],
+      [
+       76,
+       76
+      ],
+      [
+       83,
+       86
+      ],
+      [
+       88,
+       118
+      ],
+      [
+       250,
+       316
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/syntax_factory/constructors.rs",
+     "ranges": [
+      [
+       563,
+       563
+      ],
+      [
+       2060,
+       2071
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 195,
+   "case": {
+    "id": "rust-analyzer-9c9b2f4f67",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "9c9b2f4f6765dbd253da845d7753096e72f02cc3",
+    "parent": "dd3b25827ecca0685fcea29a9eb130a32bdff61b",
+    "files": [
+     "lib/expect-test/src/lib.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "lib/expect-test/src/lib.rs",
+     "ranges": [
+      [
+       142,
+       153
+      ],
+      [
+       599,
+       599
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2305,
+   "case": {
+    "id": "rust-analyzer-bd45aafe45",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "bd45aafe4528fa255a75cb4068434b70acdfa19c",
+    "parent": "1240b71cdfc7455af2dfbc04668662ff1aa1831f",
+    "files": [
+     "crates/ide-completion/src/tests/type_pos.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/tests/type_pos.rs",
+     "ranges": [
+      [
+       1533,
+       1533
+      ],
+      [
+       1575,
+       1575
+      ],
+      [
+       1612,
+       1612
+      ],
+      [
+       1630,
+       1630
+      ],
+      [
+       1652,
+       1652
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1803,
+   "case": {
+    "id": "rust-analyzer-1240b71cdf",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "1240b71cdfc7455af2dfbc04668662ff1aa1831f",
+    "parent": "a43a4d618036a29b01924736058fe3f990407cd3",
+    "files": [
+     "crates/rust-analyzer/src/config.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/rust-analyzer/src/config.rs",
+     "ranges": [
+      [
+       643,
+       643
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1506,
+   "case": {
+    "id": "rust-analyzer-6908091738",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "6908091738c2e68916cd2ae582fc13113369b6b1",
+    "parent": "76e4943575c5056ebf09b4cdd9f78aed4e791336",
+    "files": [
+     "crates/ide-completion/src/completions/pattern.rs",
+     "crates/ide-completion/src/render.rs",
+     "crates/ide-completion/src/render/literal.rs",
+     "crates/ide-completion/src/render/pattern.rs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions/pattern.rs",
+     "ranges": [
+      [
+       98,
+       98
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/render.rs",
+     "ranges": [
+      [
+       431,
+       432
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/render/literal.rs",
+     "ranges": [
+      [
+       26,
+       26
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/render/pattern.rs",
+     "ranges": [
+      [
+       51,
+       51
+      ],
+      [
+       59,
+       62
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2623,
+   "case": {
+    "id": "rust-analyzer-76e4943575",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "76e4943575c5056ebf09b4cdd9f78aed4e791336",
+    "parent": "3e4bf032e59aaea413515625d7e9029a719b6b6e",
+    "files": [
+     "crates/ide-completion/src/completions/record.rs",
+     "crates/ide-completion/src/render/literal.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions/record.rs",
+     "ranges": [
+      [
+       379,
+       379
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/render/literal.rs",
+     "ranges": [
+      [
+       66,
+       69
+      ],
+      [
+       72,
+       72
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1378,
+   "case": {
+    "id": "rust-analyzer-3e4bf032e5",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "3e4bf032e59aaea413515625d7e9029a719b6b6e",
+    "parent": "b79c3a8ddfa43331b7226bf8d10b8c61c8bffe78",
+    "files": [
+     "crates/ide-completion/src/completions.rs",
+     "crates/ide-completion/src/completions/expr.rs",
+     "crates/ide-completion/src/render/literal.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/ide-completion/src/completions.rs",
+     "ranges": [
+      [
+       497,
+       497
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/completions/expr.rs",
+     "ranges": [
+      [
+       261,
+       263
+      ],
+      [
+       270,
+       270
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/render/literal.rs",
+     "ranges": [
+      [
+       31,
+       37
+      ],
+      [
+       44,
+       44
+      ],
+      [
+       48,
+       48
+      ],
+      [
+       55,
+       55
+      ],
+      [
+       66,
+       70
+      ],
+      [
+       72,
+       73
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3807,
+   "case": {
+    "id": "rust-analyzer-f438e89e24",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "f438e89e2475c7afbbccaf031b1f545a2fc3bfd7",
+    "parent": "5f9a659c200b9c0ff9f205edf5157d636062256f",
+    "files": [
+     "crates/ide-assists/src/handlers/destructure_struct_binding.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/destructure_struct_binding.rs",
+     "ranges": [
+      [
+       69,
+       69
+      ],
+      [
+       77,
+       77
+      ],
+      [
+       85,
+       85
+      ],
+      [
+       95,
+       95
+      ],
+      [
+       103,
+       105
+      ],
+      [
+       116,
+       118
+      ],
+      [
+       125,
+       125
+      ],
+      [
+       163,
+       164
+      ],
+      [
+       170,
+       170
+      ],
+      [
+       226,
+       226
+      ],
+      [
+       1004,
+       1020
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2186,
+   "case": {
+    "id": "ripgrep-b674410666",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "b674410666d5aa3fd66c9d4683791ae811fe4fae",
+    "parent": "0856f3971e9f0bd987282dfec64494e9e03e860d",
+    "files": [
+     "crates/core/flags/defs.rs",
+     "crates/core/flags/hiargs.rs",
+     "tests/feature.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "ranges": [
+      [
+       7106,
+       7110
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/flags/hiargs.rs",
+     "ranges": [
+      [
+       10,
+       11
+      ],
+      [
+       172,
+       173
+      ],
+      [
+       177,
+       183
+      ],
+      [
+       186,
+       190
+      ],
+      [
+       1364,
+       1383
+      ]
+     ]
+    },
+    {
+     "file": "tests/feature.rs",
+     "ranges": [
+      [
+       621,
+       651
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2114,
+   "case": {
+    "id": "ripgrep-9c49a25894",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "9c49a258944543082630246983b373525bb9f851",
+    "parent": "574b20493bcf6f20c1aea43d4b3b9952fc3ee17f",
+    "files": [
+     "crates/printer/src/util.rs",
+     "tests/regression.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/printer/src/util.rs",
+     "ranges": [
+      [
+       513,
+       513
+      ],
+      [
+       545,
+       545
+      ],
+      [
+       547,
+       549
+      ],
+      [
+       559,
+       561
+      ],
+      [
+       563,
+       563
+      ],
+      [
+       567,
+       567
+      ],
+      [
+       570,
+       581
+      ]
+     ]
+    },
+    {
+     "file": "tests/regression.rs",
+     "ranges": [
+      [
+       1876,
+       1893
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3116,
+   "case": {
+    "id": "ripgrep-f831189dc5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "f831189dc54701fe93dd8764de2c28723e744293",
+    "parent": "5302ffaeb2d8b582603f5c88bf352d4c631cf684",
+    "files": [
+     "crates/core/flags/hiargs.rs",
+     "crates/core/flags/parse.rs",
+     "tests/input.rs",
+     "tests/util.rs"
+    ],
+    "eligibleFiles": 7
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/hiargs.rs",
+     "ranges": [
+      [
+       11,
+       11
+      ],
+      [
+       19,
+       21
+      ],
+      [
+       1004,
+       1016
+      ],
+      [
+       1086,
+       1087
+      ],
+      [
+       1093,
+       1101
+      ],
+      [
+       1103,
+       1103
+      ],
+      [
+       1106,
+       1111
+      ],
+      [
+       1113,
+       1118
+      ],
+      [
+       1134,
+       1137
+      ],
+      [
+       1172,
+       1282
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/flags/parse.rs",
+     "ranges": [
+      [
+       13,
+       13
+      ],
+      [
+       230,
+       233
+      ]
+     ]
+    },
+    {
+     "file": "tests/input.rs",
+     "ranges": [
+      [
+       1,
+       252
+      ]
+     ]
+    },
+    {
+     "file": "tests/util.rs",
+     "ranges": [
+      [
+       276,
+       276
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2615,
+   "case": {
+    "id": "ripgrep-5302ffaeb2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "5302ffaeb2d8b582603f5c88bf352d4c631cf684",
+    "parent": "855d9d30b551261d82912556897d0df1fe33936e",
+    "files": [
+     "crates/core/flags/defs.rs",
+     "crates/core/flags/hiargs.rs",
+     "crates/searcher/src/searcher/mod.rs",
+     "tests/max_bytes.rs"
+    ],
+    "eligibleFiles": 7
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "ranges": [
+      [
+       94,
+       94
+      ],
+      [
+       3866,
+       3922
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/flags/hiargs.rs",
+     "ranges": [
+      [
+       67,
+       67
+      ],
+      [
+       285,
+       285
+      ],
+      [
+       732,
+       733
+      ]
+     ]
+    },
+    {
+     "file": "crates/searcher/src/searcher/mod.rs",
+     "ranges": [
+      [
+       185,
+       186
+      ],
+      [
+       206,
+       206
+      ],
+      [
+       590,
+       601
+      ],
+      [
+       705,
+       718
+      ],
+      [
+       720,
+       720
+      ],
+      [
+       788,
+       794
+      ],
+      [
+       797,
+       797
+      ],
+      [
+       1001,
+       1007
+      ],
+      [
+       1010,
+       1010
+      ],
+      [
+       1023,
+       1030
+      ]
+     ]
+    },
+    {
+     "file": "tests/max_bytes.rs",
+     "ranges": [
+      [
+       1,
+       49
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1386,
+   "case": {
+    "id": "ripgrep-855d9d30b5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "855d9d30b551261d82912556897d0df1fe33936e",
+    "parent": "d225390134dcf45fbf8d928983aca7b4bd04eda5",
+    "files": [
+     "crates/core/flags/hiargs.rs",
+     "crates/printer/src/color.rs",
+     "crates/regex/src/ban.rs",
+     "crates/regex/src/strip.rs"
+    ],
+    "eligibleFiles": 4
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/hiargs.rs",
+     "ranges": [
+      [
+       553,
+       553
+      ],
+      [
+       625,
+       625
+      ],
+      [
+       636,
+       636
+      ],
+      [
+       664,
+       664
+      ],
+      [
+       666,
+       666
+      ]
+     ]
+    },
+    {
+     "file": "crates/printer/src/color.rs",
+     "ranges": [
+      [
+       276,
+       276
+      ],
+      [
+       279,
+       279
+      ]
+     ]
+    },
+    {
+     "file": "crates/regex/src/ban.rs",
+     "ranges": [
+      [
+       15,
+       15
+      ],
+      [
+       23,
+       23
+      ],
+      [
+       33,
+       33
+      ]
+     ]
+    },
+    {
+     "file": "crates/regex/src/strip.rs",
+     "ranges": [
+      [
+       64,
+       64
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 397,
+   "case": {
+    "id": "ripgrep-b7ff405419",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "b7ff405419b89bdac46ddaa1a5237287e4356266",
+    "parent": "109c400704e514fdc5cd951011b7354f3ef528a1",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       318,
+       318
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1013,
+   "case": {
+    "id": "ripgrep-109c400704",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "109c400704e514fdc5cd951011b7354f3ef528a1",
+    "parent": "13e024427a291fc90c1d7310d00b5f6218fe3aef",
+    "files": [
+     "crates/globset/src/glob.rs",
+     "crates/globset/src/lib.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/globset/src/glob.rs",
+     "ranges": [
+      [
+       1087,
+       1099
+      ],
+      [
+       1125,
+       1164
+      ],
+      [
+       1176,
+       1195
+      ],
+      [
+       1402,
+       1419
+      ],
+      [
+       1742,
+       1785
+      ]
+     ]
+    },
+    {
+     "file": "crates/globset/src/lib.rs",
+     "ranges": [
+      [
+       87,
+       91
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 388,
+   "case": {
+    "id": "ripgrep-13e024427a",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "13e024427a291fc90c1d7310d00b5f6218fe3aef",
+    "parent": "96cc4fb8018301a75d2bae8dc14859cb12c67873",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       38,
+       38
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 426,
+   "case": {
+    "id": "ripgrep-96cc4fb801",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "96cc4fb8018301a75d2bae8dc14859cb12c67873",
+    "parent": "4065a9e951fd820ef64818d77eb95de7163cbdf0",
+    "files": [
+     "crates/printer/src/hyperlink/aliases.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/printer/src/hyperlink/aliases.rs",
+     "ranges": [
+      [
+       68,
+       69
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 170,
+   "case": {
+    "id": "ripgrep-4065a9e951",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "4065a9e951fd820ef64818d77eb95de7163cbdf0",
+    "parent": "3860ead1e5b8ea614ef417b28f8e0ab869ab91f4",
+    "files": [
+     "crates/cli/src/decompress.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/cli/src/decompress.rs",
+     "ranges": [
+      [
+       597,
+       604
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2078,
+   "case": {
+    "id": "ripgrep-3860ead1e5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "3860ead1e5b8ea614ef417b28f8e0ab869ab91f4",
+    "parent": "a75574dea43e7d8a9ae8058d186081825dc7d8c9",
+    "files": [
+     "crates/printer/src/json.rs",
+     "tests/json.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/printer/src/json.rs",
+     "ranges": [
+      [
+       250,
+       252
+      ],
+      [
+       548,
+       548
+      ],
+      [
+       717,
+       760
+      ],
+      [
+       783,
+       783
+      ],
+      [
+       930,
+       938
+      ]
+     ]
+    },
+    {
+     "file": "tests/json.rs",
+     "ranges": [
+      [
+       155,
+       353
+      ],
+      [
+       601,
+       601
+      ],
+      [
+       604,
+       615
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 392,
+   "case": {
+    "id": "ripgrep-a75574dea4",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "a75574dea43e7d8a9ae8058d186081825dc7d8c9",
+    "parent": "4fc2543538913ca5f912e0c3a4c48267f6296f92",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       160,
+       167
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 399,
+   "case": {
+    "id": "ripgrep-f6e762317b",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "f6e762317bc2482149f482edfa4175633e169293",
+    "parent": "9b90d7c75615d819b08c182ec05a50384b4d2848",
+    "files": [
+     "crates/ignore/src/lib.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/lib.rs",
+     "ranges": [
+      [
+       195,
+       195
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 275,
+   "case": {
+    "id": "ripgrep-4961cab7c2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "4961cab7c2b31106e03b1925c1600d3f16582bf8",
+    "parent": "8447171eac5e0ee52078918d0e367a2686bb0a74",
+    "files": [
+     "crates/cli/src/decompress.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/cli/src/decompress.rs",
+     "ranges": [
+      [
+       646,
+       739
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1061,
+   "case": {
+    "id": "ripgrep-8447171eac",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "8447171eac5e0ee52078918d0e367a2686bb0a74",
+    "parent": "248ec5d50573f25117ae3a65a74658f1870a6920",
+    "files": [
+     "crates/core/flags/defs.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "ranges": [
+      [
+       6105,
+       6109
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1269,
+   "case": {
+    "id": "ripgrep-248ec5d505",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "248ec5d50573f25117ae3a65a74658f1870a6920",
+    "parent": "8bc7a7a6b56038a9d58b15febdf3d8ac6b6f15da",
+    "files": [
+     "crates/core/flags/complete/nushell.rs",
+     "crates/core/flags/defs.rs",
+     "crates/core/flags/mod.rs",
+     "crates/core/main.rs"
+    ],
+    "eligibleFiles": 6
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/complete/nushell.rs",
+     "ranges": [
+      [
+       1,
+       78
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/flags/defs.rs",
+     "ranges": [
+      [
+       2439,
+       2441
+      ],
+      [
+       2453,
+       2453
+      ],
+      [
+       2464,
+       2464
+      ],
+      [
+       2493,
+       2495
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/flags/mod.rs",
+     "ranges": [
+      [
+       22,
+       22
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/main.rs",
+     "ranges": [
+      [
+       375,
+       375
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 824,
+   "case": {
+    "id": "ripgrep-8bc7a7a6b5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "8bc7a7a6b56038a9d58b15febdf3d8ac6b6f15da",
+    "parent": "190b87ea6c473e844664cb47f5781efc2e396e19",
+    "files": [
+     "crates/ignore/src/gitignore.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/gitignore.rs",
+     "ranges": [
+      [
+       336,
+       363
+      ],
+      [
+       521,
+       521
+      ],
+      [
+       930,
+       930
+      ],
+      [
+       956,
+       977
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 398,
+   "case": {
+    "id": "ripgrep-190b87ea6c",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "190b87ea6c473e844664cb47f5781efc2e396e19",
+    "parent": "76b7708a797f84a9c8c781854358dadd08ad536b",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       217,
+       220
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2295,
+   "case": {
+    "id": "ripgrep-76b7708a79",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "76b7708a797f84a9c8c781854358dadd08ad536b",
+    "parent": "96fbf60f427d206681e013dbadb0cff962460b1d",
+    "files": [
+     "crates/cli/src/decompress.rs",
+     "crates/core/search.rs",
+     "tests/misc.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/cli/src/decompress.rs",
+     "ranges": [
+      [
+       28,
+       29
+      ],
+      [
+       142,
+       147
+      ],
+      [
+       201,
+       218
+      ],
+      [
+       271,
+       319
+      ],
+      [
+       407,
+       428
+      ],
+      [
+       458,
+       469
+      ],
+      [
+       606,
+       611
+      ],
+      [
+       621,
+       621
+      ],
+      [
+       631,
+       643
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/search.rs",
+     "ranges": [
+      [
+       264,
+       265
+      ],
+      [
+       341,
+       372
+      ]
+     ]
+    },
+    {
+     "file": "tests/misc.rs",
+     "ranges": [
+      [
+       977,
+       1008
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 263,
+   "case": {
+    "id": "ripgrep-96fbf60f42",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "96fbf60f427d206681e013dbadb0cff962460b1d",
+    "parent": "203b24c62906aa0db9418719b3b12e89694efd93",
+    "files": [
+     "crates/searcher/src/searcher/mod.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/searcher/src/searcher/mod.rs",
+     "ranges": [
+      [
+       730,
+       730
+      ],
+      [
+       737,
+       754
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 606,
+   "case": {
+    "id": "ripgrep-203b24c629",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "203b24c62906aa0db9418719b3b12e89694efd93",
+    "parent": "02baf1e5bf47526aa9b12a2ee241fdce152ca183",
+    "files": [
+     "crates/core/flags/doc/man.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/doc/man.rs",
+     "ranges": [
+      [
+       30,
+       31
+      ],
+      [
+       44,
+       49
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 414,
+   "case": {
+    "id": "ripgrep-02baf1e5bf",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "02baf1e5bf47526aa9b12a2ee241fdce152ca183",
+    "parent": "b466c0b8e53b2f59ca80e611f62f7d5a91a8be5d",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       158,
+       158
+      ],
+      [
+       252,
+       252
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2332,
+   "case": {
+    "id": "ripgrep-b466c0b8e5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "b466c0b8e53b2f59ca80e611f62f7d5a91a8be5d",
+    "parent": "a3ae2f42a5f6cdc45e850d7d8aa75b3d1c294fea",
+    "files": [
+     "crates/ignore/src/gitignore.rs",
+     "tests/regression.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/gitignore.rs",
+     "ranges": [
+      [
+       526,
+       532
+      ],
+      [
+       897,
+       905
+      ]
+     ]
+    },
+    {
+     "file": "tests/regression.rs",
+     "ranges": [
+      [
+       1839,
+       1855
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2026,
+   "case": {
+    "id": "ripgrep-a3ae2f42a5",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "a3ae2f42a5f6cdc45e850d7d8aa75b3d1c294fea",
+    "parent": "61f43ca6f29e64afc31792e94d855c6800db12dd",
+    "files": [
+     "crates/core/flags/defs.rs",
+     "tests/misc.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "ranges": [
+      [
+       77,
+       77
+      ],
+      [
+       2531,
+       2532
+      ],
+      [
+       2536,
+       2536
+      ],
+      [
+       2553,
+       2557
+      ],
+      [
+       2656,
+       2746
+      ]
+     ]
+    },
+    {
+     "file": "tests/misc.rs",
+     "ranges": [
+      [
+       337,
+       360
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1858,
+   "case": {
+    "id": "ripgrep-61f43ca6f2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "61f43ca6f29e64afc31792e94d855c6800db12dd",
+    "parent": "138deed3a84cb1e2a4fe015cc3963a00633574b1",
+    "files": [
+     "crates/core/haystack.rs",
+     "crates/core/main.rs",
+     "crates/printer/src/path.rs",
+     "crates/printer/src/util.rs"
+    ],
+    "eligibleFiles": 10
+   },
+   "changed": [
+    {
+     "file": "crates/core/haystack.rs",
+     "ranges": [
+      [
+       38,
+       38
+      ],
+      [
+       52,
+       52
+      ]
+     ]
+    },
+    {
+     "file": "crates/core/main.rs",
+     "ranges": [
+      [
+       131,
+       135
+      ],
+      [
+       205,
+       209
+      ],
+      [
+       218,
+       222
+      ]
+     ]
+    },
+    {
+     "file": "crates/printer/src/path.rs",
+     "ranges": [
+      [
+       17,
+       17
+      ],
+      [
+       27,
+       27
+      ],
+      [
+       115,
+       120
+      ],
+      [
+       160,
+       161
+      ],
+      [
+       163,
+       163
+      ],
+      [
+       167,
+       167
+      ]
+     ]
+    },
+    {
+     "file": "crates/printer/src/util.rs",
+     "ranges": [
+      [
+       4,
+       4
+      ],
+      [
+       292,
+       292
+      ],
+      [
+       306,
+       306
+      ],
+      [
+       311,
+       321
+      ],
+      [
+       353,
+       357
+      ],
+      [
+       385,
+       403
+      ],
+      [
+       645,
+       664
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 751,
+   "case": {
+    "id": "ripgrep-138deed3a8",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "138deed3a84cb1e2a4fe015cc3963a00633574b1",
+    "parent": "ac063229eb02e50448cc53ed5410ddb4e6002b07",
+    "files": [
+     "crates/ignore/src/walk.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/walk.rs",
+     "ranges": [
+      [
+       2167,
+       2167
+      ],
+      [
+       2173,
+       2188
+      ],
+      [
+       3032,
+       3050
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 896,
+   "case": {
+    "id": "ripgrep-42a4be1cb3",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "42a4be1cb373deb0683b638ac0de120c2963af14",
+    "parent": "4e588dd8b27693797984a71ee62aea1a9013c23b",
+    "files": [
+     "crates/ignore/src/dir.rs",
+     "crates/ignore/src/walk.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/dir.rs",
+     "ranges": [
+      [
+       90,
+       98
+      ],
+      [
+       212,
+       212
+      ],
+      [
+       215,
+       217
+      ],
+      [
+       767,
+       773
+      ],
+      [
+       848,
+       848
+      ],
+      [
+       1000,
+       1007
+      ]
+     ]
+    },
+    {
+     "file": "crates/ignore/src/walk.rs",
+     "ranges": [
+      [
+       780,
+       783
+      ],
+      [
+       2095,
+       2103
+      ],
+      [
+       2712,
+       2782
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 407,
+   "case": {
+    "id": "ripgrep-4e588dd8b2",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "4e588dd8b27693797984a71ee62aea1a9013c23b",
+    "parent": "fe7856312065079a3fbd996add8e139dd2de370a",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       197,
+       197
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 402,
+   "case": {
+    "id": "ripgrep-9da8cc711e",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "9da8cc711efd9deb8eee3718509ed7acd1a132bb",
+    "parent": "e2b508de363c9f16fff2a6bb50e8692287cba015",
+    "files": [
+     "crates/ignore/src/gitignore.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/gitignore.rs",
+     "ranges": [
+      [
+       233,
+       238
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1975,
+   "case": {
+    "id": "ripgrep-e2b508de36",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "e2b508de363c9f16fff2a6bb50e8692287cba015",
+    "parent": "97059eacb64e6cd09a11ed362f7d54e7b2a7cd29",
+    "files": [
+     "crates/regex/src/config.rs",
+     "crates/regex/src/matcher.rs",
+     "crates/searcher/src/searcher/core.rs",
+     "tests/regression.rs"
+    ],
+    "eligibleFiles": 4
+   },
+   "changed": [
+    {
+     "file": "crates/regex/src/config.rs",
+     "ranges": [
+      [
+       243,
+       243
+      ],
+      [
+       256,
+       265
+      ]
+     ]
+    },
+    {
+     "file": "crates/regex/src/matcher.rs",
+     "ranges": [
+      [
+       624,
+       645
+      ]
+     ]
+    },
+    {
+     "file": "crates/searcher/src/searcher/core.rs",
+     "ranges": []
+    },
+    {
+     "file": "tests/regression.rs",
+     "ranges": [
+      [
+       1507,
+       1523
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 204,
+   "case": {
+    "id": "ripgrep-97059eacb6",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "97059eacb64e6cd09a11ed362f7d54e7b2a7cd29",
+    "parent": "41d3959a80570725e8c7ac887099721718ee4bc4",
+    "files": [
+     "crates/cli/src/human.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/cli/src/human.rs",
+     "ranges": [
+      [
+       82,
+       82
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1648,
+   "case": {
+    "id": "ripgrep-41d3959a80",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "41d3959a80570725e8c7ac887099721718ee4bc4",
+    "parent": "5cc1d69c51d154b135e2581fbee8908ae306c9e3",
+    "files": [
+     "crates/globset/src/glob.rs",
+     "crates/ignore/src/gitignore.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/globset/src/glob.rs",
+     "ranges": [
+      [
+       747,
+       764
+      ],
+      [
+       766,
+       789
+      ],
+      [
+       791,
+       791
+      ],
+      [
+       1512,
+       1515
+      ],
+      [
+       1576,
+       1576
+      ],
+      [
+       1776,
+       1800
+      ]
+     ]
+    },
+    {
+     "file": "crates/ignore/src/gitignore.rs",
+     "ranges": [
+      [
+       884,
+       900
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 440,
+   "case": {
+    "id": "ripgrep-5cc1d69c51",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "5cc1d69c51d154b135e2581fbee8908ae306c9e3",
+    "parent": "144ea1e95d73ae79ffa3fd839f2c6b67c5416d28",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       194,
+       194
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 606,
+   "case": {
+    "id": "ripgrep-144ea1e95d",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "144ea1e95d73ae79ffa3fd839f2c6b67c5416d28",
+    "parent": "586b81c07cc75c87d9fc0bd45eb693865b61bfda",
+    "files": [
+     "crates/printer/src/hyperlink/mod.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/printer/src/hyperlink/mod.rs",
+     "ranges": [
+      [
+       898,
+       900
+      ],
+      [
+       902,
+       908
+      ],
+      [
+       910,
+       929
+      ],
+      [
+       932,
+       934
+      ],
+      [
+       1134,
+       1144
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 214,
+   "case": {
+    "id": "ripgrep-586b81c07c",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "586b81c07cc75c87d9fc0bd45eb693865b61bfda",
+    "parent": "0c8f5f1a89675ab52af49025bf4794091fc6232f",
+    "files": [
+     "crates/globset/src/lib.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/globset/src/lib.rs",
+     "ranges": [
+      [
+       84,
+       84
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 232,
+   "case": {
+    "id": "ripgrep-0c8f5f1a89",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "0c8f5f1a89675ab52af49025bf4794091fc6232f",
+    "parent": "b01c1f46e69c85ded372dfc21078081e3f9aa7b2",
+    "files": [
+     "crates/searcher/src/sink.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/searcher/src/sink.rs",
+     "ranges": [
+      [
+       107,
+       107
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 972,
+   "case": {
+    "id": "ripgrep-b01c1f46e6",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "b01c1f46e69c85ded372dfc21078081e3f9aa7b2",
+    "parent": "4d592f1cdcbcc5ff3bf814c695204ca3fb62a722",
+    "files": [
+     "crates/core/flags/defs.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "ranges": [
+      [
+       5032,
+       5032
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1896,
+   "case": {
+    "id": "ripgrep-4d592f1cdc",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "4d592f1cdcbcc5ff3bf814c695204ca3fb62a722",
+    "parent": "e9e0a3ae4cc27ef527d27b427b0372addf35c5be",
+    "files": [
+     "crates/core/main.rs",
+     "tests/regression.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/core/main.rs",
+     "ranges": [
+      [
+       190,
+       199
+      ]
+     ]
+    },
+    {
+     "file": "tests/regression.rs",
+     "ranges": [
+      [
+       2,
+       2
+      ],
+      [
+       1803,
+       1858
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 407,
+   "case": {
+    "id": "ripgrep-dda5dac8b1",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "dda5dac8b103ae811dcc4f3408c3ae4c9ed05d92",
+    "parent": "e082e98b66bd7625d196e1696d33d113dd584264",
+    "files": [
+     "crates/ignore/src/default_types.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/default_types.rs",
+     "ranges": [
+      [
+       236,
+       236
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 164,
+   "case": {
+    "id": "ripgrep-e082e98b66",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "e082e98b66bd7625d196e1696d33d113dd584264",
+    "parent": "05f8e5a7353273540e494670e689ce5d60f925f2",
+    "files": [
+     "crates/cli/src/hostname.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/cli/src/hostname.rs",
+     "ranges": [
+      [
+       50,
+       50
+      ],
+      [
+       54,
+       55
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 457,
+   "case": {
+    "id": "ripgrep-05f8e5a735",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "05f8e5a7353273540e494670e689ce5d60f925f2",
+    "parent": "9ca85a37539f0f7d3246f2baf62fcd583aecb940",
+    "files": [
+     "crates/searcher/src/lines.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/searcher/src/lines.rs",
+     "ranges": [
+      [
+       78,
+       95
+      ],
+      [
+       252,
+       259
+      ],
+      [
+       361,
+       406
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2326,
+   "case": {
+    "id": "ripgrep-9ca85a3753",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "9ca85a37539f0f7d3246f2baf62fcd583aecb940",
+    "parent": "e8b49b6758d49d67428d3510e3fc4270515f2b11",
+    "files": [
+     "crates/ignore/src/walk.rs",
+     "tests/regression.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/walk.rs",
+     "ranges": [
+      [
+       424,
+       445
+      ],
+      [
+       1242,
+       1257
+      ],
+      [
+       1933,
+       1937
+      ],
+      [
+       2853,
+       2936
+      ]
+     ]
+    },
+    {
+     "file": "tests/regression.rs",
+     "ranges": [
+      [
+       1803,
+       1840
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2211,
+   "case": {
+    "id": "ripgrep-e8b49b6758",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "e8b49b6758d49d67428d3510e3fc4270515f2b11",
+    "parent": "43fc97d43a4c61d65e7d74d4110c8480fe42ea5b",
+    "files": [
+     "crates/ignore/src/gitignore.rs",
+     "crates/ignore/src/overrides.rs",
+     "tests/regression.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/gitignore.rs",
+     "ranges": [
+      [
+       216,
+       222
+      ],
+      [
+       795,
+       813
+      ]
+     ]
+    },
+    {
+     "file": "crates/ignore/src/overrides.rs",
+     "ranges": [
+      [
+       269,
+       285
+      ]
+     ]
+    },
+    {
+     "file": "tests/regression.rs",
+     "ranges": [
+      [
+       1207,
+       1231
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 0,
+   "case": {
+    "id": "ripgrep-43fc97d43a",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "43fc97d43a4c61d65e7d74d4110c8480fe42ea5b",
+    "parent": "48242a714bcd711e9f7dc0450d339e3aaf4a9c0a",
+    "files": [
+     "build.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "build.rs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 921,
+   "case": {
+    "id": "ripgrep-48242a714b",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "48242a714bcd711e9f7dc0450d339e3aaf4a9c0a",
+    "parent": "1090d50bc43bb3616fac711a2a54bc2cc308d0e0",
+    "files": [
+     "crates/globset/src/glob.rs",
+     "crates/globset/src/lib.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/globset/src/glob.rs",
+     "ranges": [
+      [
+       860,
+       866
+      ],
+      [
+       1309,
+       1324
+      ]
+     ]
+    },
+    {
+     "file": "crates/globset/src/lib.rs",
+     "ranges": [
+      [
+       192,
+       193
+      ],
+      [
+       239,
+       241
+      ],
+      [
+       267,
+       267
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2210,
+   "case": {
+    "id": "ripgrep-1090d50bc4",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "1090d50bc43bb3616fac711a2a54bc2cc308d0e0",
+    "parent": "bc1bf5ee1bd35d2d68a5603b917e591a9c1c5fc6",
+    "files": [
+     "crates/ignore/src/gitignore.rs",
+     "tests/regression.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/gitignore.rs",
+     "ranges": [
+      [
+       702,
+       705
+      ],
+      [
+       707,
+       712
+      ],
+      [
+       717,
+       717
+      ],
+      [
+       903,
+       938
+      ]
+     ]
+    },
+    {
+     "file": "tests/regression.rs",
+     "ranges": [
+      [
+       1741,
+       1760
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 782,
+   "case": {
+    "id": "ripgrep-bc1bf5ee1b",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "bc1bf5ee1bd35d2d68a5603b917e591a9c1c5fc6",
+    "parent": "7fa391dd8c628db7e3689267a877dbf67bf7138c",
+    "files": [
+     "crates/globset/src/lib.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/globset/src/lib.rs",
+     "ranges": [
+      [
+       308,
+       308
+      ],
+      [
+       312,
+       318
+      ],
+      [
+       333,
+       333
+      ],
+      [
+       479,
+       479
+      ],
+      [
+       492,
+       492
+      ],
+      [
+       572,
+       572
+      ],
+      [
+       1175,
+       1184
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 412,
+   "case": {
+    "id": "ripgrep-7fa391dd8c",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "7fa391dd8c628db7e3689267a877dbf67bf7138c",
+    "parent": "7c7ffc02b0a598b4038380e676fd2233d384add2",
+    "files": [
+     "crates/printer/src/standard.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/printer/src/standard.rs",
+     "ranges": [
+      [
+       1460,
+       1462
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 794,
+   "case": {
+    "id": "ripgrep-7c7ffc02b0",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "7c7ffc02b0a598b4038380e676fd2233d384add2",
+    "parent": "4e63e9cf60b00ab3712cfd24d368a0808fedae9a",
+    "files": [
+     "crates/ignore/src/gitignore.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/ignore/src/gitignore.rs",
+     "ranges": [
+      [
+       152,
+       157
+      ],
+      [
+       160,
+       160
+      ],
+      [
+       357,
+       357
+      ],
+      [
+       919,
+       934
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1086,
+   "case": {
+    "id": "ripgrep-4e63e9cf60",
+    "repo": "ripgrep",
+    "language": "rust",
+    "commit": "4e63e9cf60b00ab3712cfd24d368a0808fedae9a",
+    "parent": "991405e86e94c2b1e00e98cc6315728694d59eda",
+    "files": [
+     "crates/core/flags/defs.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/core/flags/defs.rs",
+     "ranges": [
+      [
+       5479,
+       5480
+      ],
+      [
+       6088,
+       6090
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "timings": [],
+ "warmup": null,
+ "timingErrors": [],
+ "init": []
+}

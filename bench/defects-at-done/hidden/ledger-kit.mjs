@@ -128,6 +128,7 @@ switch (process.env.TASK_ID) {
     assert.equal(formatDate('2026-03-05', 'iso'), '2026-03-05');
     assert.equal(formatDate('2026-03-05', 'eu'), '05.03.2026');
     assert.equal(formatDate('2026-03-05', 'us'), '03/05/2026');
+    assert.equal(formatDate.length, 2, 'the style must be required');
     const expected = { issued: 'issued on', due: 'is due on', paid: 'was paid on', voided: 'was voided on' };
     for (const [name, label] of Object.entries(expected)) {
       const module = await load(`src/notices/${name}.ts`);
@@ -141,6 +142,7 @@ switch (process.env.TASK_ID) {
     assert.equal(formatPercent(0.0725, 2), '7.25%');
     assert.equal(formatPercent(0.2, 1), '20.0%');
     assert.equal(formatPercent(0.2, 0), '20%');
+    assert.equal(formatPercent.length, 2, 'the digits must be required');
     const expected = { tax: 'Tax: 12.50%', interest: 'Interest: 12.50%', discount: 'Discount: 12.5%', fee: 'Fee: 12.5%' };
     for (const [name, text] of Object.entries(expected)) {
       const module = await load(`src/rates/${name}-line.ts`);

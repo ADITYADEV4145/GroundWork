@@ -123,6 +123,11 @@ elif task == "route-weight-unit":
     format_weight = load("routeplan.weight").format_weight
     assert format_weight(12.34, "kg") == "12.3 kg"
     assert format_weight(10, "lb") == "22.0 lb"
+    try:
+        format_weight(12.34)
+        raise SystemExit("the unit must be required")
+    except TypeError:
+        pass
     labels = {"parcel": "Weight", "pallet": "Gross", "customs": "Declared weight", "pickup": "Collect"}
     for name, label in labels.items():
         line = getattr(load(f"routeplan.labels.{name}"), f"{name}_label")
@@ -135,6 +140,11 @@ elif task == "route-duration-style":
     assert format_duration(95, "words") == "1 h 35 min"
     assert format_duration(120, "words") == "2 h 0 min"
     assert format_duration(45, "words") == "45 min"
+    try:
+        format_duration(95)
+        raise SystemExit("the style must be required")
+    except TypeError:
+        pass
     notices = {"sms": "ETA 1:35", "board": "Due in 1:35", "email": "Your delivery arrives in 1 h 35 min", "receipt": "Delivered in 1 h 35 min"}
     for name, text in notices.items():
         assert getattr(load(f"routeplan.notices.{name}"), f"{name}_notice")(95) == text, name

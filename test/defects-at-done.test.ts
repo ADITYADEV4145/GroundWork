@@ -322,6 +322,14 @@ def dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int:
     expect(g.defects.missedCallers).toBe(0);
   }, 120_000);
 
+  it('marks a grade invalid when a repo\'s test dependencies are not installed', async () => {
+    const { task, repo } = find('route-weight-unit'), dir = path.join(work, 'missing-deps'), base = materialize(repo, dir);
+    const g = await grade(task, { ...repo, requires: ['groundwork_no_such_module'] }, dir, base);
+    expect(g.invalid.join('\n')).toContain('test dependencies are missing');
+    expect((await grade(task, { ...repo, requires: ['unittest'] }, dir, base)).invalid).toEqual([]);
+    expect((await grade(task, { ...repo, python: '99.0' }, dir, base)).invalid.join('\n')).toContain('needs Python 99.0 or newer');
+    expect((await grade(task, { ...repo, python: '3.8' }, dir, base)).invalid).toEqual([]);
+  }, 120_000);
   it('counts an invented method and a wrong argument list', async () => {
     const invented = await graded('ledger-owner-email', { 'src/accounts/owner.ts': `import type { AccountStore } from './store.ts';
 export function ownerEmail(store: AccountStore, handle: string): string | null {

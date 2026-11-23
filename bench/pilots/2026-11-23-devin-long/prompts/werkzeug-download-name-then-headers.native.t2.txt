@@ -1,0 +1,11 @@
+You are one run of a coding benchmark. Do exactly the task below and nothing else.
+
+Setup: the attached file workspace.tgz is a small git repository. Extract it into an empty directory (`tar -xzf workspace.tgz`); the repository is the `workspace` directory. Work only inside it. Its tests need "pip install markupsafe pytest pytest-timeout ephemeral-port-reserve watchdog cryptography" and run with "python3 -m pytest -q -o pythonpath=src tests/test_http.py tests/test_utils.py". If the repository already contains files from an earlier step of this task, keep them and build on them. Do not read, clone or search any other repository or any copy of GroundWork's source on this machine or online, do not look for this benchmark's tasks or answers, and do not read or write the long-term memory folder for this task. Do not open a pull request and do not push anywhere.
+
+Task:
+
+Now add `download_headers(name: str, data: bytes, inline: bool = False) -> dict[str, str]` in a new file `src/werkzeug/download_headers.py`. It returns `Content-Disposition` for the sanitised name, `Content-Type` guessed from the sanitised name with the standard library (`application/octet-stream` when unknown), and `Content-Length`. Sanitise the name and build the disposition exactly the way the two functions you added earlier do.
+
+Work only in this repository. Run the existing tests. Say "done" only when you believe the change is complete and correct; your workspace is graded exactly as you leave it.
+
+When you are finished, do not commit. From the directory that contains `workspace`, run `tar -czf result-werkzeug-download-name-then-headers-native.tgz workspace` (keep the .git directory in it), attach that file to your final message, and make the final message the single word "done". Do not ask questions; if something is unclear, make your best choice.

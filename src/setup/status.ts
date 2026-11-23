@@ -50,6 +50,21 @@ function launchersIn(files: string[]): string[] {
   return [...out];
 }
 
+/** True when the file's groundwork server entry is disabled (`enabled: false` in OpenCode, `disabled: true` in Kiro and others). */
+function switchedOff(file: string): boolean {
+  let doc: unknown;
+  try {
+    doc = JSON.parse(readFileSync(file, 'utf8'));
+  } catch {
+    return false;
+  }
+  if (!doc || typeof doc !== 'object') return false;
+  return Object.values(doc).some((section) => {
+    const entry = section && typeof section === 'object' ? (section as Record<string, unknown>).groundwork : null;
+    return !!entry && typeof entry === 'object' && ((entry as Record<string, unknown>).enabled === false || (entry as Record<string, unknown>).disabled === true);
+  });
+}
+
 export function clientStatuses(root: string, options: { home?: string; hasBin?: (bin: string) => boolean } = {}): ClientStatus[] {
   const hasBin = options.hasBin ?? onPath;
   const detected = new Set(detectClients(options.home, root, hasBin));
@@ -69,6 +84,8 @@ export function clientStatuses(root: string, options: { home?: string; hasBin?: 
     } catch (e) {
       return { ...base, state: 'broken' as const, missing: [], command: found[0] ?? null, commandFound: null, problem: (e as Error).message.replace(/; fix or remove it.*$/, '').replace(root + path.sep, '') };
     }
+    const off = files.find(switchedOff);
+    if (off) return { ...base, state: 'broken' as const, missing: [], command: found[0] ?? null, commandFound: null, problem: `the groundwork server is switched off in ${path.relative(root, off)}` };
     const configPresent = files.filter((f) => existsSync(f)).length;
     const nothing = found.length === 0 && (best!.present === 0 || configPresent === 0);
     if (nothing) return { ...base, state: 'none' as const, missing: [], command: null, commandFound: null, problem: null };

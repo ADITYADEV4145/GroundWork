@@ -28,6 +28,9 @@ inputs:
   token:
     description: Token used to post the comment.
     default: ${{ github.token }}
+  comment-author:
+    description: Login that posts the comment, such as my-app[bot]. Set it with a GitHub App token, whose login cannot be looked up; otherwise leave empty.
+    default: ''
 outputs:
   conclusion:
     description: pass, fail or skipped.
@@ -82,11 +85,13 @@ runs:
         GH_TOKEN: ${{ inputs.token }}
         GW_PR: ${{ github.event.pull_request.number }}
         GW_REPO: ${{ github.repository }}
+        GW_AUTHOR: ${{ inputs.comment-author }}
       run: |
         file="$RUNNER_TEMP/groundwork-comment.md"
         # One comment per pull request: update ours when it exists, remove it when the findings are gone.
         # Ours means written by this token's account; anyone can paste the marker into a comment of their own.
-        me=$(gh api user --jq .login 2>/dev/null) || me="github-actions[bot]"
+        me="$GW_AUTHOR"
+        [ -n "$me" ] || me=$(gh api user --jq .login 2>/dev/null) || me="github-actions[bot]"
         existing=$(gh api "repos/$GW_REPO/issues/$GW_PR/comments" --paginate | jq -r --arg me "$me" '.[] | select(.user.login == $me and (.body | startswith("<!-- groundwork-check -->"))) | .id' | head -n 1) || existing=""
         if [ -s "$file" ]; then
           if [ -n "$existing" ]; then gh api -X PATCH "repos/$GW_REPO/issues/comments/$existing" -F body=@"$file" > /dev/null

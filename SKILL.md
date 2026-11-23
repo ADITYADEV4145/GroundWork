@@ -48,6 +48,8 @@ Before writing a genuinely new non-trivial helper/function (including a class, h
 
 Prefer one combined call when you need more than one answer: `before_write({ "new": { "description": "what it does", "name": "planned name" }, "calls": ["helperYouWillCall"], "changes": ["symbolYouWillChange"] })` returns code to reuse, exact signatures and the callers to update together. Pass only the parts you need; repeat with `expand: "reuse"` or `expand: "callers"` only when the short answer is cut. It replaces separate `find_similar`, `read_symbol` and `callers` calls for that step.
 
+In a repository you do not know yet, call `architecture` once before the first write: it lists the packages, entry points, most-called helpers and naming conventions. When `before_write` shows candidates, record what you did with them: `before_write({ "decision": { "choice": "reuse" | "extend" | "new", "reason": "one line" } })`.
+
 1. Call `find_similar({ "description": "what it does", "name": "planned name", "signature": "planned signature" })`. Pass `code` once you have a draft.
 2. State your decision in one line:
    - `REUSE <symbol>`: an existing symbol already does it. Import it and call it.

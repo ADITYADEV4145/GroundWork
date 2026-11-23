@@ -19,7 +19,10 @@ export interface Ledger {
   /** Imports and calls the edit hook verified, and wall time spent inside hooks: the session receipt's inputs. */
   callsChecked: number;
   hookMs: number;
+  /** REUSE / EXTEND / NEW choices the agent reported through before_write, newest last. */
+  reuseDecisions?: ReuseDecision[];
 }
+export interface ReuseDecision { choice: 'reuse' | 'extend' | 'new'; reason: string }
 const dir = (root: string) => path.join(root, '.groundwork', 'sessions');
 const count = z.number().finite().nonnegative();
 const ledgerSchema = z.object({
@@ -29,6 +32,7 @@ const ledgerSchema = z.object({
   exploration: z.object({ files: z.array(z.string()), hinted: z.boolean() }),
   duplicatesPrevented: count, inventedCallsCaught: count, ignores: count,
   callsChecked: count.default(0), hookMs: count.default(0),
+  reuseDecisions: z.array(z.object({ choice: z.enum(['reuse', 'extend', 'new']), reason: z.string() })).optional(),
 }).passthrough();
 function parseLedger(value: unknown, id: string): Ledger {
   const parsed = ledgerSchema.safeParse(value);
@@ -61,6 +65,9 @@ export function stats(ledger: Ledger, guard: string): GuardStats {
 }
 export function bumpCounter(root: string, id: string | null, counter: 'duplicatesPrevented' | 'inventedCallsCaught' | 'ignores' | 'callsChecked' | 'hookMs', amount = 1): void {
   updateLedger(root, id, (l) => { l[counter] += amount; });
+}
+export function recordReuseDecision(root: string, id: string | null | undefined, choice: ReuseDecision['choice'], reason: string): boolean {
+  return updateLedger(root, id, (l) => { l.reuseDecisions = [...(l.reuseDecisions ?? []), { choice, reason: reason.replace(/\s+/g, ' ').slice(0, 200) }].slice(-50); });
 }
 export function sessionIds(root: string): string[] {
   try { return readdirSync(dir(root)).filter((f) => /^[A-Za-z0-9_-]{1,128}\.json$/.test(f)).sort((a, b) => statSync(path.join(dir(root), b)).mtimeMs - statSync(path.join(dir(root), a)).mtimeMs).map((f) => f.slice(0, -5)); }

@@ -33,7 +33,7 @@ describe('before_write', () => {
       const only = await beforeWriteTool.handler({ calls: ['parseDateString'] }, ctx);
       expect(only).not.toContain('Reuse');
       expect(only).not.toContain('Callers');
-      await expect(beforeWriteTool.handler({}, ctx)).rejects.toThrow('Provide new, calls or changes');
+      await expect(beforeWriteTool.handler({}, ctx)).rejects.toThrow('Provide new, calls, changes or decision');
     });
   });
 

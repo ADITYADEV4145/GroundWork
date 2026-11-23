@@ -253,7 +253,24 @@ describe('compiled-language type checks', () => {
       resetCompilerMemo();
       expect(() => compilerDiagnostics('go', root, 'main.go', Date.now() + 120_000)).toThrow(/checked from source/);
       resetCompilerMemo();
+      // A package that does not import that dependency is still checked.
+      writeFileSync(path.join(root, 'main.go'), 'package main\n\nimport _ "example.com/lib"\n\nfunc main() { missing() }\n');
+      expect(compilerDiagnostics('go', root, 'main.go', Date.now() + 120_000).map((f) => f.code)).toEqual(['undefined']);
+      resetCompilerMemo();
     } finally { if (saved === undefined) delete process.env.GOMODCACHE; else process.env.GOMODCACHE = saved; }
+  }, 180_000);
+
+  it.skipIf(!toolchain.go)('checks Go with the sizes of the build target', async () => {
+    const root = repo({ 'go.mod': 'module example.com/app\n\ngo 1.21\n', 'main.go': 'package main\n\nfunc main() {}\n' });
+    edit(root, 'main.go', 'package main\n\nfunc main() {}\n', 'package main\n\nimport "unsafe"\n\nfunc take([4]byte) {}\n\nfunc main() { take([unsafe.Sizeof(uintptr(0))]byte{}) }\n');
+    const { compilerDiagnostics, resetCompilerMemo } = await import('../src/types/compilers.js');
+    const saved = process.env.GOARCH;
+    process.env.GOARCH = '386';
+    try {
+      resetCompilerMemo();
+      expect(compilerDiagnostics('go', root, 'main.go', Date.now() + 120_000)).toEqual([]);
+      resetCompilerMemo();
+    } finally { if (saved === undefined) delete process.env.GOARCH; else process.env.GOARCH = saved; }
   }, 180_000);
 
   it.skipIf(!toolchain.go)('reports a Go import cycle as unavailable instead of waiting on it', async () => {

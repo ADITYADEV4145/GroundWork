@@ -99,6 +99,8 @@ var (
 	exported    types.Importer
 	exportMu    sync.Mutex
 	exportErr   = map[string]error{}
+	sourcedMemo = map[string]string{}
+	arch        = runtime.GOARCH
 	reachMu     sync.Mutex
 	reach       = map[string]map[string]bool{}
 	outMu       sync.Mutex
@@ -169,8 +171,14 @@ func load() {
 		args = append(args, "./"+filepath.ToSlash(rel))
 	}
 	cache := ""
-	if output, err := exec.Command("go", "env", "GOMODCACHE").Output(); err == nil {
-		cache = strings.TrimSpace(string(output))
+	// The sizes of the build target, which need not be this machine's.
+	if output, err := exec.Command("go", "env", "GOMODCACHE", "GOARCH").Output(); err == nil {
+		if lines := strings.Split(strings.TrimSpace(string(output)), "\n"); len(lines) == 2 {
+			cache = strings.TrimSpace(lines[0])
+			if types.SizesFor("gc", strings.TrimSpace(lines[1])) != nil {
+				arch = strings.TrimSpace(lines[1])
+			}
+		}
 	}
 	for _, p := range goList(args...) {
 		path := strip(p.ImportPath)
@@ -211,15 +219,6 @@ func exports() {
 	for path, p := range packages {
 		if p.local || path == "unsafe" || p.Dir == "" {
 			continue
-		}
-		// Export data names its own copy of a package, which is not the one checked from source here.
-		for _, s := range p.Imports {
-			if m := p.ImportMap[s]; m != "" {
-				s = m
-			}
-			if q := packages[s]; q != nil && q.local {
-				fail("dependency " + path + " imports " + s + ", which is checked from source")
-			}
 		}
 		if file := known[exportKey(p)]; file != "" {
 			if _, err := os.Stat(file); err == nil {
@@ -369,6 +368,33 @@ func reaches(path, test string) bool {
 	return visit(path)
 }
 
+// Export data names its own copy of a package, which is not the one checked from source here.
+func sourced(path string) string {
+	if found, ok := sourcedMemo[path]; ok {
+		return found
+	}
+	sourcedMemo[path] = ""
+	p := packages[path]
+	if p == nil {
+		return ""
+	}
+	found := ""
+	if p.local {
+		found = path
+	}
+	for _, s := range p.Imports {
+		if found != "" {
+			break
+		}
+		if m := p.ImportMap[s]; m != "" {
+			s = m
+		}
+		found = sourced(s)
+	}
+	sourcedMemo[path] = found
+	return found
+}
+
 func (u *universe) load(path string) (*types.Package, error) {
 	if path == "unsafe" {
 		return types.Unsafe, nil
@@ -385,6 +411,14 @@ func (u *universe) load(path string) (*types.Package, error) {
 		exportMu.Lock()
 		defer exportMu.Unlock()
 		if err := exportErr[path]; err != nil {
+			return nil, err
+		}
+		if s := sourced(path); s != "" {
+			err := fmt.Errorf("dependency %s imports %s, which is checked from source", path, s)
+			exportErr[path] = err
+			if unavailable == "" {
+				unavailable = err.Error()
+			}
 			return nil, err
 		}
 		pkg, err := exported.Import(path)
@@ -476,7 +510,7 @@ func (u *universe) check(p *listed, path, name string, names, needs []string, fu
 		IgnoreFuncBodies:         !full,
 		FakeImportC:              true,
 		GoVersion:                version,
-		Sizes:                    types.SizesFor("gc", runtime.GOARCH),
+		Sizes:                    types.SizesFor("gc", arch),
 		DisableUnusedImportCheck: !full,
 		Error: func(err error) {
 			var e types.Error

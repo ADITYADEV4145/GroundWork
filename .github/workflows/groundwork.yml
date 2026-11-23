@@ -15,3 +15,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./
+        with:
+          # Stored task solutions are overlays for other repositories, and the grounding fixtures hold invented calls on purpose.
+          ignore: bench/defects-at-done/reference/**,bench/defects-at-done/hidden/**,fixtures/**

@@ -238,6 +238,9 @@ export class Grounder {
     const tail = tails.find((t) => f.path === t || f.path.endsWith(`/${t}`));
     if (!tail) return false;
     const rootDir = f.path.slice(0, f.path.length - tail.length);
+    // A directory is only on the importer's path when it is the repository root, a source root, or holds the importer:
+    // `import sphinx` in docs/ is the installed package, not tests/sphinx.
+    if (rootDir !== '' && !/^(src|lib)\/$/.test(rootDir) && !from.path.startsWith(rootDir)) return false;
     return !existsSync(path.join(this.root, rootDir, '__init__.py'));
   }
 
@@ -364,7 +367,9 @@ export class Grounder {
   private checkImport(f: FileFacts, imp: ImportFact, lines: string[]): Finding | null {
     if (imp.unresolvedReason === 'not-found') {
       if (isPy(f) && optionalPythonImport(lines, imp.line)) return null;
-      if (!imp.module.startsWith('.') || existsOnDisk(this.root, f.path, imp.module, isPy(f))) return null;
+      // Bundlers take a query after the path (`./README.md?raw`); the file is what has to exist.
+      const spec = isPy(f) ? imp.module : imp.module.replace(/\?.*$/, '');
+      if (!imp.module.startsWith('.') || existsOnDisk(this.root, f.path, spec, isPy(f))) return null;
       return {
         file: f.path,
         line: imp.line,

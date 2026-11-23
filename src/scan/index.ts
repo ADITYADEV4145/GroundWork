@@ -77,6 +77,22 @@ export function changedFromDiff(diff: string): ChangedFile[] {
 
 export interface ScanOptions { config: GroundworkConfig; changed?: ChangedFile[]; base?: string }
 
+/**
+ * A function nothing in the repository calls by name but that a runtime or test harness runs: Go's `init`, `main` and
+ * `Test…` functions, Rust's `main`, and any function declared under an attribute or decorator (`#[test]`, `#[bench]`, `@app.route`, `[Test]`).
+ */
+function runByFramework(file: string, name: string, source: string, line: number): boolean {
+  if (file.endsWith('.go') && /^(init|main|(Test|Benchmark|Fuzz|Example)(_|[A-Z0-9]|$))/.test(name)) return true;
+  if (file.endsWith('.rs') && name === 'main') return true;
+  const lines = source.split('\n');
+  for (let i = line - 2; i >= 0; i--) {
+    const above = lines[i]!.trim();
+    if (above === '' || above.startsWith('//') || above.startsWith('#!')) continue;
+    return above.startsWith('#[') || above.startsWith('@') || (file.endsWith('.cs') && /^\[.*\]$/.test(above));
+  }
+  return false;
+}
+
 export async function scanRepository(db: Db, root: string, options: ScanOptions): Promise<ScanReport> {
   const start = performance.now();
   const { config, changed } = options;
@@ -138,7 +154,9 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
       // Point at a constant in another file that the change did not write; failing that, at the first of the group.
       const first = group.find((l) => l.file !== copy.file && !touched(l.file, l.line)) ?? group[0]!;
       if (copy === first || copy.file === first.file) continue;
-      all.push({ kind: 'duplicate-constant', confidence: copy.constName === first.constName ? 'high' : 'low', file: copy.file, line: copy.line,
+      // The same name in same-named files of sibling directories (one settings file per locale or platform) is a layout, not a copy.
+      const parallel = path.posix.basename(copy.file) === path.posix.basename(first.file);
+      all.push({ kind: 'duplicate-constant', confidence: copy.constName === first.constName && !parallel ? 'high' : 'low', file: copy.file, line: copy.line,
         message: `${copy.constName} repeats the value of ${first.constName}.`, suggestion: `${first.constName} (${first.file}:${first.line})` });
     }
   }
@@ -158,6 +176,7 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
     if (s.file.endsWith('.py') && (!s.name.startsWith('_') || s.name.endsWith('__'))) continue;
     const source = text(s.file);
     if (source === null || !/^[A-Za-z_$][\w$]*$/.test(s.name)) continue;
+    if (runByFramework(s.file, s.name, source, s.line)) continue;
     if ((source.match(new RegExp(`(?<![\\w$])${s.name.replace(/\$/g, '\\$')}(?![\\w$])`, 'g')) ?? []).length !== 1) continue;
     all.push({ kind: 'dead-code', confidence: 'medium', file: s.file, line: s.line, message: `${s.qualifiedName} is private and never referenced.`, suggestion: null });
   }

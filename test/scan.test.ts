@@ -44,6 +44,28 @@ async function open(root: string) {
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe('gw scan', () => {
+  it('does not call two memoized getters over different loaders copies', async () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), 'gw-scan-')); roots.push(root);
+    const getter = (name: string, loader: string) => `export function ${name}(cache: Map<number, string[]>, id: number): string[] {
+  let hit = cache.get(id);
+  if (!hit) cache.set(id, (hit = ${loader}(id)));
+  if (hit.length > 100) hit = hit.slice(0, 100);
+  return hit;
+}
+`;
+    writeFileSync(path.join(root, '.gitignore'), '.groundwork/\n');
+    writeFileSync(path.join(root, 'load.ts'), 'export const loadUsers = (id: number): string[] => [String(id)];\nexport const loadTeams = (id: number): string[] => [String(id), "t"];\n');
+    writeFileSync(path.join(root, 'memo.ts'), 'import { loadUsers, loadTeams } from "./load.js";\n' + getter('usersOf', 'loadUsers') + getter('teamsOf', 'loadTeams') + getter('membersOf', 'loadUsers')
+      + 'export async function timed(n: number): Promise<number> {\n  const start = Date.now();\n  const users = await Promise.resolve(loadUsers(n));\n  const names = users.map((u) => u.trim()).filter((u) => u.length > 0);\n  return Date.now() - start + users.length + names.length;\n}\n'
+      + 'export function run(n: number) {\n  const again = async (): Promise<number> => {\n    const start = Date.now();\n    const users = await Promise.resolve(loadUsers(n));\n    const names = users.map((u) => u.trim()).filter((u) => u.length > 0);\n    return Date.now() - start + users.length + names.length;\n  };\n  return again;\n}\n');
+    git(root, 'init'); git(root, 'add', '.');
+    git(root, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'base');
+    const { config, db } = await open(root);
+    try {
+      const dupes = (await scanRepository(db, root, { config })).findings.filter((f) => f.kind === 'duplicate-logic');
+      expect(dupes.map((f) => f.message)).toEqual(['membersOf has the same body as usersOf.', 'run.again has the same body as timed.']);
+    } finally { db.close(); }
+  });
   it('reports each defect kind in a repository that was never set up', async () => {
     const root = fixture();
     const { config, db } = await open(root);

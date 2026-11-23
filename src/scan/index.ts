@@ -111,12 +111,22 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
     const group = groups.get(s.fingerprint.normHash) ?? [];
     group.push(s); groups.set(s.fingerprint.normHash, group);
   }
+  const sources = new Map<string, Buffer | null>();
+  /** Functions a body calls by bare name, apart from itself and its parameters. Two bodies that match token for token but call different functions (memoized getters over different loaders) are not copies. */
+  const freeCalls = (sym: (typeof symbols)[number]): string => {
+    if (!sources.has(sym.file)) { try { sources.set(sym.file, readFileSync(path.join(root, sym.file))); } catch { sources.set(sym.file, null); } }
+    const body = sources.get(sym.file)?.subarray(sym.startByte, sym.endByte).toString('utf8') ?? '';
+    // Declaration keywords differ between `function f(` and `const f = async (`, which are still the same body.
+    const own = new Set([sym.name, ...sym.params.map((p) => p.name), 'async', 'function', 'def', 'func', 'fn', 'lambda']);
+    return [...new Set([...body.matchAll(/(?<![.\w$])([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1]!).filter((n) => !own.has(n)))].sort().join(' ');
+  };
   for (const group of groups.values()) {
     if (group.length < 2) continue;
     // The copy is whichever one the change wrote; an untouched symbol is the original to point at.
     const original = group.find((s) => !touched(s.file, s.line, s.endLine)) ?? group[0]!;
     for (const copy of group) {
       if (copy === original || !touched(copy.file, copy.line, copy.endLine)) continue;
+      if (freeCalls(copy) !== freeCalls(original)) continue;
       all.push({ kind: 'duplicate-logic', confidence: 'high', file: copy.file, line: copy.line,
         message: `${copy.qualifiedName} has the same body as ${original.qualifiedName}.`, suggestion: `${original.qualifiedName} (${original.file}:${original.line})` });
     }

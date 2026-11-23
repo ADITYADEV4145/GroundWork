@@ -338,6 +338,24 @@ export function ownerEmail(store: AccountStore, handle: string): string | null {
     expect(wrong.defects.wrongArguments).toBe(1);
     expect(wrong.defects.inventedCalls).toBe(0);
   }, 120_000);
+  it('does not count a call a test expects to raise, but counts the same call outside it', async () => {
+    const test = (body: string) => `import unittest
+from routeplan.weight import format_weight
+
+
+class Required(unittest.TestCase):
+    def test_unit_required(self):
+${body}
+`;
+    const expected = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(TypeError):
+            format_weight(12.34)
+        self.assertRaises(TypeError, lambda: format_weight(12.34))`) }, true);
+    expect(expected.items).toEqual([]);
+    const plain = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(TypeError):
+            pass
+        format_weight(12.34)`) }, true);
+    expect(plain.defects.wrongArguments).toBe(1);
+  }, 120_000);
   it('counts stale docs after a signature change and callers missed by a ripple change', async () => {
     const { repo } = find('ledger-tax-options');
     const original = (file: string) => readFileSync(path.join(path.dirname(new URL(import.meta.url).pathname), '../bench/defects-at-done/repos', repo.id, file), 'utf8');

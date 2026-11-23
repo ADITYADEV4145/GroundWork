@@ -120,6 +120,24 @@ function goDiagnostics(root: string): { items: { file: string; line: number; mes
   return { items, infra: !r.ok && !items.length ? `go vet failed without diagnostics: ${r.output.slice(0, 300)}` : null };
 }
 
+/** A Python call a test makes in order to see it raise (`assertRaises`, `pytest.raises`) is the test's point, not a wrong call. */
+function expectedToRaise(root: string, file: string, line: number): boolean {
+  if (!file.endsWith('.py')) return false;
+  let lines: string[];
+  try { lines = readFileSync(path.join(root, file), 'utf8').split('\n'); } catch { return false; }
+  const raises = /\b(assertRaises\w*|pytest\.raises)\s*\(/, indent = (l: string) => l.length - l.trimStart().length;
+  const own = lines[line - 1] ?? '';
+  if (raises.test(own)) return true;
+  let depth = indent(own);
+  for (let i = line - 2; i >= 0 && depth > 0; i--) {
+    const l = lines[i]!;
+    if (!l.trim() || indent(l) >= depth) continue;
+    depth = indent(l);
+    if (/^\s*with\b/.test(l) && raises.test(l)) return true;
+  }
+  return false;
+}
+
 async function grounding(root: string, base: string): Promise<DefectItem[]> {
   await initSqlBackend();
   await refreshIndex(root);
@@ -128,6 +146,7 @@ async function grounding(root: string, base: string): Promise<DefectItem[]> {
     const grounder = new Grounder(db, root);
     return changedFromGit(root, base).flatMap((c) => grounder.verify(c.file, { ranges: c.ranges }).findings)
       .filter((f) => f.blocking && f.kind !== 'type')
+      .filter((f) => !((f.kind === 'arity' || f.kind === 'unknown-keyword') && expectedToRaise(root, f.file, f.line)))
       .map((f) => ({ defect: f.kind === 'arity' || f.kind === 'unknown-keyword' ? 'wrongArguments' as const : 'inventedCalls' as const,
         file: f.file, line: f.line, name: f.name, evidence: `index: ${f.message}` }));
   } finally { db.close(); }

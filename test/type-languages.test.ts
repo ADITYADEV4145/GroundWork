@@ -273,6 +273,23 @@ describe('compiled-language type checks', () => {
     } finally { if (saved === undefined) delete process.env.GOARCH; else process.env.GOARCH = saved; }
   }, 180_000);
 
+  it.skipIf(!toolchain.go || process.arch !== 'x64')('keeps the Go baseline of one build target apart from another', async () => {
+    const text = 'package main\n\nimport "unsafe"\n\nfunc take([4]byte) {}\n\nfunc main() { take([unsafe.Sizeof(uintptr(0))]byte{}) }\n';
+    const root = repo({ 'go.mod': 'module example.com/app\n\ngo 1.21\n', 'main.go': text });
+    const { compilerDiagnostics, resetCompilerMemo } = await import('../src/types/compilers.js');
+    const base = new Map([['main.go', text]]);
+    const saved = process.env.GOARCH;
+    process.env.GOARCH = '386';
+    try {
+      resetCompilerMemo();
+      expect(compilerDiagnostics('go', root, 'main.go', Date.now() + 120_000, base)).toEqual([]);
+      resetCompilerMemo();
+      process.env.GOARCH = 'amd64';
+      expect(compilerDiagnostics('go', root, 'main.go', Date.now() + 120_000, base).map((f) => f.code)).toEqual(['argument-type']);
+      resetCompilerMemo();
+    } finally { if (saved === undefined) delete process.env.GOARCH; else process.env.GOARCH = saved; }
+  }, 180_000);
+
   it.skipIf(!toolchain.go)('reports a Go import cycle as unavailable instead of waiting on it', async () => {
     const c = cases.find((x) => x.language === 'go')!;
     const root = repo({ ...c.files, 'cmd/cmd.go': 'package cmd\n\nfunc Name() string { return "app" }\n' });

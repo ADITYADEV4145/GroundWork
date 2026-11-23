@@ -508,7 +508,9 @@ const MANIFESTS = /^(go\.(mod|sum)|Cargo\.(toml|lock)|pom\.xml|build\.gradle(\.k
  * without this every Stop that finds an error would compile the project twice.
  */
 function baseCacheFile(language: CompiledLanguage, root: string, file: string, base: BaseTexts): string | null {
-  const variant = language === 'rust' ? String(rustTargets.get(path.resolve(root, file))) : '';
+  let variant = language === 'rust' ? String(rustTargets.get(path.resolve(root, file))) : '';
+  // The Go build target decides which files are built and the sizes they are checked with.
+  if (language === 'go') variant = spawnSync('go', ['env', 'GOOS', 'GOARCH', 'GOFLAGS', 'CGO_ENABLED'], { cwd: path.dirname(path.resolve(root, file)), encoding: 'utf8', timeout: 2000 }).stdout ?? '';
   const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', timeout: 2000 });
   if (head.status !== 0) return null;
   const hash = createHash('sha256').update([language, file, head.stdout.trim(), variant].join('\0'));

@@ -153,18 +153,20 @@ export function locateNpmModule(root: string, fromFile: string, specifier: strin
   }
   const isWorkspace = !real.split(path.sep).includes('node_modules');
   const ref: PackageRef = { ecosystem: 'npm', name: split.name, version: String(pkg.version ?? '0.0.0'), location: real };
-  let entry = entryIn(real, pkg, split.subpath, isWorkspace, cjs);
-  const condition = cjs && entry !== entryIn(real, pkg, split.subpath, isWorkspace, false);
-  let separateTypes = false;
-  if (!entry && !isWorkspace) {
-    const typesName = `@types/${split.name.startsWith('@') ? split.name.slice(1).replace('/', '__') : split.name}`;
-    const typesDir = findPackageDir(path.dirname(path.resolve(root, fromFile)), typesName, root);
-    const typesPkg = typesDir ? readJson(path.join(typesDir, 'package.json')) : null;
-    if (typesDir && typesPkg) entry = entryIn(typesDir, typesPkg, split.subpath, false, cjs);
-    separateTypes = entry !== null;
-    // The cached surface is only valid for this pairing of package and types versions.
-    if (separateTypes) ref.location = `${real} + ${typesName}@${String(typesPkg!.version ?? '')}`;
-  }
+  // The declarations can come from the package or, failing that, from @types; either may pick by condition.
+  const typesName = `@types/${split.name.startsWith('@') ? split.name.slice(1).replace('/', '__') : split.name}`;
+  const typesDir = isWorkspace ? null : findPackageDir(path.dirname(path.resolve(root, fromFile)), typesName, root);
+  const typesPkg = typesDir ? readJson(path.join(typesDir, 'package.json')) : null;
+  const resolve = (forCjs: boolean): { entry: string | null; separate: boolean } => {
+    const own = entryIn(real, pkg, split.subpath, isWorkspace, forCjs);
+    if (own || !typesDir || !typesPkg) return { entry: own, separate: false };
+    const typed = entryIn(typesDir, typesPkg, split.subpath, false, forCjs);
+    return { entry: typed, separate: typed !== null };
+  };
+  const { entry, separate: separateTypes } = resolve(cjs);
+  const condition = cjs && entry !== resolve(false).entry;
+  // The cached surface is only valid for this pairing of package and types versions.
+  if (separateTypes) ref.location = `${real} + ${typesName}@${String(typesPkg!.version ?? '')}`;
   return { ref, subpath: split.subpath, entry, ...(isWorkspace ? { workspace: true } : {}), ...(separateTypes ? { separateTypes: true } : {}), ...(condition ? { cacheKey: `${split.subpath}#require` } : {}) };
 }
 

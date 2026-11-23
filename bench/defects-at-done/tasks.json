@@ -456,6 +456,207 @@
       "hidden": "route-plan.py"
     },
     {
+      "id": "route-path-length",
+      "repo": "route-plan",
+      "category": "hidden-helper",
+      "prompt": "Planners want the length of a route drawn on the map. Add `path_km(points: list[Point]) -> float` in a new module `routeplan/legs.py`. It is the sum of the great-circle distances between consecutive points (Earth radius 6371 km), rounded to one decimal. A path with fewer than two points has length 0.",
+      "entry": "routeplan/legs.py",
+      "trap": {
+        "existing": [
+          "routeplan/internal/geo.py#great_circle_km"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
+      "id": "route-shift-length",
+      "repo": "route-plan",
+      "category": "hidden-helper",
+      "prompt": "Payroll needs shift lengths. Add `shift_minutes(start: str, end: str) -> int` in a new module `routeplan/shifts.py`. Both arguments are times of day as dispatchers write them: `9:05`, `09.05`, `0905` and `9h05` are the same time, and surrounding spaces are ignored. Return the minutes from start to end; an end earlier than the start means the shift runs past midnight. Anything that is not a time of day (hour above 23, minute above 59, or other text) raises ValueError.",
+      "entry": "routeplan/shifts.py",
+      "trap": {
+        "existing": [
+          "routeplan/internal/clock.py#minutes_of_day"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
+      "id": "route-vehicle-capacity",
+      "repo": "route-plan",
+      "category": "near-name",
+      "prompt": "Loaders type a licence plate and need the vehicle's capacity. Add `vehicle_capacity(fleet: Fleet, plate: str) -> int | None` in a new module `routeplan/capacity.py`. Plates are matched in any letter case, ignoring spaces and dashes. Return the capacity in kg of the in-service vehicle with that plate, or None when there is no such vehicle in service. A label such as `van` is not a plate.",
+      "entry": "routeplan/capacity.py",
+      "trap": {
+        "existing": [
+          "routeplan/fleet.py#Fleet.find_by_plate"
+        ],
+        "decoys": [
+          "find_by_label",
+          "find_by_code",
+          "get_by_plate",
+          "lookup_plate"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
+      "id": "route-driver-phone",
+      "repo": "route-plan",
+      "category": "near-name",
+      "prompt": "Dispatch needs to call a driver from the badge number on a manifest. Add `driver_phone(roster: DriverRoster, badge: str) -> str | None` in a new module `routeplan/contact.py`. Badges are matched in any letter case, ignoring surrounding spaces and zeros in front of the number, so `d7` is badge `D007`. Return the phone number of the on-duty driver with that badge, or None when no on-duty driver has it. A driver's name is not a badge.",
+      "entry": "routeplan/contact.py",
+      "trap": {
+        "existing": [
+          "routeplan/drivers.py#DriverRoster.lookup_badge"
+        ],
+        "decoys": [
+          "lookup_name",
+          "find_by_badge",
+          "find_by_code",
+          "get_badge"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
+      "id": "route-fuel-keyword",
+      "repo": "route-plan",
+      "category": "changed-signature",
+      "prompt": "Callers keep swapping the two numbers passed to `fuel_litres`. Change it in `routeplan/fuel.py` from `fuel_litres(rate_l_per_100km, distance_km)` to `fuel_litres(distance_km, *, rate_l_per_100km=8.5)`, so the rate is keyword-only and defaults to 8.5. Keep the behavior of `trip_cost` and `leg_costs` the same, and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "routeplan/fuel.py",
+      "trap": {
+        "existing": [
+          "routeplan/fuel.py#fuel_litres"
+        ],
+        "affected": [
+          "routeplan/fuel.py",
+          "routeplan/costs.py",
+          "docs/fuel.md"
+        ],
+        "decoys": [
+          "fuel_litres(rate_l_per_100km",
+          "fuel_litres(8.5"
+        ]
+      },
+      "hidden": "route-plan.py",
+      "affectedTests": [
+        "tests/test_costs.py"
+      ]
+    },
+    {
+      "id": "route-load-ratio-keyword",
+      "repo": "route-plan",
+      "category": "changed-signature",
+      "prompt": "`load_ratio` has been called with its two numbers swapped more than once. Change it in `routeplan/capacity_ratio.py` from `load_ratio(capacity_kg, weight_kg)` to `load_ratio(weight_kg, *, capacity_kg)`, so the capacity is a required keyword argument. Keep the behavior of `overloaded` and `spare_kg` the same, and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "routeplan/capacity_ratio.py",
+      "trap": {
+        "existing": [
+          "routeplan/capacity_ratio.py#load_ratio"
+        ],
+        "affected": [
+          "routeplan/capacity_ratio.py",
+          "routeplan/loading.py",
+          "docs/loading.md"
+        ],
+        "decoys": [
+          "load_ratio(capacity_kg",
+          "load_ratio(vehicle.capacity_kg",
+          "load_ratio(800"
+        ]
+      },
+      "hidden": "route-plan.py",
+      "affectedTests": [
+        "tests/test_costs.py"
+      ]
+    },
+    {
+      "id": "route-weight-unit",
+      "repo": "route-plan",
+      "category": "ripple",
+      "prompt": "Weights are printed without a unit. Make the unit a required second argument: `format_weight(kg, unit)` returns the weight with one decimal followed by a space and the unit, for example `12.3 kg`; for the unit `lb` the kilograms are converted to pounds first (1 kg = 2.20462 lb). Every label must print its parcel's unit, and the existing tests and docs must be brought up to date with the new output.",
+      "entry": "routeplan/weight.py",
+      "trap": {
+        "existing": [
+          "routeplan/weight.py#format_weight"
+        ],
+        "affected": [
+          "routeplan/labels/parcel.py",
+          "routeplan/labels/pallet.py",
+          "routeplan/labels/customs.py",
+          "routeplan/labels/pickup.py",
+          "tests/test_labels.py",
+          "docs/loading.md"
+        ]
+      },
+      "hidden": "route-plan.py",
+      "affectedTests": [
+        "tests/test_labels.py"
+      ]
+    },
+    {
+      "id": "route-duration-style",
+      "repo": "route-plan",
+      "category": "ripple",
+      "prompt": "Durations over an hour are hard to read as plain minutes. Make the style a required second argument: `format_duration(minutes, style)`. The style `clock` gives hours and two-digit minutes, `1:35` for 95 and `0:05` for 5. The style `words` gives `1 h 35 min` for 95, `2 h 0 min` for 120, and just `45 min` under an hour. The sms and board notices use the clock style, the email and receipt notices use the words style, and the existing tests and docs must be brought up to date with the new output.",
+      "entry": "routeplan/duration.py",
+      "trap": {
+        "existing": [
+          "routeplan/duration.py#format_duration"
+        ],
+        "affected": [
+          "routeplan/notices/sms.py",
+          "routeplan/notices/board.py",
+          "routeplan/notices/email.py",
+          "routeplan/notices/receipt.py",
+          "tests/test_labels.py",
+          "docs/loading.md"
+        ]
+      },
+      "hidden": "route-plan.py",
+      "affectedTests": [
+        "tests/test_labels.py"
+      ]
+    },
+    {
+      "id": "route-toll-then-parking",
+      "repo": "route-plan",
+      "category": "compaction",
+      "prompt": "Add `toll_charge(distance_km: float, rate_per_km: float) -> float` in a new module `routeplan/tolls.py`: the distance times the rate plus a fixed 1.50 gate fee, rounded the way this codebase rounds amounts billed to customers.",
+      "turns": [
+        {
+          "prompt": "Now add `parking_charge(minutes: int, rate_per_hour: float) -> float` in a new module `routeplan/parking.py`: the time in hours times the hourly rate. Round it exactly the way you rounded the toll charge.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "routeplan/parking.py",
+      "trap": {
+        "existing": [
+          "routeplan/charges.py#round_charge"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
+      "id": "route-pallet-then-crate",
+      "repo": "route-plan",
+      "category": "compaction",
+      "prompt": "Add `pallet_billable(weights: list[float]) -> float` in a new module `routeplan/pallets.py`: the parcel weights in kg added up, plus 20 kg for the pallet itself, turned into the weight the carrier bills the way this codebase already does it.",
+      "turns": [
+        {
+          "prompt": "Now add `crate_billable(weights: list[float], crates: int) -> float` in a new module `routeplan/crates.py`: the weights added up plus 4.5 kg per crate. Turn it into a billable weight exactly the way you did for the pallet.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "routeplan/crates.py",
+      "trap": {
+        "existing": [
+          "routeplan/internal/scale.py#billable_kg"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
       "id": "stock-item-slug",
       "repo": "stock-room",
       "category": "hidden-helper",

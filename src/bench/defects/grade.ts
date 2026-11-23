@@ -230,6 +230,11 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
     else if (!changedFiles.has(file) && task.category === 'ripple') items.push({ defect: 'missedCallers', file, name: path.basename(file), evidence: 'affected file was not updated' });
   }
 
+  if (repo.python) {
+    const [major, minor] = repo.python.split('.');
+    const version = run(root, ['python3', '-c', `import sys; sys.exit(0 if sys.version_info >= (${major}, ${minor}) else 1)`]);
+    if (version.infra || !version.ok) invalid.push(`the repo needs Python ${repo.python} or newer${version.infra ? ': ' + version.infra : ''}`);
+  }
   if (repo.requires?.length) {
     const deps = run(root, ['python3', '-c', `import ${repo.requires.join(', ')}`]);
     if (deps.infra || !deps.ok) invalid.push(`test dependencies are missing: ${deps.infra ?? deps.output.trim().split('\n').pop()}`);

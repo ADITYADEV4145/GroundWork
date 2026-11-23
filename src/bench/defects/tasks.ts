@@ -33,6 +33,8 @@ export const repoSchema = z.object({
   testOne: z.array(z.string()).min(1),
   /** Python modules the tests import that the repo does not ship. A host without them cannot grade the repo's tasks. */
   requires: z.array(z.string().regex(/^[A-Za-z_][\w.]*$/)).optional(),
+  /** Oldest Python the repo supports, as `major.minor`. An older host cannot grade the repo's tasks. */
+  python: z.string().regex(/^\d+\.\d+$/).optional(),
 });
 export type Repo = z.infer<typeof repoSchema>;
 

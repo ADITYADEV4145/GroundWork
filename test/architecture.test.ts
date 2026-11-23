@@ -51,7 +51,9 @@ describe('architecture', () => {
       expect(a.hotUtilities.some((h) => h.symbol === 'padLeft')).toBe(false);
       expect(a.naming.functions.typescript).toMatch(/^camelCase/);
       expect(a.naming.tests).toBe('*.test.*');
-      expect(architecture(db, root)).toBe(a);
+      expect(architecture(db, root)).toEqual(a);
+      writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'app', main: 'src/orders/total.ts' }));
+      expect(architecture(db, root).entryPoints).toEqual([{ file: 'src/orders/total.ts', why: 'package.json main' }, { file: 'src/cli/main.ts', why: 'imported by nothing, imports 3 files' }]);
       const text = renderArchitecture(a, 300);
       expect(text).toContain('Reuse these');
       expect(text).toContain('src/orders → src/util (2)');

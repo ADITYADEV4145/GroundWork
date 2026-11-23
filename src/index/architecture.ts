@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Db } from '../store/db.js';
 import { fitToBudget } from '../util/tokens.js';
-import { indexGeneration } from './query.js';
+import { architectureFacts, indexGeneration } from './query.js';
 
 export interface Architecture {
   packages: { dir: string; files: number; lines: number; languages: string[] }[];
@@ -54,10 +54,14 @@ const cache = new Map<string, { generation: string; value: Architecture }>();
 /** The shape of the repository in one read: where code lives, what depends on what, and which helpers everything already calls. */
 export function architecture(db: Db, root: string): Architecture {
   const generation = indexGeneration(db), hit = cache.get(root);
-  if (generation && hit?.generation === generation) return hit.value;
+  // package.json is not indexed, so its entry points are read on every call rather than cached with the index generation.
+  const withManifest = (value: Architecture): Architecture => {
+    const manifest = manifestEntries(root);
+    return { ...value, entryPoints: [...manifest, ...value.entryPoints.filter((r) => !manifest.some((m) => m.file === r.file))] };
+  };
+  if (generation && hit?.generation === generation) return withManifest(hit.value);
 
-  const files = db.prepare("SELECT id, path, language, lines, is_test FROM files WHERE status != 'skipped' AND is_generated = 0").all()
-    .map((r) => ({ id: Number(r.id), path: String(r.path), language: r.language ? String(r.language) : null, lines: Number(r.lines), test: Number(r.is_test) === 1 }));
+  const facts = architectureFacts(db), files = facts.files;
   const pkgOfFile = new Map(files.map((f) => [f.id, packageOf(f.path)]));
   const source = files.filter((f) => !f.test);
 
@@ -70,44 +74,32 @@ export function architecture(db: Db, root: string): Architecture {
 
   const edges = new Map<string, { from: string; to: string; imports: number }>();
   const imported = new Set<number>();
-  for (const r of db.prepare('SELECT DISTINCT file_id, resolved_file_id FROM imports WHERE resolved_file_id IS NOT NULL').all()) {
-    const from = pkgOfFile.get(Number(r.file_id)), to = pkgOfFile.get(Number(r.resolved_file_id));
-    imported.add(Number(r.resolved_file_id));
+  const outgoing = new Map<number, number>();
+  for (const link of facts.imports) {
+    const from = pkgOfFile.get(link.from), to = pkgOfFile.get(link.to);
+    imported.add(link.to); outgoing.set(link.from, (outgoing.get(link.from) ?? 0) + 1);
     if (!from || !to || from === to) continue;
     const key = `${from}\0${to}`, edge = edges.get(key) ?? { from, to, imports: 0 };
     edge.imports++; edges.set(key, edge);
   }
   const testPackages = new Set(files.filter((f) => f.test).map((f) => packageOf(f.path)).filter((dir) => !packages.has(dir)));
 
-  const outgoing = new Map<number, number>();
-  for (const r of db.prepare('SELECT file_id, COUNT(DISTINCT resolved_file_id) n FROM imports WHERE resolved_file_id IS NOT NULL GROUP BY file_id').all())
-    outgoing.set(Number(r.file_id), Number(r.n));
   const roots = source.filter((f) => !imported.has(f.id) && (outgoing.get(f.id) ?? 0) > 0)
     .sort((a, b) => outgoing.get(b.id)! - outgoing.get(a.id)! || a.path.localeCompare(b.path)).slice(0, 5)
     .map((f) => ({ file: f.path, why: `imported by nothing, imports ${outgoing.get(f.id)} files` }));
-  const manifest = manifestEntries(root);
-  const entryPoints = [...manifest, ...roots.filter((r) => !manifest.some((m) => m.file === r.file))];
 
   // A helper is hot when other files call it through a resolved import; same-file and name-only calls say nothing about reuse.
-  const hot = db.prepare(`SELECT s.id, s.qualified_name, s.signature, s.start_line, f.id file_id, f.path, COUNT(DISTINCT c.file_id) callers
-    FROM calls c JOIN symbols s ON s.id = c.callee_id JOIN files f ON f.id = s.file_id
-    WHERE c.file_id != s.file_id AND c.confidence IN ('exact', 'import-resolved') AND f.is_test = 0 AND f.is_generated = 0 AND s.kind IN ('function', 'method', 'class', 'component')
-    GROUP BY s.id HAVING callers >= 2 ORDER BY callers DESC, f.path, s.start_line`).all();
   const perPackage = new Map<string, number>(), hotUtilities: Architecture['hotUtilities'] = [];
-  for (const r of hot) {
-    const pkg = pkgOfFile.get(Number(r.file_id));
+  for (const h of facts.hot) {
+    const pkg = pkgOfFile.get(h.fileId);
     if (!pkg || (perPackage.get(pkg) ?? 0) >= 3) continue;
     perPackage.set(pkg, (perPackage.get(pkg) ?? 0) + 1);
-    hotUtilities.push({ package: pkg, symbol: String(r.qualified_name), file: String(r.path), line: Number(r.start_line), signature: String(r.signature), callers: Number(r.callers) });
+    hotUtilities.push({ package: pkg, symbol: h.symbol, file: h.file, line: h.line, signature: h.signature, callers: h.callers });
   }
 
   const functions: Record<string, string> = {};
   const byLanguage = new Map<string, string[]>();
-  for (const r of db.prepare(`SELECT s.name, f.language FROM symbols s JOIN files f ON f.id = s.file_id
-    WHERE s.kind IN ('function', 'method') AND f.is_test = 0 AND f.is_generated = 0 AND f.language IS NOT NULL`).all()) {
-    const list = byLanguage.get(String(r.language)) ?? [];
-    list.push(String(r.name)); byLanguage.set(String(r.language), list);
-  }
+  for (const f of facts.functions) byLanguage.set(f.language, [...(byLanguage.get(f.language) ?? []), f.name]);
   for (const [language, names] of [...byLanguage].sort()) { const m = majority(names); if (m) functions[language] = m; }
   const tests = files.filter((f) => f.test).map((f) => path.posix.basename(f.path));
   const testShapes = ([['*.test.*', /\.test\.[^.]+$/], ['*.spec.*', /\.spec\.[^.]+$/], ['test_*', /^test_/], ['*_test.*', /_test\.[^.]+$/]] as const)
@@ -115,13 +107,13 @@ export function architecture(db: Db, root: string): Architecture {
 
   const value: Architecture = {
     packages: [...packages.values()].sort((a, b) => b.lines - a.lines || a.dir.localeCompare(b.dir)).map((p) => ({ ...p, languages: [...p.languages].sort() })),
-    entryPoints,
+    entryPoints: roots,
     layers: [...edges.values()].filter((e) => !testPackages.has(e.from)).sort((a, b) => b.imports - a.imports || a.from.localeCompare(b.from) || a.to.localeCompare(b.to)),
     hotUtilities,
     naming: { functions, files: majority(source.map((f) => path.posix.basename(f.path).replace(/\.[^.]+$/, ''))), tests: testShapes[0] && testShapes[0][1] > 0 ? testShapes[0][0] : null },
   };
   if (generation) cache.set(root, { generation, value });
-  return value;
+  return withManifest(value);
 }
 
 export function renderArchitecture(a: Architecture, budgetTokens = 600): string {

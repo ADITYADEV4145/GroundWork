@@ -107,10 +107,15 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
 
   // Reuse: each existing helper named by the trap must be referenced from added code, otherwise the agent re-implemented it.
   if (added.size && (task.category === 'hidden-helper' || task.category === 'compaction')) {
-    const text = [...added.values()].flat().map((l) => l.text).join('\n');
+    const join = (lines: { text: string }[]) => lines.map((l) => l.text).join('\n');
+    // After compaction only the last step's file counts: it must use each helper itself, or go through an earlier added file that does.
+    const own = task.category === 'compaction' ? join(added.get(task.entry) ?? []) : join([...added.values()].flat());
+    const through = task.category !== 'compaction' ? '' : [...added].filter(([file, lines]) => file !== task.entry
+      && lines.some((l) => /^\s*(export\s+)?(async\s+)?(function|def|const|class)\s/.test(l.text))
+      && word(path.basename(file).replace(/\.[^.]+$/, '')).test(own)).map(([, lines]) => join(lines)).join('\n');
     for (const ref of task.trap.existing) {
       const name = ref.split('#')[1]!.split('.').pop()!;
-      if (!word(name).test(text)) items.push({ defect: 'duplicates', file: task.entry, name, evidence: `existing ${ref} is not used by the added code` });
+      if (!word(name).test(own) && !word(name).test(through)) items.push({ defect: 'duplicates', file: task.entry, name, evidence: `existing ${ref} is not used by the added code` });
     }
   }
 

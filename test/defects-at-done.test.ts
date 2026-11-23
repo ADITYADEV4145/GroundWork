@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -7,8 +7,8 @@ import { grade } from '../src/bench/defects/grade.js';
 import { armBlocker, loadArms, parseUsage, registered, runSuite } from '../src/bench/defects/harness.js';
 import { prStudy } from '../src/bench/defects/pr-study.js';
 import { buildReport, leaderboard, markdown, pairedBootstrap, tasksNeeded, verdicts, writeReport } from '../src/bench/defects/report.js';
-import { CATEGORIES, loadManifest, manifestSchema, taskSetHash } from '../src/bench/defects/tasks.js';
-import { applyReference, materialize } from '../src/bench/defects/workspaces.js';
+import { CATEGORIES, dataRoot, loadManifest, manifestSchema, taskSetHash } from '../src/bench/defects/tasks.js';
+import { applyReference, materialize, snapshotSetup } from '../src/bench/defects/workspaces.js';
 
 const work = mkdtempSync(path.join(os.tmpdir(), 'gw-dad-test-'));
 afterAll(() => rmSync(work, { recursive: true, force: true }));
@@ -56,6 +56,29 @@ export function invoiceSlug(invoice: Invoice): string {
     expect(g.defects.duplicates).toBe(1);
     expect(g.totalDefects).toBe(1);
   }, 120_000);
+  it('counts a helper re-implemented after compaction even when the first step reused it', async () => {
+    const reference = await graded('ledger-credit-then-refund', {}, true);
+    expect(reference.totalDefects).toBe(0);
+    const g = await graded('ledger-credit-then-refund', { 'src/invoices/refund.ts': `import { subtotalCents } from './total.ts';
+import type { Invoice } from '../types.ts';
+export function refundCents(invoice: Invoice, feeFraction: number): number {
+  const subtotal = subtotalCents(invoice), fee = subtotal * feeFraction, floor = Math.floor(fee), rest = fee - floor;
+  return subtotal - (rest > 0.5 || (rest === 0.5 && floor % 2 === 1) ? floor + 1 : floor);
+}
+` }, true);
+    expect(g.defects.duplicates).toBe(1);
+  }, 120_000);
+
+  it('does not count files written by arm setup as the agent\'s change', async () => {
+    const { task, repo } = find('ledger-invoice-slug'), dir = path.join(work, 'setup-only');
+    materialize(repo, dir);
+    writeFileSync(path.join(dir, '.mcp.json'), '{"mcpServers":{}}\n');
+    writeFileSync(path.join(dir, 'CLAUDE.md'), 'Use the tool.\n');
+    const g = await grade(task, repo, dir, snapshotSetup(dir));
+    expect(g.defects.duplicates).toBe(0);
+    expect(g.defects.missedCallers).toBe(0);
+  }, 120_000);
+
   it('counts an invented method and a wrong argument list', async () => {
     const invented = await graded('ledger-owner-email', { 'src/accounts/owner.ts': `import type { AccountStore } from './store.ts';
 export function ownerEmail(store: AccountStore, handle: string): string | null {
@@ -106,6 +129,14 @@ describe('DefectsAtDone harness and report', () => {
     expect([again.records, again.skipped]).toEqual([0, 2]);
     await expect(runSuite({ ...options, arms: ['native'], model: 'other' })).rejects.toThrow(/different model/);
     await expect(runSuite({ ...options, arms: ['native'], out: path.join(process.cwd(), 'x') })).rejects.toThrow(/outside/);
+    // The blocked arm survives a later report rebuild, and a changed arm definition cannot resume the run.
+    expect(buildReport(path.join(out, 'unit')).notRun.map((b) => b.arm)).toEqual(['serena']);
+    const root = path.join(work, 'data');
+    cpSync(dataRoot, root, { recursive: true });
+    const armsPath = path.join(root, 'arms.json'), arms = JSON.parse(readFileSync(armsPath, 'utf8')) as { arms: { id: string; label: string }[] };
+    arms.arms.find((a) => a.id === 'native')!.label = 'changed';
+    writeFileSync(armsPath, JSON.stringify(arms));
+    await expect(runSuite({ ...options, arms: ['native'], root })).rejects.toThrow(/different definition of arm native/);
   }, 120_000);
 
   it('reports exploratory runs without verdicts and keeps invalid records visible', async () => {
@@ -127,6 +158,8 @@ describe('DefectsAtDone harness and report', () => {
   it('never passes a preregistered verdict on incomplete evidence', () => {
     const report = buildReport(path.join(out, 'unit'));
     report.preregistration = { file: 'bench/prereg/defects-at-done-v1.md', commit: 'a'.repeat(40), committedAt: '2026-01-01T00:00:00Z', sha256: 'b'.repeat(64) };
+    expect(verdicts(report).map((v) => v.passed)).toEqual([null, null, null, null, null]);
+    report.arms = report.arms.filter((x) => x.arm !== 'native').map((x) => ({ ...x, arm: 'groundwork' }));
     expect(verdicts(report).map((v) => v.passed)).toEqual([null, null, null, null, null]);
   });
 

@@ -49,7 +49,8 @@ export async function prStudy(listFile: string, cache: string): Promise<PrStudy>
       git('add', '-A'); git('commit', '-qm', 'head');
       execFileSync('git', ['apply', '--index', '-'], { cwd: work, input: patch, stdio: ['pipe', 'pipe', 'pipe'] });
       git('commit', '-qm', 'base', '--allow-empty');
-      git('checkout', '-q', 'HEAD~1', '--', '.');
+      // --no-overlay also removes files the PR deleted.
+      git('checkout', '-q', '--no-overlay', 'HEAD~1', '--', '.');
       await refreshIndex(work);
       const db = openDb(indexDbPath(work), { readonly: true });
       let found = 0;

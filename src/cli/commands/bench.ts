@@ -47,7 +47,7 @@ function registerDefects(bench: Command): void {
       const result = await runSuite({ run: o.run, out: o.out, model: o.model, agent: o.agent, arms: o.arms.split(','), replicates: Number(o.replicates),
         maxTurns: Number(o.maxTurns), timeoutMs: Number(o.timeout) * 1000, ...(o.tasks ? { tasks: o.tasks.split(',') } : {}),
         ...(o.prereg ? { prereg: o.prereg } : {}), ...(o.cache ? { cache: o.cache } : {}), log: (line) => { if (!opts.json) process.stderr.write(line + '\n'); } });
-      const { files } = writeReport(result.directory, result.blocked);
+      const { files } = writeReport(result.directory);
       emit(opts, { ...result, ...files }, () => `${result.records} sessions graded, ${result.skipped} already recorded, ${result.blocked.length} arms not run\nReport: ${files.markdown}\nLeaderboard: ${files.html}`);
     }));
   bench.command('leaderboard')

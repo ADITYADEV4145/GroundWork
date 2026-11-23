@@ -62,7 +62,9 @@ export function readRecords(directory: string): RunRecord[] {
 
 interface Header { run: string; taskSetHash: string; agent: string; model: string; replicates: number; tasks: string[]; preregistration?: Report['preregistration'] }
 
-export function buildReport(directory: string, notRun: { arm: string; reason: string }[] = []): Report {
+export function buildReport(directory: string, given?: { arm: string; reason: string }[]): Report {
+  const notRunFile = path.join(directory, 'not-run.json');
+  const notRun = given ?? (existsSync(notRunFile) ? JSON.parse(readFileSync(notRunFile, 'utf8')) as { arm: string; reason: string }[] : []);
   const header = JSON.parse(readFileSync(path.join(directory, 'run.json'), 'utf8')) as Header;
   const records = readRecords(directory);
   const stale = records.find((r) => r.taskSetHash !== header.taskSetHash);
@@ -129,7 +131,7 @@ export function verdicts(report: Report): Verdict[] {
     rule('H1', 'GroundWork leaves at least 50% fewer defects at done than the native agent', v?.defectReductionPct, (i) => i.estimate >= 50 && i.low > 0, '%'),
     rule('H2', 'Task success does not drop (difference above -5 points)', v?.successDifferencePts, (i) => i.low > -5, ' pts'),
     rule('H3', 'Wall time is within 5% of native', v?.timeRatio, (i) => i.low >= 0.95 && i.high <= 1.05, 'x'),
-    rule('H4', 'Provider-billed tokens are no worse than native', gw && gw.tokensReported === gw.valid && native!.tokensReported === native!.valid ? v?.tokenRatio : null, (i) => i.high <= 1, 'x'),
+    rule('H4', 'Provider-billed tokens are no worse than native', gw && native && gw.tokensReported === gw.valid && native.tokensReported === native.valid ? v?.tokenRatio : null, (i) => i.high <= 1, 'x'),
   ];
   const others = report.arms.filter((a) => a.arm !== 'native' && !a.arm.startsWith('groundwork'));
   const expectedOthers = ['serena', 'codebase-memory', 'augment'];
@@ -193,7 +195,7 @@ ${r.verdicts.length ? `<h2>Preregistered verdicts</h2><div class="wrap"><table><
 `;
 }
 
-export function writeReport(directory: string, notRun: { arm: string; reason: string }[] = []): { report: Report; files: { json: string; markdown: string; html: string } } {
+export function writeReport(directory: string, notRun?: { arm: string; reason: string }[]): { report: Report; files: { json: string; markdown: string; html: string } } {
   const report = buildReport(directory, notRun);
   const files = { json: path.join(directory, 'report.json'), markdown: path.join(directory, 'report.md'), html: path.join(directory, 'leaderboard.html') };
   writeFileSync(files.json, JSON.stringify(report, null, 2) + '\n');

@@ -6,8 +6,8 @@ import { dataRoot, filesUnder, type Repo, type Task } from './tasks.js';
 export function git(root: string, ...args: string[]): string {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 }
-function commit(root: string, message: string): void {
-  git(root, '-c', 'user.name=Benchmark setup', '-c', 'user.email=benchmark@localhost', 'commit', '-qm', message);
+function commit(root: string, message: string, allowEmpty = false): void {
+  git(root, '-c', 'user.name=Benchmark setup', '-c', 'user.email=benchmark@localhost', 'commit', '-qm', message, ...(allowEmpty ? ['--allow-empty'] : []));
 }
 
 /**
@@ -15,6 +15,13 @@ function commit(root: string, message: string): void {
  * at their pinned SHA from `cache` (a local mirror made by the operator; the harness never fetches during a run).
  * Hidden checks, traps and reference solutions are never copied in.
  */
+/** Commits what an arm's setup wrote, so grading sees only the agent's own change. Index state stays untracked. */
+export function snapshotSetup(dir: string): string {
+  git(dir, 'add', '-A', '--', '.', ':(exclude).groundwork');
+  commit(dir, 'benchmark: arm setup', true);
+  return git(dir, 'rev-parse', 'HEAD');
+}
+
 export function materialize(repo: Repo, dir: string, options: { root?: string; cache?: string } = {}): string {
   if (existsSync(dir)) throw new Error(`Refusing to overwrite ${dir}`);
   mkdirSync(dir, { recursive: true });

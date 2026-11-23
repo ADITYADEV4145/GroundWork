@@ -5,7 +5,7 @@ import path from 'node:path';
 import * as z from 'zod';
 import { grade, GRADER_VERSION, type Grade } from './grade.js';
 import { dataRoot, loadManifest, projectRoot, taskSetHash, type Repo, type Task } from './tasks.js';
-import { git, materialize, taskPrompt, writeJson } from './workspaces.js';
+import { git, materialize, snapshotSetup, taskPrompt, writeJson } from './workspaces.js';
 
 const id = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const mcpServer = z.object({ name: id, command: z.string().min(1), args: z.array(z.string()).default([]), env: z.record(z.string(), z.string()).default({}) });
@@ -82,6 +82,8 @@ export interface RunOptions {
 export interface TurnResult { exit: number | null; timedOut: boolean; stdout: string; stderr: string }
 
 /** A preregistration counts only if the exact file is committed before the run starts. */
+const sha = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+
 export function registered(file: string, root = projectRoot): { file: string; commit: string; committedAt: string; sha256: string } {
   const rel = path.relative(root, path.resolve(root, file)).split(path.sep).join('/');
   if (rel.startsWith('..') || !existsSync(path.join(root, rel))) throw new Error(`No preregistration at ${file}`);
@@ -169,13 +171,22 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
   const hash = taskSetHash(root), blocked: { arm: string; reason: string }[] = [];
   const meta = path.join(out, options.run, 'run.json');
   const header = { format: 1, run: options.run, taskSetHash: hash, graderVersion: GRADER_VERSION, agent: agent.id, model: options.model,
+    // The agent definition is part of the treatment: a run cannot resume after it changes.
+    agentHash: sha(agent),
     preregistration: options.prereg ? registered(options.prereg) : null,
     replicates: options.replicates, maxTurns: options.maxTurns ?? 60, timeoutMs: options.timeoutMs ?? 1_200_000, tasks: tasks.map((t) => t.id) };
   if (existsSync(meta)) {
     const previous = JSON.parse(readFileSync(meta, 'utf8')) as Record<string, unknown>;
     for (const key of Object.keys(header) as (keyof typeof header)[])
       if (JSON.stringify(previous[key]) !== JSON.stringify(header[key])) throw new Error(`Run ${options.run} was started with a different ${key}; use a new run id`);
-  } else writeJson(meta, { ...header, startedAt: new Date().toISOString() });
+    // Same for each arm's definition, checked per arm so a competitor pinned later can still join the run.
+    const arms = (previous.arms ?? {}) as Record<string, string>;
+    for (const arm of wanted) {
+      if (arms[arm.id] && arms[arm.id] !== sha(arm)) throw new Error(`Run ${options.run} was started with a different definition of arm ${arm.id}; use a new run id`);
+      arms[arm.id] = sha(arm);
+    }
+    writeJson(meta, { ...previous, arms });
+  } else writeJson(meta, { ...header, arms: Object.fromEntries(wanted.map((a) => [a.id, sha(a)])), startedAt: new Date().toISOString() });
 
   let records = 0, skipped = 0;
   for (const arm of wanted) {
@@ -192,8 +203,9 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
         turns: [], grade: null, invalid: [] };
       try {
         mkdirSync(session, { recursive: true });
-        const base = materialize(repo, dir, { root, ...(options.cache ? { cache: options.cache } : {}) });
+        materialize(repo, dir, { root, ...(options.cache ? { cache: options.cache } : {}) });
         const installed = installArm(arm, dir, path.join(session, 'state'));
+        const base = snapshotSetup(dir);
         record.armVersion = installed.version;
         let usage: Usage | null = { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, costUsd: 0 };
         for (let turn = 0; turn <= task.turns.length; turn++) {
@@ -215,7 +227,6 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
           }
         }
         record.usage = usage;
-        if (!usage && !options.execute) record.invalid.push('provider-billed token usage was not reported');
         record.grade = await grade(task, repo, dir, base, root);
         record.invalid.push(...record.grade.invalid);
       } catch (e) { record.invalid.push(`harness: ${(e as Error).message}`); }
@@ -224,5 +235,8 @@ export async function runSuite(options: RunOptions): Promise<{ records: number; 
       log(`${arm.id} ${task.id} #${replicate}: ${record.invalid.length ? 'INVALID' : `${record.grade!.totalDefects} defects, ${record.grade!.success ? 'success' : 'failed'}`}`);
     }
   }
+  const notRunFile = path.join(out, options.run, 'not-run.json');
+  const earlier = existsSync(notRunFile) ? JSON.parse(readFileSync(notRunFile, 'utf8')) as { arm: string; reason: string }[] : [];
+  writeJson(notRunFile, [...earlier.filter((e) => !wanted.some((a) => a.id === e.arm)), ...blocked]);
   return { records, skipped, blocked, directory: path.join(out, options.run) };
 }

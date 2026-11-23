@@ -79,15 +79,13 @@ export interface ScanOptions { config: GroundworkConfig; changed?: ChangedFile[]
 
 /**
  * A function nothing in the repository calls by name but that a runtime or test harness runs: Go's `init`, `main` and
- * `Test…` functions, Rust's `main`, and any function declared under an attribute or decorator (`#[test]`, `#[bench]`, `@app.route`, `[Test]`).
+ * `Test…` functions, Rust's `main`, and any function declared under an attribute or decorator (`#[test]`, `#[bench]`, `@app.route`).
  */
-/** `[Test]`, `[Fact, Trait("a", "b")]`: names with optional arguments, not followed by what continues an expression (`[1, 2];`, `[a][0]`). */
-const CS_ATTRIBUTE = /^\[[A-Za-z_][\w.]*(\([^\]]*\))?(\s*,\s*[A-Za-z_][\w.]*(\([^\]]*\))?)*\](?!\s*[;.,=)[])/;
 function runByFramework(file: string, name: string, source: string, line: number): boolean {
   if (file.endsWith('.go') && /^(init|main|(Test|Benchmark|Fuzz|Example)(_.*|[A-Z0-9].*)?)$/.test(name)) return true;
   if (file.endsWith('.rs') && name === 'main') return true;
   const lines = source.split('\n');
-  const marker = (text: string) => text.startsWith('#[') || text.startsWith('@') || (file.endsWith('.cs') && CS_ATTRIBUTE.test(text));
+  const marker = (text: string) => text.startsWith('#[') || text.startsWith('@');
   // Python's indexed span starts on the decorator, and an attribute can share the declaration's line.
   if (marker((lines[line - 1] ?? '').trim())) return true;
   for (let i = line - 2; i >= 0; i--) {

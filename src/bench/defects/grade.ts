@@ -230,6 +230,10 @@ export async function grade(task: Task, repo: Repo, root: string, base: string, 
     else if (!changedFiles.has(file) && task.category === 'ripple') items.push({ defect: 'missedCallers', file, name: path.basename(file), evidence: 'affected file was not updated' });
   }
 
+  if (repo.requires?.length) {
+    const deps = run(root, ['python3', '-c', `import ${repo.requires.join(', ')}`]);
+    if (deps.infra || !deps.ok) invalid.push(`test dependencies are missing: ${deps.infra ?? deps.output.trim().split('\n').pop()}`);
+  }
   const visible = run(root, repo.test);
   if (visible.infra) invalid.push(`visible tests could not start: ${visible.infra}`);
   for (const test of task.affectedTests) {

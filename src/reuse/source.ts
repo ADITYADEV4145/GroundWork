@@ -7,7 +7,10 @@ import type { Language } from '../types.js';
 import { sha1 } from '../util/hash.js';
 import { contractOf } from './contracts.js';
 
-function bindingHash(body: Node, symbol: ExtractedSymbol): string {
+/** Languages where 'x' and "x" are the same value; Ruby quotes differ in escapes and interpolation. */
+const QUOTE_NEUTRAL = new Set<Language>(['typescript', 'tsx', 'javascript', 'python']);
+
+function bindingHash(body: Node, symbol: ExtractedSymbol, language: Language): string {
   const locals = new Map<string, string>();
   const declare = (name: string) => { if (!locals.has(name)) locals.set(name, `local:${locals.size}`); };
   for (const param of symbol.params) declare(param.name);
@@ -33,7 +36,9 @@ function bindingHash(body: Node, symbol: ExtractedSymbol): string {
       return;
     }
     if (['string', 'template_string', 'concatenated_string'].includes(node.type)) {
-      tokens.push(node.text);
+      // Quote style is formatting there, with or without a Python prefix; a literal holding a quote is compared as written.
+      const plain = node.type === 'string' && QUOTE_NEUTRAL.has(language) ? /^([A-Za-z]{0,2})(['"])([^'"]*)\2$/.exec(node.text) : null;
+      tokens.push(plain ? `${plain[1]!.toLowerCase()}"${plain[3]}"` : node.text);
       return;
     }
     if (node.childCount === 0) { if (node.text.trim()) tokens.push(node.text); return; }
@@ -59,7 +64,7 @@ export function extractReuseSource(source: string, language: Language) {
       if (!symbol.fingerprint) return { ...symbol, bindingHash: null };
       const node = nodes.find((node) => node.startIndex >= symbol.startByte && node.endIndex <= symbol.endByte &&
         fingerprint(node.childForFieldName('body')!, [symbol.name]).normHash === symbol.fingerprint!.normHash);
-      return { ...symbol, bindingHash: node ? bindingHash(node.childForFieldName('body')!, symbol) : null,
+      return { ...symbol, bindingHash: node ? bindingHash(node.childForFieldName('body')!, symbol, language) : null,
         contract: node ? contractOf(source, language, symbol, node.childForFieldName('body')!) : null };
     }) };
   } finally {

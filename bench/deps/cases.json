@@ -1,0 +1,712 @@
+{
+ "version": 1,
+ "packages": {
+  "npm": {
+   "lodash": "4.17.21",
+   "@types/lodash": "4.17.13",
+   "axios": "1.7.9",
+   "date-fns": "3.6.0",
+   "zod": "3.23.8",
+   "express": "4.21.2",
+   "@types/express": "4.17.21",
+   "@types/node": "22.10.0"
+  },
+  "pypi": {
+   "requests": "2.32.3",
+   "click": "8.1.7",
+   "PyYAML": "6.0.2",
+   "Jinja2": "3.1.4"
+  },
+  "go": {
+   "github.com/google/uuid": "v1.6.0",
+   "github.com/spf13/pflag": "v1.0.5"
+  },
+  "maven": {
+   "com.google.guava:guava": "33.0.0-jre",
+   "org.apache.commons:commons-lang3": "3.14.0",
+   "com.google.code.gson:gson": "2.10.1"
+  },
+  "control": {
+   "org.apache.commons:commons-text (sources)": "1.11.0"
+  },
+  "timing": {
+   "react-scripts": "5.0.1"
+  }
+ },
+ "cases": [
+  {
+   "id": "npm-01",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import _ from 'lodash';"
+   ],
+   "good": "export const g = _.includes([1], 1);",
+   "bad": "export const b = _.contains([1], 1);",
+   "note": "removed in lodash 4"
+  },
+  {
+   "id": "npm-02",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import _ from 'lodash';"
+   ],
+   "good": "export const g = _.map([{ a: 1 }], 'a');",
+   "bad": "export const b = _.pluck([{ a: 1 }], 'a');",
+   "note": "removed in lodash 4"
+  },
+  {
+   "id": "npm-03",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { uniqBy } from 'lodash';",
+   "bad": "import { uniqueBy } from 'lodash';"
+  },
+  {
+   "id": "npm-04",
+   "ecosystem": "npm",
+   "kind": "arity",
+   "prelude": [
+    "import _ from 'lodash';"
+   ],
+   "good": "export const g = _.chunk([1, 2], 1);",
+   "bad": "export const b = _.chunk();"
+  },
+  {
+   "id": "npm-05",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import _ from 'lodash';"
+   ],
+   "good": "export const g = _.flattenDeep([[1]]);",
+   "bad": "export const b = _.flattenAll([[1]]);"
+  },
+  {
+   "id": "npm-06",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import axios from 'axios';"
+   ],
+   "good": "export const g = axios.get('/u');",
+   "bad": "export const b = axios.getJSON('/u');"
+  },
+  {
+   "id": "npm-07",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { isAxiosError } from 'axios';",
+   "bad": "import { isHttpError } from 'axios';"
+  },
+  {
+   "id": "npm-08",
+   "ecosystem": "npm",
+   "kind": "arity",
+   "prelude": [
+    "import axios from 'axios';"
+   ],
+   "good": "export const g = axios.get('/u', {});",
+   "bad": "export const b = axios.get();"
+  },
+  {
+   "id": "npm-09",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import axios from 'axios';"
+   ],
+   "good": "export const g = axios.create({});",
+   "bad": "export const b = axios.createInstance({});"
+  },
+  {
+   "id": "npm-10",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { addDays } from 'date-fns';",
+   "bad": "import { addWorkdays } from 'date-fns';"
+  },
+  {
+   "id": "npm-11",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { formatDistanceToNow } from 'date-fns';",
+   "bad": "import { formatDistanceToNowShort } from 'date-fns';"
+  },
+  {
+   "id": "npm-12",
+   "ecosystem": "npm",
+   "kind": "arity",
+   "prelude": [
+    "import { differenceInDays } from 'date-fns';"
+   ],
+   "good": "export const g = differenceInDays(new Date(), new Date());",
+   "bad": "export const b = differenceInDays(new Date());"
+  },
+  {
+   "id": "npm-13",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { isValid } from 'date-fns';",
+   "bad": "import { isDateValid } from 'date-fns';"
+  },
+  {
+   "id": "npm-14",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import { z } from 'zod';"
+   ],
+   "good": "export const g = z.string();",
+   "bad": "export const b = z.text();"
+  },
+  {
+   "id": "npm-15",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { ZodError } from 'zod';",
+   "bad": "import { ZodValidationError } from 'zod';"
+  },
+  {
+   "id": "npm-16",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import { z } from 'zod';"
+   ],
+   "good": "export const g = z.object({});",
+   "bad": "export const b = z.objectOf({});"
+  },
+  {
+   "id": "npm-17",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import express from 'express';"
+   ],
+   "good": "export const g = express.json();",
+   "bad": "export const b = express.bodyParser();",
+   "note": "removed in express 4"
+  },
+  {
+   "id": "npm-18",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { Router } from 'express';",
+   "bad": "import { createServer } from 'express';"
+  },
+  {
+   "id": "npm-19",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import * as fs from 'node:fs';"
+   ],
+   "good": "export const g = fs.existsSync('a');",
+   "bad": "export const b = fs.existsFileSync('a');"
+  },
+  {
+   "id": "npm-20",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import * as crypto from 'node:crypto';"
+   ],
+   "good": "export const g = crypto.randomUUID();",
+   "bad": "export const b = crypto.randomUuid();"
+  },
+  {
+   "id": "npm-21",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import { readFile } from 'node:fs/promises';",
+   "bad": "import { readFileText } from 'node:fs/promises';"
+  },
+  {
+   "id": "npm-22",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "prelude": [
+    "import * as os from 'node:os';"
+   ],
+   "good": "export const g = os.homedir();",
+   "bad": "export const b = os.homeDirectory();"
+  },
+  {
+   "id": "pypi-01",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "prelude": [
+    "import requests"
+   ],
+   "good": "g = requests.get(\"http://x\")",
+   "bad": "b = requests.get_json(\"http://x\")",
+   "probe": "not hasattr(requests, \"get_json\")"
+  },
+  {
+   "id": "pypi-02",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from requests import Session",
+   "bad": "from requests import AsyncSession",
+   "probe": "not hasattr(requests, \"AsyncSession\")"
+  },
+  {
+   "id": "pypi-03",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from requests.exceptions import ConnectionError",
+   "bad": "from requests.exceptions import NetworkError",
+   "probe": "not hasattr(requests.exceptions, \"NetworkError\")"
+  },
+  {
+   "id": "pypi-04",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from requests.adapters import HTTPAdapter",
+   "bad": "from requests.adapters import RetryAdapter",
+   "probe": "not hasattr(requests.adapters, \"RetryAdapter\")"
+  },
+  {
+   "id": "pypi-05",
+   "ecosystem": "pypi",
+   "kind": "arity",
+   "prelude": [
+    "import requests"
+   ],
+   "good": "g = requests.get(\"http://x\")",
+   "bad": "b = requests.get()",
+   "probe": "arity_fails(requests.get, 0)"
+  },
+  {
+   "id": "pypi-06",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from requests.utils import get_netrc_auth",
+   "bad": "from requests.utils import parse_url_params",
+   "probe": "not hasattr(requests.utils, \"parse_url_params\")"
+  },
+  {
+   "id": "pypi-07",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "prelude": [
+    "import click"
+   ],
+   "good": "g = click.echo(\"x\")",
+   "bad": "b = click.print_line(\"x\")",
+   "probe": "not hasattr(click, \"print_line\")"
+  },
+  {
+   "id": "pypi-08",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "prelude": [
+    "import click"
+   ],
+   "good": "g = click.get_current_context()",
+   "bad": "b = click.get_terminal_size()",
+   "probe": "not hasattr(click, \"get_terminal_size\")",
+   "note": "removed in click 8.1"
+  },
+  {
+   "id": "pypi-09",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from click import Choice",
+   "bad": "from click import MultiChoice",
+   "probe": "not hasattr(click, \"MultiChoice\")"
+  },
+  {
+   "id": "pypi-10",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from click.testing import CliRunner",
+   "bad": "from click.testing import CommandRunner",
+   "probe": "not hasattr(click.testing, \"CommandRunner\")"
+  },
+  {
+   "id": "pypi-11",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "prelude": [
+    "import click"
+   ],
+   "good": "g = click.confirm(\"ok?\")",
+   "bad": "b = click.confirm_prompt(\"ok?\")",
+   "probe": "not hasattr(click, \"confirm_prompt\")"
+  },
+  {
+   "id": "pypi-12",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "prelude": [
+    "import yaml"
+   ],
+   "good": "g = yaml.safe_load(\"a: 1\")",
+   "bad": "b = yaml.safe_parse(\"a: 1\")",
+   "probe": "not hasattr(yaml, \"safe_parse\")"
+  },
+  {
+   "id": "pypi-13",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "prelude": [
+    "import yaml"
+   ],
+   "good": "g = yaml.safe_load_all(\"a: 1\")",
+   "bad": "b = yaml.load_file(\"a.yml\")",
+   "probe": "not hasattr(yaml, \"load_file\")"
+  },
+  {
+   "id": "pypi-14",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from yaml import SafeLoader",
+   "bad": "from yaml import FastLoader",
+   "probe": "not hasattr(yaml, \"FastLoader\")"
+  },
+  {
+   "id": "pypi-15",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from jinja2 import Environment",
+   "bad": "from jinja2 import TemplateEngine",
+   "probe": "not hasattr(jinja2, \"TemplateEngine\")"
+  },
+  {
+   "id": "pypi-16",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "from jinja2 import Template",
+   "bad": "from jinja2 import Markup",
+   "probe": "not hasattr(jinja2, \"Markup\")",
+   "note": "removed in Jinja2 3.1"
+  },
+  {
+   "id": "pypi-17",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "prelude": [
+    "import jinja2"
+   ],
+   "good": "g = jinja2.FileSystemLoader(\"t\")",
+   "bad": "b = jinja2.DirectoryLoader(\"t\")",
+   "probe": "not hasattr(jinja2, \"DirectoryLoader\")"
+  },
+  {
+   "id": "pypi-18",
+   "ecosystem": "pypi",
+   "kind": "arity",
+   "prelude": [
+    "from requests.utils import unquote_unreserved"
+   ],
+   "good": "g = unquote_unreserved(\"a\")",
+   "bad": "b = unquote_unreserved(\"a\", \"b\", \"c\")",
+   "probe": "arity_fails(requests.utils.unquote_unreserved, 3)"
+  },
+  {
+   "id": "go-01",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"github.com/google/uuid\""
+   ],
+   "good": "var _ = uuid.NewString()",
+   "bad": "var _ = uuid.NewV4()"
+  },
+  {
+   "id": "go-02",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"github.com/google/uuid\""
+   ],
+   "good": "var _, _ = uuid.Parse(\"x\")",
+   "bad": "var _, _ = uuid.FromString(\"x\")"
+  },
+  {
+   "id": "go-03",
+   "ecosystem": "go",
+   "kind": "arity",
+   "prelude": [
+    "import \"github.com/google/uuid\""
+   ],
+   "good": "var _ = uuid.NewSHA1(uuid.Nil, []byte(\"a\"))",
+   "bad": "var _ = uuid.NewSHA1(uuid.Nil)"
+  },
+  {
+   "id": "go-04",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"github.com/google/uuid\""
+   ],
+   "good": "var _ = uuid.Validate(\"x\")",
+   "bad": "var _ = uuid.IsValid(\"x\")"
+  },
+  {
+   "id": "go-05",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"strings\""
+   ],
+   "good": "var _ = strings.ToTitle(\"a\")",
+   "bad": "var _ = strings.Capitalize(\"a\")"
+  },
+  {
+   "id": "go-06",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"strings\""
+   ],
+   "good": "var _ = strings.EqualFold(\"a\", \"A\")",
+   "bad": "var _ = strings.ContainsIgnoreCase(\"a\", \"A\")"
+  },
+  {
+   "id": "go-07",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"os\""
+   ],
+   "good": "var _, _ = os.ReadFile(\"a\")",
+   "bad": "var _, _ = os.ReadAllFile(\"a\")"
+  },
+  {
+   "id": "go-08",
+   "ecosystem": "go",
+   "kind": "arity",
+   "prelude": [
+    "import \"strings\""
+   ],
+   "good": "var _ = strings.Split(\"a,b\", \",\")",
+   "bad": "var _ = strings.Split(\"a,b\", \",\", 2)"
+  },
+  {
+   "id": "go-09",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"path/filepath\""
+   ],
+   "good": "var _ = filepath.Join(\"a\", \"b\")",
+   "bad": "var _ = filepath.JoinPath(\"a\", \"b\")"
+  },
+  {
+   "id": "go-10",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"time\""
+   ],
+   "good": "var _ = time.Now()",
+   "bad": "var _ = time.NowUTC()"
+  },
+  {
+   "id": "go-11",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"errors\""
+   ],
+   "good": "var _ = errors.New(\"x\")",
+   "bad": "var _ = errors.Wrap(nil, \"x\")"
+  },
+  {
+   "id": "go-12",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"github.com/spf13/pflag\""
+   ],
+   "good": "var _ = pflag.String(\"n\", \"\", \"u\")",
+   "bad": "var _ = pflag.StringOpt(\"n\", \"\", \"u\")"
+  },
+  {
+   "id": "go-13",
+   "ecosystem": "go",
+   "kind": "arity",
+   "prelude": [
+    "import \"github.com/spf13/pflag\""
+   ],
+   "good": "var _ = pflag.Int(\"n\", 1, \"u\")",
+   "bad": "var _ = pflag.Int(\"n\", 1)"
+  },
+  {
+   "id": "go-14",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "prelude": [
+    "import \"encoding/json\""
+   ],
+   "good": "var _, _ = json.Marshal(1)",
+   "bad": "var _, _ = json.Stringify(1)"
+  },
+  {
+   "id": "maven-01",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import com.google.common.base.Strings;"
+   ],
+   "good": "Strings.isNullOrEmpty(\"a\");",
+   "bad": "Strings.isEmpty(\"a\");"
+  },
+  {
+   "id": "maven-02",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import com.google.common.base.Objects;"
+   ],
+   "good": "Objects.equal(1, 2);",
+   "bad": "Objects.toStringHelper(\"a\");",
+   "note": "removed from Guava"
+  },
+  {
+   "id": "maven-03",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import com.google.common.collect.Lists;"
+   ],
+   "good": "Lists.newArrayList();",
+   "bad": "Lists.newImmutableList();"
+  },
+  {
+   "id": "maven-04",
+   "ecosystem": "maven",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import com.google.common.collect.ImmutableList;",
+   "bad": "import com.google.common.collect.ImmutableArrayList;"
+  },
+  {
+   "id": "maven-05",
+   "ecosystem": "maven",
+   "kind": "arity",
+   "prelude": [
+    "import com.google.common.base.Preconditions;"
+   ],
+   "good": "Preconditions.checkNotNull(\"a\");",
+   "bad": "Preconditions.checkNotNull();"
+  },
+  {
+   "id": "maven-06",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import com.google.common.io.Files;"
+   ],
+   "good": "Files.toByteArray(new java.io.File(\"a\"));",
+   "bad": "Files.readFileToString(new java.io.File(\"a\"));"
+  },
+  {
+   "id": "maven-07",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import org.apache.commons.lang3.StringUtils;"
+   ],
+   "good": "StringUtils.isBlank(\"a\");",
+   "bad": "StringUtils.isNullOrBlank(\"a\");"
+  },
+  {
+   "id": "maven-08",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import org.apache.commons.lang3.StringUtils;"
+   ],
+   "good": "StringUtils.capitalize(\"a\");",
+   "bad": "StringUtils.capitalise(\"a\");"
+  },
+  {
+   "id": "maven-09",
+   "ecosystem": "maven",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import org.apache.commons.lang3.StringUtils;",
+   "bad": "import org.apache.commons.lang3.StringUtil;"
+  },
+  {
+   "id": "maven-10",
+   "ecosystem": "maven",
+   "kind": "arity",
+   "prelude": [
+    "import org.apache.commons.lang3.StringUtils;"
+   ],
+   "good": "StringUtils.repeat(\"a\", 2);",
+   "bad": "StringUtils.repeat(\"a\");"
+  },
+  {
+   "id": "maven-11",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import org.apache.commons.lang3.ArrayUtils;"
+   ],
+   "good": "ArrayUtils.addAll(new int[0], new int[0]);",
+   "bad": "ArrayUtils.concat(new int[0], new int[0]);"
+  },
+  {
+   "id": "maven-12",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import com.google.gson.JsonParser;"
+   ],
+   "good": "JsonParser.parseString(\"{}\");",
+   "bad": "JsonParser.parseJson(\"{}\");"
+  },
+  {
+   "id": "maven-13",
+   "ecosystem": "maven",
+   "kind": "unknown-export",
+   "prelude": [],
+   "good": "import com.google.gson.GsonBuilder;",
+   "bad": "import com.google.gson.GsonFactory;"
+  },
+  {
+   "id": "maven-14",
+   "ecosystem": "maven",
+   "kind": "arity",
+   "prelude": [
+    "import com.google.gson.Gson;"
+   ],
+   "good": "new Gson();",
+   "bad": "new Gson(\"pretty\");"
+  },
+  {
+   "id": "maven-15",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "prelude": [
+    "import org.apache.commons.lang3.math.NumberUtils;"
+   ],
+   "good": "NumberUtils.toInt(\"1\");",
+   "bad": "NumberUtils.parseInt(\"1\");"
+  }
+ ]
+}

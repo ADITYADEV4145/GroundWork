@@ -75,3 +75,7 @@ Every task passed all three repeats in both arms. The follow-up interval spans z
 2. To carry a repo across tasks, set matching `sequence` on related tasks and give each a contiguous `step` starting at 1. The collector reapplies earlier patches in the sequence as commits, then measures the next step. All steps in a sequence use the same repo.
 3. Add `bench/<suite>/grade.mjs` exporting `grade(task, observation, context)`. Return a boolean or `{success, metrics: {duplicatesAdded: 0, inventedCalls: 0}}` with suite-specific numeric metrics. `context.withWorkspace(async (root) => ...)` gives the verifier the pinned worktree with prior sequence patches and the current patch applied.
 4. Capture with `GW_BENCH_SUITE=<suite>` set for every capture action. Grade with `gw bench --suite <suite>`. `--suite all` replays suites with recorded evidence; with `--observations` it grades every suite with a task manifest and requires captures for each.
+
+## Dependency-hallucination gate
+
+`bench/deps/` holds the preregistered gate for checking beyond the repository: 69 seeded mistakes in real npm, PyPI, Go and Maven packages, plus accepted code that must not be blocked. `npm run setup:deps-bench` is the developer-only step that downloads the pinned packages into `~/.cache/groundwork-bench/deps` (override with `GROUNDWORK_DEPS_BENCH`); `npm run bench:deps` then runs offline with network access instrumented. The v1 run failed and stays in `results/`; v2 is in `results-v2/`.

@@ -1,0 +1,20 @@
+name: agent-checked
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./
+        with:
+          # Stored task solutions are overlays for other repositories, and the grounding fixtures hold invented calls on purpose.
+          ignore: bench/defects-at-done/reference/**,bench/defects-at-done/hidden/**,fixtures/**

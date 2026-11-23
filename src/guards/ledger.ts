@@ -16,7 +16,13 @@ export interface Ledger {
   duplicatesPrevented: number;
   inventedCallsCaught: number;
   ignores: number;
+  /** Imports and calls the edit hook verified, and wall time spent inside hooks: the session receipt's inputs. */
+  callsChecked: number;
+  hookMs: number;
+  /** REUSE / EXTEND / NEW choices the agent reported through before_write, newest last. */
+  reuseDecisions?: ReuseDecision[];
 }
+export interface ReuseDecision { choice: 'reuse' | 'extend' | 'new'; reason: string }
 const dir = (root: string) => path.join(root, '.groundwork', 'sessions');
 const count = z.number().finite().nonnegative();
 const ledgerSchema = z.object({
@@ -25,6 +31,8 @@ const ledgerSchema = z.object({
   commands: z.record(z.string(), z.object({ step: count, fingerprint: z.string(), summary: z.string(), logPath: z.string().nullable(), outputBytes: count })),
   exploration: z.object({ files: z.array(z.string()), hinted: z.boolean() }),
   duplicatesPrevented: count, inventedCallsCaught: count, ignores: count,
+  callsChecked: count.default(0), hookMs: count.default(0),
+  reuseDecisions: z.array(z.object({ choice: z.enum(['reuse', 'extend', 'new']), reason: z.string() })).optional(),
 }).passthrough();
 function parseLedger(value: unknown, id: string): Ledger {
   const parsed = ledgerSchema.safeParse(value);
@@ -34,7 +42,7 @@ function parseLedger(value: unknown, id: string): Ledger {
 }
 export const tokens = (text: string) => Buffer.byteLength(text) / 4;
 export function emptyLedger(sessionId: string): Ledger {
-  return { sessionId, method: 'bytes/4', step: 0, guards: {}, commands: {}, exploration: { files: [], hinted: false }, duplicatesPrevented: 0, inventedCallsCaught: 0, ignores: 0 };
+  return { sessionId, method: 'bytes/4', step: 0, guards: {}, commands: {}, exploration: { files: [], hinted: false }, duplicatesPrevented: 0, inventedCallsCaught: 0, ignores: 0, callsChecked: 0, hookMs: 0 };
 }
 export function readLedger(root: string, id: string): Ledger {
   try {
@@ -55,8 +63,11 @@ export function updateLedger(root: string, id: string | null | undefined, update
 export function stats(ledger: Ledger, guard: string): GuardStats {
   return ledger.guards[guard] ??= { interventions: 0, tokensSaved: 0, forced: 0 };
 }
-export function bumpCounter(root: string, id: string | null, counter: 'duplicatesPrevented' | 'inventedCallsCaught' | 'ignores', amount = 1): void {
+export function bumpCounter(root: string, id: string | null, counter: 'duplicatesPrevented' | 'inventedCallsCaught' | 'ignores' | 'callsChecked' | 'hookMs', amount = 1): void {
   updateLedger(root, id, (l) => { l[counter] += amount; });
+}
+export function recordReuseDecision(root: string, id: string | null | undefined, choice: ReuseDecision['choice'], reason: string): boolean {
+  return updateLedger(root, id, (l) => { l.reuseDecisions = [...(l.reuseDecisions ?? []), { choice, reason: reason.replace(/\s+/g, ' ').slice(0, 200) }].slice(-50); });
 }
 export function sessionIds(root: string): string[] {
   try { return readdirSync(dir(root)).filter((f) => /^[A-Za-z0-9_-]{1,128}\.json$/.test(f)).sort((a, b) => statSync(path.join(dir(root), b)).mtimeMs - statSync(path.join(dir(root), a)).mtimeMs).map((f) => f.slice(0, -5)); }
@@ -74,6 +85,7 @@ export function report(root: string, ids: string[]): Ledger & { forced: number; 
     total.duplicatesPrevented += l.duplicatesPrevented;
     total.inventedCallsCaught += l.inventedCallsCaught;
     total.ignores += l.ignores;
+    total.callsChecked += l.callsChecked; total.hookMs += l.hookMs;
   }
   const forced = Object.values(total.guards).reduce((n, s) => n + s.forced, 0);
   const interventions = Object.values(total.guards).reduce((n, s) => n + s.interventions, 0);

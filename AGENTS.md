@@ -26,7 +26,7 @@ Read the index through `src/index/query.ts` (or `src/api.ts`); don't write SQL a
 
 - Agent-facing output is short, ranked and token-budgeted (`fitToBudget`); every CLI command supports `--json`.
 - Hooks fail open: any error or timeout means allow, exit 0, nothing on stdout.
-- Runtime is local and offline. The sole consented setup exception is `gw init --embeddings`, which downloads a model to `.groundwork/models/` only on that explicit command; runtime inference is local-files-only and never downloads missing models. Dev-only benchmark scripts (`scripts/calibrate-mine.ts`, `scripts/setup-real-repos.ts`) clone pinned repos into external caches and are not shipped with the tool.
+- Runtime is local and offline. The sole consented setup exception is `gw init --embeddings`, which downloads a model to `.groundwork/models/` only on that explicit command; runtime inference is local-files-only and never downloads missing models. `gw update` is the other explicit exception: it asks the npm registry for the latest release only when the user runs it, and installs nothing unless the tarball's sha512 matches. Dev-only benchmark scripts (`scripts/calibrate-mine.ts`, `scripts/setup-real-repos.ts`, `scripts/setup-deps-bench.ts`) fetch pinned repos and packages into external caches and are not shipped with the tool.
 
 ## Releasing
 

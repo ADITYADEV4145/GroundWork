@@ -8,13 +8,28 @@
 <h1 align="center">Less searching. More building.</h1>
 
 <p align="center">
+  <a href="https://github.com/ADITYADEV4145/GroundWork/actions/workflows/groundwork.yml"><img src="https://github.com/ADITYADEV4145/GroundWork/actions/workflows/groundwork.yml/badge.svg" alt="agent-checked"></a>
+</p>
+
+### Search by intent
+
+Use `gw search "where do we retry failed requests" --limit 5` (or `--json`)
+and MCP `search_code` when you know what code does but not its name. Results
+include symbol IDs, locations, a short doc line and match evidence. Use
+`find_code` for known names; it is unchanged. Search normalizes English filler,
+inflections and a small code vocabulary. After explicit `gw init --embeddings`
+setup, installed local source embeddings augment lexical ranking; otherwise
+search silently stays lexical. Runtime never downloads models. The frozen
+retrieval evaluation and limitations live in `bench/search/`.
+
+<p align="center">
   A live, local map of your codebase for coding agents.<br>
   Find the right symbol. Reuse the right helper. Call code that actually exists.
 </p>
 
 <p align="center">
   <strong>Claude Code · Codex · Cursor</strong><br>
-  TypeScript · JavaScript · Python &nbsp; / &nbsp; Node.js 22+ &nbsp; / &nbsp; MIT
+  TypeScript · JavaScript · Python · Go · Rust · Java · C# · Ruby &nbsp; / &nbsp; Node.js 22+ &nbsp; / &nbsp; MIT
 </p>
 
 <p align="center">
@@ -81,7 +96,7 @@ Then, **from the repository you want your agent to work in**:
 
 ```sh
 gw init       # build the local index in .groundwork/
-gw setup      # preview project-level changes, then confirm
+gw install    # detect your clients, preview project-level changes, then confirm
 ```
 
 Restart your agent after setup. Codex asks you to trust the new hooks once, under `/hooks`.
@@ -143,7 +158,7 @@ These integrations use the `gw` on your PATH from any install above. One-off run
 
 Waste guards also catch repeated commands, suggest more focused exploration, and trim noisy command output while retaining failures and a full local log. See [waste guards](docs/waste-guards.md) for the agent-specific behavior and limits.
 
-**Languages:** TypeScript, JavaScript (including JSX and CommonJS), and Python. Other files fall back to the agent's normal tools.
+**Languages:** Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript (including JSX and CommonJS), Python, Go, Rust, Java, C# and Ruby. Grounding call verification remains limited to TypeScript, JavaScript and Python. Other files fall back to the agent's normal tools.
 
 ## See a real check
 
@@ -181,7 +196,10 @@ Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): strin
 | `outline` | A file's symbols and signatures without their bodies. |
 | `read_symbol` | One symbol's source, not the whole file. |
 | `callers` / `callees` / `where_used` | Who calls a symbol, what it calls, and its references. |
+| `before_write` | One call before writing: code to reuse, exact signatures to call, and callers to update. |
+| `architecture` | Once per session in an unfamiliar repo: packages, entry points, which package depends on which, the most-called helpers, and naming conventions. |
 | `find_similar` | Existing code to consider before writing something new. |
+| `refactor_symbol` | Read-only preview of a guarded TS/JS symbol rename or function body edit. |
 | `verify_calls` | Whether snippet imports and calls exist, and their argument counts. |
 | `index_status` | Index freshness and size. |
 
@@ -233,6 +251,55 @@ Or edit `.groundwork/config.json`. Explicit settings override profile defaults:
 
 Commit `config.json` to share your team's preferences. Everything else in `.groundwork/` is git-ignored.
 
+### Change impact
+
+`gw impact [--base ref] [--depth n] [--json]` and MCP `change_impact` list changed
+symbols, unchanged callers and reaching tests, with simple high/medium/low risk.
+Session evidence marks callers not observed opened/edited and tests not observed
+running. Stop adds nonblocking, deduplicated context only; timeouts fail open.
+`complete: true` means no further lookup changes the indexed static answer for that
+snapshot; ambiguity, stale/unparsed files or depth truncation keep it false.
+Configure `impact` (`enabled`, `stopGate`, `depth`, `budgetTokens`, `timeoutMs`).
+See [impact rules and limitations](references/impact.md). The deterministic tool
+benchmark is not an agent run; the planted-caller agent gate remains pending.
+
+### Optional type checking
+
+`gw types check [files...] [--base ref]` checks changed lines using the target project's
+own TypeScript compiler or Pyright (the project's binary, then PATH). Nothing is downloaded;
+missing compilers leave syntax/import grounding unchanged and are reported only in explicit
+CLI/MCP output. `check_types` accepts `files: [{file, lines?}]` and returns budgeted findings.
+`gw check` and Stop include type findings; strict Stop can block new definite errors,
+while standard reports context. Existing diagnostics in the base file are informational.
+Missing-module TS 2307 diagnostics and diagnostics in files with grounding's
+dynamic-patching signals are informational; grounding owns missing-module blocking.
+The TypeScript blocking allowlist is 2304, 2305, 2724, 2339, 2551, 2349, 2554,
+2555, 2556, 2345, 2353, 2561.
+`gw types def|impl|refs file:line:col` provides TypeScript navigation. All support `--json`.
+
+Go, Rust, Java and C# files are checked with the toolchain already on the machine:
+a `go/types` checker built once from the installed Go (needs `go.mod`; `go build -gcflags=-e` /
+`go vet` if it cannot be built), `cargo check --offline` (needs `Cargo.toml`), `javac` on the Maven/Gradle source roots and local jars, and
+`dotnet build --no-restore` (needs a restored `.csproj`; outputs go to a scratch directory,
+never the project's `bin`/`obj`). Only undefined names, unknown members, wrong argument
+counts and unresolved imports on changed lines can block; everything else, and everything
+`javac` reports with an incomplete classpath or in a project that uses annotation
+processors (Lombok and the like), is informational. A missing toolchain or
+project file leaves grounding unchanged. These four have no `def|impl|refs` navigation.
+On the preregistered gate (two pinned real repositories per language, seeded one-line errors,
+100 real commits each) Java and Go pass; Rust and C# fail. Go failed the first run and passes
+the second, on the first run's cases and on a held-out set. Rust still fails: on rust-analyzer
+20 of 100 real commits exceed the 4 s budget and fail open. C# is unchanged and fails for the
+same reason on Polly. Results: `bench/type-languages/results/RESULTS.md` (first run),
+`bench/type-languages/results-v2/RESULTS.md` (second run).
+
+The optional `types` config section defaults to
+`{ "enabled": true, "stopGate": true, "postToolHook": false, "timeoutMs": 4000,
+"budgetTokens": 400, "typescript": "auto", "python": "auto", "go": "auto", "rust": "auto",
+"java": "auto", "csharp": "auto" }`.
+Set `enabled: false` to disable it, or set any language to `"off"`.
+Timeouts fail open; type checking is not enabled after individual edits by default.
+
 > The profile controls the **Stop gate**, not every possible intervention. Read and repeat-command guards can deny redundant actions in the profiles where they are enabled; each has an override.
 
 ## Commands
@@ -242,15 +309,119 @@ Commit `config.json` to share your team's preferences. Everything else in `.grou
 | `gw symbols <query>` / `gw show <symbol>` | Search symbols; show a signature, callers and callees. |
 | `gw similar "<description>"` | Find existing code to reuse. |
 | `gw check [--base <ref>]` | Check changed code for duplicates and grounding errors; exit 1 on BLOCK. |
+| `gw scan [dir \| diff \| -] [--base <ref>] [--json \| --sarif]` | One-screen report with no setup: invented calls, wrong arguments, duplicated logic, duplicate constants and dead code, plus type errors on the changed lines of a diff. Each finding carries a confidence; low-confidence ones are listed separately under "Check". Exit 1 on a high-confidence finding. |
+| `gw ci [--base <ref>] [--only-ai] [--block \| --warn \| --off <kinds>] [--ignore <globs>]` | The pull request check behind the GitHub Action: scans what the pull request changed, exits 1 on a blocking finding, and writes the comment (`--comment-file`) and SARIF (`--sarif-file`). |
+| `gw badge [--repo <owner/name>] [--workflow <file>]` | Print the `agent-checked` README badge for the workflow that runs the check. |
+| `gw receipt [--session <id>] [--png <file>]` | Counts for one agent session: calls checked, invented calls caught, duplicates prevented, callers updated, affected tests run, time added. Counts only, never file names or code. |
 | `gw verify [files...]` | Check grounding alone; exit 1 on definite errors. |
+| `gw deps [build\|show <module>]` | Inspect what is known about installed dependencies, workspace packages and local contracts. |
+| `gw refactor <symbol> --rename <name>` / `--body-file <path>` | Preview a TS/JS symbol rename or body replacement; use `--apply <preview-id>` to revalidate and write. |
 | `gw run -- <cmd>` | Keep the full command log locally and print a trimmed summary. |
 | `gw report` | Show session guard activity and estimated savings. |
 | `gw refresh` / `gw stats` | Refresh the index or inspect its contents. |
-| `gw doctor` / `gw selftest` | Check the environment or run acceptance checks. |
+| `gw install [--client <names>\|all]` | Detect your clients and wire Groundwork into each; prints what each one enforces. See [clients](docs/clients.md). |
+| `gw update [--check]` | Update from the npm registry; installs only a download whose sha512 checksum matches. |
+| `gw view` | Open a local page with the module graph and where the last session was blocked. |
+| `gw doctor` / `gw selftest` | Check languages, type backends, the index and each client's hooks and MCP, or run acceptance checks. |
 
 Every command accepts `--json`.
 
+### Guarded symbol edits
+
+```sh
+gw refactor src/math.ts:formatTotal --rename formatSum --json
+gw refactor src/math.ts:formatTotal --rename formatSum --apply <preview-id>
+gw refactor src/math.ts:formatSum --body-file /path/to/new-body.txt --json
+```
+
+Use an exact symbol ID (from `gw symbols --json`), qualified name, or repo-relative `file:name`. The body file contains the full replacement body, including braces for a block. Groundwork preserves the declaration and edits only the selected body. Rename follows TypeScript's static references, including imports and re-exports, without replacing unrelated names, ordinary strings or comments. It does not update dynamic references or external consumers.
+
+Preview returns a patch in JSON without modifying tracked or untracked source. Groundwork checks for compiler errors and changed bindings, then runs the reuse and grounding checks against isolated copies of the current working tree. A blocking finding, uncheckable target, or stale preview prevents apply; warnings are reported. Apply requires the same request and preview ID, rechecks the candidate, and leaves the patch unstaged. This works in Git repositories with an indexed TS/JS declaration in a compiler project. Rename stops if a source file outside the compiler project may reference the symbol. A body edit must preserve the callable type if the compiler project does not cover all repository TS/JS files. Use ordinary edits and tests for other languages or dynamic references.
+
+## GitHub Action
+
+Check every pull request in CI. The scan runs inside the runner; no code leaves it.
+
+```yaml
+# .github/workflows/groundwork.yml
+name: agent-checked
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]  # labels matter for only-ai
+permissions:
+  contents: read
+  pull-requests: write    # the comment
+  security-events: write  # code scanning (SARIF)
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ADITYADEV4145/GroundWork@v1
+        with:
+          only-ai: false   # true checks only agent-written pull requests
+```
+
+The action is not tagged yet: until a `v1` tag exists, pin a commit SHA.
+
+- The check fails on high-confidence invented calls and wrong arguments. Duplicated logic, duplicate constants and dead code are warnings. Type errors are not checked in CI, because the type checker would run tools from the pull request's checkout. Low-confidence findings never appear and never fail the check.
+- Findings go into one comment, grouped by kind, at most 10, each with the real symbol to use when there is one. The comment is updated on each push and removed when the findings are gone. A pull request with no findings gets no comment. With a GitHub App token in `token`, set `comment-author` to the app's login (`my-app[bot]`) so the action finds its own comment.
+- Findings are uploaded as SARIF to code scanning (`sarif: false` turns it off).
+- `only-ai: true` skips pull requests that do not look agent-written: a label (`ai`, `agent`, `devin`, `copilot`, `claude`, `codex`, `cursor`, `ai-generated`), a bot author other than dependency bots, or an agent commit author or `Co-Authored-By` trailer.
+- Inputs `block`, `warn`, `off` (finding kinds) and `ignore` (globs) override the defaults per workflow. The same settings live in `.groundwork/config.json`:
+
+```json
+{ "ci": { "severity": { "duplicate-logic": "block", "dead-code": "off" }, "ignore": ["vendor/**"], "onlyAi": true } }
+```
+
+Add the badge with `gw badge`; it shows the latest run of the workflow and links to it.
+
+The check is tested on 20 scripted pull requests (`test/ci-replay.ts`): every reported finding was expected, the 8 clean ones got no comment, and one seeded defect (a missing member of a namespace import) was missed because it is only low confidence. These are hand-written cases, not real agent-written pull requests; that replay has not been run.
+
 ## Benchmark results
+
+<!-- phase-a-v9:start -->
+
+### v9 Phase A (PR #41: one-turn answers + batching guidance, measured, not shipped)
+
+Navigation engineering gate passed with fewer actions per session (compliant 51.8 vs 60.3 baseline), no speed win (session-time CI includes zero, point estimate slower), tool-side time higher (−389% reduction), success 480/480 each arm. PR #41 was measured, not shipped. These navigation-only results are not an overall Phase A pass.
+
+Stable-v1; collector/product source pin 36f54a0845fe2bf4184549cf5cef8f216a8957ab. There are 16 sessions per arm, 30 tasks per navigation session. Positive reduction favors GroundWork; all intervals are nominal 95% whole-session bootstrap CIs (10,000 draws, seed 0x51ab17ed). Captured actions are wrapper tool calls, not model conversation turns. Bytes are emitted tool output, not billed tokens or dollars.
+
+The protocol-compliant v9c GroundWork arm is the official navigation gate. The regenerated-skill v9 arm is shown next to it as a disclosed deviation, never in its place. Both engineering gates pass: mean actions/session is no higher than baseline and the session-time reduction CI includes zero or better. Neither arm has a confirmatory latency win. The same 16 baseline sessions are reused; these are 48 unique navigation captures, not independent replications of the baseline. Success guardrails pass in every category.
+
+| Navigation arm | Estimand | Baseline mean | GroundWork mean | Reduction [95% CI] | Success guardrail |
+| --- | --- | --- | --- | --- | --- |
+| Compliant v9c — official | Session elapsed/task (ms) | 5701.72 | 5782.44 | -1.42% [-9.81, 6.53] | met: 480/480 / 480/480 |
+| Compliant v9c — official | Emitted bytes/session | 32680.50 | 34459.38 | -5.44% [-13.59, 1.79] | met: 480/480 / 480/480 |
+| Compliant v9c — official | Tool-side ms/session | 1501.69 | 7336.66 | -388.56% [-475.34, -313.35] | met: 480/480 / 480/480 |
+| Regenerated-skill v9 — deviation | Session elapsed/task (ms) | 5701.72 | 6005.23 | -5.32% [-13.94, 2.48] | met: 480/480 / 480/480 |
+| Regenerated-skill v9 — deviation | Emitted bytes/session | 32680.50 | 35862.25 | -9.74% [-17.78, -2.07] | met: 480/480 / 480/480 |
+| Regenerated-skill v9 — deviation | Tool-side ms/session | 1501.69 | 7895.47 | -425.77% [-545.32, -330.11] | met: 480/480 / 480/480 |
+
+| Navigation arm | Baseline actions/session | GroundWork actions/session | GW − baseline [95% CI] | Navigation engineering gate |
+| --- | --- | --- | --- | --- |
+| Compliant v9c — official | 60.31 | 51.81 | -8.50 [-11.25, -5.69] | PASS |
+| Regenerated-skill v9 — deviation | 60.31 | 52.19 | -8.12 [-11.00, -5.44] | PASS |
+
+Long-horizon: no confirmatory verdict (incomplete collection under PROTOCOL.md). The grader rejected lh-09 run 6 for a malformed outline action: the agent omitted the mcp subcommand, and the wrapper recorded the failed invocation as action="outline". All raw exports remain unchanged. Exploratory analysis alone adapts that rejected action into a generic schema bucket, retaining its one-action count, 30 bytes and duration. The following normalized numbers are EXPLORATORY ONLY, with no confirmatory claim.
+
+| EXPLORATORY ONLY — LH | Baseline mean | GroundWork mean | Reduction [95% CI] | Exploratory acceptance |
+| --- | --- | --- | --- | --- |
+| Session elapsed/task (ms) | 9738.61 | 11303.73 | -16.07% [-25.07, -7.46] | 160/160 / 160/160; exploratory |
+| Emitted bytes/session | 5627.19 | 7017.44 | -24.71% [-54.00, -2.14] | 160/160 / 160/160; exploratory |
+| Tool-side ms/session | 559.80 | 1554.04 | -177.60% [-330.25, -73.96] | 160/160 / 160/160; exploratory |
+
+Exploratory captured actions/session: baseline 19.56, GroundWork 18.31; GW − baseline -1.25 [-5.38, 2.62]. No long-horizon gate verdict or overall Phase A pass. Equal success is not a correctness win; engineering-gate passage is not proof of equivalence or speed superiority.
+
+All 80 raw captures are retained: 32 navigation v9 (including deviation GroundWork), 16 compliant navigation v9c GroundWork, and 32 long-horizon v9. Navigation validates 48/48; original capture schema validates 79/80 overall. Exports record the collector revision, not an independent product-binary hash; the product source pin relies on the frozen same-checkout build instructions.
+
+[Full v9 analysis, provenance and normalization disclosure](bench/V9-ANALYSIS.md).
+
+<!-- phase-a-v9:end -->
+
 
 <!-- phase-b-v1:start -->
 
@@ -288,8 +459,55 @@ Disclosures:
 All 64 raw captures and unchanged grader outputs are archived under [bench/multiturn-reuse/v1](bench/multiturn-reuse/v1/), with [input and artifact hashes](bench/PHASEB-INPUTS.json). No billed-token, dollar-savings or latency claim is made. [Full Phase B analysis, per-turn curves, provenance and timing audit](bench/PHASEB-ANALYSIS.md).
 
 <!-- phase-b-v1:end -->
-
 <!-- stable-protocol:start -->
+<!-- v10-results:start -->
+### v10 (PR #48: engineering gates, not a speed win)
+
+V10 measured PR #48 at product/collector/grader pin e3bdc7401daf7264b242b32a2d7bc4de09178f69, not a claim that PR #48 is shipped. There are 96 unchanged raw captures: 16 sessions per arm per suite, sharing one baseline within each suite. Compliant arms are official; regenerated-skill arms are disclosed deviations and never stand in for official results.
+
+The navigation engineering gate passed on fewer actions, in both official and disclosed deviation arms. There is no speed win: navigation session-time intervals cross zero, and navigation tool-side time is about 5x baseline (5.66x official; 5.57x disclosed deviation). The LH disclosed deviation also passed its engineering gate; its session-time interval crosses zero.
+
+Engineering gate: GW mean actions/session no higher than baseline, session-time reduction CI includes zero or better, and no category success drop. These are captured actions, not LLM conversation turns. Reductions are 100*(1-GW/B); positive favors GW. Nominal 95% intervals use 10,000 independent whole-session bootstrap draws per arm, seed 0x51ab17ed. Navigation success is 480/480 per arm; valid LH deviation and baseline are 160/160 each, with all category guardrails met. Gate passage is not superiority or equivalence; bytes are emitted output, not billed tokens or dollar savings.
+
+| Comparison | Estimand | Baseline mean | GW mean | Reduction % [95% CI] |
+| --- | --- | --- | --- | --- |
+| Navigation official | Session elapsed/task (ms) | 5668.09 | 5445.73 | 3.92 [-4.43, 11.31] |
+| Navigation official | Emitted bytes/session | 32401.62 | 33028.19 | -1.93 [-8.26, 4.23] |
+| Navigation official | Tool-side ms/session | 1315.68 | 7445.79 | -465.93 [-540.05, -405.27] |
+| Navigation disclosed deviation | Session elapsed/task (ms) | 5668.09 | 5959.93 | -5.15 [-13.10, 1.98] |
+| Navigation disclosed deviation | Emitted bytes/session | 32401.62 | 35947.62 | -10.94 [-20.11, -2.04] |
+| Navigation disclosed deviation | Tool-side ms/session | 1315.68 | 7328.08 | -456.98 [-531.10, -390.89] |
+| LH disclosed deviation | Session elapsed/task (ms) | 9418.56 | 10215.93 | -8.47 [-19.87, 1.55] |
+| LH disclosed deviation | Emitted bytes/session | 5149.94 | 6333.25 | -22.98 [-45.58, -2.43] |
+| LH disclosed deviation | Tool-side ms/session | 506.18 | 1242.24 | -145.42 [-225.64, -81.75] |
+
+| Comparison | Baseline actions/session [95% CI] | GW actions/session [95% CI] | GW - B [95% CI] | Engineering gate |
+| --- | --- | --- | --- | --- |
+| Navigation official | 57.12 [54.44, 59.69] | 50.31 [49.06, 51.75] | -6.81 [-9.75, -3.69] | PASS |
+| Navigation disclosed deviation | 57.12 [54.44, 59.69] | 52.62 [50.06, 55.44] | -4.50 [-8.25, -0.62] | PASS |
+| LH disclosed deviation | 17.44 [14.56, 20.75] | 17.31 [16.00, 19.00] | -0.12 [-3.75, 3.19] | PASS |
+
+#### Official long-horizon — EXPLORATORY ONLY
+
+Official long-horizon has no confirmatory verdict. The rejected capture v10-lh-groundwork-11, task lh-04, action "outline", is disclosed unchanged. EXPLORATORY ONLY: a separate analysis copy maps that one rejected action to the shell schema bucket, not an executed shell, retaining its count, 30 bytes, 0.07910900000001675 ms and timestamps. Exploratory official LH numbers support no publication claim and never replace official results.
+
+| Comparison | Estimand | Baseline mean | GW mean | Reduction % [95% CI] |
+| --- | --- | --- | --- | --- |
+| EXPLORATORY official LH | Session elapsed/task (ms) | 9418.56 | 10371.71 | -10.12 [-20.21, -0.79] |
+| EXPLORATORY official LH | Emitted bytes/session | 5149.94 | 6298.06 | -22.29 [-43.04, -5.28] |
+| EXPLORATORY official LH | Tool-side ms/session | 506.18 | 1304.47 | -157.71 [-243.83, -90.61] |
+
+| Comparison | Baseline actions/session [95% CI] | GW actions/session [95% CI] | GW - B [95% CI] | Engineering gate |
+| --- | --- | --- | --- | --- |
+| EXPLORATORY official LH | 17.44 [14.56, 20.75] | 17.44 [16.25, 18.81] | 0.00 [-3.50, 3.19] | NO CONFIRMATORY VERDICT |
+
+18 never-started sessions across 17 units were terminated and relaunched; no data was collected from those attempts. Official nav baseline run 10 required two terminations. Final completed exports are all retained, including the schema-rejected official LH capture.
+
+The capture.mjs root cause is in the capture harness, not product outline: an unknown subcommand falls through dispatch, then its caught error is recorded with action=argv[0], outside the schema enum. The written proposal is for a future pre-registered run only: reject unknown wrapper verbs before recording, with an explicit policy for failed-attempt counts and timing. No capture.mjs, schema, grader or PROTOCOL.md change is included.
+
+[Full analysis and rejected-record/root-cause evidence](bench/V10-ANALYSIS.md) · [Inputs and hashes](bench/V10-INPUTS.json) · [Per-tool tables](bench/v10/results/per-tool.md) · [Pre-collection arms](bench/V10-ARMS-NOTE.md).
+<!-- v10-results:end -->
+
 ### v8 (PR #39: fresh-root index cloning + bundled service, not shipped)
 
 V8 publishes the completed v8b recollection: 16 sessions per arm per suite, product and unchanged stable-v1 collector/grader pinned to 243bb549e352ee4a63e968230055cda0c165bbe5. The earlier 3e804c9 run was killed and discarded; none of its captures are included.
@@ -510,14 +728,15 @@ wrappers or task timers cannot be established from these captures.
 | Check | What is measured | What not to assume |
 | --- | --- | --- |
 | Duplicate BLOCK findings | 95% precision on the labeled duplicate corpus; 100% recall for exact copies and 96% for renamed copies. | These are planted examples, not production-repository results. Heavily rewritten clones may be warnings or missed. |
-| Grounding | Resolves 99% of internal imports in this repository. | Dynamic dispatch, computed member names and external packages are skipped, not verified. |
+| Grounding | Resolves 99% of internal imports in this repository. | Dynamic dispatch and computed member names are skipped, not verified. |
+| Dependencies | 61 of 69 seeded dependency mistakes caught (88.4%) with 0 false blocks in 7,857 accepted checks, across npm, PyPI, Go and Maven; the first run failed at 71% and stays published. | Seeded cases, not agent sessions. PyPI recall is 12 of 18; packages without readable types are not checked; Rust and service contracts only warn. |
 
-See [reuse methodology](references/reuse.md) and [grounding behavior](references/grounding.md). These figures are not a claim about end-to-end token savings.
+See [reuse methodology](references/reuse.md), [grounding behavior](references/grounding.md) and [checking beyond the repository](docs/beyond-the-repo.md). These figures are not a claim about end-to-end token savings.
 
 ## Privacy and security
 
 - **Local state:** the index, logs and session state stay in your repository's `.groundwork/`.
-- **Offline runtime:** there is no telemetry or hosted inference. The optional `gw init --embeddings` command downloads a local model only when explicitly requested; similarity search also works without it.
+- **Offline runtime:** there is no telemetry or hosted inference. `gw update` contacts the npm registry only when you run it. The optional `gw init --embeddings` command downloads a local model only when explicitly requested; similarity search also works without it.
 - **Your permissions:** hooks run as your user. They inspect agent actions and may wrap supported noisy commands with `gw run`; they are not an autonomous command runner.
 - **Fail open:** hook errors and timeouts let the agent continue. Explicit CLI checks still return nonzero on findings.
 
@@ -561,6 +780,10 @@ Run `gw setup --remove` to remove the integrations, then delete `.groundwork/` t
 </details>
 
 ## Learn more
+
+- [Clients](docs/clients.md): the eight supported clients and what Groundwork can enforce in each.
+- [Languages](docs/languages.md): what is checked per language and which type backend is used.
+- [Blocks](docs/blocks.md): every block and warning, what it means and how to clear it.
 
 | Start here | Go deeper |
 | --- | --- |

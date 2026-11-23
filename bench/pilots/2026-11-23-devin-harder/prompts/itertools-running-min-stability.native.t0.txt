@@ -1,0 +1,11 @@
+You are one run of a coding benchmark. Do exactly the task below and nothing else.
+
+Setup: the attached file workspace.tgz is a small git repository. Extract it into an empty directory (`tar -xzf workspace.tgz`); the repository is the `workspace` directory. Work only inside it. Do not read, clone or search any other repository or any copy of GroundWork's source on this machine or online, do not look for this benchmark's tasks or answers, and do not read or write the long-term memory folder for this task. Do not open a pull request and do not push anywhere.
+
+Task:
+
+In more_itertools, running_min and running_max with `maxlen` do not agree with the built-in min() and max() when values compare equal but are different objects: for `[0, 0.0, Fraction(0)]` with `maxlen=2` they yield the later of two equal values, while min(x, y) and max(x, y) return the first. Make the windowed forms return, for every window, the same object the built-in would return for that window.
+
+Work only in this repository. Run the existing tests. Say "done" only when you believe the change is complete and correct; your workspace is graded exactly as you leave it.
+
+When you are finished, do not commit. From the directory that contains `workspace`, run `tar -czf result-itertools-running-min-stability-native.tgz workspace` (keep the .git directory in it), attach that file to your final message, and make the final message the single word "done". Do not ask questions; if something is unclear, make your best choice.

@@ -1,7 +1,7 @@
 // Shared record shapes for everything stored in the index. Later phases read these; change them only
 // together with the store schema version.
 
-export type Language = 'typescript' | 'tsx' | 'javascript' | 'python';
+export type Language = 'typescript' | 'tsx' | 'javascript' | 'python' | 'go' | 'rust' | 'java' | 'csharp' | 'ruby';
 
 export type SymbolKind =
   | 'function'

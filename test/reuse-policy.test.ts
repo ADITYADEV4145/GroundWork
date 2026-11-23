@@ -52,3 +52,23 @@ describe('independent, substitutable BLOCK evidence', () => {
     expect(chooseBlock(rows)).toBe(0.9);
   });
 });
+
+describe('binding hash quote style', () => {
+  it('treats quote style as formatting and literal content as code', async () => {
+    const { initParsers } = await import('../src/lang/index.js');
+    const { extractReuseSource } = await import('../src/reuse/source.js');
+    await initParsers();
+    const py = (body: string) => extractReuseSource(`def slug(text: str) -> str:\n    ${body}\n`, 'python').symbols[0]!.bindingHash;
+    expect(py(`return re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")`)).toBe(py(`return re.sub(r'[^a-z0-9]+', '_', text.lower()).strip('_')`));
+    expect(py(`return re.sub(r"[^a-z0-9]+", "_", text.lower())`)).not.toBe(py(`return re.sub(r"[^a-z0-9]+", "-", text.lower())`));
+    expect(py(`return text.strip("'")`)).not.toBe(py(`return text.strip('"')`));
+    expect(py(`return text.replace(r"\\d", "")`)).not.toBe(py(`return text.replace("\\d", "")`));
+    const ts = (body: string) => extractReuseSource(`export function slug(text: string): string { ${body} }\n`, 'typescript').symbols[0]!.bindingHash;
+    expect(ts(`return text.normalize("NFKD").toLowerCase();`)).toBe(ts(`return text.normalize('NFKD').toLowerCase();`));
+    expect(ts(`return text.normalize("NFKD").toLowerCase();`)).not.toBe(ts(`return text.normalize("NFC").toLowerCase();`));
+    const rb = (body: string) => extractReuseSource(`def slug(text)\n  ${body}\nend\n`, 'ruby').symbols[0]!.bindingHash;
+    expect(rb(`text.gsub('\\n', '_')`)).not.toBe(rb(`text.gsub("\\n", "_")`));
+    expect(rb(`text + '#{text}'`)).not.toBe(rb(`text + "#{text}"`));
+    expect(rb(`text + 'abc'`)).not.toBe(rb(`text + "abc"`));
+  });
+});

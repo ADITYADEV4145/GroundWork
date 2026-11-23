@@ -1,0 +1,1765 @@
+{
+ "exploratory": true,
+ "budgetMs": 120000,
+ "ids": [
+  "rust-analyzer-invented-function-1",
+  "rust-analyzer-wrong-import-5",
+  "rust-analyzer-41add85a27",
+  "rust-analyzer-d25253a339",
+  "rust-analyzer-95a8a878c2",
+  "rust-analyzer-6faf0946af",
+  "rust-analyzer-93815ce823",
+  "rust-analyzer-d22086e60f",
+  "rust-analyzer-f7a5bf4c1d",
+  "rust-analyzer-fdfe2fe648",
+  "rust-analyzer-bf74b398f7",
+  "rust-analyzer-813278fbf3",
+  "rust-analyzer-e2b9a8814b",
+  "rust-analyzer-7388eeb4c0",
+  "rust-analyzer-8e71c85d29",
+  "rust-analyzer-07d48a905e",
+  "rust-analyzer-5bf3425151",
+  "rust-analyzer-da0779174b",
+  "rust-analyzer-42f4f85858",
+  "rust-analyzer-3493a278aa",
+  "rust-analyzer-9d693f48a2",
+  "rust-analyzer-b154535426"
+ ],
+ "checkerCommit": "bb73e84f51e6f692133c7872aea8bd01d6431e2f",
+ "seeds": [
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/hir-def/src/builtin_type.rs",
+     "line": 97,
+     "name": "new_symbol_root_gw",
+     "message": "no associated function or constant named `new_symbol_root_gw` found for struct `hir_expand::name::Name` in the current scope",
+     "code": "E0599",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-def/src/builtin_type.rs",
+      "line": 97,
+      "column": 42,
+      "name": "new_symbol_root_gw",
+      "message": "no associated function or constant named `new_symbol_root_gw` found for struct `hir_expand::name::Name` in the current scope",
+      "code": "E0599",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1393,
+   "mutation": {
+    "id": "rust-analyzer-invented-function-1",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "invented-function",
+    "file": "crates/hir-def/src/builtin_type.rs",
+    "line": 97,
+    "before": "                BuiltinInt::I64 => Name::new_symbol_root(sym::i64),",
+    "after": "                BuiltinInt::I64 => Name::new_symbol_root_gw(sym::i64),"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "crates/ide/src/inlay_hints/implied_dyn_trait.rs",
+     "line": 77,
+     "name": "crate::inlay_hints::InlayHintsConfig_gw",
+     "message": "unresolved import `crate::inlay_hints::InlayHintsConfig_gw`",
+     "code": "E0432",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/ide/src/inlay_hints/implied_dyn_trait.rs",
+      "line": 77,
+      "column": 9,
+      "name": "crate::inlay_hints::InlayHintsConfig_gw",
+      "message": "unresolved import `crate::inlay_hints::InlayHintsConfig_gw`",
+      "code": "E0432",
+      "language": "rust",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3208,
+   "mutation": {
+    "id": "rust-analyzer-wrong-import-5",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "operator": "wrong-import",
+    "file": "crates/ide/src/inlay_hints/implied_dyn_trait.rs",
+    "line": 77,
+    "before": "    use crate::inlay_hints::InlayHintsConfig;",
+    "after": "    use crate::inlay_hints::InlayHintsConfig_gw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  }
+ ],
+ "clean": [
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 5967,
+   "case": {
+    "id": "rust-analyzer-41add85a27",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "41add85a2757298fe6f99f3e8b943c9383607a06",
+    "parent": "00825977ae82b9bcb984faede1367eff30ad0314",
+    "files": [
+     "crates/hir-ty/src/target_feature/generated.rs",
+     "crates/ide-db/src/generated/lints.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/target_feature/generated.rs",
+     "ranges": [
+      [
+       119,
+       119
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-db/src/generated/lints.rs",
+     "ranges": [
+      [
+       5406,
+       5421
+      ],
+      [
+       8544,
+       8559
+      ],
+      [
+       18138,
+       18153
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 5759,
+   "case": {
+    "id": "rust-analyzer-d25253a339",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "d25253a339ab4f94c9f307a7757c45d236462863",
+    "parent": "1565f0865ff93850b63545f97ff11a2619f2862d",
+    "files": [
+     "crates/hir/src/lib.rs",
+     "crates/hir/src/term_search/tactics.rs",
+     "crates/ide-completion/src/context.rs",
+     "crates/ide-completion/src/context/analysis.rs"
+    ],
+    "eligibleFiles": 9
+   },
+   "changed": [
+    {
+     "file": "crates/hir/src/lib.rs",
+     "ranges": [
+      [
+       4527,
+       4528
+      ],
+      [
+       4603,
+       4603
+      ],
+      [
+       4624,
+       4625
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir/src/term_search/tactics.rs",
+     "ranges": [
+      [
+       60,
+       60
+      ],
+      [
+       110,
+       110
+      ],
+      [
+       172,
+       172
+      ],
+      [
+       218,
+       218
+      ],
+      [
+       252,
+       252
+      ],
+      [
+       386,
+       386
+      ],
+      [
+       465,
+       465
+      ],
+      [
+       480,
+       480
+      ],
+      [
+       510,
+       510
+      ],
+      [
+       538,
+       538
+      ],
+      [
+       553,
+       553
+      ],
+      [
+       588,
+       588
+      ],
+      [
+       691,
+       691
+      ],
+      [
+       730,
+       730
+      ],
+      [
+       751,
+       751
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/context.rs",
+     "ranges": [
+      [
+       794,
+       794
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-completion/src/context/analysis.rs",
+     "ranges": [
+      [
+       661,
+       661
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 5724,
+   "case": {
+    "id": "rust-analyzer-95a8a878c2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "95a8a878c26db3766eff8832f874e299f9f1ecb1",
+    "parent": "aa198229289901e5718e7c0a8d4115638cc1900c",
+    "files": [
+     "crates/hir-def/src/lang_item.rs",
+     "crates/intern/src/symbol/symbols.rs",
+     "crates/test-utils/src/minicore.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/lang_item.rs",
+     "ranges": [
+      [
+       111,
+       112
+      ],
+      [
+       398,
+       407
+      ],
+      [
+       866,
+       869
+      ],
+      [
+       1065,
+       1065
+      ]
+     ]
+    },
+    {
+     "file": "crates/intern/src/symbol/symbols.rs",
+     "ranges": [
+      [
+       478,
+       478
+      ]
+     ]
+    },
+    {
+     "file": "crates/test-utils/src/minicore.rs",
+     "ranges": [
+      [
+       1320,
+       1320
+      ],
+      [
+       1328,
+       1328
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 5828,
+   "case": {
+    "id": "rust-analyzer-6faf0946af",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "6faf0946af2b1f9d2ce2e71e66761f22ae1b001c",
+    "parent": "946b80a756ac1a1ef8882ec65e4f3199e38a23c7",
+    "files": [
+     "crates/hir-def/src/lang_item.rs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/lang_item.rs",
+     "ranges": [
+      [
+       5,
+       5
+      ],
+      [
+       133,
+       134
+      ],
+      [
+       1058,
+       1113
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 11788,
+   "case": {
+    "id": "rust-analyzer-93815ce823",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "93815ce82374ff63954f520c4ac84ede9198432c",
+    "parent": "db89bd286f5dd47c0b38a6ac5a1d04588627725d",
+    "files": [
+     "crates/hir-def/src/attrs.rs",
+     "crates/ide/src/hover/tests.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/attrs.rs",
+     "ranges": [
+      [
+       1414,
+       1414
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide/src/hover/tests.rs",
+     "ranges": [
+      [
+       9583,
+       9583
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 6141,
+   "case": {
+    "id": "rust-analyzer-d22086e60f",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "d22086e60f5fe53077dfe460c8b813116440b3e5",
+    "parent": "88dd3e021004e84f0faa9da7dfba138ecfa0ded8",
+    "files": [
+     "crates/hir-ide/src/tests/traits.rs",
+     "crates/hir-ty/src/next_solver/solver.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ide/src/tests/traits.rs",
+     "ranges": [
+      [
+       1425,
+       1425
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/solver.rs",
+     "ranges": [
+      [
+       100,
+       100
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 9349,
+   "case": {
+    "id": "rust-analyzer-f7a5bf4c1d",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "f7a5bf4c1daa00c04b126855ad7005ae9634ab25",
+    "parent": "946b80a756ac1a1ef8882ec65e4f3199e38a23c7",
+    "files": [
+     "crates/paths/src/lib.rs",
+     "crates/rust-analyzer/src/main_loop.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/paths/src/lib.rs",
+     "ranges": [
+      [
+       311,
+       316
+      ]
+     ]
+    },
+    {
+     "file": "crates/rust-analyzer/src/main_loop.rs",
+     "ranges": [
+      [
+       1037,
+       1037
+      ],
+      [
+       1042,
+       1045
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 8361,
+   "case": {
+    "id": "rust-analyzer-fdfe2fe648",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "fdfe2fe648465b33792aec8765a77e43d20cf471",
+    "parent": "b664fd5c7e7055c9569960f7fe73f21c7d00c9cd",
+    "files": [
+     "crates/hir-def/src/macro_expansion_tests/mbe/regression.rs",
+     "crates/parser/test_data/parser/inline/ok/asm_keyword_name.rs",
+     "crates/parser/test_data/parser/inline/ok/offset_of_parens.rs",
+     "crates/syntax/src/ast/generated/nodes.rs"
+    ],
+    "eligibleFiles": 36
+   },
+   "changed": [
+    {
+     "file": "crates/hir-def/src/macro_expansion_tests/mbe/regression.rs",
+     "ranges": [
+      [
+       1030,
+       1030
+      ],
+      [
+       1064,
+       1064
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/test_data/parser/inline/ok/asm_keyword_name.rs",
+     "ranges": [
+      [
+       2,
+       2
+      ]
+     ]
+    },
+    {
+     "file": "crates/parser/test_data/parser/inline/ok/offset_of_parens.rs",
+     "ranges": [
+      [
+       2,
+       2
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/generated/nodes.rs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 7363,
+   "case": {
+    "id": "rust-analyzer-bf74b398f7",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "bf74b398f74f3d208b22b452401168e42e3b5728",
+    "parent": "813278fbf38d68d0fed30d10711ae13e64339c7c",
+    "files": [
+     "crates/hir-ty/src/next_solver.rs",
+     "crates/hir-ty/src/next_solver/consts/int.rs",
+     "crates/hir-ty/src/next_solver/consts/valtree.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/next_solver.rs",
+     "ranges": [
+      [
+       101,
+       105
+      ],
+      [
+       166,
+       171
+      ],
+      [
+       261,
+       261
+      ],
+      [
+       265,
+       266
+      ],
+      [
+       286,
+       286
+      ],
+      [
+       306,
+       315
+      ],
+      [
+       334,
+       334
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/int.rs",
+     "ranges": [
+      [
+       4,
+       5
+      ],
+      [
+       136,
+       136
+      ],
+      [
+       202,
+       202
+      ],
+      [
+       241,
+       266
+      ],
+      [
+       378,
+       437
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/valtree.rs",
+     "ranges": [
+      [
+       13,
+       13
+      ],
+      [
+       326,
+       326
+      ],
+      [
+       343,
+       343
+      ],
+      [
+       349,
+       357
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 7869,
+   "case": {
+    "id": "rust-analyzer-813278fbf3",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "813278fbf38d68d0fed30d10711ae13e64339c7c",
+    "parent": "2c3ebf6d10266a56e06e7cd6e551aa720d7cd6e8",
+    "files": [
+     "crates/hir-ty/src/next_solver/consts.rs",
+     "crates/hir-ty/src/next_solver/consts/int.rs",
+     "crates/hir-ty/src/next_solver/consts/valtree.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/next_solver/consts.rs",
+     "ranges": [
+      [
+       3,
+       3
+      ],
+      [
+       29,
+       29
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/int.rs",
+     "ranges": [
+      [
+       1,
+       392
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/next_solver/consts/valtree.rs",
+     "ranges": [
+      [
+       1,
+       1
+      ],
+      [
+       13,
+       13
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 22229,
+   "case": {
+    "id": "rust-analyzer-e2b9a8814b",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "e2b9a8814b7124cb92a70a1c7e89d0ccc2aed24f",
+    "parent": "919f0f9ccbb6a7464488aa40fc572757029f3ff5",
+    "files": [
+     "crates/ide-assists/src/handlers/unqualify_method_call.rs",
+     "crates/syntax/src/ast/node_ext.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/unqualify_method_call.rs",
+     "ranges": [
+      [
+       85,
+       85
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/node_ext.rs",
+     "ranges": [
+      [
+       367,
+       367
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 23226,
+   "case": {
+    "id": "rust-analyzer-7388eeb4c0",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "7388eeb4c0a96c3c0f5caa305ab0a611ca8fd93d",
+    "parent": "8ba7bef996a21ee8157d13f141b0525b092a9872",
+    "files": [
+     "crates/ide-assists/src/utils.rs",
+     "crates/syntax/src/ast/generated/nodes.rs",
+     "crates/syntax/src/ast/node_ext.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/utils.rs",
+     "ranges": [
+      [
+       724,
+       724
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/generated/nodes.rs",
+     "ranges": []
+    },
+    {
+     "file": "crates/syntax/src/ast/node_ext.rs",
+     "ranges": [
+      [
+       368,
+       369
+      ],
+      [
+       553,
+       577
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 8563,
+   "case": {
+    "id": "rust-analyzer-8e71c85d29",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "8e71c85d297a8d8756bfd25ab8264eb0abf16f18",
+    "parent": "358380cbec3c703074140f9906703f05c6fd89d8",
+    "files": [
+     "crates/hir-ide/src/tests/consteval.rs",
+     "crates/hir-ty/src/mir/eval.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ide/src/tests/consteval.rs",
+     "ranges": [
+      [
+       296,
+       311
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/mir/eval.rs",
+     "ranges": [
+      [
+       1504,
+       1507
+      ],
+      [
+       1512,
+       1519
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 7418,
+   "case": {
+    "id": "rust-analyzer-07d48a905e",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "07d48a905eadce6989af3e087b8cb1bdfa6b6eb6",
+    "parent": "358380cbec3c703074140f9906703f05c6fd89d8",
+    "files": [
+     "crates/hir-ide/src/tests/traits.rs",
+     "crates/hir-ty/src/builtin_derive.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ide/src/tests/traits.rs",
+     "ranges": [
+      [
+       4580,
+       4603
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/builtin_derive.rs",
+     "ranges": [
+      [
+       15,
+       18
+      ],
+      [
+       25,
+       26
+      ],
+      [
+       365,
+       365
+      ],
+      [
+       372,
+       374
+      ],
+      [
+       379,
+       389
+      ],
+      [
+       391,
+       397
+      ],
+      [
+       405,
+       419
+      ],
+      [
+       422,
+       428
+      ],
+      [
+       434,
+       511
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3899,
+   "case": {
+    "id": "rust-analyzer-5bf3425151",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "5bf3425151442e9e7a56d58a2ae4bde652dd395e",
+    "parent": "e5e7830640558e323e89c831488a3172b58dc66d",
+    "files": [
+     "crates/rust-analyzer/src/cli/flags.rs",
+     "crates/rust-analyzer/src/cli/lsif.rs",
+     "crates/rust-analyzer/tests/slow-tests/support.rs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "crates/rust-analyzer/src/cli/flags.rs",
+     "ranges": [
+      [
+       181,
+       183
+      ],
+      [
+       338,
+       338
+      ]
+     ]
+    },
+    {
+     "file": "crates/rust-analyzer/src/cli/lsif.rs",
+     "ranges": [
+      [
+       296,
+       297
+      ]
+     ]
+    },
+    {
+     "file": "crates/rust-analyzer/tests/slow-tests/support.rs",
+     "ranges": [
+      [
+       122,
+       122
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 8056,
+   "case": {
+    "id": "rust-analyzer-da0779174b",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "da0779174bcc5eb7acabcd9572b6980852fcc4f1",
+    "parent": "81e052e9627381b681744419ea1cf87e2888bd0d",
+    "files": [
+     "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "crates/syntax/src/ast/syntax_factory/constructors.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "ranges": [
+      [
+       88,
+       88
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/syntax_factory/constructors.rs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 8486,
+   "case": {
+    "id": "rust-analyzer-42f4f85858",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "42f4f8585806bdddf81670df6f2321b2e006a9f5",
+    "parent": "fde5133f7d116dd81f33f71bd0d389c768c7bd58",
+    "files": [
+     "crates/hir-ty/src/lower/diagnostics.rs",
+     "crates/hir-ty/src/lower/path.rs",
+     "crates/hir/src/diagnostics.rs",
+     "crates/ide-diagnostics/src/handlers/unresolved_associated_type.rs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/lower/diagnostics.rs",
+     "ranges": [
+      [
+       85,
+       87
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir-ty/src/lower/path.rs",
+     "ranges": [
+      [
+       502,
+       504
+      ],
+      [
+       525,
+       527
+      ]
+     ]
+    },
+    {
+     "file": "crates/hir/src/diagnostics.rs",
+     "ranges": [
+      [
+       214,
+       214
+      ],
+      [
+       743,
+       747
+      ],
+      [
+       2091,
+       2095
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-diagnostics/src/handlers/unresolved_associated_type.rs",
+     "ranges": [
+      [
+       1,
+       51
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3497,
+   "case": {
+    "id": "rust-analyzer-3493a278aa",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "3493a278aafbad2b166338d2ef8db785ff52751a",
+    "parent": "9d693f48a24dad840478c65f04e94f4d7c2be445",
+    "files": [
+     "crates/hir-ty/src/target_feature/generated.rs",
+     "xtask/src/codegen/target_features.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/target_feature/generated.rs",
+     "ranges": [
+      [
+       9,
+       9
+      ]
+     ]
+    },
+    {
+     "file": "xtask/src/codegen/target_features.rs",
+     "ranges": [
+      [
+       30,
+       30
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 23,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 113,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 186,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 370,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 381,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 392,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 406,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 472,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 490,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 559,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 832,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 855,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 901,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     },
+     {
+      "file": "crates/hir-ty/src/target_feature/generated.rs",
+      "line": 920,
+      "column": 13,
+      "name": "Stability::InternalOnly",
+      "message": "variant `Stability::InternalOnly` has no field named `target_modifier`",
+      "code": "E0559",
+      "language": "rust",
+      "blocking": false
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 5416,
+   "case": {
+    "id": "rust-analyzer-9d693f48a2",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "9d693f48a24dad840478c65f04e94f4d7c2be445",
+    "parent": "91f2c17c55643bc5e0fff2fb14938fc2da409184",
+    "files": [
+     "crates/hir-ty/src/target_feature/generated.rs",
+     "crates/ide-db/src/generated/lints.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/hir-ty/src/target_feature/generated.rs",
+     "ranges": [
+      [
+       23,
+       23
+      ],
+      [
+       111,
+       115
+      ],
+      [
+       182,
+       188
+      ],
+      [
+       368,
+       370
+      ],
+      [
+       379,
+       381
+      ],
+      [
+       390,
+       392
+      ],
+      [
+       404,
+       408
+      ],
+      [
+       470,
+       474
+      ],
+      [
+       488,
+       492
+      ],
+      [
+       559,
+       559
+      ],
+      [
+       830,
+       834
+      ],
+      [
+       853,
+       857
+      ],
+      [
+       898,
+       903
+      ],
+      [
+       919,
+       920
+      ]
+     ]
+    },
+    {
+     "file": "crates/ide-db/src/generated/lints.rs",
+     "ranges": [
+      [
+       743,
+       749
+      ],
+      [
+       4862,
+       4862
+      ],
+      [
+       7824,
+       7839
+      ],
+      [
+       8075,
+       8090
+      ],
+      [
+       8292,
+       8305
+      ],
+      [
+       9158,
+       9173
+      ],
+      [
+       10147,
+       10162
+      ],
+      [
+       10645,
+       10660
+      ],
+      [
+       12389,
+       12404
+      ],
+      [
+       14687,
+       14702
+      ],
+      [
+       15937,
+       15952
+      ],
+      [
+       17160,
+       17175
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": true,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 11912,
+   "case": {
+    "id": "rust-analyzer-b154535426",
+    "repo": "rust-analyzer",
+    "language": "rust",
+    "commit": "b154535426afaa445394e195e5eba3d92c8a326d",
+    "parent": "5998f6f8825550786f9e70f7011aeb7ac5cccc5b",
+    "files": [
+     "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "crates/syntax/src/ast/syntax_factory/constructors.rs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "crates/ide-assists/src/handlers/generate_is_empty_from_len.rs",
+     "ranges": [
+      [
+       4,
+       8
+      ],
+      [
+       50,
+       50
+      ],
+      [
+       76,
+       76
+      ],
+      [
+       83,
+       86
+      ],
+      [
+       88,
+       118
+      ],
+      [
+       250,
+       316
+      ]
+     ]
+    },
+    {
+     "file": "crates/syntax/src/ast/syntax_factory/constructors.rs",
+     "ranges": [
+      [
+       563,
+       563
+      ],
+      [
+       2060,
+       2071
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

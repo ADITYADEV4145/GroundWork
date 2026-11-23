@@ -322,7 +322,9 @@ Check every pull request in CI. The scan runs inside the runner; no code leaves 
 ```yaml
 # .github/workflows/groundwork.yml
 name: agent-checked
-on: pull_request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]  # labels matter for only-ai
 permissions:
   contents: read
   pull-requests: write    # the comment
@@ -341,7 +343,7 @@ jobs:
 
 The action is not tagged yet: until a `v1` tag exists, pin a commit SHA.
 
-- The check fails on high-confidence invented calls and wrong arguments. Duplicated logic, duplicate constants, dead code and type errors are warnings. Low-confidence findings never appear and never fail the check.
+- The check fails on high-confidence invented calls and wrong arguments. Duplicated logic, duplicate constants and dead code are warnings. Type errors are not checked in CI, because the type checker would run tools from the pull request's checkout. Low-confidence findings never appear and never fail the check.
 - Findings go into one comment, grouped by kind, at most 10, each with the real symbol to use when there is one. The comment is updated on each push and removed when the findings are gone. A pull request with no findings gets no comment.
 - Findings are uploaded as SARIF to code scanning (`sarif: false` turns it off).
 - `only-ai: true` skips pull requests that do not look agent-written: a label (`ai`, `agent`, `devin`, `copilot`, `claude`, `codex`, `cursor`, `ai-generated`), a bot author other than dependency bots, or an agent commit author or `Co-Authored-By` trailer.

@@ -76,9 +76,11 @@ export function openJar(file: string): JarFile | null {
   }
 }
 
+const MAX_ENTRY = 16 * 1024 * 1024;
+
 export function readJarEntry(jar: JarFile, name: string): Buffer | null {
   const entry = jar.entries.get(name);
-  if (!entry || entry.size > 16 * 1024 * 1024) return null;
+  if (!entry || entry.size > MAX_ENTRY || entry.compressedSize > MAX_ENTRY) return null;
   let fd: number;
   try {
     fd = openSync(jar.path, 'r');
@@ -91,7 +93,8 @@ export function readJarEntry(jar: JarFile, name: string): Buffer | null {
     const start = entry.headerOffset + 30 + header.readUInt16LE(26) + header.readUInt16LE(28);
     const data = readAt(fd, start, entry.compressedSize);
     if (entry.method === 0) return data;
-    if (entry.method === 8) return inflateRawSync(data);
+    // The declared size is not trusted: cap what inflating may produce.
+    if (entry.method === 8) return inflateRawSync(data, { maxOutputLength: MAX_ENTRY });
     return null;
   } catch {
     return null;

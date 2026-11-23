@@ -891,7 +891,7 @@
       "id": "route-path-length",
       "repo": "route-plan",
       "category": "hidden-helper",
-      "prompt": "Planners want the length of a route drawn on the map. Add `path_km(points: list[Point]) -> float` in a new module `routeplan/legs.py`. It is the sum of the great-circle distances between consecutive points (Earth radius 6371 km), rounded to one decimal. A path with fewer than two points has length 0.",
+      "prompt": "Planners want the length of a route drawn on the map. Add `path_km(points: list[Point]) -> float` in a new module `routeplan/legs.py`. It is the sum of the great-circle distances between consecutive points on the mean Earth radius, rounded to one decimal. A path with fewer than two points has length 0.",
       "entry": "routeplan/legs.py",
       "trap": {
         "existing": [

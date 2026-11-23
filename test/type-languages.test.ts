@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -190,6 +190,91 @@ describe('compiled-language type checks', () => {
     const result = await typeCheck(root, [{ file: 'main.go', ranges: [[4, 4]] }], config());
     expect(result.findings.filter((f) => f.blocking).map((f) => f.code)).toEqual(['undefined']);
   }, 180_000);
+
+  it.skipIf(!toolchain.go)('checks Go test files against the test build of their package, and every changed package in one run', async () => {
+    const root = repo({
+      'go.mod': 'module demo\n\ngo 1.21\n',
+      'store/store.go': 'package store\n\ntype Store struct{ n int }\n\nfunc New() *Store { return &Store{} }\n',
+      // A method only the test build has, reached through a package that imports the one under test.
+      'store/export_test.go': 'package store\n\nfunc (s *Store) Count() int { return s.n }\n',
+      'app/app.go': 'package app\n\nimport "demo/store"\n\nfunc Make() *store.Store { return store.New() }\n',
+      'store/store_ext_test.go': 'package store_test\n\nimport (\n\t"testing"\n\n\t"demo/app"\n)\n\nfunc TestCount(t *testing.T) {\n\tif app.Make().Count() != 0 {\n\t\tt.Fatal("count")\n\t}\n}\n',
+    });
+    const changed = [{ file: 'store/store_ext_test.go', ranges: null }, { file: 'app/app.go', ranges: null }];
+    writeFileSync(path.join(root, 'store/store_ext_test.go'), `${readFileSync(path.join(root, 'store/store_ext_test.go'), 'utf8')}\n`);
+    const clean = await typeCheck(root, changed, config());
+    expect(clean.available.go).toBe(true);
+    expect(clean.findings).toEqual([]);
+    edit(root, 'store/store_ext_test.go', 'Count()', 'Counts()');
+    edit(root, 'app/app.go', 'store.New()', 'store.Make()');
+    const result = await typeCheck(root, changed, config());
+    expect(result.findings.filter((f) => f.blocking).map((f) => `${f.file} ${f.code}`).sort()).toEqual(['app/app.go undefined', 'store/store_ext_test.go missing-member']);
+  }, 180_000);
+
+  it.skipIf(!toolchain.go)('reports a Go import cycle as unavailable instead of waiting on it', async () => {
+    const c = cases.find((x) => x.language === 'go')!;
+    const root = repo({ ...c.files, 'cmd/cmd.go': 'package cmd\n\nfunc Name() string { return "app" }\n' });
+    edit(root, 'store/store.go', 'package store\n', 'package store\n\nimport "example.com/app/cmd"\n\nvar _ = cmd.Name\n');
+    edit(root, 'cmd/cmd.go', 'package cmd\n', 'package cmd\n\nimport "example.com/app/store"\n\nvar _ = store.Normalize\n');
+    const result = await typeCheck(root, [{ file: 'store/store.go', ranges: null }, { file: 'cmd/cmd.go', ranges: null }], config());
+    expect(result.available.go).toMatch(/import cycle not allowed/);
+    expect(result.findings).toEqual([]);
+    expect(result.timedOut).toBe(false);
+  }, 180_000);
+
+  it.skipIf(!toolchain.go || process.platform === 'win32')('checks Go in a checkout reached through a symlink', async () => {
+    const c = cases.find((x) => x.language === 'go')!;
+    const root = repo(c.files);
+    const link = `${root}-link`; symlinkSync(root, link); directories.push(link);
+    edit(link, c.file, c.errors[0]![0], c.errors[0]![1]);
+    const result = await typeCheck(link, [{ file: c.file, ranges: null }], config());
+    expect(result.findings.filter((f) => f.blocking).map((f) => `${f.file} ${f.code}`)).toEqual(['main.go undefined']);
+  }, 180_000);
+
+  it.skipIf(!toolchain.go)('checks Go without compiling the package', async () => {
+    const c = cases.find((x) => x.language === 'go')!;
+    const root = repo(c.files);
+    const cache = mkdtempSync(path.join(os.tmpdir(), 'gw-type-languages-gocache-')); directories.push(cache);
+    const { compilerDiagnostics, resetCompilerMemo } = await import('../src/types/compilers.js');
+    const saved = process.env.GOCACHE;
+    process.env.GOCACHE = cache;
+    try {
+      edit(root, c.file, c.errors[0]![0], c.errors[0]![1]);
+      expect(compilerDiagnostics('go', root, c.file, Date.now() + 120_000).map((f) => f.code)).toContain('undefined');
+      resetCompilerMemo();
+      // The standard library is built for its export data; the module's own packages never are.
+      const built = execFileSync('go', ['list', '-f', '{{.ImportPath}} {{.Stale}}', './...'], { cwd: root, encoding: 'utf8', env: { ...process.env, GOCACHE: cache } });
+      expect(built.trim().split('\n').sort()).toEqual(['example.com/app true', 'example.com/app/store true']);
+    } finally { if (saved === undefined) delete process.env.GOCACHE; else process.env.GOCACHE = saved; }
+  }, 180_000);
+
+  it.skipIf(!toolchain.rust)('checks Rust test code with the test targets, and only then', async () => {
+    const root = repo({
+      'Cargo.toml': '[package]\nname = "app"\nversion = "0.1.0"\nedition = "2021"\n',
+      'src/lib.rs': 'pub fn double(n: u32) -> u32 { n * 2 }\n\npub fn run() -> u32 {\n    double(1)\n}\n\n#[cfg(test)]\nmod fixture;\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    #[test]\n    fn runs() {\n        assert_eq!(run(), 2);\n    }\n}\n',
+      // No attribute in this file says that only a test build compiles it.
+      'src/fixture.rs': 'pub fn sample() -> u32 {\n    crate::double(2)\n}\n',
+    });
+    const blocking = async (file: string, ranges: [number, number][]) => (await typeCheck(root, [{ file, ranges }], config())).findings.filter((f) => f.blocking).map((f) => `${f.line} ${f.code}`);
+    edit(root, 'src/lib.rs', 'assert_eq!(run(), 2);', 'assert_eq!(runs_twice(), 2);');
+    // The test module holds an error, but the edit under check is outside it.
+    expect(await blocking('src/lib.rs', [[4, 4]])).toEqual([]);
+    expect(await blocking('src/lib.rs', [[16, 16]])).toEqual(['16 E0425']);
+    edit(root, 'src/lib.rs', 'assert_eq!(runs_twice(), 2);', 'assert_eq!(run(), 2);');
+    edit(root, 'src/lib.rs', 'double(1)', 'doubled(1)');
+    expect(await blocking('src/lib.rs', [[4, 4]])).toEqual(['4 E0425']);
+    edit(root, 'src/lib.rs', 'doubled(1)', 'double(1)');
+    edit(root, 'src/fixture.rs', 'crate::double(2)', 'crate::doubled(2)');
+    expect(await blocking('src/fixture.rs', [[2, 2]])).toEqual(['2 E0425']);
+  }, 180_000);
+
+  it('finds the Rust lines only a test build compiles', async () => {
+    const { rustTestRegions } = await import('../src/types/compilers.js');
+    expect(rustTestRegions('fn a() {}\n')).toEqual([]);
+    expect(rustTestRegions('#[cfg(test)]\nuse x::y;\nfn a() {}\n#[cfg(test)]\nmod tests {\n    #[test]\n    fn t() {}\n}\n')).toEqual([[1, 2], [4, 9]]);
+    expect(rustTestRegions('fn a() {}\n#[cfg(all(test, unix))]\n#[allow(dead_code)]\nfn helper() { let s = "}"; }\nfn b() {}\n')).toEqual([[2, 6]]);
+    expect(rustTestRegions('#![cfg(test)]\nfn a() {}\n')).toEqual([[1, 3]]);
+  });
 
   it.skipIf(!toolchain.csharp)('does not guess between several C# projects in one directory', async () => {
     const c = cases.find((x) => x.language === 'csharp')!;

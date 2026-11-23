@@ -1,0 +1,1637 @@
+{
+ "version": 1,
+ "seed": 24112026,
+ "repositories": [
+  {
+   "id": "hugo",
+   "language": "go",
+   "url": "https://github.com/gohugoio/hugo",
+   "commit": "68434ddaf46afc1a485547bb282b97da3f719df3",
+   "latency": true
+  },
+  {
+   "id": "cobra",
+   "language": "go",
+   "url": "https://github.com/spf13/cobra",
+   "commit": "adbc8813901bba65827259daa8e22ff94ec1f30e"
+  }
+ ],
+ "mutations": [
+  {
+   "id": "hugo-invented-function-1",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "resources/images/resampling.go",
+   "line": 34,
+   "before": "\t\t\t\treturn bcspline(x, 0.0, 0.0)",
+   "after": "\t\t\t\treturn bcsplineGw(x, 0.0, 0.0)"
+  },
+  {
+   "id": "hugo-invented-function-2",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "common/hreflect/compare.go",
+   "line": 40,
+   "before": "\t\tcase IsUint(bk):",
+   "after": "\t\tcase IsUintGw(bk):"
+  },
+  {
+   "id": "hugo-invented-function-3",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "navigation/menu_cache.go",
+   "line": 54,
+   "before": "\t\t\tapply(*m)",
+   "after": "\t\t\tapplyGw(*m)"
+  },
+  {
+   "id": "hugo-invented-function-4",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "parser/metadecoders/format.go",
+   "line": 37,
+   "before": "\t\tif f := FormatFromString(s); f != \"\" {",
+   "after": "\t\tif f := FormatFromStringGw(s); f != \"\" {"
+  },
+  {
+   "id": "hugo-invented-function-5",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "markup/markup.go",
+   "line": 105,
+   "before": "\tGetHighlighter() highlight.Highlighter",
+   "after": "\tGetHighlighterGw() highlight.Highlighter"
+  },
+  {
+   "id": "hugo-invented-method-1",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "config/allconfig/load.go",
+   "line": 65,
+   "before": "\tdefer l.deleteMergeStrategies()",
+   "after": "\tdefer l.deleteMergeStrategiesGw()"
+  },
+  {
+   "id": "hugo-invented-method-2",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "cache/dynacache/dynacache.go",
+   "line": 646,
+   "before": "\treturn path.Clean(paths.ToSlashPreserveLeading(s))",
+   "after": "\treturn path.Clean(paths.ToSlashPreserveLeadingGw(s))"
+  },
+  {
+   "id": "hugo-invented-method-3",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "deploy/deploy.go",
+   "line": 595,
+   "before": "\t\t\td.logger.Infof(\"  remote dropping %q due to exclude\\n\", obj.Key)",
+   "after": "\t\t\td.logger.InfofGw(\"  remote dropping %q due to exclude\\n\", obj.Key)"
+  },
+  {
+   "id": "hugo-invented-method-4",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "modules/collect.go",
+   "line": 60,
+   "before": "\tif err := (&mc).setActiveMods(h.logger); err != nil {",
+   "after": "\tif err := (&mc).setActiveModsGw(h.logger); err != nil {"
+  },
+  {
+   "id": "hugo-invented-method-5",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "tpl/tplimpl/templatestore.go",
+   "line": 1787,
+   "before": "\t\tif of, found := s.opts.OutputFormats.GetByName(ofs); found {",
+   "after": "\t\tif of, found := s.opts.OutputFormats.GetByNameGw(ofs); found {"
+  },
+  {
+   "id": "hugo-wrong-arity-1",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "tpl/internal/go_templates/texttemplate/parse/parse.go",
+   "line": 532,
+   "before": "\t\t\tt.unexpected(token, context)",
+   "after": "\t\t\tt.unexpected(token, context, 0, 0)"
+  },
+  {
+   "id": "hugo-wrong-arity-2",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "output/config.go",
+   "line": 49,
+   "before": "\t\t\tm = hmaps.CleanConfigStringMap(m)",
+   "after": "\t\t\tm = hmaps.CleanConfigStringMap(m, 0, 0)"
+  },
+  {
+   "id": "hugo-wrong-arity-3",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "tpl/math/math.go",
+   "line": 94,
+   "before": "\tafy, err := cast.ToFloat64E(m)",
+   "after": "\tafy, err := cast.ToFloat64E(m, 0, 0)"
+  },
+  {
+   "id": "hugo-wrong-arity-4",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "cache/filecache/filecache.go",
+   "line": 479,
+   "before": "\treturn c.cfg.MaxAge == 0 || time.Since(modTime) > c.cfg.MaxAge",
+   "after": "\treturn c.cfg.MaxAge == 0 || time.Since(modTime, 0, 0) > c.cfg.MaxAge"
+  },
+  {
+   "id": "hugo-wrong-arity-5",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "hugolib/integrationtest_builder.go",
+   "line": 370,
+   "before": "\tv := s.H.Conf.ConfiguredDimensions().ResolveVector(types.Strings3{language, version, role})",
+   "after": "\tv := s.H.Conf.ConfiguredDimensions().ResolveVector(types.Strings3{language, version, role}, 0, 0)"
+  },
+  {
+   "id": "hugo-wrong-import-1",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-import",
+   "file": "hugolib/pages_capture.go",
+   "line": 31,
+   "before": "\t\"github.com/gohugoio/hugo/source\"",
+   "after": "\t\"github.com/gohugoio/hugo/sourcegw\""
+  },
+  {
+   "id": "hugo-wrong-import-2",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-import",
+   "file": "cache/filecache/filecache_pruner.go",
+   "line": 22,
+   "before": "\t\"github.com/gohugoio/hugo/common/herrors\"",
+   "after": "\t\"github.com/gohugoio/hugo/common/herrorsgw\""
+  },
+  {
+   "id": "hugo-wrong-import-3",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-import",
+   "file": "helpers/path.go",
+   "line": 28,
+   "before": "\t\"github.com/gohugoio/hugo/common/herrors\"",
+   "after": "\t\"github.com/gohugoio/hugo/common/herrorsgw\""
+  },
+  {
+   "id": "hugo-wrong-import-4",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-import",
+   "file": "resources/resource_transformers/js/transform.go",
+   "line": 28,
+   "before": "\t\"github.com/gohugoio/hugo/resources/resource\"",
+   "after": "\t\"github.com/gohugoio/hugo/resources/resourcegw\""
+  },
+  {
+   "id": "hugo-wrong-import-5",
+   "repo": "hugo",
+   "language": "go",
+   "operator": "wrong-import",
+   "file": "hugolib/page__data.go",
+   "line": 21,
+   "before": "\t\"github.com/gohugoio/hugo/resources/page\"",
+   "after": "\t\"github.com/gohugoio/hugo/resources/pagegw\""
+  },
+  {
+   "id": "cobra-invented-function-1",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "completions.go",
+   "line": 365,
+   "before": "\tflag, finalArgs, toComplete, flagErr := checkIfFlagCompletion(finalCmd, finalArgs, toComplete)",
+   "after": "\tflag, finalArgs, toComplete, flagErr := checkIfFlagCompletionGw(finalCmd, finalArgs, toComplete)"
+  },
+  {
+   "id": "cobra-invented-function-2",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "flag_groups.go",
+   "line": 129,
+   "before": "\t\t\t\tif !hasAllFlags(flags, flagnames...) {",
+   "after": "\t\t\t\tif !hasAllFlagsGw(flags, flagnames...) {"
+  },
+  {
+   "id": "cobra-invented-function-3",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "command.go",
+   "line": 1297,
+   "before": "\t\t\t\t\tCheckErr(c.Root().Usage())",
+   "after": "\t\t\t\t\tCheckErrGw(c.Root().Usage())"
+  },
+  {
+   "id": "cobra-invented-function-4",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "bash_completions.go",
+   "line": 562,
+   "before": "\t\tWriteStringAndCheck(buf, \"    flag_parsing_disabled=1\\n\")",
+   "after": "\t\tWriteStringAndCheckGw(buf, \"    flag_parsing_disabled=1\\n\")"
+  },
+  {
+   "id": "cobra-invented-function-5",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-function",
+   "file": "active_help.go",
+   "line": 50,
+   "before": "\t\tactiveHelpCfg = os.Getenv(activeHelpEnvVar(cmd.Root().Name()))",
+   "after": "\t\tactiveHelpCfg = os.Getenv(activeHelpEnvVarGw(cmd.Root().Name()))"
+  },
+  {
+   "id": "cobra-invented-method-1",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "command.go",
+   "line": 854,
+   "before": "\t\tif err := c.ParseFlags(flags); err != nil {",
+   "after": "\t\tif err := c.ParseFlagsGw(flags); err != nil {"
+  },
+  {
+   "id": "cobra-invented-method-2",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "completions.go",
+   "line": 523,
+   "before": "\t\t\t\t\t\t\tcompletions = append(completions, CompletionWithDesc(subCmd.Name(), subCmd.Short))",
+   "after": "\t\t\t\t\t\t\tcompletions = append(completions, CompletionWithDesc(subCmd.NameGw(), subCmd.Short))"
+  },
+  {
+   "id": "cobra-invented-method-3",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "zsh_completions.go",
+   "line": 32,
+   "before": "\treturn c.genZshCompletion(w, true)",
+   "after": "\treturn c.genZshCompletionGw(w, true)"
+  },
+  {
+   "id": "cobra-invented-method-4",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "bash_completionsV2.go",
+   "line": 483,
+   "before": "\treturn c.genBashCompletion(w, includeDesc)",
+   "after": "\treturn c.genBashCompletionGw(w, includeDesc)"
+  },
+  {
+   "id": "cobra-invented-method-5",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "invented-method",
+   "file": "bash_completions.go",
+   "line": 663,
+   "before": "\tif cmd.Root() == cmd {",
+   "after": "\tif cmd.RootGw() == cmd {"
+  },
+  {
+   "id": "cobra-wrong-arity-1",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "command.go",
+   "line": 1071,
+   "before": "\t_, err := c.ExecuteC()",
+   "after": "\t_, err := c.ExecuteC(0, 0)"
+  },
+  {
+   "id": "cobra-wrong-arity-2",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "bash_completions.go",
+   "line": 685,
+   "before": "\twritePreamble(buf, c.Name())",
+   "after": "\twritePreamble(buf, c.Name(), 0, 0)"
+  },
+  {
+   "id": "cobra-wrong-arity-3",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "flag_groups.go",
+   "line": 36,
+   "before": "\t\tf := c.Flags().Lookup(v)",
+   "after": "\t\tf := c.Flags(0, 0).Lookup(v)"
+  },
+  {
+   "id": "cobra-wrong-arity-4",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "zsh_completions.go",
+   "line": 32,
+   "before": "\treturn c.genZshCompletion(w, true)",
+   "after": "\treturn c.genZshCompletion(w, true, 0, 0)"
+  },
+  {
+   "id": "cobra-wrong-arity-5",
+   "repo": "cobra",
+   "language": "go",
+   "operator": "wrong-arity",
+   "file": "completions.go",
+   "line": 376,
+   "before": "\tif err = finalCmd.ParseFlags(finalArgs); err != nil {",
+   "after": "\tif err = finalCmd.ParseFlags(finalArgs, 0, 0); err != nil {"
+  }
+ ],
+ "clean": [
+  {
+   "id": "hugo-8df3180928",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "8df3180928ec42ef072d3fa678723e1de8596501",
+   "parent": "00fe8db2ccfeb7a334917014bcc4409f033a9545",
+   "files": [
+    "tpl/cast/docshelper.go",
+    "tpl/cast/docshelper_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-00fe8db2cc",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "00fe8db2ccfeb7a334917014bcc4409f033a9545",
+   "parent": "e27a6760c5547237f87d353aebe0580feadb20f4",
+   "files": [
+    "common/hugo/version_current.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-e27a6760c5",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "e27a6760c5547237f87d353aebe0580feadb20f4",
+   "parent": "285d0efc420b6b8b017dffd4eaf5c3997d2f1336",
+   "files": [
+    "common/hugo/version_current.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-c94bdf92aa",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "c94bdf92aac8ea8390ac0dd98d02a3c01462844f",
+   "parent": "63fb71caf009bc94640296aeda93ebf3b579e592",
+   "files": [
+    "internal/warpc/avif.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-63fb71caf0",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "63fb71caf009bc94640296aeda93ebf3b579e592",
+   "parent": "2f2f33b284924fcd9f3b1ca0fe6f6f18af4f946f",
+   "files": [
+    "internal/warpc/warpc.go",
+    "internal/warpc/warpc_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-13ee7e9751",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "13ee7e9751a690ffb7eec9a2c1d900942206756a",
+   "parent": "846b1d74e8c36f0fd15513c26ddc0951c5fd24d7",
+   "files": [
+    "internal/warpc/webp.go",
+    "resources/image.go",
+    "resources/images/codec.go",
+    "resources/images/config.go"
+   ],
+   "eligibleFiles": 7
+  },
+  {
+   "id": "hugo-0688a8cd3c",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "0688a8cd3c229a9444832d7eca1f5686a4ee9e46",
+   "parent": "c9f6e4d4abc3645cb46824c870e4e1b4c098b765",
+   "files": [
+    "internal/js/esbuild/options.go",
+    "internal/js/esbuild/options_test.go",
+    "resources/resource_transformers/js/js_integration_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "hugo-c9f6e4d4ab",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "c9f6e4d4abc3645cb46824c870e4e1b4c098b765",
+   "parent": "df8badea25f909ebf9a710d3288491bd7eecbe72",
+   "files": [
+    "resources/images/codec.go",
+    "resources/images/image.go",
+    "resources/images/image_resource.go",
+    "resources/transform.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "hugo-df8badea25",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "df8badea25f909ebf9a710d3288491bd7eecbe72",
+   "parent": "5379c10923388e3be680f2e6a42ec2fb2c91592a",
+   "files": [
+    "langs/i18n/translationProvider.go",
+    "langs/languages_integration_test.go",
+    "tpl/lang/init.go",
+    "tpl/lang/lang.go"
+   ],
+   "eligibleFiles": 8
+  },
+  {
+   "id": "hugo-0732eadd5a",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "0732eadd5aead94d4bd4674d87e9bfc79aaf10a7",
+   "parent": "d1024ae6b89588d03126f23b943f92a8cb6d6645",
+   "files": [
+    "hugolib/siteJSONEncode_test.go",
+    "resources/page/page.go",
+    "resources/page/page_generate/generate_page_wrappers.go",
+    "tpl/debug/debug.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "hugo-d1024ae6b8",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "d1024ae6b89588d03126f23b943f92a8cb6d6645",
+   "parent": "6883b55ad59e0daa1aaba0cf2b66db1132202e2c",
+   "files": [
+    "commands/hugobuilder.go",
+    "common/loggers/handlerterminal.go",
+    "common/terminal/colors.go",
+    "hugolib/hugo_sites.go"
+   ],
+   "eligibleFiles": 9
+  },
+  {
+   "id": "hugo-6883b55ad5",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "6883b55ad59e0daa1aaba0cf2b66db1132202e2c",
+   "parent": "f44c355e5915e61ccb3a7cf91cdebb3a0767cbe7",
+   "files": [
+    "hugofs/hugofs_integration_test.go",
+    "modules/collect.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-f44c355e59",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "f44c355e5915e61ccb3a7cf91cdebb3a0767cbe7",
+   "parent": "46123a609bd1272f10acfedbf85a96515c5a08d8",
+   "files": [
+    "scripts/fork_go_templates/main.go",
+    "tpl/internal/go_templates/htmltemplate/escape_test.go",
+    "tpl/internal/go_templates/htmltemplate/js.go",
+    "tpl/internal/go_templates/htmltemplate/js_test.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "hugo-ac62c804c3",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "ac62c804c329bcbd74975c4753d9b6c76d89bf19",
+   "parent": "31f5395d40941f8527ccfedaf6aea5a33d9e9f58",
+   "files": [
+    "hugolib/hugo_sites_build.go",
+    "hugolib/rebuild_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-31f5395d40",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "31f5395d40941f8527ccfedaf6aea5a33d9e9f58",
+   "parent": "6b3ba3a7e22ae2809605b8118aeed08b244f1955",
+   "files": [
+    "transform/metainject/hugogenerator.go",
+    "transform/metainject/hugogenerator_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-6b3ba3a7e2",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "6b3ba3a7e22ae2809605b8118aeed08b244f1955",
+   "parent": "8c88da3723b007ca2ea4593f7e7483aa9b140fc6",
+   "files": [
+    "internal/warpc/avif_color_test.go",
+    "internal/warpc/avif_integration_test.go",
+    "internal/warpc/webp_integration_test.go",
+    "tpl/collections/collections_test.go"
+   ],
+   "eligibleFiles": 8
+  },
+  {
+   "id": "hugo-be8ffd62a9",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "be8ffd62a978b879f2a541d09cca1ab00fce6f1d",
+   "parent": "ec69d0e64931715e490ae411cba2b305636d20e0",
+   "files": [
+    "modules/config_integration_test.go",
+    "modules/config_test.go",
+    "tpl/css/css.go",
+    "tpl/tplimpl/templatestore_legacy1_integration_test.go"
+   ],
+   "eligibleFiles": 8
+  },
+  {
+   "id": "hugo-60c84b18ca",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "60c84b18ca0ee3e055dc8d021132b532cce49880",
+   "parent": "3fff6fb5c267dacb26280c78dbe8c344054249c8",
+   "files": [
+    "common/hugo/version_current.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-3fff6fb5c2",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "3fff6fb5c267dacb26280c78dbe8c344054249c8",
+   "parent": "f6606f1fd5ec705983a72f0b3a0b6b1baf3727b8",
+   "files": [
+    "common/hugo/version_current.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-41040cc7b1",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "41040cc7b1d2905b860e0cf9cae30c368c4da558",
+   "parent": "2aa51f3485054bca4a2e368bed4be32367b229e6",
+   "files": [
+    "resources/resource_transformers/tocss/dartsass/dartsass_integration_test.go",
+    "resources/resource_transformers/tocss/sass/helpers.go",
+    "resources/resource_transformers/tocss/scss/scss_integration_test.go",
+    "resources/resource_transformers/tocss/scss/tocss.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "hugo-2aa51f3485",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "2aa51f3485054bca4a2e368bed4be32367b229e6",
+   "parent": "c7f9999309a2e7a12d24c03fe639008ddc4565f8",
+   "files": [
+    "common/hexec/exec.go",
+    "common/hexec/nodesymlinks.go",
+    "internal/js/esbuild/resolve.go",
+    "resources/resource_transformers/js/js_integration_test.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "hugo-c7f9999309",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "c7f9999309a2e7a12d24c03fe639008ddc4565f8",
+   "parent": "dd16df1407208076f13647797b5cc06a7fd7df82",
+   "files": [
+    "commands/hugobuilder.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-dd16df1407",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "dd16df1407208076f13647797b5cc06a7fd7df82",
+   "parent": "140d9362fd08663fd6a3ee830ac97e4cafa37c53",
+   "files": [
+    "common/collections/append.go",
+    "common/collections/append_test.go",
+    "tpl/collections/collections_integration_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "hugo-140d9362fd",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "140d9362fd08663fd6a3ee830ac97e4cafa37c53",
+   "parent": "fdbba5a6614d00eb631c1ad6b424b42f6f7195f8",
+   "files": [
+    "markup/goldmark/tables/tables_integration_test.go",
+    "tpl/tplimpl/templatestore.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-fdbba5a661",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "fdbba5a6614d00eb631c1ad6b424b42f6f7195f8",
+   "parent": "83ab7999a89de94225ec008d4b1911874ccf58ca",
+   "files": [
+    "hugolib/page_permalink_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-83ab7999a8",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "83ab7999a89de94225ec008d4b1911874ccf58ca",
+   "parent": "5d43ab70005f20e58b91d2084005d9e89f88697d",
+   "files": [
+    "hugolib/sitesmatrix/dimensions.go",
+    "resources/page/pagemeta/page_frontmatter.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-5d43ab7000",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "5d43ab70005f20e58b91d2084005d9e89f88697d",
+   "parent": "bc68654147cda08f5667a1dde5be0a52b1702dec",
+   "files": [
+    "hugolib/page__paths.go",
+    "hugolib/page_permalink_test.go",
+    "resources/page/page_paths.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "hugo-bc68654147",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "bc68654147cda08f5667a1dde5be0a52b1702dec",
+   "parent": "806a62e85b9ca299623073240b570afa36597afe",
+   "files": [
+    "config/allconfig/allconfig.go",
+    "hugolib/page_permalink_test.go",
+    "tpl/tplimpl/embedded_templates_integration_test.go",
+    "tpl/tplimpl/tplimpl_integration_test.go"
+   ],
+   "eligibleFiles": 6
+  },
+  {
+   "id": "hugo-806a62e85b",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "806a62e85b9ca299623073240b570afa36597afe",
+   "parent": "8bac4de7a173977489ddd82d6e782a577c140f88",
+   "files": [
+    "scripts/fork_go_templates/main.go",
+    "tpl/internal/go_templates/texttemplate/funcs.go",
+    "tpl/internal/go_templates/texttemplate/hugo_template.go",
+    "tpl/internal/go_templates/texttemplate/hugo_template_test.go"
+   ],
+   "eligibleFiles": 4
+  },
+  {
+   "id": "hugo-8bac4de7a1",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "8bac4de7a173977489ddd82d6e782a577c140f88",
+   "parent": "079c76f0104de25c3e8f5b7d77878291bd8c8c2c",
+   "files": [
+    "magefile.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-bd1588bdc4",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "bd1588bdc421961c60221a46e46e123d5b8e43e7",
+   "parent": "90861931ad376b188878f9079e7c9900dcfcdaca",
+   "files": [
+    "tpl/partials/partials.go",
+    "tpl/partials/partials_integration_test.go",
+    "tpl/tplimpl/templatestore.go",
+    "tpl/tplimpl/templatetransform.go"
+   ],
+   "eligibleFiles": 4
+  },
+  {
+   "id": "hugo-90861931ad",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "90861931ad376b188878f9079e7c9900dcfcdaca",
+   "parent": "1567bdef12256fd260d641546755150917b84110",
+   "files": [
+    "commands/helpers.go",
+    "commands/hugobuilder.go",
+    "config/allconfig/allconfig.go",
+    "config/allconfig/load.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "hugo-a74b753908",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "a74b753908993473d283169722e10d72c8f4d178",
+   "parent": "07b9fba11ba4e781ee87ecca56e78bde5775950c",
+   "files": [
+    "commands/hugobuilder.go",
+    "main_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-07b9fba11b",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "07b9fba11ba4e781ee87ecca56e78bde5775950c",
+   "parent": "09fa49be210071f44326252a436d9e1169820d78",
+   "files": [
+    "commands/commandeer.go",
+    "commands/hugobuilder.go",
+    "main_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "hugo-09fa49be21",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "09fa49be210071f44326252a436d9e1169820d78",
+   "parent": "2fe9bab765fe1bcfdd77c963044daa433b807c60",
+   "files": [
+    "hugofs/nosymlinks_fs.go",
+    "hugofs/rootmapping_fs.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-2fe9bab765",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "2fe9bab765fe1bcfdd77c963044daa433b807c60",
+   "parent": "671fbf2c11ef721996dc3fcb7dd6dd0d8d2ac8df",
+   "files": [
+    "hugofs/rootmapping_fs.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-671fbf2c11",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "671fbf2c11ef721996dc3fcb7dd6dd0d8d2ac8df",
+   "parent": "c7e1a8e639bc6569af5fe1ae8157e973b9721813",
+   "files": [
+    "markup/tableofcontents/tableofcontents.go",
+    "markup/tableofcontents/tableofcontents_integration_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-2782bfd39d",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "2782bfd39d5fea70e4e38ccefa396e12215c1fc7",
+   "parent": "5edd05bbc5c16ae9423f74926f97db506da3a012",
+   "files": [
+    "commands/hugobuilder.go",
+    "common/loggers/logger.go",
+    "transform/livereloadinject/livereloadinject.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "hugo-5edd05bbc5",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "5edd05bbc5c16ae9423f74926f97db506da3a012",
+   "parent": "25f2856aca2277c93a0da3e5c951beca328dfb32",
+   "files": [
+    "resources/image_test.go",
+    "resources/images/config.go",
+    "resources/images/image.go",
+    "resources/images/smartcrop.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "hugo-25f2856aca",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "25f2856aca2277c93a0da3e5c951beca328dfb32",
+   "parent": "cb6a7072230920fb47ece28f67501a2c15934ade",
+   "files": [
+    "hugofs/rootmapping_fs.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-cb6a707223",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "cb6a7072230920fb47ece28f67501a2c15934ade",
+   "parent": "7a46cd2b6165d40adfd7bc1b9fa6614226cfc74a",
+   "files": [
+    "helpers/general.go",
+    "hugolib/rebuild_test.go",
+    "tpl/openapi/openapi3/openapi3.go",
+    "tpl/os/os.go"
+   ],
+   "eligibleFiles": 23
+  },
+  {
+   "id": "hugo-366377b614",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "366377b614cd7bf76b911bdd0baa7f404638d60f",
+   "parent": "1d87ee5b7005a38d83cb841471245b9ae7f914bd",
+   "files": [
+    "tpl/collections/collections_integration_test.go",
+    "tpl/collections/reflect_helpers.go",
+    "tpl/collections/where.go",
+    "tpl/collections/where_test.go"
+   ],
+   "eligibleFiles": 6
+  },
+  {
+   "id": "hugo-1d87ee5b70",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "1d87ee5b7005a38d83cb841471245b9ae7f914bd",
+   "parent": "10bb97ba354ed628ea29917a902acaa23b0902be",
+   "files": [
+    "magefile.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-10bb97ba35",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "10bb97ba354ed628ea29917a902acaa23b0902be",
+   "parent": "51cd9e6c7e9b33dc3836e28ac30a3b9260dd1b4e",
+   "files": [
+    "magefile.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-51cd9e6c7e",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "51cd9e6c7e9b33dc3836e28ac30a3b9260dd1b4e",
+   "parent": "ec578f0c1fc52dff130870c93b9daadc6a53684d",
+   "files": [
+    "parser/metadecoders/decoder.go",
+    "tpl/transform/transform_integration_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-ec578f0c1f",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "ec578f0c1fc52dff130870c93b9daadc6a53684d",
+   "parent": "5698de946837a5b78773af55d2705a1d0dd0aaa9",
+   "files": [
+    "parser/metadecoders/decoder.go",
+    "tpl/transform/transform_integration_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-d692a243a0",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "d692a243a058bf6d28f8e2bea99ee5b83a417c8e",
+   "parent": "ec57bb7d348989513b919c7ea9ff08fed0bec327",
+   "files": [
+    "hugolib/page_test.go",
+    "resources/page/page_markup.go",
+    "resources/page/page_markup_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "hugo-3be817ed5b",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "3be817ed5b3fae7bf934d95bc95394020acd234c",
+   "parent": "34d8cdb1ee8cafeaf2b9d7a4780e2198417853b2",
+   "files": [
+    "config/security/securityConfig_integration_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "hugo-ffbcdba9e9",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "ffbcdba9e9768b6a1bd0580eb56ed26c486f2cce",
+   "parent": "4d628bbdc3441f3c44b1f6f4e6ad04f4df4728bf",
+   "files": [
+    "tpl/collections/collections.go",
+    "tpl/collections/collections_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "hugo-4d628bbdc3",
+   "repo": "hugo",
+   "language": "go",
+   "commit": "4d628bbdc3441f3c44b1f6f4e6ad04f4df4728bf",
+   "parent": "a374b865f7e99cccafcbe443dcdb47552b91af3c",
+   "files": [
+    "common/hreflect/compare_test.go",
+    "common/hreflect/convert_test.go",
+    "tpl/collections/reflect_helpers.go",
+    "tpl/compare/compare_integration_test.go"
+   ],
+   "eligibleFiles": 10
+  },
+  {
+   "id": "cobra-8b1eba4761",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "8b1eba47616566fc4d258a93da48d5d8741865f0",
+   "parent": "4cafa37bc4bb85633b4245aa118280fe5a9edcd5",
+   "files": [
+    "command.go",
+    "doc/md_docs.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-4cafa37bc4",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "4cafa37bc4bb85633b4245aa118280fe5a9edcd5",
+   "parent": "5c962a221e70fd6b12296e5d7075f28b422f98b2",
+   "files": [
+    "cobra.go",
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "cobra-95d8a1e45d",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "95d8a1e45d7719c56dc017e075d3e6099deba85d",
+   "parent": "bd4d1655f6655f690f45d281fe698dacb9c7d750",
+   "files": [
+    "command.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-bd4d1655f6",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "bd4d1655f6655f690f45d281fe698dacb9c7d750",
+   "parent": "0c72800b8dba637092b57a955ecee75949e79a73",
+   "files": [
+    "completions.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-0c72800b8d",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "0c72800b8dba637092b57a955ecee75949e79a73",
+   "parent": "c5dacb3ea4512e6766f86907dfa7014ceb9cb041",
+   "files": [
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-285460dca6",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "285460dca6152bb86994fa4a9659c24ca4060e2f",
+   "parent": "4955da7c11ea14678cbca3a4016bd4b0b1c51f39",
+   "files": [
+    "command.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-fd865a44e3",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "fd865a44e3c48afeb6a6dbddadb8a5519173e029",
+   "parent": "60d056d1574d04c859638354bc9cacab70bab296",
+   "files": [
+    "command_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-60d056d157",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "60d056d1574d04c859638354bc9cacab70bab296",
+   "parent": "66b215ba186e6e28ccab74b9022149cc2236d863",
+   "files": [
+    "doc/man_docs_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-c81c46a015",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "c81c46a015b48d9f79c73cc6f528f90eaabb0c7e",
+   "parent": "dcb405a9399ed307eaa0e50f5cb1c290c8979dd4",
+   "files": [
+    "completions_test.go",
+    "flag_groups.go",
+    "flag_groups_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "cobra-fdee73b4a0",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "fdee73b4a0d0be3e233b968ab038866b7cd99772",
+   "parent": "988bd76139210bc1d686c7112b4eb5e784365f1f",
+   "files": [
+    "powershell_completions.go",
+    "powershell_completions_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-988bd76139",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "988bd76139210bc1d686c7112b4eb5e784365f1f",
+   "parent": "2246fa82e91dda4486b9466fab691b41b516f747",
+   "files": [
+    "fish_completions_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-2246fa82e9",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "2246fa82e91dda4486b9466fab691b41b516f747",
+   "parent": "0e3a0bfe91a52670ba78ec020f3657d48954a4f7",
+   "files": [
+    "bash_completions.go",
+    "bash_completionsV2.go",
+    "cobra.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "cobra-284f410104",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "284f4101043c4b1faebde411caec35a7b6e36494",
+   "parent": "4dd4b25de38418174a6e859e8a32eaccca32dccc",
+   "files": [
+    "fish_completions.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-45360a55cc",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "45360a55ccccf909b35f4290242bfb8a6bfbef66",
+   "parent": "c8a20a16bafa2dc85d304b59b2e677c7f75a73a6",
+   "files": [
+    "completions.go",
+    "zsh_completions.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-9e6b58afc7",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "9e6b58afc70c60a6b3c8a0138fb25acc734d47e3",
+   "parent": "fb3652402b30b582975880f652e7ed81343e8312",
+   "files": [
+    "active_help_test.go",
+    "bash_completions_test.go",
+    "command_win.go",
+    "doc/man_examples_test.go"
+   ],
+   "eligibleFiles": 36
+  },
+  {
+   "id": "cobra-567ea8ebc9",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "567ea8ebc9b4385ae671486415cd203fc2a3bab9",
+   "parent": "3daa4b9c36617509a756832a3d0ee2b6f4b8c129",
+   "files": [
+    "powershell_completions.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-3daa4b9c36",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "3daa4b9c36617509a756832a3d0ee2b6f4b8c129",
+   "parent": "a516d4132c811a4101ce6d99ac12671217d1ac37",
+   "files": [
+    "bash_completionsV2.go",
+    "fish_completions.go",
+    "powershell_completions.go",
+    "zsh_completions.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "cobra-b4f979ae35",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "b4f979ae352828a0153281b590771ce9588d67f8",
+   "parent": "bf11ab6321f2831be5390fdd71ab0bb2edbd9ed5",
+   "files": [
+    "command.go",
+    "completions_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-bf11ab6321",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "bf11ab6321f2831be5390fdd71ab0bb2edbd9ed5",
+   "parent": "fdffa5a4c760e30a38e596299b91c328ffd461bc",
+   "files": [
+    "bash_completions.go",
+    "command.go",
+    "completions.go",
+    "doc/rest_docs.go"
+   ],
+   "eligibleFiles": 5
+  },
+  {
+   "id": "cobra-f25a3c6e0b",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "f25a3c6e0b4220c616a3b342b57b055c1256d318",
+   "parent": "923592041e4ae38e2ae5c3cc66c3eb1e0c27261f",
+   "files": [
+    "cobra.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-c6b9971923",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "c6b99719235fcb18d950f972f27d95fdb0347f02",
+   "parent": "430549841b79b3731b27df81e2752b729fd4ae43",
+   "files": [
+    "powershell_completions.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-ad6db7f8f6",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "ad6db7f8f6e485f55b1561df9276fa4d8e278bde",
+   "parent": "6b0bd3076cfafd1c108264ed1e4aa0c0fe3f8537",
+   "files": [
+    "command_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-6b0bd3076c",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "6b0bd3076cfafd1c108264ed1e4aa0c0fe3f8537",
+   "parent": "cc7e235fc26cfd0b5ae36c960f399eea4badaa3e",
+   "files": [
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-10cf7be997",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "10cf7be9972ee5b5994cf760ecba642309ac8685",
+   "parent": "4b9d00dfecd605048ddf3ad2a81afcab381ac1ae",
+   "files": [
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-badcce14f8",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "badcce14f8e828cda4d8ac404a12448700de1441",
+   "parent": "1424b7b92743e634e20f611e99a495e411fa4732",
+   "files": [
+    "bash_completionsV2.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-860791844e",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "860791844ed3a2e544a9b9bbbcb14144a948ad20",
+   "parent": "2169adb5749372c64cdd303864ae8a444da6350f",
+   "files": [
+    "command.go",
+    "completions.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-2169adb574",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "2169adb5749372c64cdd303864ae8a444da6350f",
+   "parent": "212ea4078323771dc49b6f25a41d84efbaac3a4c",
+   "files": [
+    "command.go",
+    "command_test.go",
+    "completions.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "cobra-212ea40783",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "212ea4078323771dc49b6f25a41d84efbaac3a4c",
+   "parent": "d4040ad8dbc351b7eb88b2ffcff6f3642bce8ce1",
+   "files": [
+    "command.go",
+    "completions.go",
+    "completions_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "cobra-d4040ad8db",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "d4040ad8dbc351b7eb88b2ffcff6f3642bce8ce1",
+   "parent": "23fc5e099f7bb8b8f979e3928cb1078b9c939daa",
+   "files": [
+    "powershell_completions.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-93d1913fb0",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "93d1913fb03362f97e95aeacc7d1541764cafc2f",
+   "parent": "07034fee4995578a771c4185dab38cc16ac3f420",
+   "files": [
+    "cobra.go",
+    "command.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-7039e1fa21",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "7039e1fa214cfc1de404ed6540158c8fda64a758",
+   "parent": "fce8d8aeb08dc6afe413cc0af67a7fbb3cffec4c",
+   "files": [
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-fce8d8aeb0",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "fce8d8aeb08dc6afe413cc0af67a7fbb3cffec4c",
+   "parent": "a281c8b47b315fe428cf31ad5c38b526dc136f55",
+   "files": [
+    "command.go",
+    "flag_groups.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-6d978a911e",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "6d978a911e7fff69b1ca2a873dd91d78ebca44cf",
+   "parent": "4065a33bfdf697b6ce748a521686aee7edc748eb",
+   "files": [
+    "bash_completionsV2_test.go",
+    "command_test.go",
+    "fish_completions_test.go",
+    "zsh_completions_test.go"
+   ],
+   "eligibleFiles": 36
+  },
+  {
+   "id": "cobra-fe08012edd",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "fe08012eddbdf42edd466b8defeee33ec0ec4446",
+   "parent": "d689184a421607457a18131e0a2b602fec22e3b4",
+   "files": [
+    "powershell_completions_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-d689184a42",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "d689184a421607457a18131e0a2b602fec22e3b4",
+   "parent": "70e53f62be77e03f376be845efacbd99c00024ca",
+   "files": [
+    "cobra.go",
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "cobra-70e53f62be",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "70e53f62be77e03f376be845efacbd99c00024ca",
+   "parent": "2e8ba6f3087bda425da42af31f7373cd2c2c08c5",
+   "files": [
+    "args.go",
+    "args_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-2a7647ff46",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "2a7647ff4661fd5bc54bdc022d349d7efe29674f",
+   "parent": "704540525032e759304ffdbdacb2050dbdf4b2c5",
+   "files": [
+    "command.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-22b617914c",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "22b617914c8890ba20db7ceafcdc2ef4ca4817d3",
+   "parent": "dbf85f6104904d539cabceebec234e817fa0df0c",
+   "files": [
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-dbf85f6104",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "dbf85f6104904d539cabceebec234e817fa0df0c",
+   "parent": "f911c0b89c6e0c41b6ad218c9235d8706c36a1b2",
+   "files": [
+    "doc/yaml_docs.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-f911c0b89c",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "f911c0b89c6e0c41b6ad218c9235d8706c36a1b2",
+   "parent": "7790bf97fd40e285913066cf65387ad281cd6c2e",
+   "files": [
+    "bash_completionsV2.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-7790bf97fd",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "7790bf97fd40e285913066cf65387ad281cd6c2e",
+   "parent": "6bf8cd85825800c5cbc63009b1fb2c54185f05ed",
+   "files": [
+    "doc/yaml_docs.go",
+    "doc/yaml_docs_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-5f2ec3c897",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "5f2ec3c897155c3346e77430932e3966e5cfa648",
+   "parent": "b9ca5949e2f58373e8e4c3823c213401f7d9d0e3",
+   "files": [
+    "completions.go",
+    "completions_test.go",
+    "flag_groups.go"
+   ],
+   "eligibleFiles": 3
+  },
+  {
+   "id": "cobra-b9ca5949e2",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "b9ca5949e2f58373e8e4c3823c213401f7d9d0e3",
+   "parent": "ea94a3db55f84f026891709d82ebf25e17f89e0d",
+   "files": [
+    "command.go",
+    "command_test.go"
+   ],
+   "eligibleFiles": 2
+  },
+  {
+   "id": "cobra-ea94a3db55",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "ea94a3db55f84f026891709d82ebf25e17f89e0d",
+   "parent": "7c9831d376a6c048ae9f95b435cdde9dc14358a0",
+   "files": [
+    "command.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-7c9831d376",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "7c9831d376a6c048ae9f95b435cdde9dc14358a0",
+   "parent": "ed7bb9dda481082672ed9ea60c29b3b70ae0fc04",
+   "files": [
+    "bash_completionsV2.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-ed7bb9dda4",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "ed7bb9dda481082672ed9ea60c29b3b70ae0fc04",
+   "parent": "f464d6c82e9af74b7a46301a775163984af32cd1",
+   "files": [
+    "fish_completions_test.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-f464d6c82e",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "f464d6c82e9af74b7a46301a775163984af32cd1",
+   "parent": "7dc8b004e653f2f69511378d52c2989c8f64d42b",
+   "files": [
+    "active_help.go",
+    "bash_completionsV2.go",
+    "fish_completions_test.go",
+    "zsh_completions.go"
+   ],
+   "eligibleFiles": 13
+  },
+  {
+   "id": "cobra-87ea1807f7",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "87ea1807f71dfa4d0bd7058c099b3978b128aea6",
+   "parent": "ca8e3c2779b8cc6168ab6ffdf9c1f2ac65652404",
+   "files": [
+    "completions.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-37d481d4d4",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "37d481d4d40a07b1a8f2f6c345124540e870c85c",
+   "parent": "5b11656e45a6a6579298a3b28c71f456ff196ad6",
+   "files": [
+    "zsh_completions.go"
+   ],
+   "eligibleFiles": 1
+  },
+  {
+   "id": "cobra-5b11656e45",
+   "repo": "cobra",
+   "language": "go",
+   "commit": "5b11656e45a6a6579298a3b28c71f456ff196ad6",
+   "parent": "ffa8860dbe017851bc4e8ff4fb2b6249cfc1e4d8",
+   "files": [
+    "bash_completionsV2.go"
+   ],
+   "eligibleFiles": 1
+  }
+ ],
+ "sourceHashes": {
+  "hugo": {
+   "cache/dynacache/dynacache.go": "2ae2b8432253e987e2bbeb4fd1de01c6ffc6df3c892b62364cbe1e22c8917751",
+   "cache/filecache/filecache.go": "bd1b691fddb348969b82b90af62cea254bdc8a8b0300b2b202c1cdb0a0895dd0",
+   "cache/filecache/filecache_pruner.go": "fe1cb4434c7c678cda5928e0ba12914d293dbc0c7ff3af0adf68481934452583",
+   "common/hreflect/compare.go": "358d1d4cf4dfcad5a7470b87724d542529c43e2b1431329213dee6aec7978471",
+   "config/allconfig/load.go": "07ff487812dc9b857c88543099ac1f6fa035934f31235d79cacb604742c01d53",
+   "deploy/deploy.go": "0f475e9924f5912c1f5e8179493429758155b86369635d865c69bba03f8771cc",
+   "helpers/path.go": "2750b685cf2b5e1265e15811ee2145b7c613226245d453c45e7eea72793f2999",
+   "hugolib/integrationtest_builder.go": "72a209c906759ffec5941b4c7a8522a675908da4c3ff40265773ee71918e2a27",
+   "hugolib/page__data.go": "7102c68562bd80a353e829e1ddb61849f411c71ab4b5bcf0bb706038ac72900e",
+   "hugolib/pages_capture.go": "e2adc4df0ac2b17df756b86194874aa10e66dcea9a1598acccda355213023dab",
+   "markup/markup.go": "814c1be455ce7d3243e0340eae94454dd5672bcca683c7392802180831d39c1e",
+   "modules/collect.go": "c675c3a18cd6e0a1feb2118ae0e42a635047b980345f67b634adf7dc291f54f7",
+   "navigation/menu_cache.go": "b1a0033bcda1d502eb042033a4e3fac8a7d0680f0c8c905bc599b90b58191f79",
+   "output/config.go": "98da3e94b15c6d8419540133b45af8d530f246398893e57072350ea301c33965",
+   "parser/metadecoders/format.go": "2df28e609533a3d8342c80d73b98faebde41fef2b04075559561ade983211bbb",
+   "resources/images/resampling.go": "23581aa8a8786d2412b0c54d0a8ef8ac4338bfe0b83c254ddacad99baa5ffd86",
+   "resources/resource_transformers/js/transform.go": "a8943a2162e748bfce25ce611f45443475101c342fbf18250cb2401dca645337",
+   "tpl/internal/go_templates/texttemplate/parse/parse.go": "a2d7754ebdeb72ae62b788fe1b137a20eee669800d5fec504b6d8f14b581c252",
+   "tpl/math/math.go": "df64d32000a125af7d2fc36fb2074e39f385ee79d0cc2a298a6a66d60900a2ae",
+   "tpl/tplimpl/templatestore.go": "bb53ed60775587827266c5630e5adf8989228c6239d07eac7029d4765ca079fa"
+  },
+  "cobra": {
+   "active_help.go": "92bde33086d33e413b9ac945ddb38f7487f9ce91067453a7ce97fd62fa59cdc5",
+   "bash_completions.go": "7370190d5344eec0325b2fd2dd7a0f39ca2acc5881f818adb5124b16ee7ac507",
+   "bash_completionsV2.go": "906f68743cdae6ddb3228ca42e4b56d2a51371d7f135f67e4476342abffc6215",
+   "command.go": "f79613721ad04c9b438dfb30fe0ac3deca85c487658b0aa04a1ae6e4395bfd90",
+   "completions.go": "b28a4f6c509acde7367323e835cfb4f4939fe656dd3214320d76f53e91743c89",
+   "flag_groups.go": "3b0572e1fc2fc6e8ef62319b4294cdda86259fb0b1afebc18b03fa643e431251",
+   "zsh_completions.go": "a80998389020b259308582d539cb3ae0979f83b55e8ffa68b20c46b015feae24"
+  }
+ },
+ "timing": {
+  "hugo": {
+   "file": "tpl/internal/go_templates/htmltemplate/css.go",
+   "line": 261,
+   "sha256": "52d3584d9de08ddd1c6cde00a5b08fda956f96f4e28ef45be45737ae0869e95e",
+   "languageLines": 235173
+  }
+ }
+}

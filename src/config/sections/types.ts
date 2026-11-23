@@ -8,4 +8,8 @@ export const typesConfigSchema = z.object({
   budgetTokens: z.number().int().positive().default(400),
   typescript: z.enum(['auto', 'off']).default('auto'),
   python: z.enum(['auto', 'off']).default('auto'),
+  go: z.enum(['auto', 'off']).default('auto'),
+  rust: z.enum(['auto', 'off']).default('auto'),
+  java: z.enum(['auto', 'off']).default('auto'),
+  csharp: z.enum(['auto', 'off']).default('auto'),
 }).strict();

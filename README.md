@@ -271,10 +271,21 @@ The TypeScript blocking allowlist is 2304, 2305, 2724, 2339, 2551, 2349, 2554,
 2555, 2556, 2345, 2353, 2561.
 `gw types def|impl|refs file:line:col` provides TypeScript navigation. All support `--json`.
 
+Go, Rust, Java and C# files are checked with the toolchain already on the machine:
+`go build -gcflags=-e` / `go vet` (needs `go.mod`), `cargo check --offline` (needs
+`Cargo.toml`), `javac` on the Maven/Gradle source roots and local jars, and
+`dotnet build --no-restore` (needs a restored `.csproj`; outputs go to a scratch directory,
+never the project's `bin`/`obj`). Only undefined names, unknown members, wrong argument
+counts and unresolved imports on changed lines can block; everything else, and everything
+`javac` reports with an incomplete classpath, is informational. A missing toolchain or
+project file leaves grounding unchanged. These four have no `def|impl|refs` navigation.
+Measured results, including the rules that fail: `bench/type-languages/results/RESULTS.md`.
+
 The optional `types` config section defaults to
 `{ "enabled": true, "stopGate": true, "postToolHook": false, "timeoutMs": 4000,
-"budgetTokens": 400, "typescript": "auto", "python": "auto" }`.
-Set `enabled: false` to disable it, or set either language to `"off"`.
+"budgetTokens": 400, "typescript": "auto", "python": "auto", "go": "auto", "rust": "auto",
+"java": "auto", "csharp": "auto" }`.
+Set `enabled: false` to disable it, or set any language to `"off"`.
 Timeouts fail open; type checking is not enabled after individual edits by default.
 
 > The profile controls the **Stop gate**, not every possible intervention. Read and repeat-command guards can deny redundant actions in the profiles where they are enabled; each has an override.

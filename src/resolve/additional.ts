@@ -14,8 +14,48 @@ export class AdditionalResolver {
     this.module = existsSync(mod) ? /^\s*module\s+(\S+)/m.exec(readFileSync(mod, 'utf8'))?.[1]?.replace(/^"|"$/g, '') ?? null : null;
   }
 
+  private readonly byId = new Map<number, FileInfo>();
+  private readonly byLanguage = new Map<string, FileInfo[]>();
+  private readonly byPath = new Map<string, FileInfo>();
+  private readonly goDirs = new Map<string, FileInfo[]>();
+  private readonly targetCache = new Map<string, FileInfo[]>();
+  private indexed: { symbols: AdditionalSymbol[]; same: Map<string, AdditionalSymbol[]>; named: Map<string, AdditionalSymbol[]>; byId: Map<string, AdditionalSymbol> } | null = null;
+
+  private prepare(): void {
+    if (this.byId.size || !this.files.length) return;
+    for (const f of this.files) {
+      this.byId.set(f.id, f);
+      this.byPath.set(f.path, f);
+      const language = f.language ?? '';
+      if (!this.byLanguage.has(language)) this.byLanguage.set(language, []);
+      this.byLanguage.get(language)!.push(f);
+      if (language !== 'go') continue;
+      const dir = path.posix.dirname(f.path);
+      if (!this.goDirs.has(dir)) this.goDirs.set(dir, []);
+      this.goDirs.get(dir)!.push(f);
+    }
+  }
+
+  private symbolIndex(symbols: AdditionalSymbol[]) {
+    if (this.indexed?.symbols === symbols) return this.indexed;
+    this.prepare();
+    const same = new Map<string, AdditionalSymbol[]>(), named = new Map<string, AdditionalSymbol[]>(), byId = new Map<string, AdditionalSymbol>();
+    for (const s of symbols) {
+      if (!['function', 'method', 'class'].includes(s.kind)) continue;
+      const language = this.byId.get(s.fileId)?.language;
+      if (!language) continue;
+      if (!same.has(language)) same.set(language, []);
+      same.get(language)!.push(s);
+      const key = `${language}\0${s.name}`;
+      if (!named.has(key)) named.set(key, []);
+      named.get(key)!.push(s);
+      if (!byId.has(`${language}\0${s.id}`)) byId.set(`${language}\0${s.id}`, s);
+    }
+    return (this.indexed = { symbols, same, named, byId });
+  }
+
   private suffix(language: string, suffixes: string[]): FileInfo[] {
-    return this.files.filter((f) => f.language === language && suffixes.some((s) => f.path === s || f.path.endsWith('/' + s)));
+    return (this.byLanguage.get(language) ?? []).filter((f) => suffixes.some((s) => f.path === s || f.path.endsWith('/' + s)));
   }
 
   private rustFiles(from: FileInfo, spec: string): FileInfo[] {
@@ -28,19 +68,25 @@ export class AdditionalResolver {
       while (parts[0] === 'super') { base = path.posix.dirname(base); parts.shift(); }
     }
     const stem = path.posix.join(base, ...parts);
-    return this.files.filter((f) => f.language === 'rust' && [stem + '.rs', stem + '/mod.rs', ...(parts.length ? [] : [base + '/lib.rs', base + '/main.rs'])].includes(f.path));
+    const wanted = [stem + '.rs', stem + '/mod.rs', ...(parts.length ? [] : [base + '/lib.rs', base + '/main.rs'])];
+    return (this.byLanguage.get('rust') ?? []).filter((f) => wanted.includes(f.path));
   }
 
   targets(from: FileInfo, im: AdditionalImport): FileInfo[] {
+    this.prepare();
+    const key = `${from.id}\0${im.module}\0${im.name}\0${im.kind}`;
+    let cached = this.targetCache.get(key);
+    if (!cached) this.targetCache.set(key, (cached = this.findTargets(from, im)));
+    return cached;
+  }
+
+  private findTargets(from: FileInfo, im: AdditionalImport): FileInfo[] {
     if (from.language === 'go') {
-      const dirs = new Set(this.files.filter((f) => f.language === 'go').map((f) => path.posix.dirname(f.path)));
       const local = this.module && (im.module === this.module || im.module.startsWith(this.module + '/')) ? im.module.slice(this.module.length).replace(/^\//, '') || '.' : null;
       if (local === null && (this.module || !/^\.\.?\//.test(im.module))) return [];
       const target = local ?? path.posix.normalize(path.posix.join(path.posix.dirname(from.path), im.module));
       if (target === '..' || target.startsWith('../') || path.posix.isAbsolute(target)) return [];
-      const matches = [...dirs].filter((d) => d === target);
-      if (matches.length !== 1) return [];
-      return this.files.filter((f) => f.language === 'go' && path.posix.dirname(f.path) === matches[0]);
+      return this.goDirs.get(target) ?? [];
     }
     if (from.language === 'java') {
       const full = [im.module, im.name === '*' ? '' : im.name].filter(Boolean).join('.').replace(/\./g, '/');
@@ -51,9 +97,9 @@ export class AdditionalResolver {
       const stem = im.module.replace(/\.rb$/, '');
       if (im.kind === 'side-effect') {
         const rel = path.posix.normalize(path.posix.join(path.posix.dirname(from.path), stem + '.rb'));
-        return this.files.filter((f) => f.language === 'ruby' && f.path === rel);
+        return (this.byLanguage.get('ruby') ?? []).filter((f) => f.path === rel);
       }
-      const lib = this.files.filter((f) => f.language === 'ruby' && f.path === `lib/${stem}.rb`);
+      const lib = (this.byLanguage.get('ruby') ?? []).filter((f) => f.path === `lib/${stem}.rb`);
       return lib.length ? lib : this.suffix('ruby', [stem + '.rb']);
     }
     if (from.language === 'rust') {
@@ -71,11 +117,12 @@ export class AdditionalResolver {
   }
 
   resolveCall(from: FileInfo, callerId: string | null, text: string, name: string, imports: AdditionalImport[], symbols: AdditionalSymbol[]): { id: string; conf: CallConfidence } | null {
-    const same = symbols.filter((s) => this.files.find((f) => f.id === s.fileId)?.language === from.language && ['function', 'method', 'class'].includes(s.kind));
+    const index = this.symbolIndex(symbols), language = from.language ?? '';
+    const same = index.same.get(language) ?? [];
     const pick = (candidates: AdditionalSymbol[], conf: CallConfidence) => candidates.length === 1 ? { id: candidates[0]!.id, conf } : null;
-    const named = same.filter((s) => s.name === name);
+    const named = index.named.get(`${language}\0${name}`) ?? [];
     const qualified = /\.|::/.test(text);
-    const caller = same.find((s) => s.id === callerId);
+    const caller = callerId === null ? undefined : index.byId.get(`${language}\0${callerId}`);
     if (/^(this|self)\.[^.]+$/.test(text) && caller?.parentId) return pick(named.filter((s) => s.parentId === caller.parentId), 'exact');
     if (!qualified) {
       const local = named.filter((s) => s.fileId === from.id && (s.parentId === null || (caller?.parentId && s.parentId === caller.parentId)));
@@ -94,7 +141,7 @@ export class AdditionalResolver {
       if (from.language !== 'go' && targets.length !== 1) continue;
       const ids = new Set(targets.map((f) => f.id));
       const targetName = !qualified && im.alias && im.alias !== '.' ? im.name : name;
-      imported.push(...same.filter((s) => ids.has(s.fileId) && s.name === targetName));
+      imported.push(...(index.named.get(`${language}\0${targetName}`) ?? []).filter((s) => ids.has(s.fileId)));
     }
     if (imported.length) return pick([...new Map(imported.map((s) => [s.id, s])).values()], 'import-resolved');
     if (bound && from.language !== 'ruby') return null;
@@ -106,11 +153,11 @@ export class AdditionalResolver {
     }
     if (qualified) {
       const head = text.split(/::|\./)[0]!;
-      const classes = same.filter((s) => s.name === head && s.kind === 'class');
+      const classes = (index.named.get(`${language}\0${head}`) ?? []).filter((s) => s.kind === 'class');
       if (classes.length === 1) return pick(named.filter((s) => s.parentId === classes[0]!.id), 'exact');
       return null;
     }
-    const directory = named.filter((s) => path.posix.dirname(this.files.find((f) => f.id === s.fileId)!.path) === path.posix.dirname(from.path));
+    const directory = named.filter((s) => path.posix.dirname(this.byId.get(s.fileId)!.path) === path.posix.dirname(from.path));
     if (directory.length) return pick(directory, 'name-only');
     return pick(named, 'name-only');
   }

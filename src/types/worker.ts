@@ -7,14 +7,18 @@ import type { GroundworkConfig } from '../config/schema.js';
 import type { TypeCheckResult, TypeFinding } from './index.js';
 import { tsDiagnostics, navigate } from './typescript.js';
 import { pythonDiagnostics } from './pyright.js';
+import { compiledLanguage, compilerDiagnostics, resetCompilerMemo, type BaseTexts } from './compilers.js';
 
 const signature = (f: TypeFinding) => `${f.code}:${f.message.replace(/\s+/g, ' ').trim()}`;
 process.on('message', (request: { root: string; changed: ChangedFile[]; config: GroundworkConfig; base?: string; target?: string; operation?: 'def' | 'impl' | 'refs'; deadline: number }) => {
   try {
     if (request.target && request.operation) { process.send?.(navigate(request.root, request.target, request.operation)); return; }
-    const result: TypeCheckResult = { available: { typescript: false, python: false }, findings: [], timedOut: false };
+    const result: TypeCheckResult = { available: { typescript: false, python: false, go: false, rust: false, java: false, csharp: false }, findings: [], timedOut: false };
+    resetCompilerMemo();
+    const show = (file: string) => execFileSync('git', ['show', `${request.base ?? 'HEAD'}:${file}`], { cwd: request.root, encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'ignore'] });
     for (const changed of request.changed) {
-      const language = /\.[cm]?tsx?$/.test(changed.file) ? 'typescript' : changed.file.endsWith('.py') ? 'python' : null;
+      const compiled = compiledLanguage(changed.file);
+      const language = /\.[cm]?tsx?$/.test(changed.file) ? 'typescript' : changed.file.endsWith('.py') ? 'python' : compiled;
       if (!language) continue;
       if (!request.config.types.enabled || request.config.types[language] === 'off') { result.available[language] = 'disabled'; continue; }
       // The baseline sees the base text of every changed TypeScript file, so changed dependencies don't leak into it.
@@ -22,7 +26,12 @@ process.on('message', (request: { root: string; changed: ChangedFile[]; config: 
         try { return [[c.file, execFileSync('git', ['show', `${request.base ?? 'HEAD'}:${c.file}`], { cwd: request.root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })] as const]; }
         catch { return []; }
       }));
-      const check = (root: string, file: string, text?: string) => language === 'typescript' ? tsDiagnostics(root, file, text, text === undefined ? undefined : baseOthers()) : pythonDiagnostics(root, file, text, request.deadline);
+      // Compiled languages build a whole package, so the baseline holds every changed file of the language at its base text.
+      const baseTexts = (): BaseTexts => new Map(request.changed.filter((c) => compiledLanguage(c.file) === compiled).map((c) => {
+        try { return [c.file, show(c.file)] as const; } catch { return [c.file, null] as const; }
+      }));
+      const check = (root: string, file: string, text?: string) => compiled ? compilerDiagnostics(compiled, root, file, request.deadline, text === undefined ? undefined : baseTexts())
+        : language === 'typescript' ? tsDiagnostics(root, file, text, text === undefined ? undefined : baseOthers()) : pythonDiagnostics(root, file, text, request.deadline);
       try {
         const findings = check(request.root, changed.file);
         result.available[language] = true;

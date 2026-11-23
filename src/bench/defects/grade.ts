@@ -74,7 +74,8 @@ type Declaration = { name: string; body: string; imported: boolean; line: string
 
 /** Added lines split at each top-level declaration, so that a helper is credited only through code that is actually called. */
 function declarations(file: string, lines: { text: string }[]): Declaration[] {
-  const out: Declaration[] = [];
+  const out: Declaration[] = [], go = file.endsWith('.go');
+  let block = false;
   for (const l of lines) {
     // A top-level comment documents the declaration after it, not the one before.
     if (/^(\/\/|#|\/\*| \*)/.test(l.text)) continue;
@@ -82,7 +83,9 @@ function declarations(file: string, lines: { text: string }[]): Declaration[] {
     const bound = /^(?:from\s+\S+\s+)?import\s+(?:type\s+)?(.*?)(?:\s+from\s.*)?;?\s*$/.exec(l.text)?.[1];
     // An import is a declaration of each name it binds, so an alias re-exported by an earlier step still leads to the helper.
     // A Go import binds its alias, or else the last segment of the package path, alone or inside an import block.
-    const pkg = /^\s*(?:import\s+)?(?:([\w.]+)\s+)?"([^"]+)"\s*$/.exec(l.text);
+    if (go && /^import\s*\(\s*$/.test(l.text)) { block = true; continue; }
+    if (block && /^\)/.test(l.text)) { block = false; continue; }
+    const pkg = !go ? null : (block ? /^\s*(?:([\w.]+)\s+)?"([^"]+)"\s*$/ : /^import\s+(?:([\w.]+)\s+)?"([^"]+)"\s*$/).exec(l.text);
     if (pkg) out.push({ name: pkg[1] ?? pkg[2]!.split('/').pop()!, body: '', imported: true, line: l.text, file });
     else if (bound !== undefined) for (const part of bound.replace(/[{}()]/g, '').split(',')) {
       const alias = /([\w$]+)\s*$/.exec(part)?.[1];

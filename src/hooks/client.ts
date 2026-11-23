@@ -28,13 +28,13 @@ export async function readHookInput(): Promise<string> {
   });
 }
 
-export async function forwardHook(agent: AgentName, event: HookEventName, input: string, timeoutMs = 300): Promise<string | null> {
+export async function forwardHook(agent: AgentName, event: HookEventName, input: string, timeoutMs = 300, stopTimeoutMs = 30_000): Promise<string | null> {
   if (process.env.GW_HOOK_IN_PROCESS === '1' || process.platform === 'win32') return null;
   try {
     const raw = input.trim() ? JSON.parse(input) : {};
     if (!raw || typeof raw !== 'object') return '';
     const stop = event === 'stop';
-    // Stop runs in the service so its type checker and index stay warm between turns; a service failure reruns it in-process, never skips it.
+    // Stop runs in the service so its type checker and index stay warm between turns; a broken service reruns it in-process, a timeout allows.
     if (!stop && (!['pre_tool', 'post_tool'].includes(event) || !/^(Read|Edit|Write|MultiEdit|Delete|mcp__(?:plugin_groundwork_)?groundwork__find_code|MCP:find_code)$/.test(raw.tool_name ?? ''))) return null;
     const failed = stop ? null : '';
     let cwd: string, info: ReturnType<typeof serviceInfo>;
@@ -58,7 +58,7 @@ export async function forwardHook(agent: AgentName, event: HookEventName, input:
         socket.destroy();
         resolve(output);
       };
-      const timer = setTimeout(() => finish(failed), stop ? Math.max(timeoutMs, 30_000) : timeoutMs);
+      const timer = setTimeout(() => finish(''), stop ? stopTimeoutMs : timeoutMs);
       socket.setEncoding('utf8');
       socket.on('error', (error: NodeJS.ErrnoException) => finish(!greeted && ['ENOENT', 'ECONNREFUSED'].includes(error.code ?? '') ? null : failed));
       socket.on('close', () => finish(failed));

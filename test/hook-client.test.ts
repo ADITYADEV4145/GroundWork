@@ -54,6 +54,10 @@ describe.skipIf(process.platform === 'win32')('slim hook transport', () => {
     answer = false;
     expect(await forwardHook('claude', 'stop', stop)).toBeNull();
   });
+  it('allows Stop without rerunning it when the service does not answer in time', async () => {
+    await listen((socket, version) => { socket.write(JSON.stringify({ version }) + '\n'); });
+    expect(await forwardHook('claude', 'stop', JSON.stringify({ cwd: root, session_id: 'test' }), 300, 50)).toBe('');
+  });
   it('falls back only for absent services or a version mismatch', async () => {
     expect(await forwardHook('claude', 'pre_tool', input(root))).toBeNull();
     await listen((socket) => socket.end('{"version":"old"}\n'));

@@ -82,13 +82,16 @@ export interface ScanOptions { config: GroundworkConfig; changed?: ChangedFile[]
  * `Test…` functions, Rust's `main`, and any function declared under an attribute or decorator (`#[test]`, `#[bench]`, `@app.route`, `[Test]`).
  */
 function runByFramework(file: string, name: string, source: string, line: number): boolean {
-  if (file.endsWith('.go') && /^(init|main|(Test|Benchmark|Fuzz|Example)(_|[A-Z0-9]|$))/.test(name)) return true;
+  if (file.endsWith('.go') && /^(init|main|(Test|Benchmark|Fuzz|Example)(_.*|[A-Z0-9].*)?)$/.test(name)) return true;
   if (file.endsWith('.rs') && name === 'main') return true;
   const lines = source.split('\n');
+  const marker = (text: string) => text.startsWith('#[') || text.startsWith('@') || (file.endsWith('.cs') && /^\[[^\]]*\]/.test(text));
+  // Python's indexed span starts on the decorator, and an attribute can share the declaration's line.
+  if (marker((lines[line - 1] ?? '').trim())) return true;
   for (let i = line - 2; i >= 0; i--) {
     const above = lines[i]!.trim();
-    if (above === '' || above.startsWith('//') || above.startsWith('#!')) continue;
-    return above.startsWith('#[') || above.startsWith('@') || (file.endsWith('.cs') && /^\[.*\]$/.test(above));
+    if (above === '' || above.startsWith('//')) continue;
+    return marker(above);
   }
   return false;
 }

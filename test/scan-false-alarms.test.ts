@@ -33,10 +33,11 @@ async function scan(files: Record<string, string>) {
 describe('gw scan false alarms', () => {
   it('does not call functions dead that a runtime or test harness runs', async () => {
     const { findings } = await scan({
-      'lib.rs': 'fn unused_helper() -> u32 {\n    1\n}\n\n#[cfg(unix)]\n#[test]\nfn parses_empty() {\n    assert_eq!(1, 1);\n}\n\n// a benchmark\n#[bench]\nfn long_glob(b: &mut Bencher) {\n    b.iter(|| 1);\n}\n\nfn main() {}\n',
-      'codec.go': 'package codec\n\nvar API int\n\nfunc init() {\n\tAPI = 1\n}\n\nfunc TestRoundTrip(t *testing.T) {}\n\nfunc unusedHelper() int {\n\treturn 1\n}\n',
+      'lib.rs': 'fn unused_helper() -> u32 {\n    1\n}\n\n#[test] fn same_line() {}\n\n#[cfg(unix)]\n#[test]\nfn parses_empty() {\n    assert_eq!(1, 1);\n}\n\n// a benchmark\n#[bench]\nfn long_glob(b: &mut Bencher) {\n    b.iter(|| 1);\n}\n\nfn main() {}\n',
+      'codec.go': 'package codec\n\nvar API int\n\nfunc init() {\n\tAPI = 1\n}\n\nfunc TestRoundTrip(t *testing.T) {}\n\nfunc unusedHelper() int {\n\treturn 1\n}\n\nfunc initCache() int {\n\treturn 2\n}\n\nfunc mainLoop() int {\n\treturn 3\n}\n\nfunc Testable() int {\n\treturn 4\n}\n',
+      'hooks.py': 'import atexit\n\n\n@atexit.register\ndef _flush():\n    return 1\n\n\ndef _unused():\n    return 2\n',
     });
-    expect(findings.filter((f) => f.startsWith('dead-code'))).toEqual(['dead-code codec.go:11', 'dead-code lib.rs:1']);
+    expect(findings.filter((f) => f.startsWith('dead-code'))).toEqual(['dead-code codec.go:11', 'dead-code codec.go:15', 'dead-code codec.go:19', 'dead-code hooks.py:9', 'dead-code lib.rs:1']);
   });
 
   it('lists the same constant in same-named sibling files under check, and still reports a copy elsewhere', async () => {

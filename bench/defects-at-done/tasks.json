@@ -1,0 +1,248 @@
+{
+  "version": 1,
+  "repos": [
+    {
+      "id": "ledger-kit",
+      "language": "typescript",
+      "source": {
+        "kind": "fixture"
+      },
+      "test": [
+        "npm",
+        "test",
+        "--silent"
+      ],
+      "testOne": [
+        "node",
+        "--experimental-strip-types",
+        "--no-warnings",
+        "--test"
+      ]
+    },
+    {
+      "id": "route-plan",
+      "language": "python",
+      "source": {
+        "kind": "fixture"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "unittest"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "ledger-invoice-slug",
+      "repo": "ledger-kit",
+      "category": "hidden-helper",
+      "prompt": "Invoices need a URL-safe identifier. Add `invoiceSlug(invoice: Invoice): string` in a new file `src/invoices/slug.ts`. It is the customer name in lowercase with accents removed and every run of other characters turned into a single dash, followed by a dash and the invoice number, for example `united-parcel-inc-42`. If the customer name has no usable characters the slug is just the number.",
+      "entry": "src/invoices/slug.ts",
+      "trap": {
+        "existing": [
+          "src/internal/strings/case.ts#kebabize"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "ledger-owner-email",
+      "repo": "ledger-kit",
+      "category": "near-name",
+      "prompt": "Support needs to look up who owns a handle. Add `ownerEmail(store: AccountStore, handle: string): string | null` in a new file `src/accounts/owner.ts`. Given a handle with or without the leading `@`, in any letter case, return the lowercase email of the active account that owns it, or null when there is no such active account. An email address is not a handle.",
+      "entry": "src/accounts/owner.ts",
+      "trap": {
+        "existing": [
+          "src/accounts/store.ts#AccountStore.findByHandle"
+        ],
+        "decoys": [
+          "findByEmail",
+          "findByUsername",
+          "getByHandle"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "ledger-tax-options",
+      "repo": "ledger-kit",
+      "category": "changed-signature",
+      "prompt": "Some customers are tax exempt. Change `taxFor` in `src/billing/rates.ts` from `taxFor(region, amountCents)` to `taxFor(amountCents, options)` where options is `{ region: string; exempt?: boolean }`; an exempt customer pays 0. Keep the behavior of `totalCents` and `taxSummary` the same, and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "src/billing/rates.ts",
+      "trap": {
+        "existing": [
+          "src/billing/rates.ts#taxFor"
+        ],
+        "affected": [
+          "src/billing/rates.ts",
+          "src/invoices/total.ts",
+          "src/reports/tax-summary.ts",
+          "docs/billing.md"
+        ],
+        "decoys": [
+          "taxFor(region",
+          "taxFor('EU'"
+        ]
+      },
+      "hidden": "ledger-kit.mjs",
+      "affectedTests": [
+        "test/reports.test.mjs",
+        "test/services.test.mjs"
+      ]
+    },
+    {
+      "id": "ledger-currency-format",
+      "repo": "ledger-kit",
+      "category": "ripple",
+      "prompt": "Amounts are printed without their currency. Make the currency a required second argument: `formatCents(cents, currency)` returns the amount followed by a space and the currency code, for example `10.50 EUR`. Every report line must print its invoice's currency, and the existing tests and docs must be brought up to date with the new output.",
+      "entry": "src/money/format.ts",
+      "trap": {
+        "existing": [
+          "src/money/format.ts#formatCents"
+        ],
+        "affected": [
+          "src/reports/statement.ts",
+          "src/reports/receipt.ts",
+          "src/reports/reminder.ts",
+          "src/reports/refund.ts",
+          "src/reports/digest.ts",
+          "test/reports.test.mjs",
+          "docs/billing.md"
+        ]
+      },
+      "hidden": "ledger-kit.mjs",
+      "affectedTests": [
+        "test/reports.test.mjs"
+      ]
+    },
+    {
+      "id": "ledger-credit-then-refund",
+      "repo": "ledger-kit",
+      "category": "compaction",
+      "prompt": "Add `creditNoteCents(invoice: Invoice, fraction: number): number` in a new file `src/invoices/credit.ts`: the given fraction of the invoice subtotal, in whole cents, rounded the way this codebase rounds money.",
+      "turns": [
+        {
+          "prompt": "Now add `refundCents(invoice: Invoice, feeFraction: number): number` in a new file `src/invoices/refund.ts`: the invoice subtotal minus a fee of the given fraction of the subtotal. Round the fee exactly the way you rounded the credit note.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "src/invoices/refund.ts",
+      "trap": {
+        "existing": [
+          "src/money/round.ts#roundHalfEven",
+          "src/invoices/total.ts#subtotalCents"
+        ]
+      },
+      "hidden": "ledger-kit.mjs"
+    },
+    {
+      "id": "route-stop-key",
+      "repo": "route-plan",
+      "category": "hidden-helper",
+      "prompt": "Stops need a stable key for the cache. Add `stop_key(stop: Stop) -> str` in a new module `routeplan/keys.py`. It is the stop name in lowercase with accents removed and every run of other characters turned into a single underscore, followed by an underscore and the stop's sequence number, for example `cafe_noir_ltd_3`. If the name has no usable characters the key is just the sequence number.",
+      "entry": "routeplan/keys.py",
+      "trap": {
+        "existing": [
+          "routeplan/internal/textcase.py#snake_join"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
+      "id": "route-depot-name",
+      "repo": "route-plan",
+      "category": "near-name",
+      "prompt": "Dispatchers type a depot code and expect the depot's name. Add `depot_name(book: DepotBook, code: str) -> str | None` in a new module `routeplan/lookup.py`. Codes are matched in any letter case and with surrounding spaces ignored. Return the name of the active depot with that code, or None when there is no such active depot. A zone name is not a depot code.",
+      "entry": "routeplan/lookup.py",
+      "trap": {
+        "existing": [
+          "routeplan/depots.py#DepotBook.find_by_code"
+        ],
+        "decoys": [
+          "find_by_zone",
+          "find_by_id",
+          "get_by_code"
+        ]
+      },
+      "hidden": "route-plan.py"
+    },
+    {
+      "id": "route-eta-keyword",
+      "repo": "route-plan",
+      "category": "changed-signature",
+      "prompt": "Callers keep mixing up the two numbers passed to `eta_minutes`. Change it in `routeplan/timing.py` from `eta_minutes(speed_kph, distance_km)` to `eta_minutes(distance_km, *, speed_kph=40)`, so the speed is keyword-only and defaults to 40. Keep the behavior of `stop_etas` the same, and leave nothing in the repository that still describes or uses the old argument order.",
+      "entry": "routeplan/timing.py",
+      "trap": {
+        "existing": [
+          "routeplan/timing.py#eta_minutes"
+        ],
+        "affected": [
+          "routeplan/timing.py",
+          "routeplan/schedule.py",
+          "docs/timing.md"
+        ],
+        "decoys": [
+          "eta_minutes(speed_kph",
+          "eta_minutes(40"
+        ]
+      },
+      "hidden": "route-plan.py",
+      "affectedTests": [
+        "tests/test_services.py"
+      ]
+    },
+    {
+      "id": "route-distance-unit",
+      "repo": "route-plan",
+      "category": "ripple",
+      "prompt": "Distances are printed without a unit. Make the unit a required second argument: `format_distance(km, unit)` returns the distance with one decimal followed by a space and the unit, for example `12.3 km`; for the unit `mi` the kilometres are converted to miles first (1 km = 0.621371 mi). Every report line must print its stop's unit, and the existing tests and docs must be brought up to date with the new output.",
+      "entry": "routeplan/distance.py",
+      "trap": {
+        "existing": [
+          "routeplan/distance.py#format_distance"
+        ],
+        "affected": [
+          "routeplan/reports/manifest.py",
+          "routeplan/reports/driver_sheet.py",
+          "routeplan/reports/customer_note.py",
+          "routeplan/reports/invoice_line.py",
+          "routeplan/reports/audit.py",
+          "tests/test_reports.py",
+          "docs/timing.md"
+        ]
+      },
+      "hidden": "route-plan.py",
+      "affectedTests": [
+        "tests/test_reports.py"
+      ]
+    },
+    {
+      "id": "route-pickup-then-dropoff",
+      "repo": "route-plan",
+      "category": "compaction",
+      "prompt": "Add `pickup_window(distance_km: float, speed_kph: float) -> int` in a new module `routeplan/windows.py`: the travel time in minutes plus 10 minutes of loading, rounded the way this codebase rounds customer-facing times.",
+      "turns": [
+        {
+          "prompt": "Now add `dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int` in a new module `routeplan/dropoff.py`: the travel time in minutes plus 3 minutes of handover per parcel. Round it exactly the way you rounded the pickup window.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "routeplan/dropoff.py",
+      "trap": {
+        "existing": [
+          "routeplan/rounding.py#round_up_to_five"
+        ]
+      },
+      "hidden": "route-plan.py"
+    }
+  ]
+}

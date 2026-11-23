@@ -3,6 +3,25 @@ import type { Db, Row } from '../store/db.js';
 import { splitWords } from '../extract/fingerprint.js';
 import type { Param, SymbolKind } from '../types.js';
 
+export function searchDocuments(db: Db) {
+  const evidence = new Map<string, string[]>();
+  for (const row of db.prepare(`SELECT caller_id symbol_id, callee_name value FROM calls WHERE caller_id IS NOT NULL
+    UNION ALL SELECT symbol_id, value FROM literals WHERE symbol_id IS NOT NULL`).all()) {
+    const id = String(row.symbol_id);
+    const values = evidence.get(id) ?? [];
+    values.push(String(row.value));
+    evidence.set(id, values);
+  }
+  return db.prepare(`SELECT s.id, s.name, s.qualified_name, s.kind, f.path, s.start_line,
+    s.end_line, s.signature, s.docstring, s.start_byte, s.end_byte, f.hash
+    FROM symbols s JOIN files f ON f.id = s.file_id ORDER BY f.path, s.start_line, s.id`).all().map((r) => ({
+    id: String(r.id), name: String(r.name), qualifiedName: String(r.qualified_name),
+    kind: String(r.kind) as SymbolKind, file: String(r.path), line: Number(r.start_line),
+    endLine: Number(r.end_line), signature: String(r.signature), doc: String(r.docstring ?? ''),
+    body: (evidence.get(String(r.id)) ?? []).join(' '), start: Number(r.start_byte), end: Number(r.end_byte), hash: String(r.hash),
+  }));
+}
+
 // Read-side API over the index. Every later phase (MCP tools, hooks, gates) should go through here.
 
 export interface SymbolHit {
@@ -197,6 +216,21 @@ export function indexedLanguages(db: Db): import('../types.js').Language[] {
   return db.prepare('SELECT DISTINCT language FROM files WHERE language IS NOT NULL').all().map((row) => String(row.language) as import('../types.js').Language);
 }
 
+export interface ModuleGraph {
+  files: { path: string; language: string | null; lines: number }[];
+  /** Resolved file-to-file imports, one per pair. */
+  edges: { from: string; to: string }[];
+}
+
+export function moduleGraph(db: Db): ModuleGraph {
+  return {
+    files: db.prepare('SELECT path, language, lines FROM files ORDER BY path').all().map((r) => ({ path: String(r.path), language: r.language === null ? null : String(r.language), lines: Number(r.lines) })),
+    edges: db.prepare(`SELECT DISTINCT source.path s, target.path t FROM imports i
+      JOIN files source ON source.id = i.file_id JOIN files target ON target.id = i.resolved_file_id
+      WHERE source.id != target.id ORDER BY s, t`).all().map((r) => ({ from: String(r.s), to: String(r.t) })),
+  };
+}
+
 export function indexGeneration(db: Db): string | null {
   const row = db.prepare("SELECT value FROM meta WHERE key = 'generation'").get();
   return row ? String(row.value) : null;
@@ -350,6 +384,12 @@ export function importFacts(db: Db, fileId: number): ImportFact[] {
     }));
 }
 
+export function importingFiles(db: Db, file: string): string[] {
+  return db.prepare(`SELECT DISTINCT source.path FROM imports i
+    JOIN files source ON source.id = i.file_id JOIN files target ON target.id = i.resolved_file_id
+    WHERE target.path = ? ORDER BY source.path`).all(file).map((r) => String(r.path));
+}
+
 export function callFacts(db: Db, fileId: number): CallFact[] {
   return db
     .prepare('SELECT caller_id, callee_text, callee_name, line, col, arg_count, keyword_args_json, has_spread, callee_id, confidence FROM calls WHERE file_id = ? ORDER BY line, col')
@@ -458,4 +498,38 @@ export function readEmbedding(db: Db, model: string, contentHash: string): numbe
     const value: unknown = JSON.parse(String(row.vector));
     return Array.isArray(value) && value.length > 0 && value.every((n) => typeof n === 'number' && Number.isFinite(n)) && value.some((n) => n !== 0) ? value : null;
   } catch { return null; }
+}
+
+/** Uncapped graph snapshot for impact traversal; feature code never reads index SQL. */
+export function readImpactState(db: Db) {
+  const state = readReuseState(db);
+  return {
+    files: state.files,
+    calls: state.calls,
+    symbols: db.prepare(`SELECT ${FACT_COLS} FROM symbols s JOIN files f ON f.id = s.file_id ORDER BY f.path, s.start_line`).all().map(toFact),
+    imports: db.prepare(`SELECT f.path, i.module, i.name, i.alias, i.kind, i.line, i.unresolved_reason, target.path target
+      FROM imports i JOIN files f ON f.id = i.file_id LEFT JOIN files target ON target.id = i.resolved_file_id`).all().map((r) => ({
+      file: String(r.path), module: String(r.module), name: String(r.name), alias: r.alias === null ? null : String(r.alias),
+      kind: String(r.kind), line: Number(r.line), target: r.target === null ? null : String(r.target),
+      unresolvedReason: r.unresolved_reason === null ? null : String(r.unresolved_reason),
+    })),
+  };
+}
+
+/** Aggregate rows for the architecture report: source files, resolved file-to-file imports, helpers called from other files, and function names. */
+export function architectureFacts(db: Db) {
+  const files = db.prepare("SELECT id, path, language, lines, is_test FROM files WHERE status != 'skipped' AND is_generated = 0").all()
+    .map((r) => ({ id: Number(r.id), path: String(r.path), language: r.language ? String(r.language) : null, lines: Number(r.lines), test: Number(r.is_test) === 1 }));
+  const imports = db.prepare('SELECT DISTINCT file_id, resolved_file_id FROM imports WHERE resolved_file_id IS NOT NULL').all()
+    .map((r) => ({ from: Number(r.file_id), to: Number(r.resolved_file_id) }));
+  // A helper is hot when other files call it through a resolved import; same-file and name-only calls say nothing about reuse.
+  const hot = db.prepare(`SELECT s.qualified_name, s.signature, s.start_line, f.id file_id, f.path, COUNT(DISTINCT c.file_id) callers
+    FROM calls c JOIN symbols s ON s.id = c.callee_id JOIN files f ON f.id = s.file_id
+    WHERE c.file_id != s.file_id AND c.confidence IN ('exact', 'import-resolved') AND f.is_test = 0 AND f.is_generated = 0 AND s.kind IN ('function', 'method', 'class', 'component')
+    GROUP BY s.id HAVING callers >= 2 ORDER BY callers DESC, f.path, s.start_line`).all()
+    .map((r) => ({ symbol: String(r.qualified_name), signature: String(r.signature), line: Number(r.start_line), fileId: Number(r.file_id), file: String(r.path), callers: Number(r.callers) }));
+  const functions = db.prepare(`SELECT s.name, f.language FROM symbols s JOIN files f ON f.id = s.file_id
+    WHERE s.kind IN ('function', 'method') AND f.is_test = 0 AND f.is_generated = 0 AND f.language IS NOT NULL`).all()
+    .map((r) => ({ name: String(r.name), language: String(r.language) }));
+  return { files, imports, hot, functions };
 }

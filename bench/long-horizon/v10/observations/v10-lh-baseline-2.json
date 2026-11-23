@@ -1,0 +1,330 @@
+{
+  "suite": "long-horizon",
+  "revision": "f2d5514fd96dac166b8e57c1790949fe67e65b05",
+  "condition": "baseline",
+  "run": 2,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795360297061,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "e3bdc7401daf7264b242b32a2d7bc4de09178f69",
+  "sessionEndedAt": 1795360379480,
+  "observations": [
+    {
+      "task": "lh-01",
+      "startedAt": 1795360301079,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 307,
+          "startedAt": 1795360301223,
+          "endedAt": 1795360301229,
+          "durationMs": 5.456416999999988
+        },
+        {
+          "action": "read",
+          "bytes": 472,
+          "file": "README.md",
+          "readBytes": 471,
+          "startedAt": 1795360304296,
+          "endedAt": 1795360304297,
+          "durationMs": 0.2662119999999959
+        },
+        {
+          "action": "read",
+          "bytes": 249,
+          "file": "src/lib/retry.js",
+          "readBytes": 248,
+          "startedAt": 1795360304526,
+          "endedAt": 1795360304527,
+          "durationMs": 0.43166299999998614
+        },
+        {
+          "action": "read",
+          "bytes": 381,
+          "file": "src/lib/validation.js",
+          "readBytes": 380,
+          "startedAt": 1795360304724,
+          "endedAt": 1795360304725,
+          "durationMs": 0.40106600000001436
+        },
+        {
+          "action": "read",
+          "bytes": 205,
+          "file": "src/lib/date.js",
+          "readBytes": 204,
+          "startedAt": 1795360304901,
+          "endedAt": 1795360304902,
+          "durationMs": 0.311593000000002
+        },
+        {
+          "action": "read",
+          "bytes": 409,
+          "file": "src/lib/text.js",
+          "readBytes": 408,
+          "startedAt": 1795360305092,
+          "endedAt": 1795360305093,
+          "durationMs": 0.29318100000000413
+        },
+        {
+          "action": "read",
+          "bytes": 567,
+          "file": "src/lib/collections.js",
+          "readBytes": 566,
+          "startedAt": 1795360305284,
+          "endedAt": 1795360305285,
+          "durationMs": 0.29993500000000495
+        },
+        {
+          "action": "read",
+          "bytes": 190,
+          "file": "src/catalog.js",
+          "readBytes": 189,
+          "startedAt": 1795360305472,
+          "endedAt": 1795360305473,
+          "durationMs": 0.2818240000000003
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360313864,
+          "endedAt": 1795360313870,
+          "durationMs": 5.730060000000009
+        },
+        {
+          "action": "shell",
+          "bytes": 234,
+          "startedAt": 1795360314005,
+          "endedAt": 1795360314038,
+          "durationMs": 32.225181000000006
+        }
+      ],
+      "endedAt": 1795360318791,
+      "wallMs": 17712,
+      "patch": "diff --git a/src/features/event-card.js b/src/features/event-card.js\nnew file mode 100644\nindex 0000000..7654c21\n--- /dev/null\n+++ b/src/features/event-card.js\n@@ -0,0 +1,10 @@\n+import { slugify } from '../lib/text.js';\n+import { formatDate } from '../lib/date.js';\n+\n+export function createEventCard(event) {\n+  const title = typeof event?.title === 'string' ? event.title.trim() : '';\n+  if (!title) {\n+    throw new TypeError('Event title is required');\n+  }\n+  return { id: slugify(title), title, dateLabel: formatDate(event.startsAt) };\n+}\n"
+    },
+    {
+      "task": "lh-02",
+      "startedAt": 1795360319971,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360320112,
+          "endedAt": 1795360320119,
+          "durationMs": 5.593319999999991
+        },
+        {
+          "action": "shell",
+          "bytes": 104,
+          "startedAt": 1795360320648,
+          "endedAt": 1795360320681,
+          "durationMs": 32.477750000000015
+        }
+      ],
+      "endedAt": 1795360325252,
+      "wallMs": 5281,
+      "patch": "diff --git a/src/features/invitation.js b/src/features/invitation.js\nnew file mode 100644\nindex 0000000..f637636\n--- /dev/null\n+++ b/src/features/invitation.js\n@@ -0,0 +1,11 @@\n+import { createEventCard } from './event-card.js';\n+import { normalizeEmail } from '../lib/validation.js';\n+\n+export function buildInvitation(event, guest) {\n+  const card = createEventCard(event);\n+  return {\n+    to: normalizeEmail(guest?.email),\n+    subject: `Invitation: ${card.title}`,\n+    url: `/events/${card.id}`,\n+  };\n+}\n"
+    },
+    {
+      "task": "lh-03",
+      "startedAt": 1795360325436,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360325573,
+          "endedAt": 1795360325579,
+          "durationMs": 5.789541999999997
+        },
+        {
+          "action": "shell",
+          "bytes": 164,
+          "startedAt": 1795360325714,
+          "endedAt": 1795360325745,
+          "durationMs": 31.222287999999992
+        }
+      ],
+      "endedAt": 1795360330694,
+      "wallMs": 5258,
+      "patch": "diff --git a/src/features/agenda.js b/src/features/agenda.js\nnew file mode 100644\nindex 0000000..d76870a\n--- /dev/null\n+++ b/src/features/agenda.js\n@@ -0,0 +1,8 @@\n+import { createEventCard } from './event-card.js';\n+\n+export function buildAgenda(events) {\n+  return events\n+    .map((event, index) => ({ card: createEventCard(event), time: new Date(event.startsAt).getTime(), index }))\n+    .sort((a, b) => a.time - b.time || a.index - b.index)\n+    .map(({ card }) => card);\n+}\n"
+    },
+    {
+      "task": "lh-04",
+      "startedAt": 1795360330883,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360331039,
+          "endedAt": 1795360331047,
+          "durationMs": 7.775549000000012
+        },
+        {
+          "action": "shell",
+          "bytes": 85,
+          "startedAt": 1795360331194,
+          "endedAt": 1795360331228,
+          "durationMs": 32.591013000000004
+        }
+      ],
+      "endedAt": 1795360337536,
+      "wallMs": 6653,
+      "patch": "diff --git a/src/features/reminders.js b/src/features/reminders.js\nnew file mode 100644\nindex 0000000..805a51c\n--- /dev/null\n+++ b/src/features/reminders.js\n@@ -0,0 +1,7 @@\n+import { buildInvitation } from './invitation.js';\n+import { retry } from '../lib/retry.js';\n+\n+export async function sendReminder(event, guest, deliver) {\n+  const invitation = buildInvitation(event, guest);\n+  return retry(() => deliver(invitation), 3);\n+}\n"
+    },
+    {
+      "task": "lh-05",
+      "startedAt": 1795360337746,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360337896,
+          "endedAt": 1795360337904,
+          "durationMs": 6.664293999999984
+        },
+        {
+          "action": "shell",
+          "bytes": 157,
+          "startedAt": 1795360338041,
+          "endedAt": 1795360338073,
+          "durationMs": 31.45651699999999
+        }
+      ],
+      "endedAt": 1795360343586,
+      "wallMs": 5840,
+      "patch": "diff --git a/src/features/roster.js b/src/features/roster.js\nnew file mode 100644\nindex 0000000..e23cc52\n--- /dev/null\n+++ b/src/features/roster.js\n@@ -0,0 +1,11 @@\n+import { normalizeEmail } from '../lib/validation.js';\n+import { uniqueBy } from '../lib/collections.js';\n+\n+export function buildRoster(signups) {\n+  const normalized = signups.map((signup) => ({\n+    name: String(signup?.name ?? '').trim(),\n+    email: normalizeEmail(signup?.email),\n+  }));\n+  return uniqueBy(normalized, (entry) => entry.email)\n+    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));\n+}\n"
+    },
+    {
+      "task": "lh-06",
+      "startedAt": 1795360343791,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360343922,
+          "endedAt": 1795360343929,
+          "durationMs": 5.878366999999997
+        },
+        {
+          "action": "shell",
+          "bytes": 136,
+          "startedAt": 1795360344051,
+          "endedAt": 1795360344115,
+          "durationMs": 62.995282
+        }
+      ],
+      "endedAt": 1795360349379,
+      "wallMs": 5588,
+      "patch": "diff --git a/src/features/attendance.js b/src/features/attendance.js\nnew file mode 100644\nindex 0000000..75d4202\n--- /dev/null\n+++ b/src/features/attendance.js\n@@ -0,0 +1,12 @@\n+import { buildRoster } from './roster.js';\n+import { positiveInteger } from '../lib/validation.js';\n+\n+export function summarizeAttendance(event, signups) {\n+  const capacity = positiveInteger(event?.capacity);\n+  const count = buildRoster(signups).length;\n+  return {\n+    confirmed: Math.min(count, capacity),\n+    remaining: Math.max(capacity - count, 0),\n+    waitlisted: Math.max(count - capacity, 0),\n+  };\n+}\n"
+    },
+    {
+      "task": "lh-07",
+      "startedAt": 1795360349649,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360349791,
+          "endedAt": 1795360349797,
+          "durationMs": 5.50930000000001
+        },
+        {
+          "action": "shell",
+          "bytes": 145,
+          "startedAt": 1795360349944,
+          "endedAt": 1795360350012,
+          "durationMs": 67.23584299999999
+        }
+      ],
+      "endedAt": 1795360358659,
+      "wallMs": 9010,
+      "patch": "diff --git a/src/features/export.js b/src/features/export.js\nnew file mode 100644\nindex 0000000..62a29b4\n--- /dev/null\n+++ b/src/features/export.js\n@@ -0,0 +1,11 @@\n+import { createEventCard } from './event-card.js';\n+import { buildRoster } from './roster.js';\n+import { csvCell } from '../lib/text.js';\n+\n+const HEADER = ['event', 'date', 'name', 'email'];\n+\n+export function exportRosterCsv(event, signups) {\n+  const card = createEventCard(event);\n+  const rows = buildRoster(signups).map((entry) => [card.title, card.dateLabel, entry.name, entry.email]);\n+  return [HEADER, ...rows].map((cells) => cells.map(csvCell).join(',') + '\\n').join('');\n+}\n"
+    },
+    {
+      "task": "lh-08",
+      "startedAt": 1795360358882,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360359017,
+          "endedAt": 1795360359023,
+          "durationMs": 5.669546999999994
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360359160,
+          "endedAt": 1795360359166,
+          "durationMs": 5.829121999999998
+        },
+        {
+          "action": "shell",
+          "bytes": 599,
+          "startedAt": 1795360359303,
+          "endedAt": 1795360359346,
+          "durationMs": 42.963678000000016
+        },
+        {
+          "action": "shell",
+          "bytes": 146,
+          "startedAt": 1795360367470,
+          "endedAt": 1795360367487,
+          "durationMs": 6.710917999999992
+        }
+      ],
+      "endedAt": 1795360367640,
+      "wallMs": 8758,
+      "patch": "diff --git a/src/features/agenda.js b/src/features/agenda.js\nindex d76870a..8c68338 100644\n--- a/src/features/agenda.js\n+++ b/src/features/agenda.js\n@@ -1,8 +1,12 @@\n import { createEventCard } from './event-card.js';\n \n-export function buildAgenda(events) {\n+export function sortEventsByStart(events) {\n   return events\n-    .map((event, index) => ({ card: createEventCard(event), time: new Date(event.startsAt).getTime(), index }))\n+    .map((event, index) => ({ event, card: createEventCard(event), time: new Date(event.startsAt).getTime(), index }))\n     .sort((a, b) => a.time - b.time || a.index - b.index)\n-    .map(({ card }) => card);\n+    .map(({ event, card }) => ({ event, card }));\n+}\n+\n+export function buildAgenda(events) {\n+  return sortEventsByStart(events).map(({ card }) => card);\n }\ndiff --git a/src/features/digest.js b/src/features/digest.js\nnew file mode 100644\nindex 0000000..39fc0b0\n--- /dev/null\n+++ b/src/features/digest.js\n@@ -0,0 +1,13 @@\n+import { sortEventsByStart } from './agenda.js';\n+import { summarizeAttendance } from './attendance.js';\n+\n+function signupsFor(signupsByEvent, id) {\n+  return signupsByEvent != null && Object.hasOwn(signupsByEvent, id) ? signupsByEvent[id] ?? [] : [];\n+}\n+\n+export function buildOrganizerDigest(events, signupsByEvent = {}) {\n+  return sortEventsByStart(events).map(({ event, card }) => ({\n+    ...card,\n+    ...summarizeAttendance(event, signupsFor(signupsByEvent, card.id)),\n+  }));\n+}\n"
+    },
+    {
+      "task": "lh-09",
+      "startedAt": 1795360367886,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360368035,
+          "endedAt": 1795360368041,
+          "durationMs": 6.235298
+        },
+        {
+          "action": "shell",
+          "bytes": 191,
+          "startedAt": 1795360368198,
+          "endedAt": 1795360368240,
+          "durationMs": 41.12545799999998
+        }
+      ],
+      "endedAt": 1795360375848,
+      "wallMs": 7962,
+      "patch": "diff --git a/src/features/delivery.js b/src/features/delivery.js\nnew file mode 100644\nindex 0000000..4870d3c\n--- /dev/null\n+++ b/src/features/delivery.js\n@@ -0,0 +1,15 @@\n+import { buildOrganizerDigest } from './digest.js';\n+import { normalizeEmail } from '../lib/validation.js';\n+import { retry } from '../lib/retry.js';\n+\n+export async function deliverDigest(events, signupsByEvent, organizer, send) {\n+  const to = normalizeEmail(organizer?.email);\n+  const digest = buildOrganizerDigest(events, signupsByEvent);\n+  const payload = {\n+    to,\n+    subject: 'Event digest',\n+    eventIds: digest.map((entry) => entry.id),\n+    totalConfirmed: digest.reduce((sum, entry) => sum + entry.confirmed, 0),\n+  };\n+  return retry(() => send(payload), 3);\n+}\n"
+    },
+    {
+      "task": "lh-10",
+      "startedAt": 1795360376129,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795360376294,
+          "endedAt": 1795360376301,
+          "durationMs": 6.395657
+        },
+        {
+          "action": "shell",
+          "bytes": 822,
+          "startedAt": 1795360376503,
+          "endedAt": 1795360376544,
+          "durationMs": 39.66389799999999
+        }
+      ],
+      "endedAt": 1795360379472,
+      "wallMs": 3343,
+      "patch": "diff --git a/src/features/dashboard.js b/src/features/dashboard.js\nnew file mode 100644\nindex 0000000..cf6afe2\n--- /dev/null\n+++ b/src/features/dashboard.js\n@@ -0,0 +1,10 @@\n+import { buildOrganizerDigest } from './digest.js';\n+import { paginate } from '../lib/collections.js';\n+\n+export function buildDashboard(events, signupsByEvent, query = {}) {\n+  const { search, page = 1, pageSize = 10 } = query ?? {};\n+  const digest = buildOrganizerDigest(events, signupsByEvent);\n+  const term = String(search ?? '').trim().toLowerCase();\n+  const matches = term ? digest.filter((entry) => entry.title.toLowerCase().includes(term)) : digest;\n+  return paginate(matches, page, pageSize);\n+}\n"
+    }
+  ]
+}

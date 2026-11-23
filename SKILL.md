@@ -5,9 +5,31 @@ description: "Use for any coding task in a repository: to find code, read only w
 
 # Groundwork
 
-Groundwork keeps a live local index of this repository (TypeScript, JavaScript, Python) and exposes it as MCP tools. Use it to find and reuse existing code and verify calls.
+Groundwork keeps a live local index of this repository and exposes it as MCP tools. Indexing, navigation, impact analysis and the reuse gate support TypeScript, JavaScript, Python, Go, Rust, Java, C# and Ruby. Grounding call verification remains limited to TypeScript, JavaScript and Python.
+
+After API edits, use `change_impact` (or `gw impact --json`) for unchanged callers,
+reaching tests and session coverage. High/medium-risk Stop context is evidence,
+never a block. A `complete: true` answer needs no further impact lookup for that
+snapshot; edits invalidate it. Incomplete reasons and test commands guide follow-up.
+See [impact](references/impact.md). Tool-level benchmark results are not agent runs.
+
+## 0. When not to call Groundwork
+
+Skip every Groundwork tool call when the task does not need one. Each call costs a turn.
+
+- Tiny edits: a typo, a rename inside one function, a constant, a log line, a one-line fix in code you have already read.
+- Docs, comments, changelogs and other prose.
+- Config, lockfiles, CI files, JSON/YAML/TOML and generated files.
+- Symbols whose definition or signature is already in your context and unchanged.
+
+The automatic checks after edits and at the end of the turn still run, so skipping a call does not skip the safety net.
 
 ## 1. Navigate: use the cheapest sufficient evidence
+
+Use `search_code({ "query": "where do we retry failed requests", "limit": 5 })`
+for plain-English intent when the symbol name is unknown (`gw search "..." --json`
+in the CLI). Hits explain lexical/semantic evidence; semantic search only uses
+an already installed local model. Prefer unchanged `find_code` for known names.
 
 1. Use `rg` for a trivial literal or filename lookup. Use the index for symbol, behavior and structure questions: `find_code({ "query": "what you need" })`. Exact names return exact matches; use `breadth: "all"` only when broader results are needed. Set `locations_only: false` for signatures or docs. If you need the body with a unique exact-name lookup, use `include_body: true` in that same call. Defaults stay location-only. Stop when the requested location is resolved.
 2. For a known helper you need to recall, use `read_symbol({ "symbol": "exact name or ID" })` instead of a whole-file Read; batch several with `read_symbol({ "symbols": ["name or ID", "another name or ID"] })`. Pass either `symbol` or `symbols`, not both. If only files are known, outline several files in one call, at most once per orientation: `outline({ "files": ["src/a.ts", "src/b.ts"] })`. Keep `file` for one file. Choose symbols and read only needed bodies, not whole files. Skip outline when the symbol is known. Outline defaults to locations/ranges; set `locations_only: false` for signatures.
@@ -24,6 +46,10 @@ Fall back to ordinary search and ranged reads for docs, logs, config, unsupporte
 
 Before writing a genuinely new non-trivial helper/function (including a class, hook or component with new reusable logic), check for existing code. Skip `find_similar` for small edits, inline code, simple constants and already-confirmed helpers; reuse known symbols directly. Reuse unchanged search evidence across continuing steps and sessions when it is carried into your current context; repeat only if the relevant code changed or the evidence is missing. Default results are actionable reuse/extend matches; request `detail: "full"` only when related matches are useful.
 
+Prefer one combined call when you need more than one answer: `before_write({ "new": { "description": "what it does", "name": "planned name" }, "calls": ["helperYouWillCall"], "changes": ["symbolYouWillChange"] })` returns code to reuse, exact signatures and the callers to update together. Pass only the parts you need; repeat with `expand: "reuse"` or `expand: "callers"` only when the short answer is cut. It replaces separate `find_similar`, `read_symbol` and `callers` calls for that step.
+
+In a repository you do not know yet, call `architecture` once before the first write: it lists the packages, entry points, most-called helpers and naming conventions. When `before_write` shows candidates, record what you did with them: `before_write({ "decision": { "choice": "reuse" | "extend" | "new", "reason": "one line" } })`.
+
 1. Call `find_similar({ "description": "what it does", "name": "planned name", "signature": "planned signature" })`. Pass `code` once you have a draft.
 2. State your decision in one line:
    - `REUSE <symbol>`: an existing symbol already does it. Import it and call it.
@@ -32,6 +58,8 @@ Before writing a genuinely new non-trivial helper/function (including a class, h
 3. When you replace old code, delete the old version and move its callers over. Do not leave both behind.
 
 Reuse existing constants and config keys such as `API_URL`; do not define a second one.
+
+For a TS/JS rename or a function body replacement, preview `refactor_symbol` or `gw refactor` with an exact symbol. Inspect the patch with `gw refactor --json`. Apply only a clean preview with the same request and `--apply <preview-id>`; resolve blocking findings rather than bypassing them.
 
 ## 3. Respond to feedback
 
@@ -70,4 +98,5 @@ Forces and allows are counted and logged. If you force often, you are fighting t
 - [Navigation examples](references/navigation.md)
 - [Reuse protocol and gate findings](references/reuse.md)
 - [Grounding checks](references/grounding.md)
+- Optional types: `check_types({files: [{file, lines?}]})` uses the project's compiler when available. `gw types check` and TypeScript-only `gw types def|impl|refs file:line:col` also support `--json`. Missing compilers leave grounding unchanged. Configure `types.enabled`, `stopGate`, `postToolHook` (default false), `timeoutMs`, `budgetTokens`, `typescript` and `python` (`auto`/`off`).
 - [Troubleshooting](references/troubleshooting.md)

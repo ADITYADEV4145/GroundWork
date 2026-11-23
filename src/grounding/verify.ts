@@ -23,7 +23,7 @@ import { renderSuggestions, suggest, type Suggestion } from './suggest.js';
 // Grounding (Phase 4): flag imports, calls and arguments the agent invented. Precision first: every rule
 // only fires when the index proves the error; anything dynamic, unparsed, external or ambiguous is skipped.
 
-export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword';
+export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword' | 'type' | 'deprecated' | 'contract';
 
 export interface Finding {
   file: string;
@@ -35,6 +35,8 @@ export interface Finding {
   /** Definite errors the Stop gate / `gw check` may block on. */
   blocking: boolean;
   suggestions: Suggestion[];
+  typeConfirmed?: boolean;
+  typeBlocking?: boolean;
 }
 
 export interface VerifyResult {
@@ -42,6 +44,8 @@ export interface VerifyResult {
   /** Set when the file could not be checked (and so nothing in it was flagged). */
   unchecked: string | null;
   findings: Finding[];
+  /** Imports and calls examined in the requested ranges. */
+  checked?: number;
 }
 
 export type LineRange = [number, number];
@@ -55,7 +59,7 @@ export interface VerifyOptions {
 const CALLABLE = new Set(['function', 'method', 'class', 'component', 'dataclass']);
 const POOL_KINDS = ['function', 'method', 'class', 'component', 'dataclass', 'constant', 'variable', 'interface', 'type', 'enum'] as const;
 const SAFE_PY_DECORATORS = new Set(['staticmethod', 'classmethod', 'abstractmethod', 'abc.abstractmethod', 'override', 'typing.override', 'typing_extensions.override']);
-const DYNAMIC_TEXT = /\b(setattr|__getattr__|__getattribute__|Proxy|Reflect\.|Object\.assign|Object\.defineProperty|defineProperty|mixin|Mixin|prototype)\b/;
+export const DYNAMIC_TEXT = /\b(setattr|__getattr__|__getattribute__|Proxy|Reflect\.|Object\.assign|Object\.defineProperty|defineProperty|mixin|Mixin|prototype)\b/;
 type Lookup = SymbolFact | 'module' | 'unknown' | null;
 
 const isTs = (f: FileFacts) => f.language === 'typescript' || f.language === 'tsx';
@@ -234,6 +238,9 @@ export class Grounder {
     const tail = tails.find((t) => f.path === t || f.path.endsWith(`/${t}`));
     if (!tail) return false;
     const rootDir = f.path.slice(0, f.path.length - tail.length);
+    // A directory is only on the importer's path when it is the repository root, a source root, or holds the importer:
+    // `import sphinx` in docs/ is the installed package, not tests/sphinx.
+    if (rootDir !== '' && !/^(src|lib)\/$/.test(rootDir) && !from.path.startsWith(rootDir)) return false;
     return !existsSync(path.join(this.root, rootDir, '__init__.py'));
   }
 
@@ -329,7 +336,7 @@ export class Grounder {
 
   verify(rel: string, opts: VerifyOptions = {}): VerifyResult {
     const f = fileFacts(this.db, rel);
-    const res: VerifyResult = { file: rel, unchecked: null, findings: [] };
+    const res: VerifyResult = { file: rel, unchecked: null, findings: [], checked: 0 };
     if (!f) return { ...res, unchecked: 'not indexed' };
     if (f.status !== 'ok') return { ...res, unchecked: f.status === 'partial' ? 'parse errors' : `index status ${f.status}` };
     if (f.isGenerated) return { ...res, unchecked: 'generated file' };
@@ -342,12 +349,14 @@ export class Grounder {
     const lines = text.split('\n');
     for (const imp of this.importsOf(f.id)) {
       if (!inRanges(imp.line, opts.ranges, importEnd(lines, imp.line))) continue;
+      res.checked!++;
       const finding = this.checkImport(f, imp, lines);
       if (finding) res.findings.push(finding);
     }
     for (const call of callFacts(this.db, f.id)) {
       if (!inRanges(call.line, opts.ranges)) continue;
       if (suppressed(lines, call.line)) continue;
+      res.checked!++;
       const finding = this.checkCall(f, call, text);
       if (finding) res.findings.push({ ...finding, column: call.column });
     }
@@ -358,7 +367,9 @@ export class Grounder {
   private checkImport(f: FileFacts, imp: ImportFact, lines: string[]): Finding | null {
     if (imp.unresolvedReason === 'not-found') {
       if (isPy(f) && optionalPythonImport(lines, imp.line)) return null;
-      if (!imp.module.startsWith('.') || existsOnDisk(this.root, f.path, imp.module, isPy(f))) return null;
+      // Bundlers take a query after the path (`./README.md?raw`); the file is what has to exist.
+      const spec = isPy(f) ? imp.module : imp.module.replace(/\?.*$/, '');
+      if (!imp.module.startsWith('.') || existsOnDisk(this.root, f.path, spec, isPy(f))) return null;
       return {
         file: f.path,
         line: imp.line,

@@ -1,0 +1,134 @@
+{
+  "suite": "multiturn-reuse",
+  "revision": "aa5d233f3a080d149c4cd3f9c7ff271257a1e50a",
+  "condition": "baseline",
+  "run": 4,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795347778261,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin fusion",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "831fca40500094b904eb5078b5982884a057a439",
+  "chain": "pytest-async",
+  "sessionEndedAt": 1795347863147,
+  "observations": [
+    {
+      "task": "pytest-async-1",
+      "startedAt": 1795347780930,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 369,
+          "startedAt": 1795347785190,
+          "endedAt": 1795347785206,
+          "durationMs": 15.548977999999977
+        },
+        {
+          "action": "read",
+          "bytes": 1120,
+          "file": "src/_pytest/compat.py",
+          "readBytes": 1119,
+          "startedAt": 1795347788118,
+          "endedAt": 1795347788119,
+          "durationMs": 0.46312000000000353
+        },
+        {
+          "action": "shell",
+          "bytes": 75,
+          "startedAt": 1795347788294,
+          "endedAt": 1795347788304,
+          "durationMs": 9.096316000000002
+        },
+        {
+          "action": "shell",
+          "bytes": 173,
+          "startedAt": 1795347798823,
+          "endedAt": 1795347799082,
+          "durationMs": 258.045703
+        }
+      ],
+      "endedAt": 1795347801817,
+      "wallMs": 20887,
+      "patch": "diff --git a/src/reusebench_pytest_async/__init__.py b/src/reusebench_pytest_async/__init__.py\nnew file mode 100644\nindex 0000000..3949286\n--- /dev/null\n+++ b/src/reusebench_pytest_async/__init__.py\n@@ -0,0 +1 @@\n+\"\"\"Reusable record preparation steps built on pytest internals.\"\"\"\ndiff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nnew file mode 100644\nindex 0000000..53b94ee\n--- /dev/null\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -0,0 +1,39 @@\n+\"\"\"Record preparation steps.\"\"\"\n+\n+from __future__ import annotations\n+\n+from typing import Any\n+from typing import Callable\n+\n+from _pytest.compat import is_async_function\n+\n+\n+def validate_record(record: object) -> tuple[str, Any, bool]:\n+    \"\"\"Validate a record and return its trimmed key, value and enabled flag.\"\"\"\n+    if not isinstance(record, dict):\n+        raise ValueError(\"record must be a dict\")\n+    key = record.get(\"key\")\n+    if not isinstance(key, str) or not key.strip():\n+        raise ValueError(\"record key must be a nonempty string\")\n+    if \"value\" not in record:\n+        raise ValueError(\"record must have a value entry\")\n+    enabled = record.get(\"enabled\", True)\n+    if not isinstance(enabled, bool):\n+        raise ValueError(\"record enabled must be a bool\")\n+    return key.strip(), record[\"value\"], enabled\n+\n+\n+def prepare_record(record: object, display: Callable[[Any], Any]) -> dict[str, Any]:\n+    \"\"\"Validate record and return a new prepared dict using display(value).\"\"\"\n+    key, value, enabled = validate_record(record)\n+    return {\"key\": key, \"value\": value, \"display\": display(value), \"enabled\": enabled}\n+\n+\n+def display_async(value: object) -> bool:\n+    \"\"\"Whether value is a coroutine function or async generator function.\"\"\"\n+    return is_async_function(value)\n+\n+\n+def prepare(record: object) -> dict[str, Any]:\n+    \"\"\"Prepare record with its async-function detection as display.\"\"\"\n+    return prepare_record(record, display_async)\n"
+    },
+    {
+      "task": "pytest-async-2",
+      "startedAt": 1795347806155,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 349,
+          "startedAt": 1795347811680,
+          "endedAt": 1795347811840,
+          "durationMs": 158.79060200000004
+        },
+        {
+          "action": "shell",
+          "bytes": 496,
+          "startedAt": 1795347816768,
+          "endedAt": 1795347816914,
+          "durationMs": 145.17981099999997
+        },
+        {
+          "action": "shell",
+          "bytes": 239,
+          "startedAt": 1795347822366,
+          "endedAt": 1795347822538,
+          "durationMs": 170.986574
+        }
+      ],
+      "endedAt": 1795347825243,
+      "wallMs": 19088,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex 53b94ee..32ae4d7 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -37,3 +37,19 @@ def display_async(value: object) -> bool:\n def prepare(record: object) -> dict[str, Any]:\n     \"\"\"Prepare record with its async-function detection as display.\"\"\"\n     return prepare_record(record, display_async)\n+\n+\n+def batch(records: object) -> list[dict[str, Any]]:\n+    \"\"\"Prepare each record in order, rejecting duplicate trimmed keys.\"\"\"\n+    if not isinstance(records, list):\n+        raise ValueError(\"records must be a list\")\n+    prepared = []\n+    seen: set[str] = set()\n+    for record in records:\n+        item = prepare(record)\n+        key = item[\"key\"]\n+        if key in seen:\n+            raise ValueError(f\"duplicate key: {key!r}\")\n+        seen.add(key)\n+        prepared.append(item)\n+    return prepared\n"
+    },
+    {
+      "task": "pytest-async-3",
+      "startedAt": 1795347828125,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 40,
+          "startedAt": 1795347832983,
+          "endedAt": 1795347833179,
+          "durationMs": 195.373071
+        }
+      ],
+      "endedAt": 1795347835905,
+      "wallMs": 7780,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex 32ae4d7..58f6b3b 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -53,3 +53,12 @@ def batch(records: object) -> list[dict[str, Any]]:\n         seen.add(key)\n         prepared.append(item)\n     return prepared\n+\n+\n+def group(records: object) -> dict[str, list[Any]]:\n+    \"\"\"Group enabled display values by the first character of their key.\"\"\"\n+    groups: dict[str, list[Any]] = {}\n+    for item in batch(records):\n+        if item[\"enabled\"]:\n+            groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n+    return groups\n"
+    },
+    {
+      "task": "pytest-async-4",
+      "startedAt": 1795347838842,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 190,
+          "startedAt": 1795347843688,
+          "endedAt": 1795347844007,
+          "durationMs": 318.65964899999994
+        }
+      ],
+      "endedAt": 1795347846756,
+      "wallMs": 7914,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex 58f6b3b..33e0112 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -62,3 +62,11 @@ def group(records: object) -> dict[str, list[Any]]:\n         if item[\"enabled\"]:\n             groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return groups\n+\n+\n+def merge(left: object, right: object) -> list[dict[str, Any]]:\n+    \"\"\"Merge prepared records, right replacing left by key, left order first.\"\"\"\n+    merged = {item[\"key\"]: item for item in batch(left)}\n+    for item in batch(right):\n+        merged[item[\"key\"]] = item\n+    return list(merged.values())\n"
+    },
+    {
+      "task": "pytest-async-5",
+      "startedAt": 1795347849727,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 396,
+          "startedAt": 1795347858697,
+          "endedAt": 1795347859055,
+          "durationMs": 357.024574
+        }
+      ],
+      "endedAt": 1795347863115,
+      "wallMs": 13388,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex 33e0112..d2cbc9f 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -55,18 +55,34 @@ def batch(records: object) -> list[dict[str, Any]]:\n     return prepared\n \n \n-def group(records: object) -> dict[str, list[Any]]:\n-    \"\"\"Group enabled display values by the first character of their key.\"\"\"\n+def group_prepared(items: list[dict[str, Any]]) -> dict[str, list[Any]]:\n+    \"\"\"Group enabled prepared display values by the first character of their key.\"\"\"\n     groups: dict[str, list[Any]] = {}\n-    for item in batch(records):\n+    for item in items:\n         if item[\"enabled\"]:\n             groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return groups\n \n \n+def group(records: object) -> dict[str, list[Any]]:\n+    \"\"\"Group enabled display values by the first character of their key.\"\"\"\n+    return group_prepared(batch(records))\n+\n+\n def merge(left: object, right: object) -> list[dict[str, Any]]:\n     \"\"\"Merge prepared records, right replacing left by key, left order first.\"\"\"\n     merged = {item[\"key\"]: item for item in batch(left)}\n     for item in batch(right):\n         merged[item[\"key\"]] = item\n     return list(merged.values())\n+\n+\n+def report(left: object, right: object) -> dict[str, Any]:\n+    \"\"\"Summarize the merge of left and right with its grouping and counts.\"\"\"\n+    items = merge(left, right)\n+    return {\n+        \"items\": items,\n+        \"groups\": group_prepared(items),\n+        \"count\": len(items),\n+        \"enabled\": sum(1 for item in items if item[\"enabled\"]),\n+    }\n"
+    }
+  ]
+}

@@ -104,7 +104,8 @@ export function changedFromApplyPatch(root: string, cwd: string, patch: string):
 
 /** Lines added or changed since `base` (default HEAD), plus untracked files in full. */
 export function changedFromGit(root: string, base = 'HEAD'): ChangedFile[] {
-  const run = (args: string[]) => execFileSync('git', args, { cwd: root, stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 << 20 }).toString();
+  // quotePath off: non-ASCII file names come back as written, not as quoted octal escapes that match no indexed file.
+  const run = (args: string[]) => execFileSync('git', ['-c', 'core.quotePath=false', ...args], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 << 20 }).toString();
   const byFile = new Map<string, LineRange[]>();
   let cur: LineRange[] | null = null;
   for (const line of run(['diff', '-U0', '--no-color', '--no-ext-diff', base, '--']).split('\n')) {

@@ -1,0 +1,193 @@
+{
+  "suite": "multiturn-reuse",
+  "revision": "aa5d233f3a080d149c4cd3f9c7ff271257a1e50a",
+  "condition": "groundwork",
+  "run": 13,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795350492135,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin fusion",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "831fca40500094b904eb5078b5982884a057a439",
+  "chain": "click-summary",
+  "sessionEndedAt": 1795350596879,
+  "observations": [
+    {
+      "task": "click-summary-1",
+      "startedAt": 1795350498691,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350498691,
+          "endedAt": 1795350499522,
+          "durationMs": 830.1245630000001,
+          "bytes": 0
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 42,
+          "startedAt": 1795350503273,
+          "endedAt": 1795350503538,
+          "durationMs": 264.604789
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 1406,
+          "startedAt": 1795350506248,
+          "endedAt": 1795350506506,
+          "durationMs": 258.19099400000005
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795350516312,
+          "endedAt": 1795350516671,
+          "durationMs": 358.638029
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350519584,
+          "endedAt": 1795350521679,
+          "durationMs": 2093.701257,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350521679,
+      "wallMs": 22988,
+      "patch": "diff --git a/src/reusebench_click_summary/steps.py b/src/reusebench_click_summary/steps.py\nnew file mode 100644\nindex 0000000..8670b72\n--- /dev/null\n+++ b/src/reusebench_click_summary/steps.py\n@@ -0,0 +1,26 @@\n+from click.utils import make_default_short_help\n+\n+\n+def prepare(record: dict) -> dict:\n+    \"\"\"Validate a record and derive its short display text.\"\"\"\n+    if not isinstance(record, dict) or \"value\" not in record:\n+        raise ValueError(\"record must be a dict with a key and value\")\n+\n+    key = record.get(\"key\")\n+    if not isinstance(key, str) or not (key := key.strip()):\n+        raise ValueError(\"record key must be a nonempty string\")\n+\n+    enabled = record.get(\"enabled\", True)\n+    if not isinstance(enabled, bool):\n+        raise ValueError(\"enabled must be a bool\")\n+\n+    value = record[\"value\"]\n+    if not isinstance(value, str):\n+        raise ValueError(\"record value must be a string\")\n+\n+    return {\n+        \"key\": key,\n+        \"value\": value,\n+        \"display\": make_default_short_help(value, max_length=20),\n+        \"enabled\": enabled,\n+    }\n"
+    },
+    {
+      "task": "click-summary-2",
+      "startedAt": 1795350528154,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350528154,
+          "endedAt": 1795350528220,
+          "durationMs": 65.185668,
+          "bytes": 146
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795350535479,
+          "endedAt": 1795350535733,
+          "durationMs": 253.42375399999997
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350538236,
+          "endedAt": 1795350540090,
+          "durationMs": 1853.200007,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350540090,
+      "wallMs": 11936,
+      "patch": "diff --git a/src/reusebench_click_summary/steps.py b/src/reusebench_click_summary/steps.py\nindex 8670b72..a8d8d79 100644\n--- a/src/reusebench_click_summary/steps.py\n+++ b/src/reusebench_click_summary/steps.py\n@@ -24,3 +24,20 @@ def prepare(record: dict) -> dict:\n         \"display\": make_default_short_help(value, max_length=20),\n         \"enabled\": enabled,\n     }\n+\n+\n+def batch(records: list) -> list[dict]:\n+    \"\"\"Prepare records in order, rejecting duplicate normalized keys.\"\"\"\n+    if not isinstance(records, list):\n+        raise ValueError(\"records must be a list\")\n+\n+    prepared = []\n+    seen = set()\n+    for record in records:\n+        item = prepare(record)\n+        key = item[\"key\"]\n+        if key in seen:\n+            raise ValueError(f\"duplicate key: {key!r}\")\n+        seen.add(key)\n+        prepared.append(item)\n+    return prepared\n"
+    },
+    {
+      "task": "click-summary-3",
+      "startedAt": 1795350546455,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350546455,
+          "endedAt": 1795350546522,
+          "durationMs": 66.83430200000001,
+          "bytes": 208
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795350552684,
+          "endedAt": 1795350552948,
+          "durationMs": 263.730287
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350555428,
+          "endedAt": 1795350557237,
+          "durationMs": 1807.921896,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350557237,
+      "wallMs": 10782,
+      "patch": "diff --git a/src/reusebench_click_summary/steps.py b/src/reusebench_click_summary/steps.py\nindex a8d8d79..e96614c 100644\n--- a/src/reusebench_click_summary/steps.py\n+++ b/src/reusebench_click_summary/steps.py\n@@ -41,3 +41,12 @@ def batch(records: list) -> list[dict]:\n         seen.add(key)\n         prepared.append(item)\n     return prepared\n+\n+\n+def group(records: list) -> dict[str, list[str]]:\n+    \"\"\"Group enabled display strings by the first character of their key.\"\"\"\n+    groups = {}\n+    for item in batch(records):\n+        if item[\"enabled\"]:\n+            groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n+    return groups\n"
+    },
+    {
+      "task": "click-summary-4",
+      "startedAt": 1795350563590,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350563590,
+          "endedAt": 1795350563661,
+          "durationMs": 71.009772,
+          "bytes": 270
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795350570315,
+          "endedAt": 1795350570572,
+          "durationMs": 256.220633
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350573317,
+          "endedAt": 1795350575189,
+          "durationMs": 1870.769141,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350575189,
+      "wallMs": 11599,
+      "patch": "diff --git a/src/reusebench_click_summary/steps.py b/src/reusebench_click_summary/steps.py\nindex e96614c..1346cc4 100644\n--- a/src/reusebench_click_summary/steps.py\n+++ b/src/reusebench_click_summary/steps.py\n@@ -50,3 +50,10 @@ def group(records: list) -> dict[str, list[str]]:\n         if item[\"enabled\"]:\n             groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return groups\n+\n+\n+def merge(left: list, right: list) -> list[dict]:\n+    \"\"\"Merge prepared records, replacing shared keys without moving them.\"\"\"\n+    merged = {item[\"key\"]: item for item in batch(left)}\n+    merged.update((item[\"key\"], item) for item in batch(right))\n+    return list(merged.values())\n"
+    },
+    {
+      "task": "click-summary-5",
+      "startedAt": 1795350581387,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350581387,
+          "endedAt": 1795350581462,
+          "durationMs": 74.574576,
+          "bytes": 342
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795350591726,
+          "endedAt": 1795350592121,
+          "durationMs": 393.817485
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350595003,
+          "endedAt": 1795350596856,
+          "durationMs": 1852.720348,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350596856,
+      "wallMs": 15469,
+      "patch": "diff --git a/src/reusebench_click_summary/steps.py b/src/reusebench_click_summary/steps.py\nindex 1346cc4..e9d4856 100644\n--- a/src/reusebench_click_summary/steps.py\n+++ b/src/reusebench_click_summary/steps.py\n@@ -45,8 +45,12 @@ def batch(records: list) -> list[dict]:\n \n def group(records: list) -> dict[str, list[str]]:\n     \"\"\"Group enabled display strings by the first character of their key.\"\"\"\n+    return _group_prepared(batch(records))\n+\n+\n+def _group_prepared(items: list[dict]) -> dict[str, list[str]]:\n     groups = {}\n-    for item in batch(records):\n+    for item in items:\n         if item[\"enabled\"]:\n             groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return groups\n@@ -57,3 +61,14 @@ def merge(left: list, right: list) -> list[dict]:\n     merged = {item[\"key\"]: item for item in batch(left)}\n     merged.update((item[\"key\"], item) for item in batch(right))\n     return list(merged.values())\n+\n+\n+def report(left: list, right: list) -> dict:\n+    \"\"\"Summarize the merged records and their enabled display groups.\"\"\"\n+    items = merge(left, right)\n+    return {\n+        \"items\": items,\n+        \"groups\": _group_prepared(items),\n+        \"count\": len(items),\n+        \"enabled\": sum(item[\"enabled\"] for item in items),\n+    }\n"
+    }
+  ]
+}

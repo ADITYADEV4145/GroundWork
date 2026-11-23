@@ -8,7 +8,7 @@ import { readReuseState, type ReuseState } from '../index/query.js';
 import { refreshIndex } from '../index/refresh.js';
 import { indexDbPath } from '../index/store.js';
 import { initParsers, languageForPath } from '../lang/index.js';
-import { initSqlBackend, openDb } from '../store/db.js';
+import { initSqlBackend, openDb, type Db } from '../store/db.js';
 import { sha1 } from '../util/hash.js';
 import { ensureGwDir } from '../util/paths.js';
 import { estimateTokens, fitToBudget } from '../util/tokens.js';
@@ -19,6 +19,9 @@ import { scoreSignals } from './model.js';
 import { pairSignals, type Signals } from './signals.js';
 import { canBlock } from './policy.js';
 import type { EmbedderFactory } from './embeddings.js';
+import { changedFromGit } from '../grounding/ranges.js';
+import type { TypeCheckResult } from '../types/index.js';
+import { log } from '../util/log.js';
 
 type IndexedSymbol = ReuseState['symbols'][number];
 type Literal = ReuseState['literals'][number] & { configish?: boolean };
@@ -41,8 +44,9 @@ export interface CheckReport {
   findings: CheckFinding[];
   allows: { file: string; symbol: string; reason: string }[];
   ms: number;
+  types?: TypeCheckResult;
 }
-export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number; embeddingFactory?: EmbedderFactory }
+export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number; embeddingFactory?: EmbedderFactory; stopHook?: boolean }
 
 const location = (s: IndexedSymbol): CheckLocation => ({ file: s.file, symbol: s.qualifiedName, line: s.line });
 const order = (s: { file: string; line: number }) => `${s.file}\0${String(s.line).padStart(10, '0')}`;
@@ -61,7 +65,7 @@ export function formatFinding(f: CheckFinding): string {
   const clean = (s: string) => s.replace(/[\x00-\x1f\x7f]/g, ' ');
   if (f.grounding) return [
     `${f.severity} grounding (${f.grounding.kind}): ${clean(f.added.file)}:${f.added.line}`,
-    `Why: ${clean(f.grounding.message)}`,
+    `Why: ${clean(f.grounding.message)}${f.grounding.typeConfirmed ? ' (type-confirmed)' : ''}`,
     `Fix: ${clean(f.fix)}`,
   ].join('\n');
   const ref = (s: CheckLocation) => f.kind === 'duplicate-file' ? `${clean(s.file)}:${s.line}` : `${clean(s.symbol)} (${clean(s.file)}:${s.line})`;
@@ -88,7 +92,7 @@ export function formatCheck(report: CheckReport): string {
 /** Worktree (including staged and untracked files) versus a Git commit, never index versus index. */
 export async function checkRepository(root: string, options: CheckOptions = {}): Promise<CheckReport> {
   const start = performance.now();
-  let deadline = Date.now() + (options.timeoutMs ?? 30_000);
+  const deadline = Date.now() + (options.timeoutMs ?? 30_000);
   const checkDeadline = () => { if (Date.now() >= deadline) throw new Error('reuse check timed out'); };
   const config = options.config ?? loadConfig(root);
   const commit = git(root, ['rev-parse', '--verify', '--end-of-options', `${options.base ?? 'HEAD'}^{commit}`], deadline).trim();
@@ -103,9 +107,50 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   try {
     state = readReuseState(db);
     candidates = new CandidateIndex(db, config.reuse.skipTests);
-    if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
+    if (config.grounding.enabled) groundingFindings = (await groundingGate(db, root, { base: commit, config })).findings;
   }
   finally { db.close(); }
+  return compareSnapshots(root, base, state, candidates, groundingFindings, config, commit, start, deadline, options, root, true);
+}
+
+/** Reuse comparison for a proposed edit, using the current files as its baseline. */
+export async function checkIndexedChanges(root: string, db: Db, baselineRoot: string, baselineDb: Db,
+  config: GroundworkConfig, groundingFindings: GroundingFinding[], modelRoot: string, timeoutMs: number): Promise<CheckReport> {
+  const start = performance.now(), deadline = Date.now() + timeoutMs;
+  await initParsers();
+  const base = { root: baselineRoot, state: readReuseState(baselineDb) };
+  const state = readReuseState(db), candidates = new CandidateIndex(db, config.reuse.skipTests);
+  return compareSnapshots(root, base, state, candidates, groundingFindings, config, 'working tree', start, deadline, { timeoutMs }, modelRoot);
+}
+
+async function compareSnapshots(root: string, base: { root: string; state: ReuseState }, state: ReuseState,
+  candidates: CandidateIndex, groundingFindings: GroundingFinding[], config: GroundworkConfig, commit: string,
+  start: number, deadline: number, options: CheckOptions, modelRoot: string, gitBacked = false): Promise<CheckReport> {
+  const checkDeadline = () => { if (Date.now() >= deadline) throw new Error('reuse check timed out'); };
+  let types: TypeCheckResult | undefined;
+  const collectTypes = async () => {
+    if (!gitBacked || !config.types.enabled || (options.stopHook && !config.types.stopGate)) return;
+    const typeStart = Date.now();
+    const { typeCheck } = await import('../types/index.js');
+    types = await typeCheck(root, changedFromGit(root, commit), config, { base: commit, timeoutMs: options.stopHook ? config.types.timeoutMs : Math.max(1, Math.min(config.types.timeoutMs, deadline - Date.now())) });
+    if (options.stopHook) deadline += Date.now() - typeStart;
+    if (types.timedOut) log(root, 'warn', 'types_failed_open', { reason: 'timeout' });
+    for (const f of types.findings) {
+      const name = (value: string) => value.replace(/\(.*$/, '').split('.').at(-1);
+      const existing = groundingFindings.find((g) => g.file === f.file && g.line === f.line && name(g.name) === name(f.name));
+      if (existing) {
+        existing.typeConfirmed = true;
+        existing.typeBlocking ||= f.blocking;
+        existing.blocking ||= f.blocking;
+        const reported = findings.find((g) => g.grounding === existing);
+        if (reported) reported.severity = existing.blocking ? 'BLOCK' : 'WARN';
+      }
+      else add({ kind: 'grounding', severity: f.blocking ? 'BLOCK' : 'WARN',
+        added: { file: f.file, symbol: f.name, line: f.line }, existing: null,
+        signals: [{ name: 'typeCheck', value: 1 }], fix: `Correct the type error: ${f.message}`,
+        grounding: { ...f, kind: 'type', suggestions: [] } }, `${f.code}:${f.line}:${f.message}`);
+    }
+  };
   const oldFiles = new Map(base.state.files.map((f) => [f.file, f]));
   const changedFiles = new Set(state.files.filter((f) => f.hash !== oldFiles.get(f.file)?.hash).map((f) => f.file));
   const meaningStart = Date.now();
@@ -113,6 +158,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     await candidates.prepareMeaning(root, config, options.embeddingFactory, {
       deadline: meaningStart + (options.timeoutMs === undefined ? 30_000 : Math.max(0, Math.min(250, (deadline - meaningStart) / 10))),
       priorityFiles: changedFiles,
+      modelRoot,
     });
   } catch {
     for (const symbol of candidates.symbols) delete symbol.embedding;
@@ -260,7 +306,10 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   for (const l of literalsIn(base.state, base.root)) { const key = literalKey(l); beforeLiterals.set(key, (beforeLiterals.get(key) ?? 0) + 1); }
   const isConstant = (l: Literal, owners: Map<string, IndexedSymbol>): boolean => {
     const owner = l.symbolId ? owners.get(l.symbolId) : null;
-    return !!l.constName && owner?.kind === 'constant' && owner.parentId === null;
+    const language = languageForPath(l.file);
+    const containerKinds = language === 'java' ? ['class', 'interface'] : language === 'ruby' || language === 'csharp' ? ['class'] : [];
+    const classConstant = owner?.parentId && containerKinds.includes(owners.get(owner.parentId)?.kind ?? '');
+    return !!l.constName && owner?.kind === 'constant' && (owner.parentId === null || !!classConstant);
   };
   const baseConstants = new Set(base.state.literals.filter((l) => isConstant(l, baseSymbols)).map((l) => `${l.file}\0${l.constName}\0${literalValue(l)}`));
   const constants = state.literals.filter((l) => isConstant(l, symbols) && usableFile(l.file) && baseConstants.has(`${l.file}\0${l.constName}\0${literalValue(l)}`));
@@ -301,8 +350,9 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     }
   }
   checkDeadline();
+  await collectTypes();
   findings.sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'BLOCK' ? -1 : 1) || a.added.file.localeCompare(b.added.file) || a.added.line - b.added.line || a.kind.localeCompare(b.kind));
   const blocked = findings.some((f) => f.severity === 'BLOCK');
   checkDeadline();
-  return { status: blocked ? 'BLOCK' : findings.length ? 'WARN' : 'PASS', blocked, base: commit, findings, allows, ms: performance.now() - start };
+  return { status: blocked ? 'BLOCK' : findings.length ? 'WARN' : 'PASS', blocked, base: commit, findings, allows, ms: performance.now() - start, types };
 }

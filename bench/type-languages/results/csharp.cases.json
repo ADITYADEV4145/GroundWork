@@ -1,0 +1,9394 @@
+{
+ "language": "csharp",
+ "seeds": [
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly/Policy.ExecuteOverloads.cs",
+     "line": 201,
+     "name": "ExecuteAndCaptureGw",
+     "message": "The name 'ExecuteAndCaptureGw' does not exist in the current context",
+     "code": "CS0103",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/Policy.ExecuteOverloads.cs",
+      "line": 201,
+      "column": 9,
+      "name": "ExecuteAndCaptureGw",
+      "message": "The name 'ExecuteAndCaptureGw' does not exist in the current context",
+      "code": "CS0103",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1160,
+   "mutation": {
+    "id": "polly-invented-function-1",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Polly/Policy.ExecuteOverloads.cs",
+    "line": 201,
+    "before": "        ExecuteAndCapture((ctx, _) => action(ctx), context, DefaultCancellationToken);",
+    "after": "        ExecuteAndCaptureGw((ctx, _) => action(ctx), context, DefaultCancellationToken);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 426,
+   "mutation": {
+    "id": "polly-invented-function-2",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Polly.Core/Registry/RegistryPipelineComponentBuilder.cs",
+    "line": 24,
+    "before": "    internal (ResilienceContextPool? ContextPool, PipelineComponent Component, ResilienceStrategyTelemetry Telemetry) CreateComponent()",
+    "after": "    internal (ResilienceContextPool? ContextPool, PipelineComponent Component, ResilienceStrategyTelemetry Telemetry) CreateComponentGw()"
+   },
+   "caughtA": false,
+   "caughtB": false
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1102,
+   "mutation": {
+    "id": "polly-invented-function-3",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Polly/Retry/RetrySyntax.cs",
+    "line": 152,
+    "before": "    public static RetryPolicy RetryForever(this PolicyBuilder policyBuilder, Action<Exception, Context> onRetry)",
+    "after": "    public static RetryPolicy RetryForeverGw(this PolicyBuilder policyBuilder, Action<Exception, Context> onRetry)"
+   },
+   "caughtA": false,
+   "caughtB": false
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly/Policy.TResult.ExecuteOverloads.cs",
+     "line": 130,
+     "name": "ExecuteAndCaptureGw",
+     "message": "The name 'ExecuteAndCaptureGw' does not exist in the current context",
+     "code": "CS0103",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/Policy.TResult.ExecuteOverloads.cs",
+      "line": 130,
+      "column": 9,
+      "name": "ExecuteAndCaptureGw",
+      "message": "The name 'ExecuteAndCaptureGw' does not exist in the current context",
+      "code": "CS0103",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1078,
+   "mutation": {
+    "id": "polly-invented-function-4",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Polly/Policy.TResult.ExecuteOverloads.cs",
+    "line": 130,
+    "before": "        ExecuteAndCapture((_, ct) => action(ct), [], cancellationToken);",
+    "after": "        ExecuteAndCaptureGw((_, ct) => action(ct), [], cancellationToken);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/Simmy/Fault/ChaosFaultStrategy.cs",
+     "line": 31,
+     "name": "FaultGeneratorGw",
+     "message": "The name 'FaultGeneratorGw' does not exist in the current context",
+     "code": "CS0103",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/Simmy/Fault/ChaosFaultStrategy.cs",
+      "line": 31,
+      "column": 35,
+      "name": "FaultGeneratorGw",
+      "message": "The name 'FaultGeneratorGw' does not exist in the current context",
+      "code": "CS0103",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 422,
+   "mutation": {
+    "id": "polly-invented-function-5",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Polly.Core/Simmy/Fault/ChaosFaultStrategy.cs",
+    "line": 31,
+    "before": "                var fault = await FaultGenerator(new(context)).ConfigureAwait(context.ContinueOnCapturedContext);",
+    "after": "                var fault = await FaultGeneratorGw(new(context)).ConfigureAwait(context.ContinueOnCapturedContext);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Extensions/Telemetry/TelemetryListenerImpl.cs",
+     "line": 134,
+     "name": "bool",
+     "message": "'bool' does not contain a definition for 'AsBoxedBoolGw' and no accessible extension method 'AsBoxedBoolGw' accepting a first argument of type 'bool' could be found (are you missing a using directive or an assembly reference?)",
+     "code": "CS1061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Extensions/Telemetry/TelemetryListenerImpl.cs",
+      "line": 134,
+      "column": 103,
+      "name": "bool",
+      "message": "'bool' does not contain a definition for 'AsBoxedBoolGw' and no accessible extension method 'AsBoxedBoolGw' accepting a first argument of type 'bool' could be found (are you missing a using directive or an assembly reference?)",
+      "code": "CS1061",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1050,
+   "mutation": {
+    "id": "polly-invented-method-1",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Polly.Extensions/Telemetry/TelemetryListenerImpl.cs",
+    "line": 134,
+    "before": "                context.Tags.Add(new(ResilienceTelemetryTags.AttemptHandled, executionAttempt.Handled.AsBoxedBool()));",
+    "after": "                context.Tags.Add(new(ResilienceTelemetryTags.AttemptHandled, executionAttempt.Handled.AsBoxedBoolGw()));"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly/CircuitBreaker/AsyncAdvancedCircuitBreakerSyntax.cs",
+     "line": 37,
+     "name": "PolicyBuilder",
+     "message": "'PolicyBuilder' does not contain a definition for 'AdvancedCircuitBreakerAsyncGw' and no accessible extension method 'AdvancedCircuitBreakerAsyncGw' accepting a first argument of type 'PolicyBuilder' could be found (are you missing a using directive or an assembly reference?)",
+     "code": "CS1061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/CircuitBreaker/AsyncAdvancedCircuitBreakerSyntax.cs",
+      "line": 37,
+      "column": 30,
+      "name": "PolicyBuilder",
+      "message": "'PolicyBuilder' does not contain a definition for 'AdvancedCircuitBreakerAsyncGw' and no accessible extension method 'AdvancedCircuitBreakerAsyncGw' accepting a first argument of type 'PolicyBuilder' could be found (are you missing a using directive or an assembly reference?)",
+      "code": "CS1061",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1182,
+   "mutation": {
+    "id": "polly-invented-method-2",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Polly/CircuitBreaker/AsyncAdvancedCircuitBreakerSyntax.cs",
+    "line": 37,
+    "before": "        return policyBuilder.AdvancedCircuitBreakerAsync(",
+    "after": "        return policyBuilder.AdvancedCircuitBreakerAsyncGw("
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly/Policy.ExecuteOverloads.cs",
+     "line": 336,
+     "name": "PolicyResult<TResult>",
+     "message": "'PolicyResult<TResult>' does not contain a definition for 'FailureGw'",
+     "code": "CS0117",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/Policy.ExecuteOverloads.cs",
+      "line": 336,
+      "column": 42,
+      "name": "PolicyResult<TResult>",
+      "message": "'PolicyResult<TResult>' does not contain a definition for 'FailureGw'",
+      "code": "CS0117",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1134,
+   "mutation": {
+    "id": "polly-invented-method-3",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Polly/Policy.ExecuteOverloads.cs",
+    "line": 336,
+    "before": "            return PolicyResult<TResult>.Failure(exception, GetExceptionType(ExceptionPredicates, exception), context);",
+    "after": "            return PolicyResult<TResult>.FailureGw(exception, GetExceptionType(ExceptionPredicates, exception), context);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly/CircuitBreaker/AsyncAdvancedCircuitBreakerTResultSyntax.cs",
+     "line": 103,
+     "name": "PolicyBuilder<TResult>",
+     "message": "'PolicyBuilder<TResult>' does not contain a definition for 'AdvancedCircuitBreakerAsyncGw' and no accessible extension method 'AdvancedCircuitBreakerAsyncGw' accepting a first argument of type 'PolicyBuilder<TResult>' could be found (are you missing a using directive or an assembly reference?)",
+     "code": "CS1061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/CircuitBreaker/AsyncAdvancedCircuitBreakerTResultSyntax.cs",
+      "line": 103,
+      "column": 23,
+      "name": "PolicyBuilder<TResult>",
+      "message": "'PolicyBuilder<TResult>' does not contain a definition for 'AdvancedCircuitBreakerAsyncGw' and no accessible extension method 'AdvancedCircuitBreakerAsyncGw' accepting a first argument of type 'PolicyBuilder<TResult>' could be found (are you missing a using directive or an assembly reference?)",
+      "code": "CS1061",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1129,
+   "mutation": {
+    "id": "polly-invented-method-4",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Polly/CircuitBreaker/AsyncAdvancedCircuitBreakerTResultSyntax.cs",
+    "line": 103,
+    "before": "        policyBuilder.AdvancedCircuitBreakerAsync(",
+    "after": "        policyBuilder.AdvancedCircuitBreakerAsyncGw("
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly/Timeout/AsyncTimeoutTResultSyntax.cs",
+     "line": 44,
+     "name": "TimeoutValidator",
+     "message": "'TimeoutValidator' does not contain a definition for 'ValidateSecondsTimeoutGw'",
+     "code": "CS0117",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/Timeout/AsyncTimeoutTResultSyntax.cs",
+      "line": 44,
+      "column": 26,
+      "name": "TimeoutValidator",
+      "message": "'TimeoutValidator' does not contain a definition for 'ValidateSecondsTimeoutGw'",
+      "code": "CS0117",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1234,
+   "mutation": {
+    "id": "polly-invented-method-5",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Polly/Timeout/AsyncTimeoutTResultSyntax.cs",
+    "line": 44,
+    "before": "        TimeoutValidator.ValidateSecondsTimeout(seconds);",
+    "after": "        TimeoutValidator.ValidateSecondsTimeoutGw(seconds);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/Timeout/TimeoutResilienceStrategy.cs",
+     "line": 37,
+     "name": "ShouldApplyTimeout",
+     "message": "No overload for method 'ShouldApplyTimeout' takes 3 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/Timeout/TimeoutResilienceStrategy.cs",
+      "line": 37,
+      "column": 26,
+      "name": "ShouldApplyTimeout",
+      "message": "No overload for method 'ShouldApplyTimeout' takes 3 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 462,
+   "mutation": {
+    "id": "polly-wrong-arity-1",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Polly.Core/Timeout/TimeoutResilienceStrategy.cs",
+    "line": 37,
+    "before": "        if (!TimeoutUtil.ShouldApplyTimeout(timeout))",
+    "after": "        if (!TimeoutUtil.ShouldApplyTimeout(timeout, 0, 0))"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly/Policy.ExecuteOverloads.cs",
+     "line": 336,
+     "name": "Failure",
+     "message": "No overload for method 'Failure' takes 5 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/Policy.ExecuteOverloads.cs",
+      "line": 336,
+      "column": 42,
+      "name": "Failure",
+      "message": "No overload for method 'Failure' takes 5 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1210,
+   "mutation": {
+    "id": "polly-wrong-arity-2",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Polly/Policy.ExecuteOverloads.cs",
+    "line": 336,
+    "before": "            return PolicyResult<TResult>.Failure(exception, GetExceptionType(ExceptionPredicates, exception), context);",
+    "after": "            return PolicyResult<TResult>.Failure(exception, GetExceptionType(ExceptionPredicates, exception), context, 0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly/ISyncPolicy.cs",
+      "line": 148,
+      "column": 107,
+      "name": "",
+      "message": "Type expected",
+      "code": "CS1031",
+      "language": "csharp",
+      "blocking": false
+     },
+     {
+      "file": "src/Polly/ISyncPolicy.cs",
+      "line": 148,
+      "column": 107,
+      "name": "",
+      "message": "Identifier expected",
+      "code": "CS1001",
+      "language": "csharp",
+      "blocking": false
+     },
+     {
+      "file": "src/Polly/ISyncPolicy.cs",
+      "line": 148,
+      "column": 107,
+      "name": ",",
+      "message": "Syntax error, ',' expected",
+      "code": "CS1003",
+      "language": "csharp",
+      "blocking": false
+     },
+     {
+      "file": "src/Polly/ISyncPolicy.cs",
+      "line": 148,
+      "column": 110,
+      "name": "",
+      "message": "Type expected",
+      "code": "CS1031",
+      "language": "csharp",
+      "blocking": false
+     },
+     {
+      "file": "src/Polly/ISyncPolicy.cs",
+      "line": 148,
+      "column": 110,
+      "name": "",
+      "message": "Identifier expected",
+      "code": "CS1001",
+      "language": "csharp",
+      "blocking": false
+     },
+     {
+      "file": "src/Polly/ISyncPolicy.cs",
+      "line": 148,
+      "column": 110,
+      "name": ",",
+      "message": "Syntax error, ',' expected",
+      "code": "CS1003",
+      "language": "csharp",
+      "blocking": false
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1007,
+   "mutation": {
+    "id": "polly-wrong-arity-3",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Polly/ISyncPolicy.cs",
+    "line": 148,
+    "before": "    PolicyResult ExecuteAndCapture(Action<CancellationToken> action, CancellationToken cancellationToken);",
+    "after": "    PolicyResult ExecuteAndCapture(Action<CancellationToken> action, CancellationToken cancellationToken, 0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": false
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/ResilienceProperties.cs",
+     "line": 56,
+     "name": "TryGetValue",
+     "message": "No overload for method 'TryGetValue' takes 4 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/ResilienceProperties.cs",
+      "line": 56,
+      "column": 13,
+      "name": "TryGetValue",
+      "message": "No overload for method 'TryGetValue' takes 4 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 463,
+   "mutation": {
+    "id": "polly-wrong-arity-4",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Polly.Core/ResilienceProperties.cs",
+    "line": 56,
+    "before": "        if (TryGetValue(key, out var value))",
+    "after": "        if (TryGetValue(key, out var value, 0, 0))"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/Retry/RetryResilienceStrategy.cs",
+     "line": 71,
+     "name": "IsLastAttempt",
+     "message": "No overload for method 'IsLastAttempt' takes 4 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/Retry/RetryResilienceStrategy.cs",
+      "line": 71,
+      "column": 33,
+      "name": "IsLastAttempt",
+      "message": "No overload for method 'IsLastAttempt' takes 4 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 440,
+   "mutation": {
+    "id": "polly-wrong-arity-5",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Polly.Core/Retry/RetryResilienceStrategy.cs",
+    "line": 71,
+    "before": "            var isLastAttempt = IsLastAttempt(attempt, out bool incrementAttempts);",
+    "after": "            var isLastAttempt = IsLastAttempt(attempt, out bool incrementAttempts, 0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Extensions/Telemetry/TagsList.cs",
+     "line": 4,
+     "name": "UtilsGw",
+     "message": "The type or namespace name 'UtilsGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Extensions/Telemetry/TagsList.cs",
+      "line": 4,
+      "column": 13,
+      "name": "UtilsGw",
+      "message": "The type or namespace name 'UtilsGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 985,
+   "mutation": {
+    "id": "polly-wrong-import-1",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Polly.Extensions/Telemetry/TagsList.cs",
+    "line": 4,
+    "before": "using Polly.Utils;",
+    "after": "using Polly.UtilsGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/Timeout/TimeoutResilienceStrategy.cs",
+     "line": 1,
+     "name": "TelemetryGw",
+     "message": "The type or namespace name 'TelemetryGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/Timeout/TimeoutResilienceStrategy.cs",
+      "line": 1,
+      "column": 13,
+      "name": "TelemetryGw",
+      "message": "The type or namespace name 'TelemetryGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 397,
+   "mutation": {
+    "id": "polly-wrong-import-2",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Polly.Core/Timeout/TimeoutResilienceStrategy.cs",
+    "line": 1,
+    "before": "using Polly.Telemetry;",
+    "after": "using Polly.TelemetryGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/ResiliencePipelineBuilderBase.cs",
+     "line": 5,
+     "name": "PipelineGw",
+     "message": "The type or namespace name 'PipelineGw' does not exist in the namespace 'Polly.Utils' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/ResiliencePipelineBuilderBase.cs",
+      "line": 5,
+      "column": 19,
+      "name": "PipelineGw",
+      "message": "The type or namespace name 'PipelineGw' does not exist in the namespace 'Polly.Utils' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 379,
+   "mutation": {
+    "id": "polly-wrong-import-3",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Polly.Core/ResiliencePipelineBuilderBase.cs",
+    "line": 5,
+    "before": "using Polly.Utils.Pipeline;",
+    "after": "using Polly.Utils.PipelineGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/PredicateBuilder.Operators.cs",
+     "line": 4,
+     "name": "HedgingGw",
+     "message": "The type or namespace name 'HedgingGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/PredicateBuilder.Operators.cs",
+      "line": 4,
+      "column": 13,
+      "name": "HedgingGw",
+      "message": "The type or namespace name 'HedgingGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 400,
+   "mutation": {
+    "id": "polly-wrong-import-4",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Polly.Core/PredicateBuilder.Operators.cs",
+    "line": 4,
+    "before": "using Polly.Hedging;",
+    "after": "using Polly.HedgingGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Polly.Core/Hedging/HedgingResiliencePipelineBuilderExtensions.cs",
+     "line": 3,
+     "name": "HedgingGw",
+     "message": "The type or namespace name 'HedgingGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Polly.Core/Hedging/HedgingResiliencePipelineBuilderExtensions.cs",
+      "line": 3,
+      "column": 13,
+      "name": "HedgingGw",
+      "message": "The type or namespace name 'HedgingGw' does not exist in the namespace 'Polly' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 365,
+   "mutation": {
+    "id": "polly-wrong-import-5",
+    "repo": "polly",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Polly.Core/Hedging/HedgingResiliencePipelineBuilderExtensions.cs",
+    "line": 3,
+    "before": "using Polly.Hedging;",
+    "after": "using Polly.HedgingGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Formatting/Json/JsonValueFormatter.cs",
+     "line": 114,
+     "name": "VisitGw",
+     "message": "The name 'VisitGw' does not exist in the current context",
+     "code": "CS0103",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Formatting/Json/JsonValueFormatter.cs",
+      "line": 114,
+      "column": 13,
+      "name": "VisitGw",
+      "message": "The name 'VisitGw' does not exist in the current context",
+      "code": "CS0103",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 760,
+   "mutation": {
+    "id": "serilog-invented-function-1",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Serilog/Formatting/Json/JsonValueFormatter.cs",
+    "line": 114,
+    "before": "            Visit(state, prop.Value);",
+    "after": "            VisitGw(state, prop.Value);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 794,
+   "mutation": {
+    "id": "serilog-invented-function-2",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Serilog/Context/LogContext.cs",
+    "line": 55,
+    "before": "    public static IDisposable PushProperty(string name, object? value, bool destructureObjects = false)",
+    "after": "    public static IDisposable PushPropertyGw(string name, object? value, bool destructureObjects = false)"
+   },
+   "caughtA": false,
+   "caughtB": false
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Data/LogEventPropertyValueRewriter.cs",
+     "line": 130,
+     "name": "VisitGw",
+     "message": "The name 'VisitGw' does not exist in the current context",
+     "code": "CS0103",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Data/LogEventPropertyValueRewriter.cs",
+      "line": 130,
+      "column": 45,
+      "name": "VisitGw",
+      "message": "The name 'VisitGw' does not exist in the current context",
+      "code": "CS0103",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 729,
+   "mutation": {
+    "id": "serilog-invented-function-3",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Serilog/Data/LogEventPropertyValueRewriter.cs",
+    "line": 130,
+    "before": "                    elements[element.Key] = Visit(state, element.Value);",
+    "after": "                    elements[element.Key] = VisitGw(state, element.Value);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+     "line": 140,
+     "name": "EmitCurrentBatchAsyncGw",
+     "message": "The name 'EmitCurrentBatchAsyncGw' does not exist in the current context",
+     "code": "CS0103",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+      "line": 140,
+      "column": 27,
+      "name": "EmitCurrentBatchAsyncGw",
+      "message": "The name 'EmitCurrentBatchAsyncGw' does not exist in the current context",
+      "code": "CS0103",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 687,
+   "mutation": {
+    "id": "serilog-invented-function-4",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+    "line": 140,
+    "before": "                    await EmitCurrentBatchAsync().ConfigureAwait(false);",
+    "after": "                    await EmitCurrentBatchAsyncGw().ConfigureAwait(false);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Rendering/MessageTemplateRenderer.cs",
+     "line": 67,
+     "name": "RenderValueGw",
+     "message": "The name 'RenderValueGw' does not exist in the current context",
+     "code": "CS0103",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Rendering/MessageTemplateRenderer.cs",
+      "line": 67,
+      "column": 13,
+      "name": "RenderValueGw",
+      "message": "The name 'RenderValueGw' does not exist in the current context",
+      "code": "CS0103",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 751,
+   "mutation": {
+    "id": "serilog-invented-function-5",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-function",
+    "file": "src/Serilog/Rendering/MessageTemplateRenderer.cs",
+    "line": 67,
+    "before": "            RenderValue(propertyValue, isLiteral, isJson, output, pt.Format, formatProvider);",
+    "after": "            RenderValueGw(propertyValue, isLiteral, isJson, output, pt.Format, formatProvider);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+     "line": 149,
+     "name": "FailureAwareBatchScheduler",
+     "message": "'FailureAwareBatchScheduler' does not contain a definition for 'MarkFailureGw' and no accessible extension method 'MarkFailureGw' accepting a first argument of type 'FailureAwareBatchScheduler' could be found (are you missing a using directive or an assembly reference?)",
+     "code": "CS1061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+      "line": 149,
+      "column": 33,
+      "name": "FailureAwareBatchScheduler",
+      "message": "'FailureAwareBatchScheduler' does not contain a definition for 'MarkFailureGw' and no accessible extension method 'MarkFailureGw' accepting a first argument of type 'FailureAwareBatchScheduler' could be found (are you missing a using directive or an assembly reference?)",
+      "code": "CS1061",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 700,
+   "mutation": {
+    "id": "serilog-invented-method-1",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+    "line": 149,
+    "before": "                _batchScheduler.MarkFailure(out var shouldDropBatch, out var shouldDropQueue);",
+    "after": "                _batchScheduler.MarkFailureGw(out var shouldDropBatch, out var shouldDropQueue);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Parsing/TextToken.cs",
+     "line": 48,
+     "name": "MessageTemplateRenderer",
+     "message": "'MessageTemplateRenderer' does not contain a definition for 'RenderTextTokenGw'",
+     "code": "CS0117",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Parsing/TextToken.cs",
+      "line": 48,
+      "column": 33,
+      "name": "MessageTemplateRenderer",
+      "message": "'MessageTemplateRenderer' does not contain a definition for 'RenderTextTokenGw'",
+      "code": "CS0117",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 723,
+   "mutation": {
+    "id": "serilog-invented-method-2",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Serilog/Parsing/TextToken.cs",
+    "line": 48,
+    "before": "        MessageTemplateRenderer.RenderTextToken(this, output);",
+    "after": "        MessageTemplateRenderer.RenderTextTokenGw(this, output);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/ILogger.cs",
+     "line": 56,
+     "name": "LoggerConfiguration",
+     "message": "'LoggerConfiguration' does not contain a definition for 'CreateLoggerGw' and no accessible extension method 'CreateLoggerGw' accepting a first argument of type 'LoggerConfiguration' could be found (are you missing a using directive or an assembly reference?)",
+     "code": "CS1061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/ILogger.cs",
+      "line": 56,
+      "column": 14,
+      "name": "LoggerConfiguration",
+      "message": "'LoggerConfiguration' does not contain a definition for 'CreateLoggerGw' and no accessible extension method 'CreateLoggerGw' accepting a first argument of type 'LoggerConfiguration' could be found (are you missing a using directive or an assembly reference?)",
+      "code": "CS1061",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 681,
+   "mutation": {
+    "id": "serilog-invented-method-3",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Serilog/ILogger.cs",
+    "line": 56,
+    "before": "            .CreateLogger()",
+    "after": "            .CreateLoggerGw()"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Core/Logger.cs",
+     "line": 441,
+     "name": "MessageTemplateProcessor",
+     "message": "'MessageTemplateProcessor' does not contain a definition for 'ProcessGw' and no accessible extension method 'ProcessGw' accepting a first argument of type 'MessageTemplateProcessor' could be found (are you missing a using directive or an assembly reference?)",
+     "code": "CS1061",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Core/Logger.cs",
+      "line": 441,
+      "column": 35,
+      "name": "MessageTemplateProcessor",
+      "message": "'MessageTemplateProcessor' does not contain a definition for 'ProcessGw' and no accessible extension method 'ProcessGw' accepting a first argument of type 'MessageTemplateProcessor' could be found (are you missing a using directive or an assembly reference?)",
+      "code": "CS1061",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 760,
+   "mutation": {
+    "id": "serilog-invented-method-4",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Serilog/Core/Logger.cs",
+    "line": 441,
+    "before": "        _messageTemplateProcessor.Process(messageTemplate, propertyValues, out var parsedTemplate, out var boundProperties);",
+    "after": "        _messageTemplateProcessor.ProcessGw(messageTemplate, propertyValues, out var parsedTemplate, out var boundProperties);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "line": 86,
+     "name": "OptionalInterfaceForwardingSink",
+     "message": "'OptionalInterfaceForwardingSink' does not contain a definition for 'SupportsAllGw'",
+     "code": "CS0117",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+      "line": 86,
+      "column": 50,
+      "name": "OptionalInterfaceForwardingSink",
+      "message": "'OptionalInterfaceForwardingSink' does not contain a definition for 'SupportsAllGw'",
+      "code": "CS0117",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 697,
+   "mutation": {
+    "id": "serilog-invented-method-5",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "invented-method",
+    "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+    "line": 86,
+    "before": "            if (!OptionalInterfaceForwardingSink.SupportsAll(sink) && OptionalInterfaceForwardingSink.SupportsAny(logEventSink))",
+    "after": "            if (!OptionalInterfaceForwardingSink.SupportsAllGw(sink) && OptionalInterfaceForwardingSink.SupportsAny(logEventSink))"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Settings/KeyValuePairs/SurrogateConfigurationMethods.cs",
+     "line": 82,
+     "name": "ToMaximumCollectionCount",
+     "message": "No overload for method 'ToMaximumCollectionCount' takes 3 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Settings/KeyValuePairs/SurrogateConfigurationMethods.cs",
+      "line": 82,
+      "column": 49,
+      "name": "ToMaximumCollectionCount",
+      "message": "No overload for method 'ToMaximumCollectionCount' takes 3 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 744,
+   "mutation": {
+    "id": "serilog-wrong-arity-1",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Serilog/Settings/KeyValuePairs/SurrogateConfigurationMethods.cs",
+    "line": 82,
+    "before": "        return loggerDestructuringConfiguration.ToMaximumCollectionCount(maximumCollectionCount);",
+    "after": "        return loggerDestructuringConfiguration.ToMaximumCollectionCount(maximumCollectionCount, 0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+     "line": 191,
+     "name": "EmitCurrentBatchAsync",
+     "message": "No overload for method 'EmitCurrentBatchAsync' takes 2 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+      "line": 191,
+      "column": 27,
+      "name": "EmitCurrentBatchAsync",
+      "message": "No overload for method 'EmitCurrentBatchAsync' takes 2 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 697,
+   "mutation": {
+    "id": "serilog-wrong-arity-2",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+    "line": 191,
+    "before": "                    await EmitCurrentBatchAsync().ConfigureAwait(false);",
+    "after": "                    await EmitCurrentBatchAsync(0, 0).ConfigureAwait(false);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "line": 86,
+     "name": "SupportsAny",
+     "message": "No overload for method 'SupportsAny' takes 3 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+      "line": 86,
+      "column": 103,
+      "name": "SupportsAny",
+      "message": "No overload for method 'SupportsAny' takes 3 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 755,
+   "mutation": {
+    "id": "serilog-wrong-arity-3",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+    "line": 86,
+    "before": "            if (!OptionalInterfaceForwardingSink.SupportsAll(sink) && OptionalInterfaceForwardingSink.SupportsAny(logEventSink))",
+    "after": "            if (!OptionalInterfaceForwardingSink.SupportsAll(sink) && OptionalInterfaceForwardingSink.SupportsAny(logEventSink, 0, 0))"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Formatting/Json/JsonFormatter.cs",
+     "line": 71,
+     "name": "WriteQuotedJsonString",
+     "message": "No overload for method 'WriteQuotedJsonString' takes 4 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Formatting/Json/JsonFormatter.cs",
+      "line": 71,
+      "column": 32,
+      "name": "WriteQuotedJsonString",
+      "message": "No overload for method 'WriteQuotedJsonString' takes 4 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 715,
+   "mutation": {
+    "id": "serilog-wrong-arity-4",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Serilog/Formatting/Json/JsonFormatter.cs",
+    "line": 71,
+    "before": "            JsonValueFormatter.WriteQuotedJsonString(message, output);",
+    "after": "            JsonValueFormatter.WriteQuotedJsonString(message, output, 0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Formatting/Json/JsonValueFormatter.cs",
+     "line": 263,
+     "name": "FormatBooleanValue",
+     "message": "No overload for method 'FormatBooleanValue' takes 4 arguments",
+     "code": "CS1501",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Formatting/Json/JsonValueFormatter.cs",
+      "line": 263,
+      "column": 17,
+      "name": "FormatBooleanValue",
+      "message": "No overload for method 'FormatBooleanValue' takes 4 arguments",
+      "code": "CS1501",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 749,
+   "mutation": {
+    "id": "serilog-wrong-arity-5",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-arity",
+    "file": "src/Serilog/Formatting/Json/JsonValueFormatter.cs",
+    "line": 263,
+    "before": "                FormatBooleanValue(b, output);",
+    "after": "                FormatBooleanValue(b, output, 0, 0);"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "line": 17,
+     "name": "BatchingGw",
+     "message": "The type or namespace name 'BatchingGw' does not exist in the namespace 'Serilog.Core.Sinks' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+      "line": 17,
+      "column": 26,
+      "name": "BatchingGw",
+      "message": "The type or namespace name 'BatchingGw' does not exist in the namespace 'Serilog.Core.Sinks' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 678,
+   "mutation": {
+    "id": "serilog-wrong-import-1",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+    "line": 17,
+    "before": "using Serilog.Core.Sinks.Batching;",
+    "after": "using Serilog.Core.Sinks.BatchingGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Guard.cs",
+     "line": 1,
+     "name": "AnnotationsGw",
+     "message": "The type or namespace name 'AnnotationsGw' does not exist in the namespace 'JetBrains' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Guard.cs",
+      "line": 1,
+      "column": 17,
+      "name": "AnnotationsGw",
+      "message": "The type or namespace name 'AnnotationsGw' does not exist in the namespace 'JetBrains' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 652,
+   "mutation": {
+    "id": "serilog-wrong-import-2",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Serilog/Guard.cs",
+    "line": 1,
+    "before": "using JetBrains.Annotations;",
+    "after": "using JetBrains.AnnotationsGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  },
+  {
+   "A": [],
+   "B": [
+    {
+     "file": "src/Serilog/Configuration/BatchingOptions.cs",
+     "line": 15,
+     "name": "BatchingGw",
+     "message": "The type or namespace name 'BatchingGw' does not exist in the namespace 'Serilog.Core.Sinks' (are you missing an assembly reference?)",
+     "code": "CS0234",
+     "source": "types"
+    }
+   ],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [
+     {
+      "file": "src/Serilog/Configuration/BatchingOptions.cs",
+      "line": 15,
+      "column": 26,
+      "name": "BatchingGw",
+      "message": "The type or namespace name 'BatchingGw' does not exist in the namespace 'Serilog.Core.Sinks' (are you missing an assembly reference?)",
+      "code": "CS0234",
+      "language": "csharp",
+      "blocking": true
+     }
+    ],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 672,
+   "mutation": {
+    "id": "serilog-wrong-import-3",
+    "repo": "serilog",
+    "language": "csharp",
+    "operator": "wrong-import",
+    "file": "src/Serilog/Configuration/BatchingOptions.cs",
+    "line": 15,
+    "before": "using Serilog.Core.Sinks.Batching;",
+    "after": "using Serilog.Core.Sinks.BatchingGw;"
+   },
+   "caughtA": false,
+   "caughtB": true
+  }
+ ],
+ "clean": [
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3918,
+   "case": {
+    "id": "polly-98eaf1220c",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "98eaf1220c5e4ab58e0b4170eed8827f81e12cc3",
+    "parent": "8a37f641f631fae9c8fab243be45e576c306b9f7",
+    "files": [
+     "src/Polly/Context.Dictionary.cs",
+     "src/Polly/Policy.ExecuteOverloads.cs",
+     "test/Polly.Specs/Caching/CacheSpecs.cs",
+     "test/Polly.Specs/Timeout/TimeoutTResultAsyncSpecs.cs"
+    ],
+    "eligibleFiles": 38
+   },
+   "changed": [
+    {
+     "file": "src/Polly/Context.Dictionary.cs",
+     "ranges": [
+      [
+       39,
+       39
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Policy.ExecuteOverloads.cs",
+     "ranges": [
+      [
+       22,
+       22
+      ],
+      [
+       51,
+       51
+      ],
+      [
+       101,
+       101
+      ],
+      [
+       137,
+       137
+      ],
+      [
+       191,
+       191
+      ],
+      [
+       223,
+       223
+      ],
+      [
+       275,
+       275
+      ],
+      [
+       310,
+       310
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Caching/CacheSpecs.cs",
+     "ranges": [
+      [
+       388,
+       388
+      ],
+      [
+       407,
+       407
+      ],
+      [
+       439,
+       439
+      ],
+      [
+       449,
+       449
+      ],
+      [
+       456,
+       456
+      ],
+      [
+       473,
+       473
+      ],
+      [
+       495,
+       495
+      ],
+      [
+       498,
+       498
+      ],
+      [
+       501,
+       501
+      ],
+      [
+       568,
+       568
+      ],
+      [
+       592,
+       592
+      ],
+      [
+       611,
+       611
+      ],
+      [
+       636,
+       636
+      ],
+      [
+       666,
+       666
+      ],
+      [
+       692,
+       692
+      ],
+      [
+       718,
+       718
+      ],
+      [
+       759,
+       759
+      ],
+      [
+       762,
+       762
+      ],
+      [
+       789,
+       789
+      ],
+      [
+       794,
+       794
+      ],
+      [
+       818,
+       818
+      ],
+      [
+       855,
+       855
+      ],
+      [
+       882,
+       882
+      ],
+      [
+       903,
+       903
+      ],
+      [
+       940,
+       940
+      ],
+      [
+       978,
+       978
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Timeout/TimeoutTResultAsyncSpecs.cs",
+     "ranges": [
+      [
+       565,
+       565
+      ],
+      [
+       837,
+       837
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3905,
+   "case": {
+    "id": "polly-8c62032728",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "8c62032728ca06347daea183d1b45792cbf47216",
+    "parent": "ed9c6944689c8b585d200cd7cb958845c342bcb0",
+    "files": [
+     "bench/Polly.Core.Benchmarks/ResiliencePipelineBenchmark.cs",
+     "src/Polly.Core/Outcome.cs",
+     "test/Polly.Core.Tests/ResiliencePipelineTests.Async.cs",
+     "test/Polly.Core.Tests/ResiliencePipelineTests.AsyncT.cs"
+    ],
+    "eligibleFiles": 6
+   },
+   "changed": [
+    {
+     "file": "bench/Polly.Core.Benchmarks/ResiliencePipelineBenchmark.cs",
+     "ranges": [
+      [
+       49,
+       60
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Outcome.cs",
+     "ranges": [
+      [
+       66,
+       70
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/ResiliencePipelineTests.Async.cs",
+     "ranges": [
+      [
+       158,
+       176
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/ResiliencePipelineTests.AsyncT.cs",
+     "ranges": [
+      [
+       180,
+       199
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3942,
+   "case": {
+    "id": "polly-ed9c694468",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "ed9c6944689c8b585d200cd7cb958845c342bcb0",
+    "parent": "b6df65905bac5d156043534b99aeb165ccf1d155",
+    "files": [
+     "src/Polly.Core/ResiliencePipeline.Async.cs",
+     "src/Polly.Core/ResiliencePipeline.AsyncT.cs",
+     "test/Polly.Core.Tests/OutcomeTests.cs",
+     "test/Polly.Core.Tests/ResiliencePipelineTests.Async.cs"
+    ],
+    "eligibleFiles": 6
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/ResiliencePipeline.Async.cs",
+     "ranges": [
+      [
+       28,
+       28
+      ],
+      [
+       32,
+       32
+      ],
+      [
+       36,
+       36
+      ],
+      [
+       62,
+       62
+      ],
+      [
+       66,
+       66
+      ],
+      [
+       70,
+       70
+      ],
+      [
+       100,
+       100
+      ],
+      [
+       104,
+       104
+      ],
+      [
+       108,
+       108
+      ],
+      [
+       140,
+       140
+      ],
+      [
+       144,
+       144
+      ],
+      [
+       148,
+       148
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/ResiliencePipeline.AsyncT.cs",
+     "ranges": [
+      [
+       59,
+       59
+      ],
+      [
+       63,
+       63
+      ],
+      [
+       67,
+       67
+      ],
+      [
+       94,
+       94
+      ],
+      [
+       98,
+       98
+      ],
+      [
+       102,
+       102
+      ],
+      [
+       133,
+       133
+      ],
+      [
+       137,
+       137
+      ],
+      [
+       141,
+       141
+      ],
+      [
+       174,
+       174
+      ],
+      [
+       178,
+       178
+      ],
+      [
+       182,
+       182
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/OutcomeTests.cs",
+     "ranges": [
+      [
+       72,
+       211
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/ResiliencePipelineTests.Async.cs",
+     "ranges": [
+      [
+       109,
+       157
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3912,
+   "case": {
+    "id": "polly-31d7ac3007",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "31d7ac300743b10163d00ef72fccea88f3acabad",
+    "parent": "e3b73ae5e5b4b6960eb8435289b2d018fc54ed2e",
+    "files": [
+     "src/Polly.Core/Utils/CancellationTokenSourcePool.Pooled.cs",
+     "src/Polly.Core/Utils/Pipeline/CompositeComponent.cs",
+     "src/Polly.Core/Utils/Pipeline/DelegatingComponent.cs",
+     "test/Polly.Core.Tests/Utils/CancellationTokenSourcePoolTests.cs"
+    ],
+    "eligibleFiles": 8
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Utils/CancellationTokenSourcePool.Pooled.cs",
+     "ranges": [
+      [
+       5,
+       5
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Utils/Pipeline/CompositeComponent.cs",
+     "ranges": [
+      [
+       45,
+       45
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Utils/Pipeline/DelegatingComponent.cs",
+     "ranges": [
+      [
+       48,
+       48
+      ],
+      [
+       102,
+       102
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Utils/CancellationTokenSourcePoolTests.cs",
+     "ranges": [
+      [
+       37,
+       37
+      ],
+      [
+       47,
+       47
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3922,
+   "case": {
+    "id": "polly-97acd91b52",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "97acd91b52541664f961888d7655ba9b92ba6252",
+    "parent": "87a2e4a0074f01b4b9a430d2f67b28f39f01274d",
+    "files": [
+     "src/Polly.Core/Registry/RegistryPipelineComponentBuilder.cs",
+     "src/Polly.Core/Registry/ResiliencePipelineRegistry.TResult.cs",
+     "src/Polly.Core/Utils/Pipeline/ReloadableComponent.cs",
+     "test/Polly.Core.Tests/Issues/IssuesTests.DiscardedRegistryPipelines_3286.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Registry/RegistryPipelineComponentBuilder.cs",
+     "ranges": [
+      [
+       24,
+       24
+      ],
+      [
+       30,
+       30
+      ],
+      [
+       41,
+       41
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Registry/ResiliencePipelineRegistry.TResult.cs",
+     "ranges": [
+      [
+       2,
+       2
+      ],
+      [
+       63,
+       79
+      ],
+      [
+       81,
+       81
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Utils/Pipeline/ReloadableComponent.cs",
+     "ranges": [
+      [
+       80,
+       80
+      ],
+      [
+       83,
+       83
+      ],
+      [
+       92,
+       92
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Issues/IssuesTests.DiscardedRegistryPipelines_3286.cs",
+     "ranges": [
+      [
+       1,
+       191
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3939,
+   "case": {
+    "id": "polly-e762964283",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "e762964283619cfe9278670d59a280878de73ded",
+    "parent": "3ab3ec00b74e4816f5a4759dadbb6997fe175c17",
+    "files": [
+     "src/Polly.Core/CircuitBreaker/Controller/CircuitStateController.cs",
+     "src/Polly.Core/Utils/Pipeline/CompositeComponent.cs",
+     "src/Polly.Core/Utils/Pipeline/DelegatingComponent.cs",
+     "test/Polly.Core.Tests/CircuitBreaker/Controller/CircuitStateControllerTests.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/CircuitBreaker/Controller/CircuitStateController.cs",
+     "ranges": [
+      [
+       21,
+       21
+      ],
+      [
+       128,
+       136
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Utils/Pipeline/CompositeComponent.cs",
+     "ranges": [
+      [
+       93,
+       102
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Utils/Pipeline/DelegatingComponent.cs",
+     "ranges": [
+      [
+       12,
+       12
+      ],
+      [
+       14,
+       21
+      ],
+      [
+       29,
+       44
+      ],
+      [
+       66,
+       78
+      ],
+      [
+       87,
+       90
+      ],
+      [
+       94,
+       100
+      ],
+      [
+       110,
+       125
+      ],
+      [
+       134,
+       134
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/Controller/CircuitStateControllerTests.cs",
+     "ranges": [
+      [
+       71,
+       119
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3693,
+   "case": {
+    "id": "polly-3ab3ec00b7",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "3ab3ec00b74e4816f5a4759dadbb6997fe175c17",
+    "parent": "813d10a68b966e5a8b1fd04179bbf90308b9c4f3",
+    "files": [
+     "test/Polly.Core.Tests/CircuitBreaker/Controller/CircuitStateControllerTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/Controller/CircuitStateControllerTests.cs",
+     "ranges": [
+      [
+       309,
+       344
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3915,
+   "case": {
+    "id": "polly-813d10a68b",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "813d10a68b966e5a8b1fd04179bbf90308b9c4f3",
+    "parent": "62e7a8c00daf93d361b63d8c9c3f0b0d2e2283a6",
+    "files": [
+     "src/Polly.Core/CircuitBreaker/Controller/ScheduledTaskExecutor.cs",
+     "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/CircuitBreaker/Controller/ScheduledTaskExecutor.cs",
+     "ranges": [
+      [
+       14,
+       22
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs",
+     "ranges": [
+      [
+       1,
+       1
+      ],
+      [
+       171,
+       204
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3934,
+   "case": {
+    "id": "polly-ea41f708cf",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "ea41f708cfc33ba5ae01738ee8c5a1cf211fb9e9",
+    "parent": "4c58a76cbcae3d43d2cf2198246335d8c4313c7e",
+    "files": [
+     "test/Polly.Specs/Caching/AbsoluteTtlSpecs.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Specs/Caching/AbsoluteTtlSpecs.cs",
+     "ranges": [
+      [
+       9,
+       9
+      ],
+      [
+       44,
+       45
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3995,
+   "case": {
+    "id": "polly-0cb0aa74d1",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "0cb0aa74d11b25a9c6fe32951a1ec4a3a3d79948",
+    "parent": "2670e346f03870a0e93bd0efd5681ce5c7204171",
+    "files": [
+     "test/Polly.Specs/Retry/RetryAsyncSpecs.cs",
+     "test/Polly.Specs/Retry/RetryForeverAsyncSpecs.cs",
+     "test/Polly.Specs/Retry/RetryTResultAsyncSpecs.cs",
+     "test/Polly.Specs/Retry/WaitAndRetryAsyncSpecs.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Specs/Retry/RetryAsyncSpecs.cs",
+     "ranges": [
+      [
+       430,
+       430
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Retry/RetryForeverAsyncSpecs.cs",
+     "ranges": [
+      [
+       405,
+       405
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Retry/RetryTResultAsyncSpecs.cs",
+     "ranges": [
+      [
+       573,
+       573
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Retry/WaitAndRetryAsyncSpecs.cs",
+     "ranges": [
+      [
+       856,
+       856
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3918,
+   "case": {
+    "id": "polly-12de232094",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "12de232094609b5132db5d34efa70015b6b2ba08",
+    "parent": "bb986e492984d25e00e6e477d84f7fd655171afa",
+    "files": [
+     "bench/Polly.Benchmarks/Program.cs",
+     "bench/Polly.Core.Benchmarks/Program.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "bench/Polly.Benchmarks/Program.cs",
+     "ranges": [
+      [
+       1,
+       4
+      ]
+     ]
+    },
+    {
+     "file": "bench/Polly.Core.Benchmarks/Program.cs",
+     "ranges": [
+      [
+       9,
+       10
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3905,
+   "case": {
+    "id": "polly-bb986e4929",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "bb986e492984d25e00e6e477d84f7fd655171afa",
+    "parent": "dc933fd172cbfae51b4ebc419014f4fed695cbb6",
+    "files": [
+     "bench/Polly.Core.Benchmarks/CreationBenchmark.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "bench/Polly.Core.Benchmarks/CreationBenchmark.cs",
+     "ranges": [
+      [
+       4,
+       4
+      ],
+      [
+       9,
+       9
+      ],
+      [
+       15,
+       15
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3942,
+   "case": {
+    "id": "polly-9ad5ae9b4f",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "9ad5ae9b4ff9beb4321b0762249ce173b984f817",
+    "parent": "9d289ab10f7f7a925a95e9b7614534f3af9b8b71",
+    "files": [
+     "src/Polly.Core/Utils/CancellationTokenSourcePool.Pooled.cs",
+     "test/Polly.Core.Tests/Utils/CancellationTokenSourcePoolTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Utils/CancellationTokenSourcePool.Pooled.cs",
+     "ranges": [
+      [
+       6,
+       6
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Utils/CancellationTokenSourcePoolTests.cs",
+     "ranges": [
+      [
+       33,
+       39
+      ],
+      [
+       41,
+       41
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3937,
+   "case": {
+    "id": "polly-f35bc00d7a",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "f35bc00d7a8fd09e0a2ae51fa7e1378093cb353e",
+    "parent": "1a80392b1f093f40e59c515f4aeb989bea5db857",
+    "files": [
+     "test/Polly.Specs/ContextDictionarySpecs.cs",
+     "test/Polly.Specs/PolicyOverloadSmokeSpecs.cs",
+     "test/Polly.Specs/Timeout/TimeoutOverloadSmokeSpecs.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Specs/ContextDictionarySpecs.cs",
+     "ranges": [
+      [
+       8,
+       8
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/PolicyOverloadSmokeSpecs.cs",
+     "ranges": [
+      [
+       163,
+       183
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Timeout/TimeoutOverloadSmokeSpecs.cs",
+     "ranges": [
+      [
+       32,
+       32
+      ],
+      [
+       38,
+       38
+      ],
+      [
+       87,
+       87
+      ],
+      [
+       97,
+       97
+      ],
+      [
+       134,
+       134
+      ],
+      [
+       140,
+       140
+      ],
+      [
+       189,
+       189
+      ],
+      [
+       199,
+       199
+      ],
+      [
+       269,
+       270
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3914,
+   "case": {
+    "id": "polly-1a80392b1f",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "1a80392b1f093f40e59c515f4aeb989bea5db857",
+    "parent": "e6582c39e7ba10c8fbcddbfefccd7a09e8dd8aab",
+    "files": [
+     "test/Polly.Core.Tests/Hedging/HedgingResilienceStrategyTests.cs",
+     "test/Polly.Specs/ContextDictionarySpecs.cs",
+     "test/Polly.Specs/Retry/RetryOverloadSmokeSpecs.cs",
+     "test/Polly.Specs/Timeout/TimeoutOverloadSmokeSpecs.cs"
+    ],
+    "eligibleFiles": 20
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/Hedging/HedgingResilienceStrategyTests.cs",
+     "ranges": []
+    },
+    {
+     "file": "test/Polly.Specs/ContextDictionarySpecs.cs",
+     "ranges": [
+      [
+       1,
+       74
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Retry/RetryOverloadSmokeSpecs.cs",
+     "ranges": [
+      [
+       1,
+       648
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Timeout/TimeoutOverloadSmokeSpecs.cs",
+     "ranges": [
+      [
+       1,
+       269
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3926,
+   "case": {
+    "id": "polly-482bdf824f",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "482bdf824fba19c1188655156e512570c3d7f7af",
+    "parent": "a057350b3a0cbf4f457104ed6981f97db71b94e1",
+    "files": [
+     "src/Polly.Core/Simmy/Fault/FaultGenerator.cs",
+     "test/Polly.Core.Tests/Simmy/Fault/FaultGeneratorTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Simmy/Fault/FaultGenerator.cs",
+     "ranges": [
+      [
+       81,
+       81
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Simmy/Fault/FaultGeneratorTests.cs",
+     "ranges": [
+      [
+       42,
+       59
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1016,
+   "case": {
+    "id": "polly-47e3b412e8",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "47e3b412e8c3b7e6db1629acd98f3e3b6b529d6c",
+    "parent": "a603169f460df708206ecf907096848f584c9003",
+    "files": [
+     "src/Polly.Core/Telemetry/PipelineExecutedArguments.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Telemetry/PipelineExecutedArguments.cs",
+     "ranges": [
+      [
+       6,
+       6
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "A compatible .NET SDK was not found."
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: A compatible .NET SDK was not found."
+   ],
+   "ms": 14,
+   "case": {
+    "id": "polly-3987bb8c0a",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "3987bb8c0a876314ea0e29d200c333f0fdef5e53",
+    "parent": "c742d5dac5f768428c09802d7d80effcca5b44d6",
+    "files": [
+     "src/Polly.Core/Fallback/FallbackResiliencePipelineBuilderExtensions.cs",
+     "src/Polly.Core/Hedging/HedgingResiliencePipelineBuilderExtensions.cs",
+     "src/Polly.Core/Utils/Pipeline/ReloadableComponent.cs",
+     "src/Polly.Extensions/Telemetry/TelemetrySource.cs"
+    ],
+    "eligibleFiles": 11
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Fallback/FallbackResiliencePipelineBuilderExtensions.cs",
+     "ranges": [
+      [
+       40,
+       40
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Hedging/HedgingResiliencePipelineBuilderExtensions.cs",
+     "ranges": [
+      [
+       38,
+       38
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/Utils/Pipeline/ReloadableComponent.cs",
+     "ranges": [
+      [
+       62,
+       62
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Extensions/Telemetry/TelemetrySource.cs",
+     "ranges": [
+      [
+       37,
+       37
+      ],
+      [
+       39,
+       39
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "A compatible .NET SDK was not found."
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: A compatible .NET SDK was not found."
+   ],
+   "ms": 7,
+   "case": {
+    "id": "polly-f2a07e687b",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "f2a07e687b3020f6cbaaf9192f14e1f8845682e3",
+    "parent": "6cc79edccae5d6f236fd011a69fb12e8f913be80",
+    "files": [
+     "src/Polly.Extensions/DependencyInjection/AddResiliencePipelineContext.cs",
+     "test/Polly.Extensions.Tests/ReloadableResiliencePipelineTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Extensions/DependencyInjection/AddResiliencePipelineContext.cs",
+     "ranges": [
+      [
+       5,
+       5
+      ],
+      [
+       50,
+       71
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Extensions.Tests/ReloadableResiliencePipelineTests.cs",
+     "ranges": [
+      [
+       3,
+       3
+      ],
+      [
+       99,
+       163
+      ],
+      [
+       199,
+       229
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "A compatible .NET SDK was not found."
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: A compatible .NET SDK was not found."
+   ],
+   "ms": 7,
+   "case": {
+    "id": "polly-6cc79edcca",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "6cc79edccae5d6f236fd011a69fb12e8f913be80",
+    "parent": "059ddb2ee6dc35bf5c9d282a2b5235b78faa99bc",
+    "files": [
+     "test/Polly.Core.Tests/Timeout/TimeoutResilienceStrategyTests.cs",
+     "test/Polly.Extensions.Tests/Registry/ConfigureBuilderContextExtensionsTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/Timeout/TimeoutResilienceStrategyTests.cs",
+     "ranges": [
+      [
+       287,
+       287
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Extensions.Tests/Registry/ConfigureBuilderContextExtensionsTests.cs",
+     "ranges": [
+      [
+       30,
+       30
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "A compatible .NET SDK was not found."
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: A compatible .NET SDK was not found."
+   ],
+   "ms": 4,
+   "case": {
+    "id": "polly-8ba491d7da",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "8ba491d7da22a0364c9eb4bbef3a09d0c97c52a9",
+    "parent": "21694a8109265d89f4d99313b38d3c31b2ef104e",
+    "files": [
+     "src/Polly.Core/Utils/RandomUtil.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Utils/RandomUtil.cs",
+     "ranges": [
+      [
+       11,
+       11
+      ],
+      [
+       13,
+       13
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "A compatible .NET SDK was not found."
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: A compatible .NET SDK was not found."
+   ],
+   "ms": 14,
+   "case": {
+    "id": "polly-7a1d10f47e",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "7a1d10f47e2ec667ceada49deb6bdd9a765753bd",
+    "parent": "2a0cdd05486b418945250a5fbe21cc019f8a0a3b",
+    "files": [
+     "src/Polly.Core/Utils/ObjectPool.cs",
+     "test/Polly.Extensions.Tests/Issues/IssuesTests.StrategiesPerEndpoint_1365.cs",
+     "test/Polly.Extensions.Tests/Telemetry/TelemetryListenerImplTests.cs",
+     "test/Polly.TestUtils/TestUtilities.cs"
+    ],
+    "eligibleFiles": 4
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Utils/ObjectPool.cs",
+     "ranges": [
+      [
+       7,
+       7
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Extensions.Tests/Issues/IssuesTests.StrategiesPerEndpoint_1365.cs",
+     "ranges": [
+      [
+       17,
+       21
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Extensions.Tests/Telemetry/TelemetryListenerImplTests.cs",
+     "ranges": [
+      [
+       12,
+       13
+      ],
+      [
+       106,
+       106
+      ],
+      [
+       179,
+       179
+      ],
+      [
+       226,
+       226
+      ],
+      [
+       289,
+       289
+      ],
+      [
+       325,
+       325
+      ],
+      [
+       401,
+       401
+      ],
+      [
+       545,
+       549
+      ],
+      [
+       597,
+       597
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.TestUtils/TestUtilities.cs",
+     "ranges": [
+      [
+       55,
+       58
+      ],
+      [
+       84,
+       89
+      ],
+      [
+       96,
+       102
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "no .csproj"
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: no .csproj"
+   ],
+   "ms": 2,
+   "case": {
+    "id": "polly-2a0cdd0548",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "2a0cdd05486b418945250a5fbe21cc019f8a0a3b",
+    "parent": "796be73c98c5bad3488b8966b5224f33adc9ed18",
+    "files": [
+     "cake.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "cake.cs",
+     "ranges": [
+      [
+       6,
+       6
+      ],
+      [
+       151,
+       151
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "A compatible .NET SDK was not found."
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: A compatible .NET SDK was not found."
+   ],
+   "ms": 15,
+   "case": {
+    "id": "polly-796be73c98",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "796be73c98c5bad3488b8966b5224f33adc9ed18",
+    "parent": "976983f4e2e0814fd1e1751bea210ed5c0923058",
+    "files": [
+     "src/Polly.Core/Hedging/Controller/TaskExecution.cs",
+     "src/Polly/Retry/AsyncRetryEngine.cs",
+     "test/Polly.Specs/Retry/WaitAndRetryAsyncSpecs.cs",
+     "test/Polly.Specs/Retry/WaitAndRetrySpecs.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Hedging/Controller/TaskExecution.cs",
+     "ranges": [
+      [
+       201,
+       201
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Retry/AsyncRetryEngine.cs",
+     "ranges": [
+      [
+       68,
+       68
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Retry/WaitAndRetryAsyncSpecs.cs",
+     "ranges": [
+      [
+       354,
+       378
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Retry/WaitAndRetrySpecs.cs",
+     "ranges": [
+      [
+       390,
+       410
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3915,
+   "case": {
+    "id": "polly-e984839b83",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "e984839b8324a163270f0bc686929a1066de69e0",
+    "parent": "27eb2bbb4d45a9570bc35c5ee70419fff4376b25",
+    "files": [
+     "src/Polly.Core/Hedging/HedgingResilienceStrategy.cs",
+     "test/Polly.Core.Tests/Issues/IssuesTests.CancellationTokenPropagation_3086.cs",
+     "test/Polly.Core.Tests/Timeout/TimeoutResilienceStrategyTests.cs",
+     "test/Polly.Core.Tests/Utils/OutcomeUtilitiesTests.cs"
+    ],
+    "eligibleFiles": 7
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Hedging/HedgingResilienceStrategy.cs",
+     "ranges": [
+      [
+       3,
+       3
+      ],
+      [
+       61,
+       61
+      ],
+      [
+       76,
+       76
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Issues/IssuesTests.CancellationTokenPropagation_3086.cs",
+     "ranges": [
+      [
+       1,
+       203
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Timeout/TimeoutResilienceStrategyTests.cs",
+     "ranges": [
+      [
+       228,
+       249
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Utils/OutcomeUtilitiesTests.cs",
+     "ranges": [
+      [
+       1,
+       76
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3289,
+   "case": {
+    "id": "polly-d36bdd5c93",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "d36bdd5c931784ebf5c99ff63601cace46a1d5e8",
+    "parent": "25a596805b4b6809c653520452c965242f12dbc6",
+    "files": [
+     "test/Polly.Core.Tests/CircuitBreaker/BreakDurationGeneratorArgumentsTests.cs",
+     "test/Polly.Specs/ResiliencePipelineConversionExtensionsTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/BreakDurationGeneratorArgumentsTests.cs",
+     "ranges": [
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/ResiliencePipelineConversionExtensionsTests.cs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3253,
+   "case": {
+    "id": "polly-53bf3885fb",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "53bf3885fb62f20296280867b42c5ac1c1c13fb8",
+    "parent": "897719976a2766641b9ba28016fa6c61ed708d64",
+    "files": [
+     "test/Polly.Core.Tests/CircuitBreaker/Controller/CircuitStateControllerTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/Controller/CircuitStateControllerTests.cs",
+     "ranges": [
+      [
+       56,
+       59
+      ],
+      [
+       131,
+       136
+      ],
+      [
+       160,
+       164
+      ],
+      [
+       232,
+       237
+      ],
+      [
+       296,
+       297
+      ],
+      [
+       300,
+       302
+      ],
+      [
+       512,
+       515
+      ],
+      [
+       556,
+       559
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3872,
+   "case": {
+    "id": "polly-ed3d603c7b",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "ed3d603c7bc17e8b4eafdcb8e982916cc6928a2f",
+    "parent": "8fd8fc08736b3623443f9c87433dfc120ab18a57",
+    "files": [
+     "bench/Polly.Core.Benchmarks/Utils/Helper.Retry.cs",
+     "src/Snippets/Docs/Extensibility.cs",
+     "test/Polly.Core.Tests/Issues/IssuesTests.CircuitBreakerStateSharing_959.cs",
+     "test/Polly.Extensions.Tests/Telemetry/TelemetryListenerImplTests.cs"
+    ],
+    "eligibleFiles": 14
+   },
+   "changed": [
+    {
+     "file": "bench/Polly.Core.Benchmarks/Utils/Helper.Retry.cs",
+     "ranges": [
+      [
+       28,
+       28
+      ],
+      [
+       30,
+       30
+      ],
+      [
+       33,
+       33
+      ]
+     ]
+    },
+    {
+     "file": "src/Snippets/Docs/Extensibility.cs",
+     "ranges": [
+      [
+       18,
+       20
+      ],
+      [
+       33,
+       33
+      ],
+      [
+       38,
+       38
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Issues/IssuesTests.CircuitBreakerStateSharing_959.cs",
+     "ranges": [
+      [
+       18,
+       18
+      ],
+      [
+       21,
+       21
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Extensions.Tests/Telemetry/TelemetryListenerImplTests.cs",
+     "ranges": [
+      [
+       596,
+       596
+      ],
+      [
+       598,
+       598
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3923,
+   "case": {
+    "id": "polly-8fd8fc0873",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "8fd8fc08736b3623443f9c87433dfc120ab18a57",
+    "parent": "dbe4eb7d9d52e0705f3958184186f8ff9d2a1b63",
+    "files": [
+     "test/Polly.Core.Tests/Hedging/Controller/HedgingExecutionContextTests.cs",
+     "test/Polly.Core.Tests/Issues/IssuesTests.HandleMultipleResults_898.cs",
+     "test/Polly.TestUtils/FakeTelemetryListener.cs",
+     "test/Polly.TestUtils/TestUtilities.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/Hedging/Controller/HedgingExecutionContextTests.cs",
+     "ranges": [
+      [
+       35,
+       35
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Issues/IssuesTests.HandleMultipleResults_898.cs",
+     "ranges": [
+      [
+       24,
+       24
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.TestUtils/FakeTelemetryListener.cs",
+     "ranges": [
+      [
+       3,
+       7
+      ],
+      [
+       13,
+       13
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.TestUtils/TestUtilities.cs",
+     "ranges": [
+      [
+       109,
+       114
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3261,
+   "case": {
+    "id": "polly-51c138e7c7",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "51c138e7c72c4660d5a969348bca42cab8a1f429",
+    "parent": "e11f7d190c8c112c12ec8016b4da3ad323c13306",
+    "files": [
+     "test/Polly.Core.Tests/Hedging/Controller/HedgingExecutionContextTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/Hedging/Controller/HedgingExecutionContextTests.cs",
+     "ranges": [
+      [
+       29,
+       38
+      ],
+      [
+       76,
+       76
+      ],
+      [
+       85,
+       85
+      ],
+      [
+       97,
+       97
+      ],
+      [
+       115,
+       118
+      ],
+      [
+       122,
+       122
+      ],
+      [
+       131,
+       131
+      ],
+      [
+       133,
+       135
+      ],
+      [
+       145,
+       148
+      ],
+      [
+       152,
+       152
+      ],
+      [
+       156,
+       156
+      ],
+      [
+       160,
+       160
+      ],
+      [
+       162,
+       162
+      ],
+      [
+       164,
+       165
+      ],
+      [
+       169,
+       169
+      ],
+      [
+       172,
+       172
+      ],
+      [
+       175,
+       177
+      ],
+      [
+       180,
+       181
+      ],
+      [
+       185,
+       185
+      ],
+      [
+       191,
+       191
+      ],
+      [
+       195,
+       195
+      ],
+      [
+       198,
+       211
+      ],
+      [
+       213,
+       213
+      ],
+      [
+       217,
+       248
+      ],
+      [
+       256,
+       256
+      ],
+      [
+       271,
+       271
+      ],
+      [
+       278,
+       278
+      ],
+      [
+       281,
+       281
+      ],
+      [
+       283,
+       284
+      ],
+      [
+       293,
+       293
+      ],
+      [
+       296,
+       299
+      ],
+      [
+       309,
+       310
+      ],
+      [
+       312,
+       312
+      ],
+      [
+       320,
+       320
+      ],
+      [
+       323,
+       324
+      ],
+      [
+       337,
+       337
+      ],
+      [
+       343,
+       343
+      ],
+      [
+       346,
+       346
+      ],
+      [
+       366,
+       369
+      ],
+      [
+       373,
+       373
+      ],
+      [
+       378,
+       378
+      ],
+      [
+       381,
+       381
+      ],
+      [
+       388,
+       388
+      ],
+      [
+       402,
+       403
+      ],
+      [
+       407,
+       407
+      ],
+      [
+       409,
+       409
+      ],
+      [
+       411,
+       411
+      ],
+      [
+       419,
+       419
+      ],
+      [
+       426,
+       426
+      ],
+      [
+       429,
+       429
+      ],
+      [
+       431,
+       431
+      ],
+      [
+       440,
+       440
+      ],
+      [
+       442,
+       442
+      ],
+      [
+       453,
+       453
+      ],
+      [
+       455,
+       455
+      ],
+      [
+       457,
+       458
+      ],
+      [
+       473,
+       473
+      ],
+      [
+       475,
+       475
+      ],
+      [
+       491,
+       491
+      ],
+      [
+       510,
+       510
+      ],
+      [
+       512,
+       512
+      ],
+      [
+       514,
+       515
+      ],
+      [
+       524,
+       524
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": false
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 0,
+   "case": {
+    "id": "polly-dceefbd4f9",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "dceefbd4f9caa650cad2c10849cedad3db4060f6",
+    "parent": "b87f20347af528b6f7c6ff1f9e6c1bc02f97856c",
+    "files": [
+     "src/Polly.Extensions/Telemetry/TelemetryUtil.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Extensions/Telemetry/TelemetryUtil.cs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2997,
+   "case": {
+    "id": "polly-b87f20347a",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "b87f20347af528b6f7c6ff1f9e6c1bc02f97856c",
+    "parent": "af7e8b16a0c032149021693d326860c00e48fd0e",
+    "files": [
+     "src/Polly.Core/Registry/RegistryPipelineComponentBuilder.cs",
+     "src/Polly.Core/ResiliencePipelineBuilderBase.cs",
+     "src/Polly.Extensions/Telemetry/TelemetryListenerImpl.cs",
+     "src/Polly.Extensions/Telemetry/TelemetrySource.cs"
+    ],
+    "eligibleFiles": 9
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Registry/RegistryPipelineComponentBuilder.cs",
+     "ranges": [
+      [
+       9,
+       14
+      ],
+      [
+       18,
+       22
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/ResiliencePipelineBuilderBase.cs",
+     "ranges": [
+      [
+       132,
+       132
+      ],
+      [
+       134,
+       134
+      ],
+      [
+       140,
+       141
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Extensions/Telemetry/TelemetryListenerImpl.cs",
+     "ranges": [
+      [
+       18,
+       18
+      ],
+      [
+       23,
+       25
+      ],
+      [
+       29,
+       29
+      ],
+      [
+       34,
+       34
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Extensions/Telemetry/TelemetrySource.cs",
+     "ranges": [
+      [
+       1,
+       50
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3279,
+   "case": {
+    "id": "polly-7ddb44ec98",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "7ddb44ec982dd37533790bb938e8af681292b0e7",
+    "parent": "f58d12e5be15eac0a0182ef4ec8a270e3b59a540",
+    "files": [
+     "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs",
+     "ranges": [
+      [
+       135,
+       135
+      ],
+      [
+       150,
+       152
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3926,
+   "case": {
+    "id": "polly-016dd909db",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "016dd909db880b9d8d07954ff5f4ea3cc1e11c67",
+    "parent": "779aa834d9a317a7e26493385f2fdf48ce20f3ef",
+    "files": [
+     "src/Polly.Core/CircuitBreaker/Controller/ScheduledTaskExecutor.cs",
+     "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/CircuitBreaker/Controller/ScheduledTaskExecutor.cs",
+     "ranges": [
+      [
+       29,
+       29
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs",
+     "ranges": [
+      [
+       132,
+       152
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3910,
+   "case": {
+    "id": "polly-de3067c916",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "de3067c9166cfe4843de5336733a9580c826fb9f",
+    "parent": "49967c3eb33229a453b13873c4f12d0c61999672",
+    "files": [
+     "bench/Polly.Benchmarks/Cache.cs",
+     "src/Polly/Context.Dictionary.cs",
+     "test/Polly.Specs/Helpers/Caching/StubSerialized.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "bench/Polly.Benchmarks/Cache.cs",
+     "ranges": [
+      [
+       48,
+       48
+      ],
+      [
+       50,
+       50
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Context.Dictionary.cs",
+     "ranges": [
+      [
+       9,
+       9
+      ],
+      [
+       11,
+       11
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Helpers/Caching/StubSerialized.cs",
+     "ranges": [
+      [
+       4,
+       4
+      ],
+      [
+       16,
+       16
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3921,
+   "case": {
+    "id": "polly-42b05ffee8",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "42b05ffee89ed0da718c1a779f0ef477b46311cb",
+    "parent": "d7a9670841436cba7b4385f20394c6b66469e029",
+    "files": [
+     "cake.cs",
+     "src/Polly/Context.Dictionary.cs",
+     "test/Polly.Specs/Helpers/Bulkhead/TraceableAction.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "cake.cs",
+     "ranges": [
+      [
+       1,
+       378
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Context.Dictionary.cs",
+     "ranges": [
+      [
+       14,
+       18
+      ],
+      [
+       37,
+       37
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Helpers/Bulkhead/TraceableAction.cs",
+     "ranges": [
+      [
+       18,
+       18
+      ],
+      [
+       21,
+       22
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "no .csproj"
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": false,
+   "errors": [
+    "csharp: no .csproj"
+   ],
+   "ms": 1,
+   "case": {
+    "id": "polly-c758dbcbaf",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "c758dbcbaf5d2f99bdf8e139f59c833d8ab22d24",
+    "parent": "fb12f1580fbf70635779b8832cf1533d62d5beab",
+    "files": [
+     "test/Shared/StrongNameTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Shared/StrongNameTests.cs",
+     "ranges": [
+      [
+       1,
+       51
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2517,
+   "case": {
+    "id": "polly-a83d82c8e0",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "a83d82c8e0e9ad8f62b56e7fa1e66d1f0e689d17",
+    "parent": "aa6f02cbeba7d9cea80a11c71a675ba6b1b9683a",
+    "files": [
+     "src/Polly/Bulkhead/AsyncBulkheadPolicy.cs",
+     "src/Polly/Bulkhead/BulkheadPolicy.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly/Bulkhead/AsyncBulkheadPolicy.cs",
+     "ranges": [
+      [
+       20,
+       20
+      ],
+      [
+       26,
+       27
+      ],
+      [
+       36,
+       36
+      ],
+      [
+       89,
+       89
+      ],
+      [
+       95,
+       96
+      ],
+      [
+       128,
+       128
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Bulkhead/BulkheadPolicy.cs",
+     "ranges": [
+      [
+       20,
+       20
+      ],
+      [
+       26,
+       27
+      ],
+      [
+       54,
+       54
+      ],
+      [
+       87,
+       87
+      ],
+      [
+       93,
+       94
+      ],
+      [
+       120,
+       120
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3959,
+   "case": {
+    "id": "polly-402adfaafb",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "402adfaafb0b4da47170ca198451dfba68cd17d6",
+    "parent": "156a9bbee14397989490cc280f09de324ca85191",
+    "files": [
+     "src/Polly.Core/Retry/RetryHelper.cs",
+     "test/Polly.Core.Tests/Retry/RetryHelperTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Retry/RetryHelper.cs",
+     "ranges": [
+      [
+       57,
+       57
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Retry/RetryHelperTests.cs",
+     "ranges": [
+      [
+       270,
+       270
+      ],
+      [
+       276,
+       276
+      ],
+      [
+       286,
+       286
+      ],
+      [
+       292,
+       292
+      ],
+      [
+       321,
+       321
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3954,
+   "case": {
+    "id": "polly-156a9bbee1",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "156a9bbee14397989490cc280f09de324ca85191",
+    "parent": "c707b243ad4a54826d1580f96160344865946a11",
+    "files": [
+     "src/Polly.Core/Retry/RetryHelper.cs",
+     "test/Polly.Core.Tests/Retry/RetryHelperTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/Retry/RetryHelper.cs",
+     "ranges": [
+      [
+       48,
+       49
+      ],
+      [
+       51,
+       53
+      ],
+      [
+       55,
+       55
+      ],
+      [
+       57,
+       57
+      ],
+      [
+       75,
+       75
+      ],
+      [
+       113,
+       113
+      ],
+      [
+       115,
+       118
+      ],
+      [
+       120,
+       142
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Retry/RetryHelperTests.cs",
+     "ranges": [
+      [
+       1,
+       2
+      ],
+      [
+       266,
+       297
+      ],
+      [
+       315,
+       336
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3921,
+   "case": {
+    "id": "polly-74bf31fff0",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "74bf31fff0e0907034994be4df22424aa71818f1",
+    "parent": "50d19ddf10cda7a7e580d1a46d8e84f06bac0e62",
+    "files": [
+     "src/Polly/Timeout/AsyncTimeoutEngine.cs",
+     "src/Polly/Timeout/TimeoutEngine.cs",
+     "test/Polly.Specs/Timeout/TimeoutAsyncSpecs.cs",
+     "test/Polly.Specs/Timeout/TimeoutSpecs.cs"
+    ],
+    "eligibleFiles": 4
+   },
+   "changed": [
+    {
+     "file": "src/Polly/Timeout/AsyncTimeoutEngine.cs",
+     "ranges": [
+      [
+       49,
+       49
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Timeout/TimeoutEngine.cs",
+     "ranges": [
+      [
+       65,
+       65
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Timeout/TimeoutAsyncSpecs.cs",
+     "ranges": [
+      [
+       388,
+       388
+      ],
+      [
+       392,
+       393
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Timeout/TimeoutSpecs.cs",
+     "ranges": [
+      [
+       343,
+       344
+      ],
+      [
+       346,
+       348
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3927,
+   "case": {
+    "id": "polly-d2ccfe214d",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "d2ccfe214d8195d5c0e742552b6d3c27f3caf0ef",
+    "parent": "520b59e3899ea709f3fa9bb66d5da001ba954b56",
+    "files": [
+     "bench/Polly.Benchmarks/PollyConfig.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "bench/Polly.Benchmarks/PollyConfig.cs",
+     "ranges": [
+      [
+       8,
+       8
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1028,
+   "case": {
+    "id": "polly-836ac70efe",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "836ac70efeed0b1ab51e7fb1f1ae3a2a8e1e1a55",
+    "parent": "03ad74f01e60f82c3e3f40b13cfb305c52fffa35",
+    "files": [
+     "src/Polly.Core/ResiliencePipelineBuilderBase.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/ResiliencePipelineBuilderBase.cs",
+     "ranges": [
+      [
+       62,
+       62
+      ],
+      [
+       115,
+       115
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 954,
+   "case": {
+    "id": "polly-03ad74f01e",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "03ad74f01e60f82c3e3f40b13cfb305c52fffa35",
+    "parent": "40b5bb62e58dca97e3e7461bcb817f4debb00c74",
+    "files": [
+     "src/Polly.Core/ResilienceContext.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/ResilienceContext.cs",
+     "ranges": [
+      [
+       102,
+       102
+      ],
+      [
+       106,
+       107
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3237,
+   "case": {
+    "id": "polly-5f9462dc28",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "5f9462dc28e42c8ecacde41b208fdd0ed17b34ec",
+    "parent": "0707c4d2a2d617b341c3a2b3a361e6db4a59e59b",
+    "files": [
+     "src/Polly.Extensions/Telemetry/Log.cs",
+     "src/Polly.Extensions/Telemetry/TelemetryListenerImpl.cs",
+     "test/Polly.Extensions.Tests/Telemetry/TelemetryListenerImplTests.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Extensions/Telemetry/Log.cs",
+     "ranges": [
+      [
+       38,
+       39
+      ],
+      [
+       45,
+       45
+      ],
+      [
+       77,
+       77
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Extensions/Telemetry/TelemetryListenerImpl.cs",
+     "ranges": [
+      [
+       57,
+       59
+      ],
+      [
+       166,
+       170
+      ],
+      [
+       175,
+       178
+      ],
+      [
+       183,
+       187
+      ],
+      [
+       189,
+       189
+      ],
+      [
+       193,
+       203
+      ],
+      [
+       210,
+       213
+      ],
+      [
+       215,
+       215
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Extensions.Tests/Telemetry/TelemetryListenerImplTests.cs",
+     "ranges": [
+      [
+       294,
+       295
+      ],
+      [
+       308,
+       308
+      ],
+      [
+       360,
+       361
+      ],
+      [
+       366,
+       366
+      ],
+      [
+       370,
+       370
+      ],
+      [
+       408,
+       409
+      ],
+      [
+       419,
+       419
+      ],
+      [
+       493,
+       545
+      ],
+      [
+       579,
+       581
+      ],
+      [
+       589,
+       590
+      ],
+      [
+       594,
+       594
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3915,
+   "case": {
+    "id": "polly-65983195e7",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "65983195e7b26d182f4be8a3ad5ee3c29fbea28a",
+    "parent": "58a53a849455d814fb60dd8178fa30b3f4686b86",
+    "files": [
+     "src/LegacySupport/DynamicallyAccessedMembersAttribute.cs",
+     "src/Polly/Caching/CacheTResultSyntax.cs",
+     "src/Polly/Fallback/AsyncFallbackPolicy.cs",
+     "src/Snippets/Docs/Fallback.cs"
+    ],
+    "eligibleFiles": 26
+   },
+   "changed": [
+    {
+     "file": "src/LegacySupport/DynamicallyAccessedMembersAttribute.cs",
+     "ranges": [
+      [
+       17,
+       17
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Caching/CacheTResultSyntax.cs",
+     "ranges": [
+      [
+       25,
+       25
+      ],
+      [
+       48,
+       48
+      ],
+      [
+       77,
+       77
+      ],
+      [
+       111,
+       111
+      ],
+      [
+       135,
+       135
+      ],
+      [
+       160,
+       160
+      ],
+      [
+       196,
+       196
+      ],
+      [
+       233,
+       233
+      ],
+      [
+       277,
+       277
+      ],
+      [
+       322,
+       322
+      ],
+      [
+       361,
+       361
+      ],
+      [
+       401,
+       401
+      ],
+      [
+       417,
+       417
+      ],
+      [
+       433,
+       433
+      ],
+      [
+       449,
+       449
+      ],
+      [
+       476,
+       476
+      ],
+      [
+       507,
+       507
+      ],
+      [
+       556,
+       556
+      ],
+      [
+       577,
+       577
+      ],
+      [
+       631,
+       631
+      ],
+      [
+       662,
+       662
+      ],
+      [
+       692,
+       692
+      ],
+      [
+       730,
+       730
+      ],
+      [
+       778,
+       778
+      ],
+      [
+       826,
+       826
+      ],
+      [
+       867,
+       867
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly/Fallback/AsyncFallbackPolicy.cs",
+     "ranges": [
+      [
+       28,
+       28
+      ]
+     ]
+    },
+    {
+     "file": "src/Snippets/Docs/Fallback.cs",
+     "ranges": [
+      [
+       122,
+       122
+      ],
+      [
+       176,
+       176
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2895,
+   "case": {
+    "id": "polly-8ba1e3ba29",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "8ba1e3ba295542cbc937d0555fadfa0d23b5c568",
+    "parent": "452b34ee1e3a45ccce156a6980f60901a623ee67",
+    "files": [
+     "test/Polly.RateLimiting.Tests/RateLimiterResiliencePipelineBuilderExtensionsTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Polly.RateLimiting.Tests/RateLimiterResiliencePipelineBuilderExtensionsTests.cs",
+     "ranges": [
+      [
+       163,
+       224
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3914,
+   "case": {
+    "id": "polly-6d5fcd6160",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "6d5fcd6160f5b4a2291075131ef4e485d1dacdec",
+    "parent": "b7321afd6862fcafae818ecb44df60231999999a",
+    "files": [
+     "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs",
+     "test/Polly.Core.Tests/CircuitBreaker/OnCircuitClosedArgumentsTests.cs",
+     "test/Polly.Core.Tests/Simmy/Latency/LatencyGeneratorArgumentsTests.cs",
+     "test/Polly.Specs/Bulkhead/BulkheadSpecsBase.cs"
+    ],
+    "eligibleFiles": 122
+   },
+   "changed": [
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/Controller/ScheduledTaskExecutorTests.cs",
+     "ranges": [
+      [
+       7,
+       7
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/CircuitBreaker/OnCircuitClosedArgumentsTests.cs",
+     "ranges": [
+      [
+       11,
+       11
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Core.Tests/Simmy/Latency/LatencyGeneratorArgumentsTests.cs",
+     "ranges": [
+      [
+       11,
+       11
+      ]
+     ]
+    },
+    {
+     "file": "test/Polly.Specs/Bulkhead/BulkheadSpecsBase.cs",
+     "ranges": [
+      [
+       19,
+       19
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3924,
+   "case": {
+    "id": "polly-708b02b0a6",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "708b02b0a6e4721103f6115c7fcc38acbef05103",
+    "parent": "651508bfced1c365b8dd047e62657aac7e64df20",
+    "files": [
+     "src/Polly.Core/ResiliencePipeline.AsyncT.cs",
+     "src/Polly.Core/ResiliencePipelineT.Async.cs",
+     "src/Snippets/Docs/CircuitBreaker.cs",
+     "src/Snippets/Docs/Fallback.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/ResiliencePipeline.AsyncT.cs",
+     "ranges": [
+      [
+       19,
+       23
+      ]
+     ]
+    },
+    {
+     "file": "src/Polly.Core/ResiliencePipelineT.Async.cs",
+     "ranges": [
+      [
+       80,
+       84
+      ]
+     ]
+    },
+    {
+     "file": "src/Snippets/Docs/CircuitBreaker.cs",
+     "ranges": [
+      [
+       273,
+       273
+      ],
+      [
+       282,
+       297
+      ]
+     ]
+    },
+    {
+     "file": "src/Snippets/Docs/Fallback.cs",
+     "ranges": [
+      [
+       121,
+       121
+      ],
+      [
+       123,
+       123
+      ],
+      [
+       125,
+       136
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1283,
+   "case": {
+    "id": "polly-651508bfce",
+    "repo": "polly",
+    "language": "csharp",
+    "commit": "651508bfced1c365b8dd047e62657aac7e64df20",
+    "parent": "015914566660f8a92ae7a200f6349d533ad7c8b9",
+    "files": [
+     "src/Polly.Core/CircuitBreaker/Controller/CircuitStateController.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Polly.Core/CircuitBreaker/Controller/CircuitStateController.cs",
+     "ranges": [
+      [
+       165,
+       166
+      ],
+      [
+       248,
+       248
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3691,
+   "case": {
+    "id": "serilog-005a659010",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "005a659010598f0ceb172b5e3d0cd14910874862",
+    "parent": "81af75f3a5e28ec9f5be18ef74357a9914a51745",
+    "files": [
+     "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+     "src/Serilog/Debugging/SelfMetrics.cs",
+     "test/Serilog.Tests/Core/BatchingSinkMetricsTests.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+     "ranges": [
+      [
+       15,
+       15
+      ],
+      [
+       140,
+       140
+      ],
+      [
+       191,
+       191
+      ],
+      [
+       203,
+       238
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Debugging/SelfMetrics.cs",
+     "ranges": [
+      [
+       12,
+       13
+      ],
+      [
+       29,
+       33
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/BatchingSinkMetricsTests.cs",
+     "ranges": [
+      [
+       1,
+       119
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3271,
+   "case": {
+    "id": "serilog-bebc771900",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "bebc7719004f76187ae72e64ce138ec2540f2070",
+    "parent": "49b5339ce85385dc52d4d8e8f2b8308becf23506",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       153,
+       157
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs",
+     "ranges": [
+      [
+       382,
+       388
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 865,
+   "case": {
+    "id": "serilog-6d9fc0b84e",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "6d9fc0b84e004418f2677b5961b9c8970349d0be",
+    "parent": "561271a8a53b6549db175ada0cd5bda16e11874c",
+    "files": [
+     "src/Serilog/Core/Logger.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Core/Logger.cs",
+     "ranges": [
+      [
+       429,
+       430
+      ],
+      [
+       445,
+       446
+      ],
+      [
+       458,
+       459
+      ],
+      [
+       468,
+       471
+      ],
+      [
+       474,
+       474
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 810,
+   "case": {
+    "id": "serilog-bd7c3b3c8f",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "bd7c3b3c8f2275276c09a9bfa929d2c0691f450f",
+    "parent": "2ef63645cf0d0edd4b187510b238754249c4348f",
+    "files": [
+     "src/Serilog/Core/Logger.cs",
+     "src/Serilog/Debugging/SelfLog.cs",
+     "src/Serilog/Debugging/SelfMetrics.cs",
+     "src/Serilog/LoggerConfiguration.cs"
+    ],
+    "eligibleFiles": 4
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Core/Logger.cs",
+     "ranges": [
+      [
+       482,
+       483
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Debugging/SelfLog.cs",
+     "ranges": [
+      [
+       15,
+       16
+      ],
+      [
+       80,
+       81
+      ],
+      [
+       88,
+       96
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Debugging/SelfMetrics.cs",
+     "ranges": [
+      [
+       1,
+       36
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/LoggerConfiguration.cs",
+     "ranges": [
+      [
+       211,
+       212
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 883,
+   "case": {
+    "id": "serilog-2ef63645cf",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "2ef63645cf0d0edd4b187510b238754249c4348f",
+    "parent": "c53eb147ceafe5b88cc57f95f78e8116b86cf620",
+    "files": [
+     "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "src/Serilog/Core/Sinks/RestrictedSink.cs",
+     "test/Serilog.Tests/Core/FailureListenerTests.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "ranges": [
+      [
+       77,
+       81
+      ],
+      [
+       85,
+       89
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Core/Sinks/RestrictedSink.cs",
+     "ranges": [
+      [
+       17,
+       17
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/FailureListenerTests.cs",
+     "ranges": []
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3392,
+   "case": {
+    "id": "serilog-c53eb147ce",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "c53eb147ceafe5b88cc57f95f78e8116b86cf620",
+    "parent": "63f1da33b80672e69d067acf32405b62eaedb110",
+    "files": [
+     "src/Serilog/Core/Sinks/RestrictedSink.cs",
+     "test/Serilog.Tests/Core/FailureListenerTests.cs",
+     "test/Serilog.Tests/Support/ListenerTrackingSink.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Core/Sinks/RestrictedSink.cs",
+     "ranges": [
+      [
+       17,
+       17
+      ],
+      [
+       41,
+       48
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/FailureListenerTests.cs",
+     "ranges": [
+      [
+       30,
+       75
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Support/ListenerTrackingSink.cs",
+     "ranges": [
+      [
+       1,
+       13
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1132,
+   "case": {
+    "id": "serilog-6c3fbcf636",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "6c3fbcf636b0671bbd6f5032b61a2254937d8408",
+    "parent": "60935b4d7abad71cf6157b45a10f5c3c65ead527",
+    "files": [
+     "src/Serilog/Formatting/Json/JsonValueFormatter.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Formatting/Json/JsonValueFormatter.cs",
+     "ranges": [
+      [
+       145,
+       145
+      ],
+      [
+       147,
+       157
+      ],
+      [
+       160,
+       160
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3366,
+   "case": {
+    "id": "serilog-60935b4d7a",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "60935b4d7abad71cf6157b45a10f5c3c65ead527",
+    "parent": "0597ddfbd4ec594d9c42edd745fe728a2198bad9",
+    "files": [
+     "src/Serilog/Capturing/PropertyBinder.cs",
+     "test/Serilog.Tests/Core/LogEventPropertyCapturingTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyBinder.cs",
+     "ranges": [
+      [
+       102,
+       105
+      ],
+      [
+       107,
+       107
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/LogEventPropertyCapturingTests.cs",
+     "ranges": [
+      [
+       144,
+       172
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3236,
+   "case": {
+    "id": "serilog-dc529798b0",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "dc529798b07de14d74393f33e388a51be9c610b2",
+    "parent": "ab020cc48186e36c8f8d989be1bb88f841ba43a8",
+    "files": [
+     "src/Serilog/Formatting/Json/JsonFormatter.cs",
+     "test/Serilog.Tests/Formatting/Json/JsonFormatterTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Formatting/Json/JsonFormatter.cs",
+     "ranges": [
+      [
+       77,
+       79
+      ],
+      [
+       85,
+       87
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Formatting/Json/JsonFormatterTests.cs",
+     "ranges": [
+      [
+       320,
+       377
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1057,
+   "case": {
+    "id": "serilog-1f36d2ebf9",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "1f36d2ebf99a4272e8660c9a8087e7e78b55a42d",
+    "parent": "2fd949edc849f2b1e82e26eba78e2d650d5a592b",
+    "files": [
+     "src/Serilog/Configuration/BatchingOptions.cs",
+     "src/Serilog/Configuration/LoggerSinkConfiguration.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Configuration/BatchingOptions.cs",
+     "ranges": [
+      [
+       45,
+       45
+      ],
+      [
+       51,
+       51
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "ranges": [
+      [
+       110,
+       110
+      ],
+      [
+       134,
+       134
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 790,
+   "case": {
+    "id": "serilog-2fd949edc8",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "2fd949edc849f2b1e82e26eba78e2d650d5a592b",
+    "parent": "078de1e9fb493e08875ffd65f03633b87ab2ebfa",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       261,
+       261
+      ],
+      [
+       271,
+       271
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 750,
+   "case": {
+    "id": "serilog-078de1e9fb",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "078de1e9fb493e08875ffd65f03633b87ab2ebfa",
+    "parent": "e378f333b555c42f8530bb8d1ef1b8dfb8740d83",
+    "files": [
+     "src/Serilog/Formatting/Display/MessageTemplateTextFormatter.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Formatting/Display/MessageTemplateTextFormatter.cs",
+     "ranges": [
+      [
+       88,
+       105
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 759,
+   "case": {
+    "id": "serilog-e8de3480ce",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "e8de3480ce935f2efd4ccf9907a7f03465586168",
+    "parent": "cd6420aeafcdedd3790da1a03a419e389f0faa64",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "src/Serilog/Capturing/TrimConfiguration.cs",
+     "src/Serilog/Settings/KeyValuePairs/SettingValueConversions.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       356,
+       356
+      ],
+      [
+       362,
+       362
+      ],
+      [
+       364,
+       374
+      ],
+      [
+       376,
+       376
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Capturing/TrimConfiguration.cs",
+     "ranges": [
+      [
+       7,
+       7
+      ],
+      [
+       12,
+       13
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Settings/KeyValuePairs/SettingValueConversions.cs",
+     "ranges": [
+      [
+       30,
+       31
+      ],
+      [
+       33,
+       33
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3139,
+   "case": {
+    "id": "serilog-cd6420aeaf",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "cd6420aeafcdedd3790da1a03a419e389f0faa64",
+    "parent": "84cb7a65d823655e09374babfa0704eacfad3171",
+    "files": [
+     "src/Serilog/Context/LogContext.cs",
+     "test/Serilog.Tests/Context/LogContextTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Context/LogContext.cs",
+     "ranges": [
+      [
+       69,
+       69
+      ],
+      [
+       92,
+       92
+      ],
+      [
+       94,
+       136
+      ],
+      [
+       143,
+       146
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Context/LogContextTests.cs",
+     "ranges": [
+      [
+       5,
+       61
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3767,
+   "case": {
+    "id": "serilog-e4e0b025db",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "e4e0b025db0b55f22b25a773b99fb7021956596d",
+    "parent": "ed87d30aead032163720b700c212e891212cf3e7",
+    "files": [
+     "src/Serilog/Events/LogEvent.cs",
+     "test/Serilog.Tests/Configuration/LoggerConfigurationTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Events/LogEvent.cs",
+     "ranges": [
+      [
+       207,
+       217
+      ],
+      [
+       219,
+       220
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Configuration/LoggerConfigurationTests.cs",
+     "ranges": [
+      [
+       256,
+       273
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3783,
+   "case": {
+    "id": "serilog-0e316b7cb0",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "0e316b7cb072ee660b97976098b1bbdb20ac6da0",
+    "parent": "6b5412f4ddd572435a768f50ec4e9d7c114a6487",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "test/Serilog.Tests/Core/LoggerTests.cs",
+     "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       86,
+       86
+      ],
+      [
+       102,
+       102
+      ],
+      [
+       105,
+       105
+      ],
+      [
+       107,
+       107
+      ],
+      [
+       109,
+       109
+      ],
+      [
+       111,
+       129
+      ],
+      [
+       131,
+       131
+      ],
+      [
+       181,
+       181
+      ],
+      [
+       189,
+       189
+      ],
+      [
+       199,
+       199
+      ],
+      [
+       212,
+       212
+      ],
+      [
+       217,
+       242
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/LoggerTests.cs",
+     "ranges": [
+      [
+       326,
+       326
+      ],
+      [
+       342,
+       342
+      ],
+      [
+       358,
+       358
+      ],
+      [
+       422,
+       422
+      ],
+      [
+       424,
+       426
+      ],
+      [
+       461,
+       461
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs",
+     "ranges": [
+      [
+       110,
+       110
+      ],
+      [
+       112,
+       112
+      ],
+      [
+       123,
+       138
+      ],
+      [
+       144,
+       144
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3927,
+   "case": {
+    "id": "serilog-c939328ba3",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "c939328ba3969ab53d9bb0660d07652735d45560",
+    "parent": "49c84a49662aeb8629b0f25b77d1f92b4f27292c",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "src/Serilog/Core/Logger.cs",
+     "src/Serilog/Settings/KeyValuePairs/SettingValueConversions.cs",
+     "test/Serilog.Tests/Formatting/Json/JsonFormatterTests.cs"
+    ],
+    "eligibleFiles": 4
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       166,
+       167
+      ],
+      [
+       170,
+       170
+      ],
+      [
+       213,
+       213
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Core/Logger.cs",
+     "ranges": [
+      [
+       437,
+       437
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Settings/KeyValuePairs/SettingValueConversions.cs",
+     "ranges": [
+      [
+       30,
+       32
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Formatting/Json/JsonFormatterTests.cs",
+     "ranges": [
+      [
+       36,
+       36
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 913,
+   "case": {
+    "id": "serilog-49c84a4966",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "49c84a49662aeb8629b0f25b77d1f92b4f27292c",
+    "parent": "abf32a11f10ab558cd1a04f96fe8cc7cef16112e",
+    "files": [
+     "src/Serilog/Core/ILogEventSink.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Core/ILogEventSink.cs",
+     "ranges": [
+      [
+       29,
+       29
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3942,
+   "case": {
+    "id": "serilog-abf32a11f1",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "abf32a11f10ab558cd1a04f96fe8cc7cef16112e",
+    "parent": "29137db8fbc93f0ac5185f36b592fb0eb7fb4d71",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "test/Serilog.Tests/Core/LoggerTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       209,
+       209
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/LoggerTests.cs",
+     "ranges": [
+      [
+       322,
+       322
+      ],
+      [
+       330,
+       330
+      ],
+      [
+       338,
+       338
+      ],
+      [
+       346,
+       346
+      ],
+      [
+       354,
+       354
+      ],
+      [
+       384,
+       384
+      ],
+      [
+       392,
+       392
+      ],
+      [
+       413,
+       413
+      ],
+      [
+       452,
+       452
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3445,
+   "case": {
+    "id": "serilog-29137db8fb",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "29137db8fbc93f0ac5185f36b592fb0eb7fb4d71",
+    "parent": "148e53c90d0eee9068aeda8cc93414d91a98bcfd",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "test/Serilog.Tests/Core/LoggerTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       209,
+       214
+      ],
+      [
+       225,
+       225
+      ],
+      [
+       227,
+       228
+      ],
+      [
+       256,
+       292
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/LoggerTests.cs",
+     "ranges": [
+      [
+       354,
+       354
+      ],
+      [
+       358,
+       380
+      ],
+      [
+       385,
+       486
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3527,
+   "case": {
+    "id": "serilog-148e53c90d",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "148e53c90d0eee9068aeda8cc93414d91a98bcfd",
+    "parent": "6e6507c4f05acb2a1249444cf7bcda7d31524096",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "test/Serilog.Tests/Core/LoggerTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       219,
+       219
+      ],
+      [
+       222,
+       228
+      ],
+      [
+       232,
+       243
+      ],
+      [
+       249,
+       249
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/LoggerTests.cs",
+     "ranges": [
+      [
+       330,
+       333
+      ],
+      [
+       346,
+       349
+      ],
+      [
+       363,
+       365
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3338,
+   "case": {
+    "id": "serilog-6e6507c4f0",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "6e6507c4f05acb2a1249444cf7bcda7d31524096",
+    "parent": "7af255d20db3128648dd93d299eae50346b15edb",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "test/Serilog.Tests/Core/LoggerTests.cs",
+     "test/Serilog.Tests/Support/Extensions.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       217,
+       239
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/LoggerTests.cs",
+     "ranges": [
+      [
+       1,
+       1
+      ],
+      [
+       321,
+       368
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Support/Extensions.cs",
+     "ranges": [
+      [
+       7,
+       12
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 739,
+   "case": {
+    "id": "serilog-7af255d20d",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "7af255d20db3128648dd93d299eae50346b15edb",
+    "parent": "12c24a538dd4f570fb8fc03e5e6161e317baf71f",
+    "files": [
+     "src/Serilog/Core/Pipeline/ByReferenceStringComparer.cs",
+     "src/Serilog/Rendering/ReusableStringWriter.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Core/Pipeline/ByReferenceStringComparer.cs",
+     "ranges": [
+      [
+       42,
+       42
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Rendering/ReusableStringWriter.cs",
+     "ranges": [
+      [
+       12,
+       12
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2417,
+   "case": {
+    "id": "serilog-46a3b308c9",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "46a3b308c9dcee98af98022668c254c0ff8e7136",
+    "parent": "fe40d195850e4ff626e0e1e42547ce0a7e991b9c",
+    "files": [
+     "test/Serilog.Tests/VersioningTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/VersioningTests.cs",
+     "ranges": [
+      [
+       20,
+       26
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3104,
+   "case": {
+    "id": "serilog-fe40d19585",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "fe40d195850e4ff626e0e1e42547ce0a7e991b9c",
+    "parent": "3da09792b5fd3854c687e4eec305d1cae75f0db1",
+    "files": [
+     "src/Serilog/Configuration/BatchingOptions.cs",
+     "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+     "test/Serilog.Tests/Core/FailureAwareBatchSchedulerTests.cs",
+     "test/Serilog.Tests/Support/TestTimeProvider.cs"
+    ],
+    "eligibleFiles": 6
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Configuration/BatchingOptions.cs",
+     "ranges": [
+      [
+       48,
+       53
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Core/Sinks/Batching/BatchingSink.cs",
+     "ranges": [
+      [
+       65,
+       67
+      ],
+      [
+       74,
+       74
+      ],
+      [
+       148,
+       148
+      ],
+      [
+       150,
+       150
+      ],
+      [
+       156,
+       156
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Core/FailureAwareBatchSchedulerTests.cs",
+     "ranges": [
+      [
+       7,
+       14
+      ],
+      [
+       19,
+       19
+      ],
+      [
+       25,
+       26
+      ],
+      [
+       32,
+       34
+      ],
+      [
+       40,
+       43
+      ],
+      [
+       49,
+       53
+      ],
+      [
+       57,
+       57
+      ],
+      [
+       61,
+       63
+      ],
+      [
+       66,
+       67
+      ],
+      [
+       69,
+       70
+      ],
+      [
+       74,
+       74
+      ],
+      [
+       76,
+       79
+      ],
+      [
+       81,
+       84
+      ],
+      [
+       86,
+       86
+      ],
+      [
+       88,
+       89
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Support/TestTimeProvider.cs",
+     "ranges": [
+      [
+       1,
+       23
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 769,
+   "case": {
+    "id": "serilog-3da09792b5",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "3da09792b5fd3854c687e4eec305d1cae75f0db1",
+    "parent": "4dca2aee3d8eabc1bab62616904488990d177894",
+    "files": [
+     "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "src/Serilog/Core/LoggingFailureKind.cs",
+     "src/Serilog/Core/Sinks/OptionalInterfaceForwardingSink.cs",
+     "src/Serilog/Debugging/SelfLog.cs"
+    ],
+    "eligibleFiles": 13
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Configuration/LoggerSinkConfiguration.cs",
+     "ranges": [
+      [
+       241,
+       242
+      ],
+      [
+       253,
+       312
+      ],
+      [
+       325,
+       327
+      ],
+      [
+       349,
+       350
+      ],
+      [
+       361,
+       361
+      ],
+      [
+       363,
+       363
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Core/LoggingFailureKind.cs",
+     "ranges": [
+      [
+       1,
+       35
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Core/Sinks/OptionalInterfaceForwardingSink.cs",
+     "ranges": [
+      [
+       1,
+       93
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Debugging/SelfLog.cs",
+     "ranges": [
+      [
+       1,
+       1
+      ],
+      [
+       77,
+       85
+      ],
+      [
+       87,
+       96
+      ],
+      [
+       98,
+       103
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2360,
+   "case": {
+    "id": "serilog-3aa295bcf9",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "3aa295bcf9f0acbd8f8140d225d9f86b1231586e",
+    "parent": "6e5a82ca9d3e19a106e91f6e02c7aec5e2bf5a63",
+    "files": [
+     "test/Serilog.Tests/Core/BatchingSinkTests.cs",
+     "test/Serilog.Tests/Support/InMemoryBatchedSink.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/Core/BatchingSinkTests.cs",
+     "ranges": [
+      [
+       18,
+       20
+      ],
+      [
+       38,
+       40
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Support/InMemoryBatchedSink.cs",
+     "ranges": [
+      [
+       9,
+       9
+      ],
+      [
+       11,
+       54
+      ],
+      [
+       60,
+       60
+      ],
+      [
+       68,
+       68
+      ],
+      [
+       72,
+       72
+      ],
+      [
+       75,
+       75
+      ],
+      [
+       86,
+       86
+      ],
+      [
+       94,
+       94
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2408,
+   "case": {
+    "id": "serilog-6e5a82ca9d",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "6e5a82ca9d3e19a106e91f6e02c7aec5e2bf5a63",
+    "parent": "b5085aae221387bfcea93a82936ada87f421ac24",
+    "files": [
+     "test/Serilog.Tests/LogTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/LogTests.cs",
+     "ranges": [
+      [
+       46,
+       46
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3050,
+   "case": {
+    "id": "serilog-b5085aae22",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "b5085aae221387bfcea93a82936ada87f421ac24",
+    "parent": "68881e15fde7f977ff472fff61f042ad47c5b098",
+    "files": [
+     "src/Serilog/Log.cs",
+     "test/Serilog.Tests/LogTests.cs",
+     "test/Serilog.Tests/Support/DisposableLogger.cs",
+     "test/Serilog.Tests/Support/SyncDisposableLogger.cs"
+    ],
+    "eligibleFiles": 4
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Log.cs",
+     "ranges": [
+      [
+       62,
+       62
+      ],
+      [
+       66,
+       73
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/LogTests.cs",
+     "ranges": [
+      [
+       42,
+       50
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Support/DisposableLogger.cs",
+     "ranges": []
+    },
+    {
+     "file": "test/Serilog.Tests/Support/SyncDisposableLogger.cs",
+     "ranges": [
+      [
+       1,
+       19
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3277,
+   "case": {
+    "id": "serilog-68881e15fd",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "68881e15fde7f977ff472fff61f042ad47c5b098",
+    "parent": "3f6d855a9a3b3cfab8f756b739d8120f9f398e04",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "test/Serilog.Tests/Capturing/PropertyValueConverterTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       400,
+       400
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Capturing/PropertyValueConverterTests.cs",
+     "ranges": [
+      [
+       491,
+       504
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 758,
+   "case": {
+    "id": "serilog-3f6d855a9a",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "3f6d855a9a3b3cfab8f756b739d8120f9f398e04",
+    "parent": "9f6b814823777d45d1622519494cccfc37060c7c",
+    "files": [
+     "src/Serilog/Rendering/ReusableStringWriter.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Rendering/ReusableStringWriter.cs",
+     "ranges": [
+      [
+       6,
+       6
+      ],
+      [
+       55,
+       55
+      ],
+      [
+       59,
+       70
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2349,
+   "case": {
+    "id": "serilog-9f6b814823",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "9f6b814823777d45d1622519494cccfc37060c7c",
+    "parent": "64fccfab5b46ad5cbe397f7debf4307a02e3a522",
+    "files": [
+     "test/Serilog.Tests/Formatting/Display/MessageTemplateTextFormatterTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/Formatting/Display/MessageTemplateTextFormatterTests.cs",
+     "ranges": [
+      [
+       51,
+       63
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 909,
+   "case": {
+    "id": "serilog-64fccfab5b",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "64fccfab5b46ad5cbe397f7debf4307a02e3a522",
+    "parent": "8c82a50711fb20c6e31ffd60b585359aeb9336ed",
+    "files": [
+     "src/Serilog/Events/ScalarValue.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Events/ScalarValue.cs",
+     "ranges": [
+      [
+       98,
+       134
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3915,
+   "case": {
+    "id": "serilog-5844a9f6fa",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "5844a9f6fa3fca56dab8175700ec5128cb3cbd4a",
+    "parent": "2fb5f4d5afc54fe6edfcf0d9f440ba8a56d6dc58",
+    "files": [
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "src/Serilog/Events/StructureValue.cs",
+     "test/Serilog.PerformanceTests/BindingBenchmark.cs",
+     "test/Serilog.Tests/Capturing/PropertyValueConverterTests.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       316,
+       316
+      ],
+      [
+       318,
+       319
+      ],
+      [
+       321,
+       322
+      ],
+      [
+       380,
+       382
+      ],
+      [
+       384,
+       385
+      ],
+      [
+       387,
+       417
+      ],
+      [
+       421,
+       421
+      ],
+      [
+       427,
+       427
+      ],
+      [
+       432,
+       432
+      ],
+      [
+       441,
+       441
+      ],
+      [
+       448,
+       450
+      ],
+      [
+       452,
+       457
+      ],
+      [
+       461,
+       461
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Events/StructureValue.cs",
+     "ranges": [
+      [
+       39,
+       44
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.PerformanceTests/BindingBenchmark.cs",
+     "ranges": [
+      [
+       26,
+       27
+      ],
+      [
+       30,
+       42
+      ],
+      [
+       51,
+       51
+      ],
+      [
+       54,
+       54
+      ],
+      [
+       80,
+       86
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Capturing/PropertyValueConverterTests.cs",
+     "ranges": [
+      [
+       4,
+       4
+      ],
+      [
+       10,
+       10
+      ],
+      [
+       15,
+       15
+      ],
+      [
+       407,
+       490
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3022,
+   "case": {
+    "id": "serilog-2fb5f4d5af",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "2fb5f4d5afc54fe6edfcf0d9f440ba8a56d6dc58",
+    "parent": "d98f7fa2cf62dc11bea74a0791797f2b406e42f2",
+    "files": [
+     "src/Serilog/Capturing/GettablePropertyFinder.cs",
+     "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "test/Serilog.Tests/Capturing/GettablePropertyFinderTests.cs"
+    ],
+    "eligibleFiles": 3
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/GettablePropertyFinder.cs",
+     "ranges": [
+      [
+       1,
+       45
+      ]
+     ]
+    },
+    {
+     "file": "src/Serilog/Capturing/PropertyValueConverter.cs",
+     "ranges": [
+      [
+       166,
+       167
+      ],
+      [
+       252,
+       252
+      ],
+      [
+       310,
+       310
+      ],
+      [
+       314,
+       314
+      ],
+      [
+       316,
+       317
+      ],
+      [
+       320,
+       320
+      ],
+      [
+       333,
+       333
+      ],
+      [
+       352,
+       352
+      ],
+      [
+       356,
+       356
+      ],
+      [
+       366,
+       366
+      ],
+      [
+       385,
+       385
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Capturing/GettablePropertyFinderTests.cs",
+     "ranges": [
+      [
+       8,
+       8
+      ],
+      [
+       15,
+       15
+      ],
+      [
+       22,
+       22
+      ],
+      [
+       29,
+       29
+      ],
+      [
+       36,
+       36
+      ],
+      [
+       50,
+       50
+      ],
+      [
+       63,
+       63
+      ],
+      [
+       77,
+       77
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2370,
+   "case": {
+    "id": "serilog-d98f7fa2cf",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "d98f7fa2cf62dc11bea74a0791797f2b406e42f2",
+    "parent": "fdf4a4872b4effd02dcd7d788e45b6b8ffdfa2fc",
+    "files": [
+     "test/Serilog.Tests/MethodOverloadConventionTests.cs",
+     "test/Serilog.Tests/VersioningTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/MethodOverloadConventionTests.cs",
+     "ranges": [
+      [
+       38,
+       38
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/VersioningTests.cs",
+     "ranges": [
+      [
+       1,
+       20
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2361,
+   "case": {
+    "id": "serilog-e96347593e",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "e96347593ee6218e8d34c698a90ab6ff7555a394",
+    "parent": "5e18faff0392a8e17367582f18db2a6888c608b8",
+    "files": [
+     "test/Serilog.Tests/Core/BatchingSinkTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/Core/BatchingSinkTests.cs",
+     "ranges": [
+      [
+       7,
+       7
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2398,
+   "case": {
+    "id": "serilog-5e18faff03",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "5e18faff0392a8e17367582f18db2a6888c608b8",
+    "parent": "9fcf795c9a9d7acf4d819a90d90c63ab06a7e80b",
+    "files": [
+     "test/Serilog.Tests/Capturing/PropertyValueConverterTests.cs",
+     "test/Serilog.Tests/Formatting/Json/JsonValueFormatterTests.cs",
+     "test/Serilog.Tests/Rendering/MessageTemplateRendererTests.cs",
+     "test/Serilog.Tests/Settings/SettingValueConversionsTests.cs"
+    ],
+    "eligibleFiles": 5
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/Capturing/PropertyValueConverterTests.cs",
+     "ranges": [
+      [
+       147,
+       147
+      ],
+      [
+       156,
+       156
+      ],
+      [
+       315,
+       315
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Formatting/Json/JsonValueFormatterTests.cs",
+     "ranges": [
+      [
+       7,
+       7
+      ],
+      [
+       35,
+       35
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Rendering/MessageTemplateRendererTests.cs",
+     "ranges": [
+      [
+       12,
+       12
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Settings/SettingValueConversionsTests.cs",
+     "ranges": [
+      [
+       140,
+       140
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 758,
+   "case": {
+    "id": "serilog-9fcf795c9a",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "9fcf795c9a9d7acf4d819a90d90c63ab06a7e80b",
+    "parent": "4ef3a8772c2dee065a5c6d5ac951f405b6c7ced4",
+    "files": [
+     "src/Serilog/Capturing/TrimConfiguration.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Capturing/TrimConfiguration.cs",
+     "ranges": [
+      [
+       1,
+       14
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 706,
+   "case": {
+    "id": "serilog-4ef3a8772c",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "4ef3a8772c2dee065a5c6d5ac951f405b6c7ced4",
+    "parent": "9d3a088993109a3dd638498649a3add6d9e1d411",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       231,
+       231
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 734,
+   "case": {
+    "id": "serilog-9d3a088993",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "9d3a088993109a3dd638498649a3add6d9e1d411",
+    "parent": "920b8c87eff7ae6ae19ea48b6cc2168da0976017",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       231,
+       231
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": "timeout"
+    },
+    "findings": [],
+    "timedOut": true
+   },
+   "complete": true,
+   "checked": false,
+   "timedOut": true,
+   "errors": [
+    "type timeout"
+   ],
+   "ms": 3946,
+   "case": {
+    "id": "serilog-920b8c87ef",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "920b8c87eff7ae6ae19ea48b6cc2168da0976017",
+    "parent": "e1a00477a487010aafb2cdfbac82426147e1a305",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       233,
+       234
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs",
+     "ranges": [
+      [
+       246,
+       246
+      ],
+      [
+       249,
+       261
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1386,
+   "case": {
+    "id": "serilog-e1a00477a4",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "e1a00477a487010aafb2cdfbac82426147e1a305",
+    "parent": "921eccc03bfbdd84d7c1ed748d47094c5ad267e4",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       292,
+       292
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3206,
+   "case": {
+    "id": "serilog-921eccc03b",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "921eccc03bfbdd84d7c1ed748d47094c5ad267e4",
+    "parent": "592a1245ff325e5c90962d13154c1a43a6685ad6",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       24,
+       24
+      ],
+      [
+       26,
+       26
+      ],
+      [
+       30,
+       30
+      ],
+      [
+       36,
+       36
+      ],
+      [
+       40,
+       40
+      ],
+      [
+       42,
+       42
+      ],
+      [
+       213,
+       213
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs",
+     "ranges": [
+      [
+       110,
+       116
+      ],
+      [
+       119,
+       119
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 2376,
+   "case": {
+    "id": "serilog-592a1245ff",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "592a1245ff325e5c90962d13154c1a43a6685ad6",
+    "parent": "c8d5cd84fe48e52b6865680ca1352e234c491af8",
+    "files": [
+     "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs",
+     "ranges": [
+      [
+       111,
+       111
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 1493,
+   "case": {
+    "id": "serilog-c8d5cd84fe",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "c8d5cd84fe48e52b6865680ca1352e234c491af8",
+    "parent": "2d2e614253c59865bf767c4a6b22ea1f85b3af9f",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "test/Serilog.PerformanceTests/MessageTemplateParsingBenchmark.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": []
+    },
+    {
+     "file": "test/Serilog.PerformanceTests/MessageTemplateParsingBenchmark.cs",
+     "ranges": [
+      [
+       9,
+       9
+      ],
+      [
+       20,
+       26
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 743,
+   "case": {
+    "id": "serilog-2d2e614253",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "2d2e614253c59865bf767c4a6b22ea1f85b3af9f",
+    "parent": "fa723deb47cd22de43bf2298344092bdf822216a",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       95,
+       96
+      ],
+      [
+       98,
+       99
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3144,
+   "case": {
+    "id": "serilog-fa723deb47",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "fa723deb47cd22de43bf2298344092bdf822216a",
+    "parent": "d0a033b87db54485d0ff42da889304cbcef52389",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       255,
+       262
+      ],
+      [
+       264,
+       307
+      ],
+      [
+       309,
+       309
+      ],
+      [
+       311,
+       312
+      ],
+      [
+       316,
+       317
+      ],
+      [
+       322,
+       323
+      ],
+      [
+       325,
+       325
+      ],
+      [
+       327,
+       327
+      ],
+      [
+       331,
+       331
+      ],
+      [
+       333,
+       333
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs",
+     "ranges": [
+      [
+       17,
+       18
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 3125,
+   "case": {
+    "id": "serilog-d0a033b87d",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "d0a033b87db54485d0ff42da889304cbcef52389",
+    "parent": "2d3e208951db13735400fedb53a98a4ff783ef28",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs"
+    ],
+    "eligibleFiles": 2
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       23,
+       44
+      ],
+      [
+       61,
+       61
+      ],
+      [
+       65,
+       65
+      ],
+      [
+       90,
+       90
+      ],
+      [
+       211,
+       211
+      ],
+      [
+       219,
+       222
+      ]
+     ]
+    },
+    {
+     "file": "test/Serilog.Tests/Parsing/MessageTemplateParserTests.cs",
+     "ranges": [
+      [
+       107,
+       133
+      ],
+      [
+       137,
+       137
+      ],
+      [
+       139,
+       139
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "A": [],
+   "B": [],
+   "types": {
+    "available": {
+     "typescript": false,
+     "python": false,
+     "go": false,
+     "rust": false,
+     "java": false,
+     "csharp": true
+    },
+    "findings": [],
+    "timedOut": false
+   },
+   "complete": true,
+   "checked": true,
+   "timedOut": false,
+   "errors": [],
+   "ms": 728,
+   "case": {
+    "id": "serilog-2d3e208951",
+    "repo": "serilog",
+    "language": "csharp",
+    "commit": "2d3e208951db13735400fedb53a98a4ff783ef28",
+    "parent": "3a2363671d777413b1798bfbba9321fdf4f5dcc3",
+    "files": [
+     "src/Serilog/Parsing/MessageTemplateParser.cs"
+    ],
+    "eligibleFiles": 1
+   },
+   "changed": [
+    {
+     "file": "src/Serilog/Parsing/MessageTemplateParser.cs",
+     "ranges": [
+      [
+       121,
+       121
+      ],
+      [
+       124,
+       124
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "timings": [],
+ "warmup": null,
+ "timingErrors": [],
+ "init": []
+}

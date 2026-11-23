@@ -34,7 +34,8 @@ export interface SkillEdit {
 export type Edit = JsonEdit | BlockEdit | SkillEdit;
 
 export interface AgentTarget {
-  agent: AgentName | 'groundwork';
+  /** A hook agent, 'groundwork' for the profile, or an MCP-only client from clients.ts. */
+  agent: AgentName | 'groundwork' | (string & {});
   label: string;
   edits: Edit[];
   notes: string[];
@@ -221,7 +222,7 @@ export function targetsFor(opts: TargetOptions): AgentTarget[] {
   ];
 }
 
-function onPath(bin: string): boolean {
+export function onPath(bin: string): boolean {
   try {
     execFileSync(process.platform === 'win32' ? 'where' : 'which', [bin], { stdio: 'ignore' });
     return true;

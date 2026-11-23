@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { loadConfig } from '../config/load.js';
+import { bumpCounter } from '../guards/ledger.js';
 import { log } from '../util/log.js';
 import { hookTiming, printHookTimings } from '../util/hook-timing.js';
 import { findRepoRoot } from '../util/paths.js';
@@ -95,6 +96,9 @@ export function failOpenOutput(agent: AgentName, event: HookEventName): string {
 
 export async function dispatch(ev: HookEvent, root: string): Promise<HookResult> {
   const config = loadConfig(root);
+  const started = performance.now();
+  // The session receipt reports the time GroundWork added; an edit or Stop is where that time is spent.
+  const spent = () => { if (ev.event === 'post_tool' || ev.event === 'stop') bumpCounter(root, ev.sessionId, 'hookMs', performance.now() - started); };
   const notes: string[] = [];
   let updatedInput: Record<string, unknown> | undefined;
   for (const h of HANDLERS) {
@@ -107,12 +111,13 @@ export async function dispatch(ev: HookEvent, root: string): Promise<HookResult>
       if (!r) continue;
       if (r.updatedInput) updatedInput = r.updatedInput;
       if (r.action === 'allow') continue;
-      if (r.action === 'deny') return r;
+      if (r.action === 'deny') { spent(); return r; }
       if (r.message) notes.push(r.message);
     } catch (e) {
       log(root, 'error', 'hook_handler_failed', { handler: h.name, error: (e as Error).message });
     }
   }
+  spent();
   return notes.length ? { action: 'context', message: notes.join('\n'), updatedInput } : { action: 'allow', updatedInput };
 }
 
@@ -132,6 +137,10 @@ export async function runHook(agent: AgentName, event: HookEventName, timeoutMs 
     const raw: unknown = text.trim() ? JSON.parse(text) : {};
     const ev = normalise(agent, event, raw);
     root = findRepoRoot(ev.cwd);
+    if (event === 'stop' || event === 'post_tool') {
+      const config = loadConfig(root);
+      if (config.types.enabled && (event === 'stop' ? config.types.stopGate : config.types.postToolHook)) timeoutMs = config.types.timeoutMs + 1500;
+    }
     if (ev.tool !== 'Read' && ev.event !== 'pre_compact' && !/^mcp__(?:plugin_groundwork_)?groundwork__find_code$/.test(ev.tool ?? '')) {
       const sqlStart = performance.now();
       const { initSqlBackend } = await import('../store/db.js');

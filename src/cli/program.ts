@@ -10,16 +10,27 @@ const program = new Command()
   .option('--root <dir>', 'repository root (default: git toplevel of cwd)');
 
 const groups = [
+  { names: ['architecture'], load: () => import('./commands/architecture.js') },
+  { names: ['search'], load: () => import('./commands/search.js') },
+  { names: ['impact'], load: () => import('./commands/impact.js') },
+  { names: ['types'], load: () => import('./commands/types.js') },
   { names: ['init', 'index', 'refresh', 'stats'], load: () => import('./commands/index-cmds.js') },
   { names: ['symbols', 'show'], load: () => import('./commands/query.js') },
   { names: ['doctor'], load: () => import('./commands/doctor.js') },
   { names: ['selftest'], load: () => import('./commands/selftest.js') },
   { names: ['setup'], load: () => import('./commands/setup.js') },
+  { names: ['install'], load: () => import('./commands/install.js') },
+  { names: ['update'], load: () => import('./commands/update.js') },
+  { names: ['view'], load: () => import('./commands/view.js') },
   { names: ['mcp', 'hook'], load: () => import('./commands/agent.js') },
   { names: ['run', 'report'], load: () => import('./commands/waste.js') },
   { names: ['verify'], load: () => import('./commands/verify.js') },
+  { names: ['deps'], load: () => import('./commands/deps.js') },
   { names: ['similar'], load: () => import('./commands/similar.js') },
+  { names: ['refactor'], load: () => import('./commands/refactor.js') },
   { names: ['check'], load: () => import('./commands/check.js') },
+  { names: ['scan', 'receipt'], load: () => import('./commands/scan.js') },
+  { names: ['ci', 'badge'], load: () => import('./commands/ci.js') },
   { names: ['bench'], load: () => import('./commands/bench.js') },
 ];
 let command: string | undefined;

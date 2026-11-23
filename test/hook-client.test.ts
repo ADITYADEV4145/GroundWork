@@ -40,6 +40,24 @@ describe.skipIf(process.platform === 'win32')('slim hook transport', () => {
     });
     expect(await forwardHook('claude', 'pre_tool', input(root))).toContain('deny');
   });
+  it('forwards Stop to the service and reruns it in-process when the service fails', async () => {
+    let answer = true;
+    await listen((socket, version) => {
+      socket.write(JSON.stringify({ version }) + '\n');
+      socket.on('data', (data) => {
+        expect(JSON.parse(data.toString())).toMatchObject({ event: 'stop' });
+        socket.end(answer ? JSON.stringify({ output: '{"decision":"block","reason":"x"}' }) + '\n' : '');
+      });
+    });
+    const stop = JSON.stringify({ cwd: root, session_id: 'test' });
+    expect(await forwardHook('claude', 'stop', stop)).toContain('block');
+    answer = false;
+    expect(await forwardHook('claude', 'stop', stop)).toBeNull();
+  });
+  it('allows Stop without rerunning it when the service does not answer in time', async () => {
+    await listen((socket, version) => { socket.write(JSON.stringify({ version }) + '\n'); });
+    expect(await forwardHook('claude', 'stop', JSON.stringify({ cwd: root, session_id: 'test' }), 300, 50)).toBe('');
+  });
   it('falls back only for absent services or a version mismatch', async () => {
     expect(await forwardHook('claude', 'pre_tool', input(root))).toBeNull();
     await listen((socket) => socket.end('{"version":"old"}\n'));

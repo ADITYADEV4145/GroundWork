@@ -8,7 +8,7 @@ import { initSqlBackend, openDb, type Db } from '../store/db.js';
 import { goldenSnapshot, type GoldenSnapshot } from './golden.js';
 
 export const FIXTURES_DIR = fileURLToPath(new URL('../../fixtures/', import.meta.url));
-export const FIXTURES = ['ts-app', 'py-app'];
+export const FIXTURES = ['ts-app', 'py-app', 'go-app', 'rust-app', 'java-app', 'csharp-app', 'ruby-app'];
 
 export function tempDir(prefix = 'gw-'): string {
   return mkdtempSync(path.join(os.tmpdir(), prefix));

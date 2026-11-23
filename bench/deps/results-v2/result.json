@@ -1,0 +1,684 @@
+{
+ "preregistration": "bench/deps/PREREGISTRATION-v2.md",
+ "commit": "d1a61104ba9ece1cd4624eb54ff8cf34f54087f9",
+ "node": "v24.22.2",
+ "pass": true,
+ "gates": {
+  "validSet": true,
+  "recall": true,
+  "falseBlocks": true,
+  "indexTime": true,
+  "network": true
+ },
+ "cases": {
+  "total": 69,
+  "valid": 69,
+  "excluded": []
+ },
+ "recall": {
+  "caught": 61,
+  "of": 69,
+  "pct": 88.4,
+  "blockingShareOfCaughtPct": 100,
+  "byEcosystem": {
+   "npm": {
+    "cases": 22,
+    "caught": 21,
+    "recallPct": 95.5
+   },
+   "pypi": {
+    "cases": 18,
+    "caught": 12,
+    "recallPct": 66.7
+   },
+   "go": {
+    "cases": 14,
+    "caught": 13,
+    "recallPct": 92.9
+   },
+   "maven": {
+    "cases": 15,
+    "caught": 15,
+    "recallPct": 100
+   }
+  },
+  "byKind": {
+   "unknown-member": {
+    "cases": 38,
+    "caught": 36,
+    "recallPct": 94.7
+   },
+   "unknown-export": {
+    "cases": 20,
+    "caught": 17,
+    "recallPct": 85
+   },
+   "arity": {
+    "cases": 11,
+    "caught": 8,
+    "recallPct": 72.7
+   }
+  }
+ },
+ "falseBlocks": {
+  "count": 0,
+  "acceptedChecks": 7857,
+  "per100": 0,
+  "corpora": [
+   {
+    "name": "good-only variants",
+    "files": 69,
+    "checks": 80,
+    "falseBlocks": 0,
+    "warnings": 0
+   },
+   {
+    "name": "requests, click, jinja2 sources",
+    "files": 59,
+    "checks": 36,
+    "falseBlocks": 0,
+    "warnings": 0
+   },
+   {
+    "name": "uuid, pflag sources",
+    "files": 81,
+    "checks": 546,
+    "falseBlocks": 0,
+    "warnings": 0
+   },
+   {
+    "name": "commons-text sources",
+    "files": 106,
+    "checks": 118,
+    "falseBlocks": 0,
+    "warnings": 0
+   },
+   {
+    "name": "Groundwork src, scripts, test",
+    "files": 289,
+    "checks": 7002,
+    "falseBlocks": 0,
+    "warnings": 0
+   }
+  ],
+  "list": []
+ },
+ "index": {
+  "packages": 1048,
+  "byEcosystem": {
+   "npm": 1048
+  },
+  "fullyListed": 392,
+  "open": 656,
+  "coldMs": 2990,
+  "warmMs": 209,
+  "warmFromCache": 1048
+ },
+ "network": {
+  "calls": 0
+ },
+ "misses": [
+  "npm-04",
+  "pypi-04",
+  "pypi-05",
+  "pypi-10",
+  "pypi-12",
+  "pypi-13",
+  "pypi-14",
+  "go-03"
+ ],
+ "rows": [
+  {
+   "id": "npm-01",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "lodash has no `contains`; installed version has `constant` (v4.17)."
+  },
+  {
+   "id": "npm-02",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "lodash has no `pluck`; installed version has `pick` (v4.17)."
+  },
+  {
+   "id": "npm-03",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "lodash has no `uniqueBy`; installed version has `uniqBy`, `uniqueId`, `unionBy` (v4.17)."
+  },
+  {
+   "id": "npm-04",
+   "ecosystem": "npm",
+   "kind": "arity",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "npm-05",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "lodash has no `flattenAll`; installed version has `flatten`, `flattenDeep`, `flattenDepth` (v4.17)."
+  },
+  {
+   "id": "npm-06",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "axios has no `getJSON`; installed version has `formToJSON` (v1.7)."
+  },
+  {
+   "id": "npm-07",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "axios has no `isHttpError`; installed version has `isAxiosError` (v1.7)."
+  },
+  {
+   "id": "npm-08",
+   "ecosystem": "npm",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "axios.get takes 1-2 arguments, got 0 (axios v1.7: <T = any, R = AxiosResponse<T, any>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>)."
+  },
+  {
+   "id": "npm-09",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "axios has no `createInstance`; installed version has `AxiosInstance`, `create` (v1.7)."
+  },
+  {
+   "id": "npm-10",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "date-fns has no `addWorkdays`; installed version has `addDays` (v3.6)."
+  },
+  {
+   "id": "npm-11",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "date-fns has no `formatDistanceToNowShort`; installed version has `formatDistanceToNow`, `formatDistanceToNowStrict`, `FormatDistanceToNowOptions` (v3.6)."
+  },
+  {
+   "id": "npm-12",
+   "ecosystem": "npm",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "differenceInDays takes 2 arguments, got 1 (date-fns v3.6: <DateType extends Date>(dateLeft: string | number | DateType, dateRight: string | number | DateType): number)."
+  },
+  {
+   "id": "npm-13",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "date-fns has no `isDateValid`; installed version has `isValid`, `isDate` (v3.6)."
+  },
+  {
+   "id": "npm-14",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "zod (v3.23) has no `text`."
+  },
+  {
+   "id": "npm-15",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "zod has no `ZodValidationError`; installed version has `ZodError`, `ZodFormattedError`, `ZodInvalidUnionIssue` (v3.23)."
+  },
+  {
+   "id": "npm-16",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "zod has no `objectOf`; installed version has `object`, `ObjectPair`, `objectUtil` (v3.23)."
+  },
+  {
+   "id": "npm-17",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "express (v4.21) has no `bodyParser`."
+  },
+  {
+   "id": "npm-18",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "express (v4.21) has no `createServer`."
+  },
+  {
+   "id": "npm-19",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "node:fs has no `existsFileSync`; installed version has `existsSync`, `writeFileSync`, `appendFileSync` (@types/node v22.10)."
+  },
+  {
+   "id": "npm-20",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "node:crypto has no `randomUuid`; installed version has `randomUUID`, `RandomUUIDOptions`, `randomFill` (@types/node v22.10)."
+  },
+  {
+   "id": "npm-21",
+   "ecosystem": "npm",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "node:fs/promises has no `readFileText`; installed version has `readFile` (@types/node v22.10)."
+  },
+  {
+   "id": "npm-22",
+   "ecosystem": "npm",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "node:os (@types/node v22.10) has no `homeDirectory`."
+  },
+  {
+   "id": "pypi-01",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "requests (v2.32) has no `get_json`."
+  },
+  {
+   "id": "pypi-02",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "requests has no `AsyncSession`; installed version has `session`, `Session` (v2.32)."
+  },
+  {
+   "id": "pypi-03",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "requests.exceptions has no `NetworkError`; installed version has `RetryError` (v2.32)."
+  },
+  {
+   "id": "pypi-04",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "pypi-05",
+   "ecosystem": "pypi",
+   "kind": "arity",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "pypi-06",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "requests.utils has no `parse_url_params`; installed version has `parse_url` (v2.32)."
+  },
+  {
+   "id": "pypi-07",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "click (v8.1) has no `print_line`."
+  },
+  {
+   "id": "pypi-08",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "click (v8.1) has no `get_terminal_size`."
+  },
+  {
+   "id": "pypi-09",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "click has no `MultiChoice`; installed version has `Choice` (v8.1)."
+  },
+  {
+   "id": "pypi-10",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "pypi-11",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "click has no `confirm_prompt`; installed version has `confirm`, `prompt` (v8.1)."
+  },
+  {
+   "id": "pypi-12",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "pypi-13",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "pypi-14",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "pypi-15",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "jinja2 has no `TemplateEngine`; installed version has `TemplateError`, `Template`, `TemplatesNotFound` (v3.1)."
+  },
+  {
+   "id": "pypi-16",
+   "ecosystem": "pypi",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "jinja2 (v3.1) has no `Markup`."
+  },
+  {
+   "id": "pypi-17",
+   "ecosystem": "pypi",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "jinja2 has no `DirectoryLoader`; installed version has `DictLoader` (v3.1)."
+  },
+  {
+   "id": "pypi-18",
+   "ecosystem": "pypi",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "unquote_unreserved takes 1 argument, got 3 (requests.utils v2.32: def unquote_unreserved(uri))."
+  },
+  {
+   "id": "go-01",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "github.com/google/uuid has no `NewV4`; installed version has `NewV6`, `NewV7`, `New` (v1.6)."
+  },
+  {
+   "id": "go-02",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "github.com/google/uuid has no `FromString`; installed version has `NewString` (v1.6)."
+  },
+  {
+   "id": "go-03",
+   "ecosystem": "go",
+   "kind": "arity",
+   "caught": false,
+   "blocking": false,
+   "message": null
+  },
+  {
+   "id": "go-04",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "github.com/google/uuid has no `IsValid`; installed version has `Invalid` (v1.6)."
+  },
+  {
+   "id": "go-05",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "strings (v1.26) has no `Capitalize`."
+  },
+  {
+   "id": "go-06",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "strings has no `ContainsIgnoreCase`; installed version has `ContainsFunc`, `ContainsRune` (v1.26)."
+  },
+  {
+   "id": "go-07",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "os has no `ReadAllFile`; installed version has `ReadFile` (v1.26)."
+  },
+  {
+   "id": "go-08",
+   "ecosystem": "go",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "strings.Split takes 2 arguments, got 3 (strings v1.26: func Split(s, sep string) []string)."
+  },
+  {
+   "id": "go-09",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "path/filepath has no `JoinPath`; installed version has `Join` (v1.26)."
+  },
+  {
+   "id": "go-10",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "time has no `NowUTC`; installed version has `Now`, `UTC` (v1.26)."
+  },
+  {
+   "id": "go-11",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "errors has no `Wrap`; installed version has `Unwrap` (v1.26)."
+  },
+  {
+   "id": "go-12",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "github.com/spf13/pflag has no `StringOpt`; installed version has `StringP`, `StringToInt`, `String` (v1.0)."
+  },
+  {
+   "id": "go-13",
+   "ecosystem": "go",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "pflag.Int takes 3 arguments, got 2 (github.com/spf13/pflag v1.0: func Int(name string, value int, usage string) *int)."
+  },
+  {
+   "id": "go-14",
+   "ecosystem": "go",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "encoding/json (v1.26) has no `Stringify`."
+  },
+  {
+   "id": "maven-01",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "com.google.common.base.Strings has no `isEmpty`; installed version has `isNullOrEmpty`, `nullToEmpty` (v33.0)."
+  },
+  {
+   "id": "maven-02",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "com.google.common.base.Objects (v33.0) has no `toStringHelper`."
+  },
+  {
+   "id": "maven-03",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "com.google.common.collect.Lists has no `newImmutableList`; installed version has `newArrayList`, `newLinkedList` (v33.0)."
+  },
+  {
+   "id": "maven-04",
+   "ecosystem": "maven",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "com.google.common.collect has no `ImmutableArrayList`; installed version has `ImmutableList`, `ImmutableAsList`, `ImmutableSortedAsList` (v33.0)."
+  },
+  {
+   "id": "maven-05",
+   "ecosystem": "maven",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "Preconditions.checkNotNull takes at least 1 arguments, got 0 (com.google.common.base.Preconditions v33.0)."
+  },
+  {
+   "id": "maven-06",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "com.google.common.io.Files (v33.0) has no `readFileToString`."
+  },
+  {
+   "id": "maven-07",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "org.apache.commons.lang3.StringUtils has no `isNullOrBlank`; installed version has `isAllBlank`, `isNotBlank`, `isBlank` (v3.14)."
+  },
+  {
+   "id": "maven-08",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "org.apache.commons.lang3.StringUtils has no `capitalise`; installed version has `capitalize`, `uncapitalize` (v3.14)."
+  },
+  {
+   "id": "maven-09",
+   "ecosystem": "maven",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "org.apache.commons.lang3 has no `StringUtil`; installed version has `StringUtils`, `RandomStringUtils`, `StringEscapeUtils` (v3.14)."
+  },
+  {
+   "id": "maven-10",
+   "ecosystem": "maven",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "StringUtils.repeat takes 2-3 arguments, got 1 (org.apache.commons.lang3.StringUtils v3.14)."
+  },
+  {
+   "id": "maven-11",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "org.apache.commons.lang3.ArrayUtils (v3.14) has no `concat`."
+  },
+  {
+   "id": "maven-12",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "com.google.gson.JsonParser (v2.10) has no `parseJson`."
+  },
+  {
+   "id": "maven-13",
+   "ecosystem": "maven",
+   "kind": "unknown-export",
+   "caught": true,
+   "blocking": true,
+   "message": "com.google.gson (v2.10) has no `GsonFactory`."
+  },
+  {
+   "id": "maven-14",
+   "ecosystem": "maven",
+   "kind": "arity",
+   "caught": true,
+   "blocking": true,
+   "message": "new Gson takes 0-21 arguments, got 1 (com.google.gson.Gson v2.10)."
+  },
+  {
+   "id": "maven-15",
+   "ecosystem": "maven",
+   "kind": "unknown-member",
+   "caught": true,
+   "blocking": true,
+   "message": "org.apache.commons.lang3.math.NumberUtils (v3.14) has no `parseInt`."
+  }
+ ]
+}

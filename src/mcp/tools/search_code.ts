@@ -5,7 +5,7 @@ import { defineTool } from '../registry.js';
 
 export const searchCodeTool = defineTool({
   name: 'search_code',
-  description: 'Find code by plain-English intent. Uses lexical search and optional installed local embeddings. Use find_code for known names.',
+  description: 'Search by intent with lexical and optional local semantic matches. Use find_code for names.',
   inputSchema: {
     query: z.string().trim().min(1).max(2048).refine((s) => !/[\u0000-\u001f\u007f]/.test(s), 'Control characters are not supported'),
     limit: z.number().int().min(1).max(100).default(10),

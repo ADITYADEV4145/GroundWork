@@ -11,16 +11,16 @@ const one = (s: string, max = 200) => { const t = s.replace(/\s+/g, ' ').trim();
 /** One answer for the three questions asked before writing code: what to reuse, how to call it, and who breaks if it changes. */
 export const beforeWriteTool = defineTool({
   name: 'before_write',
-  description: 'One call before writing non-trivial code, instead of find_similar + read_symbol + callers. Give any of: new (a helper you are about to add: existing code to reuse), calls (symbols you will call: exact signatures), changes (symbols whose signature or behavior you will change: every caller to update). Skip for small edits, docs, config and symbols already confirmed in context.',
+  description: 'Before non-trivial edits: find reuse for new, signatures for calls, and caller sites for changes. Skip already confirmed evidence.',
   inputSchema: {
     new: z.object({ description: z.string().trim().min(1).max(10000), name: z.string().max(300).optional(), signature: z.string().max(10000).optional(),
-      language: similarInputSchema.shape.language.removeDefault().optional() }).strict().optional().describe('helper you are about to add'),
-    calls: z.array(ref).max(20).optional().describe('symbols you will call: name, file:qualifiedName or symbol ID'),
-    changes: z.array(ref).max(10).optional().describe('symbols you will change'),
+      language: similarInputSchema.shape.language.removeDefault().optional() }).strict().optional().describe('Proposed helper.'),
+    calls: z.array(ref).max(20).optional().describe('Names, file:qualifiedName, or IDs.'),
+    changes: z.array(ref).max(10).optional(),
     decision: z.object({ choice: z.enum(['reuse', 'extend', 'new']), reason: z.string().trim().min(1).max(200) }).strict().optional()
-      .describe('after a reuse answer: what you chose and why, in one line; recorded for the session report'),
-    expand: z.enum(['reuse', 'callers']).optional().describe('repeat the same call with this to get the full section'),
-    offset: z.number().int().min(0).optional().describe('with expand "callers": skip this many call sites, to page past the first answer'),
+      .describe('Record the reuse decision.'),
+    expand: z.enum(['reuse', 'callers']).optional(),
+    offset: z.number().int().min(0).optional().describe('Caller offset with expand: callers.'),
   },
   async handler(args, { root, db, config }) {
     if (!args.new && !args.calls?.length && !args.changes?.length && !args.decision) throw new Error('Provide new, calls, changes or decision.');

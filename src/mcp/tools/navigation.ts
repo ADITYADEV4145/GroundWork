@@ -11,11 +11,11 @@ const printable = (s: string) => !/[\u0000-\u001f\u007f]/u.test(s) && Buffer.fro
 const text = z.string().trim().min(1).max(256).refine(printable, 'Control characters are not supported');
 const pathInput = z.string().min(1).refine((s) => printable(s) && Buffer.byteLength(JSON.stringify(s)) <= 900, 'Use a short printable repository path');
 const offset = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0);
-const symbol = text.describe('Exact symbol name, repo-relative file:qualifiedName, or indexed symbol ID.');
+const symbol = text.describe('Exact name, file:qualifiedName, or ID.');
 const pageSize = z.number().int().min(1).max(100);
 const limit = (n: number) => pageSize.default(n);
 const kinds = z.enum(['function', 'method', 'class', 'interface', 'type', 'enum', 'constant', 'variable', 'component', 'dataclass']);
-const locationsOnly = z.boolean().default(true).describe('Return symbol locations and IDs; set false for signatures and documentation.');
+const locationsOnly = z.boolean().default(true);
 
 function compact(s: string, length = 180): string {
   const val = s.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -108,7 +108,7 @@ export function readSource(args: { symbol: string; context_lines: number; offset
 
 const findCodeTool = defineTool({
   name: 'find_code',
-  description: 'Find symbols by name or behavior. Exact names return only exact matches; breadth: all expands results. Set include_body: true for source with exactly one exact match, otherwise locations stay the default. Set locations_only: false for signatures/docs. Prefer rg for trivial literals. Reuse unchanged evidence carried across continuing steps/sessions.',
+  description: 'Find symbols by name or behavior. breadth: all expands exact matches. include_body returns source for a unique exact match; locations_only: false adds signatures/docs. Use rg for literals.',
   inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(false), offset },
   handler(args, ctx) {
     const { db } = ctx;
@@ -131,7 +131,7 @@ const findCodeTool = defineTool({
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List symbols and ranges without bodies. Pass file or files for a budgeted batch, not both. Outline several files in one call, at most once per orientation. Set locations_only: false for signatures. Skip outline for known symbols; use batched read_symbol.',
+  description: 'List symbol ranges: file or files, at most once per orientation. locations_only: false adds signatures. For known symbols use read_symbol.',
   inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, offset },
   handler(args, { root, db }) {
     if (Boolean(args.file) === Boolean(args.files)) return 'Provide exactly one of file or files.';
@@ -164,7 +164,7 @@ const outlineTool = defineTool({
 
 const readSymbolTool = defineTool({
   name: 'read_symbol',
-  description: 'Read known helpers instead of whole-file Read. Pass symbol for one or symbols for a budgeted batch (not both); optional context_lines. If ambiguous, pick an ID. Follow source/batch Next calls only if needed. Reuse unchanged evidence carried across continuing steps/sessions.',
+  description: 'Read source for symbol or batched symbols. Pick an ID if ambiguous; follow Next only as needed.',
   inputSchema: {
     symbol: symbol.optional(),
     symbols: z.array(symbol).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter selectors or IDs for a batch.').optional(),
@@ -186,7 +186,7 @@ const readSymbolTool = defineTool({
 
 const exploreTool = defineTool({
   name: 'explore',
-  description: 'Optional trace context: ranked definitions with bodies, direct callers/callees with confidence, definition/call-site locations and involved files in one budgeted payload. Answer directly when sufficient; follow source/edge Next calls only for missing details. Pass query or exact symbol/ID, not both. Not a complete runtime call graph.',
+  description: 'Optional trace context: definitions, indexed edges with confidence, and files. Pass query or symbol. Answer directly when sufficient.',
   inputSchema: { query: text.optional(), symbol: symbol.optional(), limit: z.number().int().min(1).max(5).default(2), offset },
   handler(args, ctx) {
     if (Boolean(args.query) === Boolean(args.symbol)) return 'Provide exactly one of query or symbol.';
@@ -229,7 +229,7 @@ const exploreTool = defineTool({
 function callsTool(direction: 'callers' | 'callees') {
   return defineTool({
     name: direction,
-    description: direction === 'callers' ? 'List indexed calls to a symbol, ordered by resolution confidence.' : 'List outgoing calls with resolution confidence, including unresolved calls. For traces chain callees/read_symbol (batch bodies), not outline+Read.',
+    description: direction === 'callers' ? 'List incoming calls by resolution confidence.' : 'List outgoing calls by resolution confidence, including unresolved calls.',
     inputSchema: { symbol, limit: limit(8), offset },
     handler(args, ctx) {
       const s = oneSymbol(direction, args, ctx);
@@ -247,7 +247,7 @@ function callsTool(direction: 'callers' | 'callees') {
 
 const whereUsedTool = defineTool({
   name: 'where_used',
-  description: 'Find indexed calls, imports, and literal mentions of a name, grouped by file. This is not a full text search.',
+  description: 'Find indexed calls, imports, and mentions by file; not full-text search.',
   inputSchema: { name: text, offset },
   handler(args, { db }) {
     const items = whereUsed(db, args.name);
@@ -269,7 +269,7 @@ interface MapEntry {
 
 const repoMapTool = defineTool({
   name: 'repo_map',
-  description: 'Orient in an unfamiliar area with a ranked tree and top symbols. Use depth 1 for a quick overview, or narrow by path.',
+  description: 'Ranked file tree and top symbols. Use depth 1 for an overview or narrow by path.',
   inputSchema: { path: pathInput.optional(), depth: z.number().int().min(1).max(8).default(2), limit: limit(12), offset },
   handler(args, { root, db }) {
     const scope = repoRelative(root, args.path ?? '.');

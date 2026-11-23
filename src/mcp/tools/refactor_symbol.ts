@@ -3,11 +3,11 @@ import { defineTool } from '../registry.js';
 
 export const refactorSymbolTool = defineTool({
   name: 'refactor_symbol',
-  description: 'Preview a guarded TS/JS symbol rename or complete function/method body replacement. Read-only; returns the preview ID and guard results. Inspect the patch using gw refactor --json; then use gw refactor --apply <preview-id> to apply.',
+  description: 'Preview a TS/JS rename or body replacement. Inspect with gw refactor --json; apply with gw refactor --apply <preview-id>.',
   inputSchema: {
-    symbol: z.string().min(1).max(1024).describe('Exact symbol ID, qualified name, or repo-relative file:name.'),
-    name: z.string().min(1).max(128).optional().describe('New identifier; for rename only.'),
-    body: z.string().min(1).max(32_768).optional().describe('Complete new function body; for body edit only.'),
+    symbol: z.string().min(1).max(1024).describe('ID, qualified name, or file:name.'),
+    name: z.string().min(1).max(128).optional().describe('New identifier.'),
+    body: z.string().min(1).max(32_768).optional().describe('Complete replacement body.'),
   },
   async handler({ symbol, name, body }, ctx) {
     if ((name === undefined) === (body === undefined)) throw new Error('Provide either name or body.');

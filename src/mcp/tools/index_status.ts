@@ -3,7 +3,7 @@ import { defineTool } from '../registry.js';
 
 export const indexStatusTool = defineTool({
   name: 'index_status',
-  description: 'Size and health of the Groundwork code index for this repo (files, symbols, import/call resolution).',
+  description: 'Index size and health: files, symbols and edge resolution.',
   inputSchema: {},
   handler(_args, { db }) {
     const s = indexStats(db);

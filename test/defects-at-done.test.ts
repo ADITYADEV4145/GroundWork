@@ -355,6 +355,13 @@ ${body}
             pass
         format_weight(12.34)`) }, true);
     expect(plain.defects.wrongArguments).toBe(1);
+  const eager = await graded('route-weight-unit', { 'tests/test_required.py': test(`        self.assertRaises(TypeError, format_weight(12.34))`) }, true);
+  expect(eager.defects.wrongArguments).toBe(1);
+  const wrapped = await graded('route-weight-unit', { 'tests/test_required.py': test(`        with self.assertRaises(
+            TypeError
+        ):
+            format_weight(12.34)`) }, true);
+  expect(wrapped.items).toEqual([]);
   }, 120_000);
   it('counts stale docs after a signature change and callers missed by a ripple change', async () => {
     const { repo } = find('ledger-tax-options');

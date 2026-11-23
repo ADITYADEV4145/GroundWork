@@ -127,11 +127,13 @@ function expectedToRaise(root: string, file: string, line: number): boolean {
   try { lines = readFileSync(path.join(root, file), 'utf8').split('\n'); } catch { return false; }
   const raises = /\b(assertRaises\w*|pytest\.raises)\s*\(/, indent = (l: string) => l.length - l.trimStart().length;
   const own = lines[line - 1] ?? '';
-  if (raises.test(own)) return true;
+  // Only a deferred call counts: `assertRaises(TypeError, f(1))` runs `f(1)` before the assertion starts.
+  if (raises.test(own) && /\blambda\b/.test(own)) return true;
   let depth = indent(own);
   for (let i = line - 2; i >= 0 && depth > 0; i--) {
     const l = lines[i]!;
-    if (!l.trim() || indent(l) >= depth) continue;
+    // The closing line of a wrapped `with (...)` header sits at the header's indent; it is not an enclosing block.
+    if (!l.trim() || /^\s*[)\]}]/.test(l) || indent(l) >= depth) continue;
     depth = indent(l);
     if (/^\s*with\b/.test(l) && raises.test(l)) return true;
   }

@@ -192,6 +192,7 @@ Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): strin
 | `outline` | A file's symbols and signatures without their bodies. |
 | `read_symbol` | One symbol's source, not the whole file. |
 | `callers` / `callees` / `where_used` | Who calls a symbol, what it calls, and its references. |
+| `before_write` | One call before writing: code to reuse, exact signatures to call, and callers to update. |
 | `find_similar` | Existing code to consider before writing something new. |
 | `refactor_symbol` | Read-only preview of a guarded TS/JS symbol rename or function body edit. |
 | `verify_calls` | Whether snippet imports and calls exist, and their argument counts. |

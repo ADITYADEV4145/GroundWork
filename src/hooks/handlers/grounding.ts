@@ -1,4 +1,4 @@
-import { changedFromToolInput, renderResults, verifyChanged } from '../../grounding/index.js';
+import { changedFromToolInput, renderResults, verifyChangedDeep } from '../../grounding/index.js';
 import { indexDbPath } from '../../index/store.js';
 import { openDb } from '../../store/db.js';
 import { log } from '../../util/log.js';
@@ -12,7 +12,7 @@ export const groundingOnEdit: HookHandler = {
   name: 'grounding_on_edit',
   events: ['post_tool'],
   tools: EDIT_TOOLS,
-  run(ev, { root, config }) {
+  async run(ev, { root, config }) {
     if (!config.grounding.enabled || !config.grounding.postToolHook) return null;
     const changed = changedFromToolInput(root, ev.cwd, ev.input).filter((c) => c.ranges === null || c.ranges.length);
     if (!changed.length) return null;
@@ -21,7 +21,7 @@ export const groundingOnEdit: HookHandler = {
     hookTiming('groundingOpenMs', performance.now() - t);
     try {
       const verifyStart = performance.now();
-      const results = verifyChanged(db, root, changed, config);
+      const results = await verifyChangedDeep(db, root, changed, config);
       hookTiming('verifyMs', performance.now() - verifyStart);
       const n = results.reduce((a, r) => a + r.findings.length, 0);
       hookTiming('groundingFiles', results.length);

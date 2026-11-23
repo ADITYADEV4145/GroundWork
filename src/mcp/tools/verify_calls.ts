@@ -14,12 +14,12 @@ export const verifyCallsTool = defineTool({
   },
   async handler({ file, lines, files }, { root, db, config }) {
     if ((!file && !files?.length) || (files && (file || lines))) throw new Error('Provide file with optional lines, or files: [{file, lines?}].');
-    const { parseLineSpec, renderResults, verifyChanged } = await import('../../grounding/index.js');
+    const { parseLineSpec, renderResults, verifyChangedDeep } = await import('../../grounding/index.js');
     const changed = (files ?? [{ file: file!, lines }]).map((item) => ({
       file: toPosix(path.relative(root, path.resolve(root, item.file))),
       ranges: item.lines ? parseLineSpec(item.lines) : null,
     }));
-    const results = verifyChanged(db, root, changed, config);
+    const results = await verifyChangedDeep(db, root, changed, config);
     return renderResults(results, config.grounding.budgetTokens * 2, { showUnchecked: true }) || 'ok';
   },
 });

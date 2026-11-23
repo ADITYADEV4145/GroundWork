@@ -4,7 +4,10 @@
   "description": "A live, local map of your codebase for coding agents: navigation, reuse-first duplicate gate, grounding checks and waste guards.",
   "type": "module",
   "license": "MIT",
-  "publishConfig": { "provenance": true, "access": "public" },
+  "publishConfig": {
+    "provenance": true,
+    "access": "public"
+  },
   "author": "Aditya",
   "repository": {
     "type": "git",
@@ -44,6 +47,7 @@
     "bench:types": "node --import tsx scripts/bench-types.ts",
     "bench:type-languages": "node --import tsx scripts/bench-type-languages.ts",
     "bench:impact": "node --import tsx scripts/bench-impact.ts",
+    "bench:lookup-tokens": "node --import tsx bench/lookup-tokens/run.ts",
     "bench:deps": "node --import tsx scripts/bench-deps.ts",
     "setup:deps-bench": "node --import tsx scripts/setup-deps-bench.ts",
     "setup:grounding-repos": "node --import tsx scripts/setup-grounding-repos.ts",
@@ -77,6 +81,7 @@
     "@types/sql.js": "^1.16.0",
     "esbuild": "^0.28.2",
     "fast-check": "^4.10.3",
+    "gpt-tokenizer": "4.1.0",
     "tsx": "^4.23.15",
     "vitest": "^5.1.1",
     "yaml": "2.8.2"

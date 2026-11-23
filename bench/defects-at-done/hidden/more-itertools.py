@@ -59,7 +59,14 @@ class PeekableReverseSlice(unittest.TestCase):
         self.assertEqual(next(it), 6)
 
     def test_infinite(self):
-        p = mi.peekable(count())
+        def endless():
+            # Fails fast instead of filling memory when the whole iterator is cached.
+            for n in count():
+                if n > 10_000:
+                    raise AssertionError("peekable consumed an endless iterator")
+                yield n
+
+        p = mi.peekable(endless())
         self.assertEqual(p[4::-2], [4, 2, 0])
         self.assertEqual(next(p), 0)
 

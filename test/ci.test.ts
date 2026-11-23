@@ -58,6 +58,12 @@ describe('gw ci', () => {
     expect([ignored.conclusion, ignored.blocking.length]).toEqual(['pass', 0]);
   });
 
+  it('checks files with non-ASCII names and never runs the type checker', async () => {
+    const r = await check(repo(), { 'café.ts': 'import { total } from "./lists.js";\nexport const sum = total(1);\n' });
+    expect(r.blocking.map((f) => `${f.kind} ${f.file}`)).toEqual(['wrong-arguments café.ts']);
+    expect(r.skipped.join()).toContain('type errors: not checked in CI');
+  });
+
   it('passes with no comment when the pull request changes nothing checkable', async () => {
     const r = await check(repo(), { 'notes.md': 'hello\n' });
     expect(r.conclusion).toBe('pass');

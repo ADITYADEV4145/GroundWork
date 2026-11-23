@@ -5,7 +5,7 @@ const severity = z.enum(['block', 'warn', 'off']);
 // Plan phase 6 (GitHub Action). What `gw ci` fails the check on, what it only reports, and what it leaves out.
 export const ciConfigSchema = z
   .object({
-    /** block fails the check (high-confidence findings only), warn is reported without failing, off is dropped. */
+    /** block fails the check (high-confidence findings only), warn is reported without failing, off is dropped. gw ci never runs the type checker, so type-error does not occur there. */
     severity: z
       .object({
         'invented-call': severity.default('block'),

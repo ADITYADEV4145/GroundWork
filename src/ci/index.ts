@@ -79,7 +79,8 @@ export interface CheckOptions { config: GroundworkConfig; base: string; severity
 
 /** Scan what changed since `base` and sort the findings into blocking and warnings by the configured severities. */
 export async function runCheck(db: Db, root: string, options: CheckOptions): Promise<CheckResult & { report: ScanReport }> {
-  const { config } = options;
+  // The type checkers run tools found in the checkout (pyright from node_modules), which a pull request controls: never in CI.
+  const config: GroundworkConfig = { ...options.config, types: { ...options.config.types, enabled: false } };
   const severity = { ...config.ci.severity, ...options.severity };
   const ignored = picomatch([...config.ci.ignore, ...(options.ignore ?? [])], { dot: true });
   const keep = (f: ScanFinding) => severity[f.kind] !== 'off' && !ignored(f.file);
@@ -96,7 +97,8 @@ export async function runCheck(db: Db, root: string, options: CheckOptions): Pro
   const blocking = findings.filter(blocks);
   return {
     conclusion: blocking.length ? 'fail' : 'pass', reason: null, blocking, warnings: findings.filter((f) => !blocks(f)),
-    lowConfidence: report.check.filter(keep).length, files: report.files, skipped: report.skipped, ms: report.ms,
+    lowConfidence: report.check.filter(keep).length, files: report.files, ms: report.ms,
+    skipped: report.skipped.map((x) => (x.startsWith('type errors:') ? 'type errors: not checked in CI, because the type checker would run tools from the pull request' : x)),
     report: { ...report, findings, check: [] },
   };
 }

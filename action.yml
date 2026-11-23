@@ -74,6 +74,7 @@ runs:
         node "$GW_MAIN" "${args[@]}" || code=$?
         # 1 is a failed check, reported by the last step after the comment and SARIF are out; anything else is a broken run.
         if [ "$code" -gt 1 ] || { [ "$code" -eq 1 ] && ! grep -q '^conclusion=fail$' "$GITHUB_OUTPUT"; }; then exit "$code"; fi
+        if [ -s "$RUNNER_TEMP/groundwork.sarif" ]; then echo "sarif=$RUNNER_TEMP/groundwork.sarif" >> "$GITHUB_OUTPUT"; fi
     - name: Comment on the pull request
       if: inputs.comment == 'true' && github.event.pull_request.number
       shell: bash
@@ -84,7 +85,9 @@ runs:
       run: |
         file="$RUNNER_TEMP/groundwork-comment.md"
         # One comment per pull request: update ours when it exists, remove it when the findings are gone.
-        existing=$(gh api "repos/$GW_REPO/issues/$GW_PR/comments" --paginate --jq '.[] | select(.body | startswith("<!-- groundwork-check -->")) | .id' | head -n 1) || existing=""
+        # Ours means written by this token's account; anyone can paste the marker into a comment of their own.
+        me=$(gh api user --jq .login 2>/dev/null) || me="github-actions[bot]"
+        existing=$(gh api "repos/$GW_REPO/issues/$GW_PR/comments" --paginate | jq -r --arg me "$me" '.[] | select(.user.login == $me and (.body | startswith("<!-- groundwork-check -->"))) | .id' | head -n 1) || existing=""
         if [ -s "$file" ]; then
           if [ -n "$existing" ]; then gh api -X PATCH "repos/$GW_REPO/issues/comments/$existing" -F body=@"$file" > /dev/null
           else gh api -X POST "repos/$GW_REPO/issues/$GW_PR/comments" -F body=@"$file" > /dev/null; fi
@@ -92,11 +95,11 @@ runs:
           gh api -X DELETE "repos/$GW_REPO/issues/comments/$existing" > /dev/null
         fi || echo "::warning::GroundWork could not write the pull request comment (the token needs pull-requests: write; pull requests from forks get a read-only token)."
     - name: Upload SARIF
-      if: inputs.sarif == 'true' && hashFiles(format('{0}/groundwork.sarif', runner.temp)) != ''
+      if: inputs.sarif == 'true' && steps.check.outputs.sarif != ''
       continue-on-error: true
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: ${{ runner.temp }}/groundwork.sarif
+        sarif_file: ${{ steps.check.outputs.sarif }}
         category: groundwork
     - name: Check status
       if: steps.check.outputs.conclusion == 'fail'

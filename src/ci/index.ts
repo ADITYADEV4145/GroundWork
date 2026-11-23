@@ -150,10 +150,12 @@ export function renderSummary(result: CheckResult): string {
 }
 
 /** SARIF for code scanning: blocking findings as errors, everything else reported as warnings. */
-export function checkSarif(result: CheckResult & { report: ScanReport }): unknown {
-  const sarif = toSarif(result.report) as { runs: { results: { level: string }[] }[] };
+export function checkSarif(result: CheckResult & { report?: ScanReport }): unknown {
+  // A skipped check has no report: its SARIF has no results, so the upload clears what an earlier run of this pull request left in code scanning.
+  const findings = result.report?.findings ?? [];
+  const sarif = toSarif({ findings, check: result.report?.check ?? [] } as unknown as ScanReport) as { runs: { results: { level: string }[] }[] };
   const blocking = new Set(result.blocking);
-  sarif.runs[0]!.results.forEach((r, i) => { r.level = blocking.has(result.report.findings[i]!) ? 'error' : 'warning'; });
+  sarif.runs[0]!.results.forEach((r, i) => { r.level = blocking.has(findings[i]!) ? 'error' : 'warning'; });
   return sarif;
 }
 

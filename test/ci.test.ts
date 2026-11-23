@@ -46,6 +46,9 @@ describe('gw ci', () => {
     const sarif = checkSarif(r) as { runs: { results: { ruleId: string; level: string }[] }[] };
     expect(sarif.runs[0]!.results.filter((x) => x.level === 'error').map((x) => x.ruleId).sort()).toEqual(['invented-call', 'wrong-arguments']);
     expect(sarif.runs[0]!.results.find((x) => x.ruleId === 'duplicate-logic')!.level).toBe('warning');
+    // A skipped check still writes SARIF, with no results, so an upload replaces the earlier run's findings.
+    const skipped = checkSarif({ conclusion: 'skipped', reason: null, blocking: [], warnings: [], lowConfidence: 0, files: 0, skipped: [], ms: 0 }) as typeof sarif;
+    expect(skipped.runs[0]!.results).toEqual([]);
   });
 
   it('follows configured severities and ignored paths', async () => {

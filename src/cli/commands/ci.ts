@@ -54,10 +54,10 @@ export function register(program: Command): void {
         const result = (options.onlyAi || config.ci.onlyAi) && !agent
           ? { conclusion: 'skipped' as const, reason: 'no agent label, bot author or agent commit trailer', blocking: [], warnings: [], lowConfidence: 0, files: 0, skipped: [], ms: 0 }
           : { ...await ci.runCheck(db, root, { config, base, severity, ignore: list(options.ignore) }), reason: agent };
-        const { report, ...summary } = result as typeof result & { report?: unknown };
+        const { report: _report, ...summary } = result as typeof result & { report?: unknown };
         const text = ci.renderSummary(summary);
         if (options.commentFile) writeFileSync(options.commentFile, ci.renderComment(summary, config.ci.maxFindings) ?? '');
-        if (options.sarifFile && report) writeFileSync(options.sarifFile, JSON.stringify(ci.checkSarif(result as Parameters<typeof ci.checkSarif>[0]), null, 2) + '\n');
+        if (options.sarifFile) writeFileSync(options.sarifFile, JSON.stringify(ci.checkSarif(result as Parameters<typeof ci.checkSarif>[0]), null, 2) + '\n');
         if (options.summaryFile) appendFileSync(options.summaryFile, '```\n' + text.replace(/```/g, "'''") + '\n```\n');
         if (options.outputFile) appendFileSync(options.outputFile, `conclusion=${summary.conclusion}\nblocking=${summary.blocking.length}\nwarnings=${summary.warnings.length}\n`);
         emit(opts, summary, () => text);

@@ -74,6 +74,8 @@ describe.skipIf(process.platform === 'win32')('persistent MCP service', () => {
     expect(await forwardHook('claude', 'post_tool', JSON.stringify(raw(root)))).toBe('');
     expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw(other)))).toBe('');
     expect(await forwardHook('claude', 'pre_tool', JSON.stringify(raw(root)))).toContain('Unchanged since Read');
+    // Stop is answered by the service itself, not handed back to a cold in-process run.
+    expect(await forwardHook('claude', 'stop', JSON.stringify({ cwd: root, session_id: 'same-session' }))).not.toBeNull();
     mkdirSync(path.join(root, '.groundwork'), { recursive: true });
     writeFileSync(path.join(root, '.groundwork/config.json'), JSON.stringify({ index: { exclude: ['**/*.ts'] } }));
     expect(await call(a, 'read_symbol', { symbol: 'normalize' })).toContain('No exact symbol');

@@ -16,10 +16,16 @@ export interface TypeCheckResult {
 }
 let child: ChildProcess | undefined;
 let queue: Promise<unknown> = Promise.resolve();
+let idle: NodeJS.Timeout | undefined;
+/** A long-lived service keeps the compiler worker warm between checks and drops it after this long unused. */
+export const WORKER_IDLE_MS = 10 * 60_000;
 
 function request(payload: object, timeoutMs: number): Promise<unknown> {
   const deadline = Date.now() + timeoutMs;
   const run = () => new Promise((resolve, reject) => {
+    clearTimeout(idle);
+    idle = setTimeout(() => { child?.kill(); child = undefined; }, WORKER_IDLE_MS);
+    idle.unref();
     if (Date.now() >= deadline) { reject(new Error('timeout')); return; }
     if (!child) {
       const compiled = new URL('../types/worker.js', import.meta.url);

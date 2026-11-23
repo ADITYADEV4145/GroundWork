@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { billedTokens, parseAnswer, parseResult, reduction, report, runSession } from '../bench/claude-code/driver.mjs';
@@ -28,6 +28,11 @@ test('bootstrap reduction is deterministic and signed', () => {
   assert.ok(a.ci9875[0] > 0 && a.reductionPct > 45 && a.reductionPct < 55);
   assert.ok(reduction([50, 55], [100, 110]).ci9875[1] < 0);
   assert.equal(reduction([], [1]), null);
+  // 98.75% two-sided: each tail holds 0.625% of the draws, so it is wider than the 95% interval.
+  const wide = reduction([100, 140, 60, 120, 80], [90, 130, 50, 115, 70]);
+  assert.ok(wide.ci9875[0] < wide.ci95[0] && wide.ci9875[1] > wide.ci95[1]);
+  const draws = reduction([1, 2, 3, 4], [1, 2, 3, 4], 1600);
+  assert.ok(draws.ci9875[0] <= draws.ci95[0]);
 });
 
 test('a session records usage, answers and failures, resumes, and reports as exploratory', async () => {
@@ -47,6 +52,7 @@ else console.log(JSON.stringify({ result: 'done', usage: { input_tokens: 7, outp
 `);
     chmodSync(fake, 0o755);
     const options = { suite: 'nav', arm: 'baseline', run: 1, model: 'test-model', out: path.join(dir, 'out'), claude: [process.execPath, fake] };
+    mkdirSync(path.join(options.out, 'nav', 'baseline', '1', 'gw-01', 'left-over'), { recursive: true });
     const session = runSession(options);
     const first = JSON.parse(readFileSync(path.join(session, 'gw-01.json'), 'utf8'));
     assert.deepEqual(first.answer, ['src/index/refresh.ts:refreshIndex']);

@@ -28,7 +28,7 @@ Primary, per suite: percent reduction in mean billed tokens per session, `100 * 
 
 Secondary, descriptive only: the same reduction for wall time and for reported cost; success counts by task category; long-horizon duplicate and invented-call metrics.
 
-Intervals come from 10,000 whole-session bootstrap draws, sessions resampled independently within each arm, xorshift32 seeded `0x51ab17ed`. The primary interval is 98.75% (Bonferroni over 2 suites and 2 directions of interest); 95% intervals are reported alongside.
+Intervals come from 10,000 whole-session bootstrap draws, sessions resampled independently within each arm, xorshift32 seeded `0x51ab17ed`. The primary interval is two-sided 98.75% (the 0.625th and 99.375th percentiles; Bonferroni over 2 suites and 2 directions of interest); 95% intervals are reported alongside.
 
 ## Decision rule, per suite
 

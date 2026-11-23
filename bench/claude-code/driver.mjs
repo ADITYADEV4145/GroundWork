@@ -152,7 +152,7 @@ export function reduction(base, treat, draws = 10_000) {
   for (let i = 0; i < draws; i++) { const b = sample(base), t = sample(treat); if (b > 0) out.push(value(b, t)); }
   out.sort((a, b) => a - b);
   const at = (q) => out[Math.min(out.length - 1, Math.max(0, Math.ceil(q * out.length) - 1))];
-  return { baselineMean: mean(base), groundworkMean: mean(treat), reductionPct: value(mean(base), mean(treat)), ci95: [at(0.025), at(0.975)], ci9875: [at(0.0125), at(0.9875)] };
+  return { baselineMean: mean(base), groundworkMean: mean(treat), reductionPct: value(mean(base), mean(treat)), ci95: [at(0.025), at(0.975)], ci9875: [at(0.00625), at(0.99375)] };
 }
 
 /** Grades every session under `out` and reports per suite. Never repairs or drops a session: problems are listed. */

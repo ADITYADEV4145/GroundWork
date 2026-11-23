@@ -39,7 +39,7 @@ export const duplicateGate: HookHandler = {
       }
       bumpCounter(root, ev.sessionId, 'duplicatesPrevented', blocks.filter((f) => f.kind.startsWith('duplicate')).length);
       const strict = config.profile === 'strict' && blocks.some((f) => f.severity === 'BLOCK');
-      log(root, 'info', 'duplicate_gate', { status: strict ? 'blocked' : 'warned', sessionId: ev.sessionId, findingSet });
+      log(root, 'info', 'duplicate_gate', { status: strict ? 'blocked' : 'warned', sessionId: ev.sessionId, findingSet, findings: blocks.slice(0, 50).map((f) => ({ kind: f.grounding ? `grounding:${f.grounding.kind}` : f.kind, file: f.added.file, line: f.added.line, symbol: f.added.symbol })) });
       const budgeted = fitToBudget(blocks, formatFinding, 500);
       // Only the strict profile blocks the stop; standard reports the same findings without holding the agent.
       return { action: strict ? 'deny' : 'context', message: budgeted.items.map(formatFinding).join('\n\n') };

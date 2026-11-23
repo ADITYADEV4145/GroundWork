@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Start with `gw doctor`. It checks the Node version, the SQLite backend, the grammars and the index.
+Start with `gw doctor`. It checks the Node version, the SQLite backend, the grammars, the languages and type backends, the index, and each client's hooks and MCP entry.
 
 | Symptom | Cause and fix |
 | --- | --- |
@@ -15,6 +15,8 @@ Start with `gw doctor`. It checks the Node version, the SQLite backend, the gram
 | The Stop gate keeps holding back the same work | Each set of findings blocks only once per session. If a finding is wrong, mark the code `// groundwork: allow-duplicate <specific reason>`, or use `"profile": "standard"` so findings are only warnings. |
 | A grounding note names a function that does exist | It lives outside the index (a package, a generated file, an excluded glob). Check `gw stats`, then add it to the index or to `grounding.exclude`. |
 | A waste guard keeps firing on purpose | Rerun with `GW_FORCE=1 <cmd>` or `<cmd> # gw:force`, or turn that guard off in `.groundwork/config.json`. |
+| No block in Gemini CLI, Copilot, Zed, Kiro or OpenCode | These clients get the MCP tools and the skill only; nothing can be blocked there. Run `gw check` before a commit or in CI. |
+| `gw doctor` says a client is incomplete or `gw` is not on PATH | Run `gw install`, or `gw install --command "npx -y groundwork-agent"` when there is no global install. |
 | Too many interventions overall | Run `gw setup --profile minimal` (navigation only), then turn guards back on one at a time. |
 
 Hook errors go to `.groundwork/logs/groundwork.log` and never block the agent. `gw report` summarises what the guards did in a session.

@@ -369,6 +369,12 @@ export function importFacts(db: Db, fileId: number): ImportFact[] {
     }));
 }
 
+export function importingFiles(db: Db, file: string): string[] {
+  return db.prepare(`SELECT DISTINCT source.path FROM imports i
+    JOIN files source ON source.id = i.file_id JOIN files target ON target.id = i.resolved_file_id
+    WHERE target.path = ? ORDER BY source.path`).all(file).map((r) => String(r.path));
+}
+
 export function callFacts(db: Db, fileId: number): CallFact[] {
   return db
     .prepare('SELECT caller_id, callee_text, callee_name, line, col, arg_count, keyword_args_json, has_spread, callee_id, confidence FROM calls WHERE file_id = ? ORDER BY line, col')

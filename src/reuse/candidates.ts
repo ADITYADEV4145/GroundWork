@@ -61,10 +61,11 @@ export class CandidateIndex {
     }
   }
 
-  async prepareMeaning(root: string, config: GroundworkConfig, factory?: EmbedderFactory, options: { deadline?: number; priorityFiles?: ReadonlySet<string> } = {}): Promise<void> {
+  async prepareMeaning(root: string, config: GroundworkConfig, factory?: EmbedderFactory, options: { deadline?: number; priorityFiles?: ReadonlySet<string>; modelRoot?: string } = {}): Promise<void> {
     if (!config.reuse.embeddings.enabled) return;
     const { DEFAULT_EMBEDDING_MODEL, embedSources, warnMeaning } = await import('./embeddings.js');
-    this.meaningContext = { root, config, factory };
+    const modelRoot = options.modelRoot ?? root;
+    this.meaningContext = { root: modelRoot, config, factory };
     const files = new Map<string, string>();
     const sources = [...this.symbols].sort((a, b) => Number(!!options.priorityFiles?.has(b.file)) - Number(!!options.priorityFiles?.has(a.file))).flatMap((s) => {
       try {
@@ -73,11 +74,11 @@ export class CandidateIndex {
       }
       catch { return []; }
     });
-    const vectors = await embedSources(root, config, sources, factory, options);
+    const vectors = await embedSources(modelRoot, config, sources, factory, options);
     for (const symbol of this.symbols) symbol.embedding = vectors.get(symbol.id);
     const model = config.reuse.embeddings.model ?? DEFAULT_EMBEDDING_MODEL;
     if (vectors.size && model !== meaningModel.embeddingModel)
-      warnMeaning(root, model, 'This model has no calibrated classifier; only baseline scoring is used.');
+      warnMeaning(modelRoot, model, 'This model has no calibrated classifier; only baseline scoring is used.');
   }
 
   async embedQuery(text: string): Promise<Embedding | undefined> {

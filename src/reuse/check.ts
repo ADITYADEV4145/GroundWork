@@ -8,7 +8,7 @@ import { readReuseState, type ReuseState } from '../index/query.js';
 import { refreshIndex } from '../index/refresh.js';
 import { indexDbPath } from '../index/store.js';
 import { initParsers, languageForPath } from '../lang/index.js';
-import { initSqlBackend, openDb } from '../store/db.js';
+import { initSqlBackend, openDb, type Db } from '../store/db.js';
 import { sha1 } from '../util/hash.js';
 import { ensureGwDir } from '../util/paths.js';
 import { estimateTokens, fitToBudget } from '../util/tokens.js';
@@ -92,7 +92,7 @@ export function formatCheck(report: CheckReport): string {
 /** Worktree (including staged and untracked files) versus a Git commit, never index versus index. */
 export async function checkRepository(root: string, options: CheckOptions = {}): Promise<CheckReport> {
   const start = performance.now();
-  let deadline = Date.now() + (options.timeoutMs ?? 30_000);
+  const deadline = Date.now() + (options.timeoutMs ?? 30_000);
   const checkDeadline = () => { if (Date.now() >= deadline) throw new Error('reuse check timed out'); };
   const config = options.config ?? loadConfig(root);
   const commit = git(root, ['rev-parse', '--verify', '--end-of-options', `${options.base ?? 'HEAD'}^{commit}`], deadline).trim();
@@ -110,9 +110,26 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
   }
   finally { db.close(); }
+  return compareSnapshots(root, base, state, candidates, groundingFindings, config, commit, start, deadline, options, root, true);
+}
+
+/** Reuse comparison for a proposed edit, using the current files as its baseline. */
+export async function checkIndexedChanges(root: string, db: Db, baselineRoot: string, baselineDb: Db,
+  config: GroundworkConfig, groundingFindings: GroundingFinding[], modelRoot: string, timeoutMs: number): Promise<CheckReport> {
+  const start = performance.now(), deadline = Date.now() + timeoutMs;
+  await initParsers();
+  const base = { root: baselineRoot, state: readReuseState(baselineDb) };
+  const state = readReuseState(db), candidates = new CandidateIndex(db, config.reuse.skipTests);
+  return compareSnapshots(root, base, state, candidates, groundingFindings, config, 'working tree', start, deadline, { timeoutMs }, modelRoot);
+}
+
+async function compareSnapshots(root: string, base: { root: string; state: ReuseState }, state: ReuseState,
+  candidates: CandidateIndex, groundingFindings: GroundingFinding[], config: GroundworkConfig, commit: string,
+  start: number, deadline: number, options: CheckOptions, modelRoot: string, gitBacked = false): Promise<CheckReport> {
+  const checkDeadline = () => { if (Date.now() >= deadline) throw new Error('reuse check timed out'); };
   let types: TypeCheckResult | undefined;
   const collectTypes = async () => {
-    if (!config.types.enabled || (options.stopHook && !config.types.stopGate)) return;
+    if (!gitBacked || !config.types.enabled || (options.stopHook && !config.types.stopGate)) return;
     const typeStart = Date.now();
     const { typeCheck } = await import('../types/index.js');
     types = await typeCheck(root, changedFromGit(root, commit), config, { base: commit, timeoutMs: options.stopHook ? config.types.timeoutMs : Math.max(1, Math.min(config.types.timeoutMs, deadline - Date.now())) });
@@ -141,6 +158,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
     await candidates.prepareMeaning(root, config, options.embeddingFactory, {
       deadline: meaningStart + (options.timeoutMs === undefined ? 30_000 : Math.max(0, Math.min(250, (deadline - meaningStart) / 10))),
       priorityFiles: changedFiles,
+      modelRoot,
     });
   } catch {
     for (const symbol of candidates.symbols) delete symbol.embedding;

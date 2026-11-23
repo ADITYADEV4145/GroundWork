@@ -22,6 +22,7 @@ const groups = [
   { names: ['run', 'report'], load: () => import('./commands/waste.js') },
   { names: ['verify'], load: () => import('./commands/verify.js') },
   { names: ['similar'], load: () => import('./commands/similar.js') },
+  { names: ['refactor'], load: () => import('./commands/refactor.js') },
   { names: ['check'], load: () => import('./commands/check.js') },
   { names: ['bench'], load: () => import('./commands/bench.js') },
 ];

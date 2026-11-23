@@ -44,6 +44,8 @@ Before writing a genuinely new non-trivial helper/function (including a class, h
 
 Reuse existing constants and config keys such as `API_URL`; do not define a second one.
 
+For a TS/JS rename or a function body replacement, preview `refactor_symbol` or `gw refactor` with an exact symbol. Inspect the patch with `gw refactor --json`. Apply only a clean preview with the same request and `--apply <preview-id>`; resolve blocking findings rather than bypassing them.
+
 ## 3. Respond to feedback
 
 **Grounding notes after an edit** ("these names/arguments do not match the code") list imports, calls, members or arguments in the lines you just changed that the index cannot find. Each note names the nearest real symbols with their signature and location. Fix the call to use one of them, or add the missing definition if you really meant to create it. Never re-read a file only to satisfy the verify rule. After edits are ready, use `verify_calls` at most once per task, only for new cross-file targets unconfirmed by unchanged evidence in your current context: one batched call instead of rereads, `verify_calls({ "files": [{ "file": "src/x.ts", "lines": "10-40" }, { "file": "src/y.ts" }] })`. Skip the explicit call if no such calls remain. Evidence can carry across continuing steps and sessions, but only when available in your current context and the relevant definitions are unchanged; recheck affected calls after changes. Read a body only when needed to understand or change behavior, using `read_symbol` (batched for several helpers). Fix findings and validate affected code with tests and automatic feedback, not another explicit verification pass; automatic grounding and duplicate-gate checks remain active.

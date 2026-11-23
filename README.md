@@ -193,6 +193,7 @@ Why: formatPrice() takes 1 argument, got 2 — formatPrice(cents: number): strin
 | `read_symbol` | One symbol's source, not the whole file. |
 | `callers` / `callees` / `where_used` | Who calls a symbol, what it calls, and its references. |
 | `find_similar` | Existing code to consider before writing something new. |
+| `refactor_symbol` | Read-only preview of a guarded TS/JS symbol rename or function body edit. |
 | `verify_calls` | Whether snippet imports and calls exist, and their argument counts. |
 | `index_status` | Index freshness and size. |
 
@@ -286,12 +287,25 @@ Timeouts fail open; type checking is not enabled after individual edits by defau
 | `gw similar "<description>"` | Find existing code to reuse. |
 | `gw check [--base <ref>]` | Check changed code for duplicates and grounding errors; exit 1 on BLOCK. |
 | `gw verify [files...]` | Check grounding alone; exit 1 on definite errors. |
+| `gw refactor <symbol> --rename <name>` / `--body-file <path>` | Preview a TS/JS symbol rename or body replacement; use `--apply <preview-id>` to revalidate and write. |
 | `gw run -- <cmd>` | Keep the full command log locally and print a trimmed summary. |
 | `gw report` | Show session guard activity and estimated savings. |
 | `gw refresh` / `gw stats` | Refresh the index or inspect its contents. |
 | `gw doctor` / `gw selftest` | Check the environment or run acceptance checks. |
 
 Every command accepts `--json`.
+
+### Guarded symbol edits
+
+```sh
+gw refactor src/math.ts:formatTotal --rename formatSum --json
+gw refactor src/math.ts:formatTotal --rename formatSum --apply <preview-id>
+gw refactor src/math.ts:formatSum --body-file /path/to/new-body.txt --json
+```
+
+Use an exact symbol ID (from `gw symbols --json`), qualified name, or repo-relative `file:name`. The body file contains the full replacement body, including braces for a block. Groundwork preserves the declaration and edits only the selected body. Rename follows TypeScript's static references, including imports and re-exports, without replacing unrelated names, ordinary strings or comments. It does not update dynamic references or external consumers.
+
+Preview returns a patch in JSON without modifying tracked or untracked source. Groundwork checks for compiler errors and changed bindings, then runs the reuse and grounding checks against isolated copies of the current working tree. A blocking finding, uncheckable target, or stale preview prevents apply; warnings are reported. Apply requires the same request and preview ID, rechecks the candidate, and leaves the patch unstaged. This works in Git repositories with an indexed TS/JS declaration in a compiler project. Rename stops if a source file outside the compiler project may reference the symbol. A body edit must preserve the callable type if the compiler project does not cover all repository TS/JS files. Use ordinary edits and tests for other languages or dynamic references.
 
 ## Benchmark results
 

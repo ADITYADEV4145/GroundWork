@@ -129,8 +129,8 @@ function expectedToRaise(root: string, file: string, line: number): boolean {
   const own = lines[line - 1] ?? '';
   // Only a deferred call counts: `assertRaises(TypeError, f(1))` runs `f(1)` before the assertion starts.
   if (raises.test(own) && /\blambda\b/.test(own)) return true;
-  // `with self.assertRaises(TypeError): f(1)` keeps the call on the header line.
-  if (/^\s*with\b/.test(own) && raises.test(own)) return true;
+  // `with self.assertRaises(TypeError): f(1)` keeps the call on the header line; a header with no body after its colon only holds eager calls.
+  if (/^\s*with\b/.test(own) && raises.test(own) && /\)\s*(as\s+\w+\s*)?:\s*[^\s#]/.test(own)) return true;
   let depth = indent(own);
   for (let i = line - 2; i >= 0 && depth > 0; i--) {
     const l = lines[i]!;

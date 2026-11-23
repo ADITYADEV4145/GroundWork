@@ -1,9 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, lstatSync, mkdirSync, realpathSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, realpathSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import type { TypeFinding } from './index.js';
+import { GO_CHECKER_SOURCE } from './go-checker.js';
 
 export type CompiledLanguage = 'go' | 'rust' | 'java' | 'csharp';
 /** Base text per changed file of one language; null means the file did not exist at the base commit. */
@@ -15,7 +16,10 @@ export const compiledLanguage = (file: string): CompiledLanguage | null => EXTEN
 
 const memo = new Map<string, Raw[]>();
 /** Package-level compiler runs are shared by the files of one request only. */
-export function resetCompilerMemo(): void { memo.clear(); }
+export function resetCompilerMemo(): void { memo.clear(); goFailed.clear(); cargoMemo.clear(); rustTargets.clear(); batch = []; }
+let batch: { file: string; ranges: [number, number][] | null }[] = [];
+/** The changed files of one request, so a backend can check them all in one compiler run and knows which lines changed. */
+export function setCompilerBatch(files: { file: string; ranges: [number, number][] | null }[]): void { batch = files; }
 
 function run(binary: string, args: string[], cwd: string, deadline: number, env: Record<string, string> = {}): { status: number; output: string } {
   const remaining = deadline - Date.now();
@@ -85,7 +89,7 @@ function baseTree(root: string, base: BaseTexts): string {
   return top;
 }
 
-// ---- Go: the compiler through `go build` (`go vet` for test files), base text through -overlay ----
+// ---- Go: go/types from source, declarations only outside the checked packages; nothing is compiled ----
 function goCode(message: string): [string, boolean] {
   if (/undefined \(.*has no field or method|^undefined: |\bundefined: [\w.]+$/.test(message) || / undefined \(/.test(message)) return [/has no field or method| undefined \(/.test(message) ? 'missing-member' : 'undefined', true];
   if (/^(not enough|too many) arguments in call/.test(message)) return ['arity', true];
@@ -95,12 +99,82 @@ function goCode(message: string): [string, boolean] {
   if (/declared and not used|imported and not used/.test(message)) return ['unused', false];
   return ['compile', false];
 }
+const goFailed = new Map<string, string>();
+const goModule = (root: string, file: string) => nearest(root, file, (names) => names.includes('go.mod') ? 'go.mod' : undefined);
+/** The checker binary for the Go toolchain this module selects, built on first use. Null when it cannot be built. */
+function goChecker(root: string, module: string, deadline: number): string | null {
+  const [version = '', GOOS = '', GOARCH = ''] = run('go', ['env', 'GOVERSION', 'GOHOSTOS', 'GOHOSTARCH'], module, deadline).output.trim().split('\n');
+  const directory = path.join(scratch(root), `go-check-${createHash('sha256').update(`${version}\0${GO_CHECKER_SOURCE}`).digest('hex').slice(0, 16)}`);
+  const binary = path.join(directory, process.platform === 'win32' ? 'gw-go-check.exe' : 'gw-go-check');
+  if (existsSync(binary)) return binary;
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(path.join(directory, 'main.go'), GO_CHECKER_SOURCE);
+  const temporary = `${binary}.${process.pid}`;
+  const built = run('go', ['build', '-o', temporary, path.join(directory, 'main.go')], module, deadline, { GOPROXY: 'off', GOFLAGS: '', GOWORK: 'off', GOOS, GOARCH });
+  if (built.status !== 0) { rmSync(temporary, { force: true }); return null; }
+  renameSync(temporary, binary);
+  return binary;
+}
 function goDiagnostics(root: string, file: string, deadline: number, base?: BaseTexts): Raw[] {
+  const module = goModule(root, file);
+  if (!module) throw new Error('no go.mod');
+  const key = `go\0${module.directory}\0${base ? 'base' : ''}`;
+  const cached = memo.get(key);
+  if (cached) return cached;
+  const failure = goFailed.get(key);
+  if (failure) throw new Error(failure);
+  let checker: string | null = null;
+  try { checker = goChecker(root, module.directory, deadline); }
+  catch (e) { if ((e as Error).message === 'timeout' || / not found$/.test((e as Error).message)) throw e; }
+  if (!checker) return goBuildDiagnostics(root, file, deadline, base);
+  // Every changed Go file of the module is checked in one run.
+  // The Go tools name files by their real path, which a symlinked checkout does not share.
+  const real = realpathSync(module.directory);
+  const inReal = (absolute: string) => path.join(real, path.relative(module.directory, absolute));
+  const targets = new Map<string, boolean>();
+  for (const f of new Set([file, ...(base ? base.keys() : batch.map((c) => c.file))])) {
+    if (!f.endsWith('.go') || goModule(root, f)?.directory !== module.directory) continue;
+    const directory = path.dirname(path.resolve(root, f));
+    if (existsSync(directory)) targets.set(inReal(directory), (targets.get(inReal(directory)) ?? false) || f.endsWith('_test.go'));
+  }
+  const temporary = mkdtempSync(path.join(os.tmpdir(), 'gw-types-go-'));
+  try {
+    const request: { Dir: string; Targets: { Dir: string; Tests: boolean }[]; Overlay?: string; Exports: string } = {
+      Dir: real, Targets: [...targets].map(([Dir, Tests]) => ({ Dir, Tests })),
+      Exports: path.join(path.dirname(checker), `exports-${createHash('sha256').update(module.directory).digest('hex').slice(0, 16)}.json`),
+    };
+    if (base) {
+      const replace: Record<string, string> = {};
+      let n = 0;
+      for (const [f, text] of base) {
+        if (text === null) { replace[inReal(path.resolve(root, f))] = ''; continue; }
+        const copy = path.join(temporary, `${n++}.go`); writeFileSync(copy, text); replace[inReal(path.resolve(root, f))] = copy;
+      }
+      request.Overlay = path.join(temporary, 'overlay.json');
+      writeFileSync(request.Overlay, JSON.stringify({ Replace: replace }));
+    }
+    writeFileSync(path.join(temporary, 'request.json'), JSON.stringify(request));
+    const { output } = run(checker, [path.join(temporary, 'request.json')], real, deadline, { GOPROXY: 'off' });
+    let response: { diagnostics: { file: string; line: number; column: number; message: string }[]; unavailable?: string } | undefined;
+    for (const line of output.split('\n')) { if (line.startsWith('{"diagnostics"')) { try { response = JSON.parse(line); } catch { /* not the response */ } } }
+    // One failed run answers for every changed file of the module.
+    const failed = !response ? unavailable(output, 'go check failed') : response.unavailable ? new Error(response.unavailable.slice(0, 200)) : null;
+    if (failed) { goFailed.set(key, failed.message); throw failed; }
+    const found = response!.diagnostics.map((d) => {
+      const [code, blocking] = goCode(d.message);
+      return { file: path.join(module.directory, path.relative(real, d.file)), line: d.line, column: d.column, code, message: d.message, blocking };
+    });
+    memo.set(key, found);
+    return found;
+  } finally { rmSync(temporary, { recursive: true, force: true }); }
+}
+/** The compiler through `go build` (`go vet` for test files), for a machine where the checker cannot be built. */
+function goBuildDiagnostics(root: string, file: string, deadline: number, base?: BaseTexts): Raw[] {
   const module = nearest(root, file, (names) => names.includes('go.mod') ? 'go.mod' : undefined);
   if (!module) throw new Error('no go.mod');
   const test = file.endsWith('_test.go');
   const packageDirectory = path.dirname(path.resolve(root, file));
-  const key = `go\0${packageDirectory}\0${test}\0${base ? 'base' : ''}`;
+  const key = `go-build\0${packageDirectory}\0${test}\0${base ? 'base' : ''}`;
   const cached = memo.get(key);
   if (cached) return cached;
   const target = `./${path.relative(module.directory, packageDirectory).split(path.sep).join('/')}`;
@@ -138,45 +212,109 @@ function goDiagnostics(root: string, file: string, deadline: number, base?: Base
 
 // ---- Rust: `cargo check --offline`, base text through a symlinked tree ----
 const RUST_BLOCKING = new Set(['E0425', 'E0599', 'E0061', 'E0432', 'E0433', 'E0609', 'E0618', 'E0560', 'E0423', 'E0412']);
+/**
+ * Line ranges that only a test build compiles. Braces are not matched (string literals hold them too):
+ * an attributed item with a body runs to the end of the file, which is where test modules sit.
+ */
+export function rustTestRegions(text: string): [number, number][] {
+  const lines = text.split('\n');
+  const regions: [number, number][] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const attribute = /^\s*#(!?)\[(?:cfg|cfg_attr)\(.*\btest\b|^\s*#\[(?:\w+::)*test\b/.exec(lines[i]!);
+    if (!attribute) continue;
+    if (attribute[1]) return [[1, lines.length]];
+    for (let j = i; j < lines.length; j++) {
+      const code = lines[j]!.replace(/^\s*#\[.*\]\s*/, '');
+      const body = code.indexOf('{'), end = code.indexOf(';');
+      if (end >= 0 && (body < 0 || end < body)) { regions.push([i + 1, j + 1]); i = j; break; }
+      if (body >= 0 || j === lines.length - 1) return [...regions, [i + 1, lines.length]];
+    }
+  }
+  return regions;
+}
+interface CargoRun { found: Raw[]; /** Source files of the package's units that were checked without `cfg(test)`. */ plain: Set<string> }
+const cargoMemo = new Map<string, CargoRun>();
+/** Whether the current-text check of a file needed the test targets, so its base-text check runs the same way. */
+const rustTargets = new Map<string, boolean>();
+function cargoCheck(root: string, tree: string, crate: string, allTargets: boolean, deadline: number): CargoRun {
+  const key = `${tree}\0${crate}\0${allTargets}`;
+  const cached = cargoMemo.get(key);
+  if (cached) return cached;
+  const { status, output } = run('cargo', ['check', '--offline', '--quiet', '--message-format=json', ...(allTargets ? ['--all-targets'] : [])], crate, deadline);
+  const result: CargoRun = { found: [], plain: new Set() };
+  const seen = new Set<string>();
+  let messages = 0;
+  // rustc reports paths relative to the workspace root, or to the package for a lone crate.
+  const bases = [crate];
+  for (let d = path.dirname(crate); !path.relative(tree, d).startsWith('..'); d = path.dirname(d)) { bases.push(d); if (d === tree) break; }
+  for (const line of output.split('\n')) {
+    if (!line.startsWith('{')) continue;
+    let entry: {
+      reason?: string; manifest_path?: string; filenames?: string[]; profile?: { test?: boolean };
+      message?: { level?: string; message?: string; code?: { code?: string } | null; spans?: { is_primary?: boolean; file_name: string; line_start: number; column_start: number; label?: string | null }[] };
+    };
+    try { entry = JSON.parse(line); } catch { continue; }
+    const package_ = entry.manifest_path ? path.dirname(entry.manifest_path) : undefined;
+    if (entry.reason === 'compiler-artifact' && package_ === crate && entry.profile?.test === false) {
+      // The dependency file beside each artifact lists the sources that unit compiled.
+      for (const artifact of entry.filenames ?? []) {
+        const name = path.basename(artifact).replace(/\.[^.]+$/, '');
+        for (const candidate of [name, name.replace(/^lib/, '')]) {
+          let text: string;
+          try { text = readFileSync(path.join(path.dirname(artifact), `${candidate}.d`), 'utf8'); } catch { continue; }
+          for (const rule of text.split('\n')) {
+            const colon = rule.indexOf(': ');
+            if (colon < 0) continue;
+            for (const source of rule.slice(colon + 2).split(/(?<!\\) /)) {
+              const name_ = source.replace(/\\ /g, ' ');
+              for (const b of bases) result.plain.add(path.resolve(b, name_));
+            }
+          }
+        }
+      }
+    }
+    if (entry.reason !== 'compiler-message' || entry.message?.level !== 'error') continue;
+    messages++;
+    const span = entry.message.spans?.find((s) => s.is_primary);
+    if (!span) continue;
+    const resolved = [...bases, ...(package_ ? [package_] : [])].map((b) => path.resolve(b, span.file_name)).find((f) => existsSync(f));
+    if (!resolved) continue;
+    const code = entry.message.code?.code ?? 'error';
+    const argument = code === 'E0308' && (entry.message.spans ?? []).some((s) => /arguments? to this .* (is|are) incorrect/.test(s.label ?? ''));
+    const id = `${resolved}:${span.line_start}:${span.column_start}:${code}:${entry.message.message}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    result.found.push({ file: path.resolve(root, path.relative(tree, resolved)), line: span.line_start, column: span.column_start, code, message: entry.message.message ?? code, blocking: RUST_BLOCKING.has(code) || argument });
+  }
+  if (status !== 0 && !messages) throw unavailable(output, 'cargo check failed');
+  cargoMemo.set(key, result);
+  return result;
+}
 function rustDiagnostics(root: string, file: string, deadline: number, base?: BaseTexts): Raw[] {
   if (!nearest(root, file, (names) => names.includes('Cargo.toml') ? 'Cargo.toml' : undefined)) throw new Error('no Cargo.toml');
   const tree = base ? baseTree(root, base) : path.resolve(root);
   try {
     const crate = nearest(tree, file, (names) => names.includes('Cargo.toml') ? 'Cargo.toml' : undefined);
     if (!crate) return [];
-    let text = '';
-    try { text = readFileSync(path.resolve(root, file), 'utf8'); } catch { /* deleted */ }
-    const allTargets = /(^|[\\/])(tests|benches|examples)[\\/]/.test(file) || /#\[(cfg\(test\)|test)\]/.test(text);
-    const key = `rust\0${crate.directory}\0${allTargets}`;
-    const cached = memo.get(key);
-    if (cached) return cached;
-    const { status, output } = run('cargo', ['check', '--offline', '--quiet', '--message-format=json', ...(allTargets ? ['--all-targets'] : [])], crate.directory, deadline);
-    const found: Raw[] = [];
-    const seen = new Set<string>();
-    let messages = 0;
-    for (const line of output.split('\n')) {
-      if (!line.startsWith('{')) continue;
-      let entry: { reason?: string; manifest_path?: string; message?: { level?: string; message?: string; code?: { code?: string } | null; spans?: { is_primary?: boolean; file_name: string; line_start: number; column_start: number; label?: string | null }[] } };
-      try { entry = JSON.parse(line); } catch { continue; }
-      if (entry.reason !== 'compiler-message' || entry.message?.level !== 'error') continue;
-      messages++;
-      const span = entry.message.spans?.find((s) => s.is_primary);
-      if (!span) continue;
-      // rustc reports paths relative to the workspace root, or to the package for a lone crate.
-      const bases = [crate.directory, ...(entry.manifest_path ? [path.dirname(entry.manifest_path)] : [])];
-      for (let d = path.dirname(crate.directory); !path.relative(tree, d).startsWith('..'); d = path.dirname(d)) { bases.push(d); if (d === tree) break; }
-      const resolved = bases.map((b) => path.resolve(b, span.file_name)).find((f) => existsSync(f));
-      if (!resolved) continue;
-      const code = entry.message.code?.code ?? 'error';
-      const argument = code === 'E0308' && (entry.message.spans ?? []).some((s) => /arguments? to this .* (is|are) incorrect/.test(s.label ?? ''));
-      const id = `${resolved}:${span.line_start}:${span.column_start}:${code}:${entry.message.message}`;
-      if (seen.has(id)) continue;
-      seen.add(id);
-      found.push({ file: path.resolve(root, path.relative(tree, resolved)), line: span.line_start, column: span.column_start, code, message: entry.message.message ?? code, blocking: RUST_BLOCKING.has(code) || argument });
+    const absolute = path.resolve(root, file);
+    const all = () => cargoCheck(root, tree, crate.directory, true, deadline).found;
+    if (base) {
+      const targets = rustTargets.get(absolute);
+      if (targets !== undefined) return targets ? all() : cargoCheck(root, tree, crate.directory, false, deadline).found;
     }
-    if (status !== 0 && !messages) throw unavailable(output, 'cargo check failed');
-    memo.set(key, found);
-    return found;
+    if (/(^|[\\/])(tests|benches|examples)[\\/]/.test(file)) { rustTargets.set(absolute, true); return all(); }
+    // The library and binaries alone are the quicker check, and enough unless the edit is in code only a test build compiles.
+    const plain = cargoCheck(root, tree, crate.directory, false, deadline);
+    let text = '';
+    try { text = readFileSync(path.join(tree, file), 'utf8'); } catch { /* deleted */ }
+    const regions = rustTestRegions(text);
+    const ranges = base ? null : batch.find((c) => c.file === file)?.ranges ?? null;
+    const inTests = ranges === null ? regions.length > 0 : ranges.some(([a, b]) => regions.some(([from, to]) => a <= to && b >= from));
+    const mine = plain.found.filter((f) => f.file === absolute);
+    // An error in the file shows as well as the dependency file does that the plain build compiles it.
+    const settled = mine.some((f) => f.blocking) || ((plain.plain.has(path.join(tree, file)) || mine.length > 0) && !inTests);
+    if (!base) rustTargets.set(absolute, !settled);
+    return settled ? plain.found : all();
   } finally { if (base) rmSync(tree, { recursive: true, force: true }); }
 }
 
@@ -370,9 +508,12 @@ const MANIFESTS = /^(go\.(mod|sum)|Cargo\.(toml|lock)|pom\.xml|build\.gradle(\.k
  * without this every Stop that finds an error would compile the project twice.
  */
 function baseCacheFile(language: CompiledLanguage, root: string, file: string, base: BaseTexts): string | null {
+  let variant = language === 'rust' ? String(rustTargets.get(path.resolve(root, file))) : '';
+  // The Go build target decides which files are built and the sizes they are checked with.
+  if (language === 'go') variant = spawnSync('go', ['env', 'GOOS', 'GOARCH', 'GOFLAGS', 'CGO_ENABLED'], { cwd: goModule(root, file)?.directory ?? root, encoding: 'utf8', timeout: 2000, env: { ...process.env, GOPROXY: 'off' } }).stdout ?? '';
   const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', timeout: 2000 });
   if (head.status !== 0) return null;
-  const hash = createHash('sha256').update([language, file, head.stdout.trim()].join('\0'));
+  const hash = createHash('sha256').update([language, file, head.stdout.trim(), variant].join('\0'));
   for (const [name, text] of [...base].sort(([a], [b]) => a.localeCompare(b))) hash.update(`\0${name}\0${text === null ? '\0' : text}`);
   const top = path.resolve(root);
   for (let directory = path.dirname(path.resolve(root, file)); ; directory = path.dirname(directory)) {

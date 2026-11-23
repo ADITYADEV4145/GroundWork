@@ -136,7 +136,7 @@ export function select(seed: number, all: Omit<Mutation, 'id'>[]): Mutation[] {
 
 export const CLEAN_COMMITS = 50;
 export const FILES_PER_COMMIT = 4;
-export function cleanCases(seed: number, repo: Repository, root: string): CleanCase[] {
+export function cleanCases(seed: number, repo: Repository, root: string, skip = 0): CleanCase[] {
   const pattern = `*${EXTENSION[repo.language]}`;
   const cases: CleanCase[] = [];
   for (const row of git(root, 'log', '--no-merges', '--format=%H %P', repo.commit, '--', pattern).split('\n')) {
@@ -147,9 +147,9 @@ export function cleanCases(seed: number, repo: Repository, root: string): CleanC
     if (!eligible.length) continue;
     const files = eligible.sort((a, b) => sha(`${seed}:${commit}:${a}`).localeCompare(sha(`${seed}:${commit}:${b}`))).slice(0, FILES_PER_COMMIT).sort();
     cases.push({ id: `${repo.id}-${commit.slice(0, 10)}`, repo: repo.id, language: repo.language, commit, parent, files, eligibleFiles: eligible.length });
-    if (cases.length === CLEAN_COMMITS) break;
+    if (cases.length === skip + CLEAN_COMMITS) break;
   }
-  return cases;
+  return cases.slice(skip);
 }
 
 export function percentile(values: number[], fraction: number): number | null {

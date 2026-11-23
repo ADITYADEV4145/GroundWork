@@ -278,8 +278,8 @@ The TypeScript blocking allowlist is 2304, 2305, 2724, 2339, 2551, 2349, 2554,
 `gw types def|impl|refs file:line:col` provides TypeScript navigation. All support `--json`.
 
 Go, Rust, Java and C# files are checked with the toolchain already on the machine:
-`go build -gcflags=-e` / `go vet` (needs `go.mod`), `cargo check --offline` (needs
-`Cargo.toml`), `javac` on the Maven/Gradle source roots and local jars, and
+a `go/types` checker built once from the installed Go (needs `go.mod`; `go build -gcflags=-e` /
+`go vet` if it cannot be built), `cargo check --offline` (needs `Cargo.toml`), `javac` on the Maven/Gradle source roots and local jars, and
 `dotnet build --no-restore` (needs a restored `.csproj`; outputs go to a scratch directory,
 never the project's `bin`/`obj`). Only undefined names, unknown members, wrong argument
 counts and unresolved imports on changed lines can block; everything else, and everything
@@ -287,9 +287,11 @@ counts and unresolved imports on changed lines can block; everything else, and e
 processors (Lombok and the like), is informational. A missing toolchain or
 project file leaves grounding unchanged. These four have no `def|impl|refs` navigation.
 On the preregistered gate (two pinned real repositories per language, seeded one-line errors,
-100 real commits each) Java passes; Go, Rust and C# fail, because checks on the large
-repositories (Hugo, rust-analyzer, Polly) often exceed the 4 s budget and fail open, and Rust
-recall is 60%: `bench/type-languages/results/RESULTS.md`.
+100 real commits each) Java and Go pass; Rust and C# fail. Go failed the first run and passes
+the second, on the first run's cases and on a held-out set. Rust still fails: on rust-analyzer
+20 of 100 real commits exceed the 4 s budget and fail open. C# is unchanged and fails for the
+same reason on Polly. Results: `bench/type-languages/results/RESULTS.md` (first run),
+`bench/type-languages/results-v2/RESULTS.md` (second run).
 
 The optional `types` config section defaults to
 `{ "enabled": true, "stopGate": true, "postToolHook": false, "timeoutMs": 4000,

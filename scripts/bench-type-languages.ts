@@ -22,7 +22,13 @@ import {
 
 const script = fileURLToPath(import.meta.url);
 const config = defaultConfig();
-const manifestPath = path.join(data, 'manifest.json');
+const option = (name: string) => process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : undefined;
+const manifestPath = path.join(data, option('--manifest') ?? 'manifest.json');
+/** The preregistered budget. `--budget-ms` or `--ids` make an exploratory run, which is never a gate result. */
+const BUDGET_MS = 4000;
+const budgetMs = Number(option('--budget-ms') ?? BUDGET_MS);
+const ids = option('--ids')?.split(',').filter(Boolean) ?? null;
+const exploratory = budgetMs !== BUDGET_MS || ids !== null;
 const dotnetHome = path.join(os.homedir(), '.dotnet');
 if (existsSync(path.join(dotnetHome, 'dotnet')) && !(process.env.PATH ?? '').split(path.delimiter).includes(dotnetHome)) process.env.PATH = `${process.env.PATH}${path.delimiter}${dotnetHome}`;
 
@@ -55,7 +61,7 @@ async function evaluate(root: string, language: Lang, changed: ChangedFile[], ba
   } catch (e) { row.complete = false; row.errors.push(`grounding: ${(e as Error).message}`); }
   const start = performance.now();
   try {
-    row.types = await typeCheck(root, changed, config, { base, timeoutMs: 4000 });
+    row.types = await typeCheck(root, changed, config, { base, timeoutMs: budgetMs });
     if (row.types.timedOut) { row.checked = false; row.timedOut = true; row.errors.push('type timeout'); }
     else if (row.types.available[language] !== true && !nothing) { row.checked = false; row.errors.push(`${language}: ${row.types.available[language]}`); }
     row.B = unionBlocks(row.A, row.types.findings.filter((f) => f.blocking).map((f) => ({ file: f.file, line: f.line, name: f.name, message: f.message, code: f.code, source: 'types' })));
@@ -74,7 +80,8 @@ async function warmChecker(root: string, language: Lang, files: string[]): Promi
     if (!existsSync(target)) continue;
     const original = readFileSync(target, 'utf8'), lines = original.split('\n').length;
     try {
-      await typeCheck(root, [{ file, ranges: [[1, 1]] }], config, { base: 'HEAD', timeoutMs: 900_000 });
+      // The whole file, so every build the file is part of (Rust test targets included) is warm.
+      await typeCheck(root, [{ file, ranges: null }], config, { base: 'HEAD', timeoutMs: 900_000 });
       const error = WARM_ERROR[language];
       if (!error) continue;
       writeFileSync(target, `${original}${original.endsWith('\n') ? '' : '\n'}${error}\n`);
@@ -111,33 +118,40 @@ function setup(): void {
   }
 }
 
+/** `--seed`, `--skip-commits` and `--language` draw a second set from the same repositories: other seeded lines, and the commits before the first set's. */
 function generate(): void {
-  const manifest: Manifest = { version: 1, seed: registry.seed, repositories: registry.repositories, mutations: [], clean: [], sourceHashes: {}, timing: {} };
-  for (const repo of registry.repositories) {
+  const seed = Number(option('--seed') ?? registry.seed), skip = Number(option('--skip-commits') ?? 0), only = option('--language');
+  const repositories = registry.repositories.filter((r) => !only || r.language === only);
+  const manifest: Manifest = { version: 1, seed, repositories, mutations: [], clean: [], sourceHashes: {}, timing: {} };
+  for (const repo of repositories) {
     const root = clonePath(repo);
     checkout(root, repo.commit);
     const files = tracked(root, repo.language);
-    const mutations = select(registry.seed, candidates(repo, root, files));
+    const mutations = select(seed, candidates(repo, root, files));
     manifest.mutations.push(...mutations);
     manifest.sourceHashes[repo.id] = Object.fromEntries([...new Set(mutations.map((m) => m.file))].sort().map((f) => [f, sha(readFileSync(path.join(root, f)))]));
-    manifest.clean.push(...cleanCases(registry.seed, repo, root));
+    manifest.clean.push(...cleanCases(seed, repo, root, skip));
     if (repo.latency) {
       const eligible = files.filter((f) => productFile(repo.language, f) && readFileSync(path.join(root, f), 'utf8').split('\n').length >= 200);
-      const file = eligible.sort((a, b) => sha(`${registry.seed}:timing:${a}`).localeCompare(sha(`${registry.seed}:timing:${b}`)))[0]!;
+      const file = eligible.sort((a, b) => sha(`${seed}:timing:${a}`).localeCompare(sha(`${seed}:timing:${b}`)))[0]!;
       const text = readFileSync(path.join(root, file), 'utf8');
       manifest.timing[repo.id] = { file, line: text.split('\n').length - (text.endsWith('\n') ? 0 : -1), sha256: sha(text), languageLines: files.reduce((n, f) => n + readFileSync(path.join(root, f), 'utf8').split('\n').length, 0) };
     }
   }
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 1)}\n`);
-  for (const language of LANGUAGES) console.log(language, 'mutations', manifest.mutations.filter((m) => m.language === language).length, 'clean', manifest.clean.filter((c) => c.language === language).length);
+  for (const language of LANGUAGES.filter((l) => !only || l === only)) console.log(language, 'mutations', manifest.mutations.filter((m) => m.language === language).length, 'clean', manifest.clean.filter((c) => c.language === language).length);
   console.log('manifest sha256', sha(readFileSync(manifestPath)));
 }
 
-export function registeredManifest(directory = data): { manifest: Manifest; hash: string } {
-  const expected = /Manifest SHA256: `([a-f0-9]{64})`/.exec(readFileSync(path.join(directory, 'PREREGISTRATION.md'), 'utf8'))?.[1];
-  const bytes = readFileSync(path.join(directory, 'manifest.json'));
-  if (!expected || sha(bytes) !== expected) throw new Error('Refusing benchmark: manifest.json SHA256 differs from preregistration');
-  return { manifest: JSON.parse(bytes.toString()) as Manifest, hash: expected };
+/** A manifest is registered when the preregistration names its SHA256 after its file name. */
+export function registeredManifest(directory = data, name = 'manifest.json', preregistration = 'PREREGISTRATION.md'): { manifest: Manifest; hash: string } {
+  const bytes = readFileSync(path.join(directory, name));
+  const text = readFileSync(path.join(directory, preregistration), 'utf8');
+  const registered = name === 'manifest.json' && preregistration === 'PREREGISTRATION.md'
+    ? [/Manifest SHA256: `([a-f0-9]{64})`/.exec(text)?.[1]]
+    : [...text.matchAll(/`([\w.-]+\.json)` SHA256: `([a-f0-9]{64})`/g)].filter((m) => m[1] === name).map((m) => m[2]);
+  if (!registered.includes(sha(bytes))) throw new Error(`Refusing benchmark: ${name} SHA256 differs from preregistration`);
+  return { manifest: JSON.parse(bytes.toString()) as Manifest, hash: sha(bytes) };
 }
 
 interface SeedRow extends Evaluation { mutation: Mutation; caughtA: boolean; caughtB: boolean }
@@ -148,7 +162,7 @@ interface LanguageResult { language: Lang; seeds: SeedRow[]; clean: CleanRow[]; 
 const TIMING_LINE = '// groundwork timing edit';
 async function timedCall(root: string, file: string, line: number, mode: 'cold' | 'warm'): Promise<Timing> {
   const start = performance.now();
-  const result = await typeCheck(root, [{ file, ranges: [[line, line]] }], config, { timeoutMs: 4000, base: 'HEAD' });
+  const result = await typeCheck(root, [{ file, ranges: [[line, line]] }], config, { timeoutMs: BUDGET_MS, base: 'HEAD' });
   return { mode, ms: Number((performance.now() - start).toFixed(3)), result };
 }
 
@@ -160,10 +174,12 @@ async function runLanguage(language: Lang, manifest: Manifest, part: Part): Prom
     const root = clonePath(repo);
     checkout(root, repo.commit);
     for (const [file, hash] of Object.entries(manifest.sourceHashes[repo.id] ?? {})) if (sha(readFileSync(path.join(root, file))) !== hash) throw new Error(`Frozen source differs: ${repo.id}/${file}`);
-    const mutations = part === 'cases' ? manifest.mutations.filter((m) => m.repo === repo.id) : [];
+    const mutations = part === 'cases' ? manifest.mutations.filter((m) => m.repo === repo.id && (!ids || ids.includes(m.id))) : [];
     const files = [...new Set(mutations.map((m) => m.file))];
-    restore(root, language, files); await warmChecker(root, language, files);
+    restore(root, language, files);
     for (const mutation of mutations) {
+      // Per case, as registered: restoring the previous seed leaves its file newer than the compiler's caches.
+      await warmChecker(root, language, [mutation.file]);
       const target = path.join(root, mutation.file);
       const original = readFileSync(target, 'utf8');
       const lines = original.split('\n');
@@ -177,7 +193,7 @@ async function runLanguage(language: Lang, manifest: Manifest, part: Part): Prom
       } finally { writeFileSync(target, original); }
       console.log(`seed ${mutation.id} ${result.seeds.at(-1)!.caughtA ? 'A' : '-'}${result.seeds.at(-1)!.caughtB ? 'B' : '-'} ${result.seeds.at(-1)!.errors.join('; ')}`);
     }
-    for (const item of part === 'cases' ? manifest.clean.filter((c) => c.repo === repo.id) : []) {
+    for (const item of part === 'cases' ? manifest.clean.filter((c) => c.repo === repo.id && (!ids || ids.includes(c.id))) : []) {
       checkout(root, item.commit); restore(root, language, item.files);
       checkout(root, item.parent); restore(root, language, item.files); await warmChecker(root, language, item.files);
       git(root, 'checkout', '--quiet', '--force', item.commit, '--', '.');
@@ -230,7 +246,7 @@ function summarize(language: Lang, manifest: Manifest, result: Omit<LanguageResu
 }
 
 const NAMES: Record<Lang, string> = { go: 'Go', java: 'Java', rust: 'Rust', csharp: 'C#' };
-export function markdown(results: { manifestSha256: string; checkerCommit: string; environment: Record<string, string>; languages: LanguageResult[] }): string {
+export function markdown(results: { manifestSha256: string; checkerCommit: string; preregistration?: string; environment: Record<string, string>; languages: LanguageResult[] }): string {
   const lines = ['# Compiled-language type-checking gate results', '', '**Deterministic tool-level evaluation, NOT an agent run.** Nothing here supports a speed, token, cost or competitor claim.', '',
     `Preregistered manifest SHA256: \`${results.manifestSha256}\`. Checker commit: \`${results.checkerCommit}\`.`, '',
     '| Language | Status | Seeded caught, grounding only (A) | Seeded caught, with types (B) | Recall B | Seeded timed out | Clean cases (checked) | Blocks on clean A / B | Stop type-check p50 / p95 ms | `gw init` ms (3 runs) | Latency repo lines | Complete |', '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | --- |'];
@@ -263,16 +279,27 @@ export function markdown(results: { manifestSha256: string; checkerCommit: strin
 }
 
 async function run(): Promise<void> {
-  const { manifest, hash } = registeredManifest();
-  const only = process.argv.includes('--language') ? process.argv[process.argv.indexOf('--language') + 1] as Lang : null;
-  const directory = path.join(data, 'results');
+  const { manifest, hash } = registeredManifest(data, option('--manifest'), option('--preregistration'));
+  const only = (option('--language') ?? null) as Lang | null;
+  const directory = path.join(data, option('--out') ?? 'results');
   mkdirSync(directory, { recursive: true });
   const version = (binary: string, ...args: string[]) => { try { return execFileSync(binary, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim().split('\n')[0]!; } catch { return 'unavailable'; } };
-  const part = process.argv[process.argv.indexOf('--part') + 1] as Part;
+  const part = option('--part') as Part;
   if (part !== 'cases' && part !== 'latency') throw new Error('--part cases|latency is required');
+  if (exploratory) {
+    if (part !== 'cases' || !option('--out')) throw new Error('An exploratory run takes --part cases and its own --out directory');
+    for (const language of LANGUAGES.filter((l) => !only || l === only)) {
+      const file = path.join(directory, `${language}.exploratory.json`);
+      if (existsSync(file)) throw new Error(`Refusing to rerun ${language}: result exists`);
+      const rows = await runLanguage(language, manifest, part);
+      writeFileSync(file, `${JSON.stringify({ exploratory: true, budgetMs, ids, checkerCommit: git(project, 'rev-parse', 'HEAD'), seeds: rows.seeds, clean: rows.clean }, null, 1)}\n`);
+    }
+    return;
+  }
   const partFile = (l: Lang, p: Part) => path.join(directory, `${l}.${p}.json`);
   for (const language of LANGUAGES) {
     if (only && only !== language) continue;
+    if (!manifest.repositories.some((r) => r.language === language)) continue;
     if (existsSync(partFile(language, part))) throw new Error(`Refusing to rerun ${language} ${part}: result exists`);
     writeFileSync(partFile(language, part), `${JSON.stringify(await runLanguage(language, manifest, part), null, 1)}\n`);
   }
@@ -282,6 +309,7 @@ async function run(): Promise<void> {
   });
   const results = {
     manifestSha256: hash, checkerCommit: git(project, 'rev-parse', 'HEAD'),
+    preregistration: option('--preregistration') ?? 'PREREGISTRATION.md',
     environment: { node: process.version, platform: `${os.platform()} ${os.arch()}, ${os.cpus().length} CPUs`, go: version('go', 'version'), javac: version('javac', '-version'), cargo: version('cargo', '--version'), dotnet: version('dotnet', '--version') },
     languages,
   };
@@ -295,5 +323,5 @@ if (process.argv[1] && path.resolve(process.argv[1]) === script) {
   else if (command === 'generate') generate();
   else if (command === 'call') { console.log(JSON.stringify(await timedCall(process.argv[3]!, process.argv[4]!, Number(process.argv[5]), 'cold'))); process.exit(0); }
   else if (command === 'run') { await run(); process.exit(0); }
-  else { console.error('usage: bench-type-languages.ts setup|generate|run [--language go|java|rust|csharp]'); process.exit(2); }
+  else { console.error('usage: bench-type-languages.ts setup | generate [--seed n --skip-commits n --language l --manifest file] | run --part cases|latency [--language l] [--manifest file --preregistration file --out dir] [--budget-ms n --ids a,b]'); process.exit(2); }
 }

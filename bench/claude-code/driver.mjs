@@ -90,18 +90,15 @@ export function runSession({ suite: name, arm, run, model, out, maxTurns = 40, t
   try { return runLocked({ suite, name, tasks, arm, run, model, dir, metaFile, treatment, maxTurns, timeoutMs, claude, log }); } finally { release(); }
 }
 
-/** One process per session: a second launch would delete the live workspace and bill the task twice. A lock whose process is gone is taken over. */
+/**
+ * One process per session: a second launch would delete the live workspace and bill the task twice.
+ * A lock is never taken over automatically, because two resumes racing to replace a stale one could both win; the operator removes it.
+ */
 function lockSession(dir) {
   const lock = path.join(dir, 'session.lock');
-  for (let attempt = 0; ; attempt++) {
-    try { writeFileSync(lock, String(process.pid), { flag: 'wx' }); break; } catch (err) {
-      if (err.code !== 'EEXIST' || attempt) throw err;
-      const pid = Number(readFileSync(lock, 'utf8'));
-      let alive = false;
-      try { process.kill(pid, 0); alive = true; } catch (e) { alive = e.code === 'EPERM'; }
-      if (alive) throw new Error(`Session is already running in process ${pid}`);
-      rmSync(lock, { force: true });
-    }
+  try { writeFileSync(lock, String(process.pid), { flag: 'wx' }); } catch (err) {
+    if (err.code !== 'EEXIST') throw err;
+    throw new Error(`Session is locked by process ${readFileSync(lock, 'utf8') || '(unknown)'}. If that process is gone, delete ${lock} and run again`);
   }
   return () => rmSync(lock, { force: true });
 }

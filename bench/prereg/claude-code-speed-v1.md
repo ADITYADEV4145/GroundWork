@@ -16,7 +16,7 @@ Both arms use the same Claude Code version, model, `--max-turns 40`, a 15-minute
 - Exactly 16 sessions per arm per suite, runs 1 to 16, 64 sessions in total. A session is every task of the suite in manifest order, each task in a fresh conversation and a fresh workspace at the suite's pinned revision. A long-horizon step starts from the patches of that session's earlier steps.
 - Order: for run 1 to 16, `baseline` then `groundwork` on odd runs and the reverse on even runs, navigation before long-horizon.
 - The model, Claude Code version and GroundWork commit are fixed before run 1 and written here by a commit made before run 1. All sessions use one GroundWork commit.
-- No optional stopping, exclusions, replacement sessions or reruns. An interrupted session resumes at its first unfinished task; finished task records are never overwritten.
+- No optional stopping, exclusions, replacement sessions or reruns. An interrupted session resumes at its first unfinished task, after the operator removes its `session.lock`; finished task records are never overwritten.
 
 ## What is recorded
 

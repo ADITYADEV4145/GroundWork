@@ -69,8 +69,10 @@ else console.log(JSON.stringify({ result: 'done', usage: { input_tokens: 7, outp
     const lock = path.join(session, 'session.lock');
     assert.equal(existsSync(lock), false);
     writeFileSync(lock, String(process.ppid));
-    assert.throws(() => runSession(options), /already running/);
-    writeFileSync(lock, '2147483646');
+    assert.throws(() => runSession(options), /Session is locked by process \d+/);
+    writeFileSync(lock, '');
+    assert.throws(() => runSession(options), /locked by process \(unknown\)/);
+    rmSync(lock);
     runSession(options);
     assert.equal(existsSync(lock), false);
 

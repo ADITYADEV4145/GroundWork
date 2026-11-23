@@ -95,6 +95,9 @@ describe('gw scan on a diff with context', () => {
       // Only the last line of lists.ts changes: its duplicated function, and the dead code in copy.ts, were there before.
       const tail = await scanRepository(db, root, { config, changed: [{ file: 'lists.ts', ranges: [[10, 10]] }] });
       expect(tail.findings.map((f) => `${f.kind} ${f.file}:${f.line}`)).toEqual(['duplicate-constant lists.ts:10']);
+      // A file changed as a whole (untracked) has no line ranges: everything in it is the change.
+      const whole = await scanRepository(db, root, { config, changed: [{ file: 'copy.ts', ranges: null }] });
+      expect(whole.findings.map((f) => f.kind).sort()).toEqual(['dead-code', 'duplicate-constant', 'duplicate-logic']);
       // A diff that writes the copy reports it against the untouched original.
       const copy = await scanRepository(db, root, { config, changed: [{ file: 'copy.ts', ranges: [[1, 8]] }] });
       expect(copy.findings).toEqual([expect.objectContaining({ kind: 'duplicate-logic', file: 'copy.ts', suggestion: 'chunk (lists.ts:1)' })]);

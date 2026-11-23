@@ -86,7 +86,7 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
   const usable = (f: { isTest: boolean; isGenerated: boolean; status: string }) => !f.isTest && !f.isGenerated && f.status === 'ok';
   const ranges = changed ? new Map(changed.map((c) => [c.file, c.ranges])) : null;
   /** In a diff scan only what the change itself touches is reported; the rest of the repository was like that before. */
-  const touched = (file: string, from: number, to = from) => !ranges || (ranges.get(file) ?? []).some(([a, b]) => from <= b && to >= a);
+  const touched = (file: string, from: number, to = from) => !ranges || (ranges.has(file) && (ranges.get(file) ?? [[0, Infinity]]).some(([a, b]) => from <= b && to >= a));
   const results = changed ? verifyChanged(db, root, changed, config) : state.files.filter(usable).map((f) => verifyFile(db, root, f.file, { config }));
   for (const result of results) all.push(...result.findings.map(fromGrounding));
 
@@ -133,11 +133,13 @@ export async function scanRepository(db: Db, root: string, options: ScanOptions)
     constants.set(key, [...(constants.get(key) ?? []), l]);
   }
   for (const group of constants.values()) {
-    const first = group.find((l) => !touched(l.file, l.line)) ?? group[0];
     for (const copy of group) {
-      if (copy === first || copy.file === first!.file || !touched(copy.file, copy.line)) continue;
-      all.push({ kind: 'duplicate-constant', confidence: copy.constName === first!.constName ? 'high' : 'low', file: copy.file, line: copy.line,
-        message: `${copy.constName} repeats the value of ${first!.constName}.`, suggestion: `${first!.constName} (${first!.file}:${first!.line})` });
+      if (!touched(copy.file, copy.line)) continue;
+      // Point at a constant in another file that the change did not write; failing that, at the first of the group.
+      const first = group.find((l) => l.file !== copy.file && !touched(l.file, l.line)) ?? group[0]!;
+      if (copy === first || copy.file === first.file) continue;
+      all.push({ kind: 'duplicate-constant', confidence: copy.constName === first.constName ? 'high' : 'low', file: copy.file, line: copy.line,
+        message: `${copy.constName} repeats the value of ${first.constName}.`, suggestion: `${first.constName} (${first.file}:${first.line})` });
     }
   }
 

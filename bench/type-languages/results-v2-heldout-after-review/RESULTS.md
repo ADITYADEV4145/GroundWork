@@ -2,11 +2,11 @@
 
 **Deterministic tool-level evaluation, NOT an agent run.** Nothing here supports a speed, token, cost or competitor claim.
 
-Preregistered manifest SHA256: `404a90e70f0155e83efeac3afbca47560b933cfe7b98be5ef06012fa93203dfa`. Checker commit: `b3f52cb398c3117637a12e595560a3e373166086`.
+Preregistered manifest SHA256: `404a90e70f0155e83efeac3afbca47560b933cfe7b98be5ef06012fa93203dfa`. Checker commit: `e0892e4509b22adf9eb9056fe6d3676b5333e3b4`.
 
 | Language | Status | Seeded caught, grounding only (A) | Seeded caught, with types (B) | Recall B | Seeded timed out | Clean cases (checked) | Blocks on clean A / B | Stop type-check p50 / p95 ms | `gw init` ms (3 runs) | Latency repo lines | Complete |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | --- |
-| Go | **PASS** | 0/35 | 32/35 | 91.4% | 0 | 100 (100) | 0 / 0 | 132.014 / 239.673 | 2567, 2641, 2570 | 235173 (hugo) | yes |
+| Go | **PASS** | 0/35 | 32/35 | 91.4% | 0 | 100 (100) | 0 / 0 | 160.412 / 269.419 | 2545, 2564, 2764 | 235173 (hugo) | yes |
 
 ## Preregistered rules
 
@@ -49,4 +49,4 @@ Raw rows: `<language>.cases.json` and `<language>.latency.json`. Protocol and li
 
 Written by hand; the tables and lists above are the runner's output, unchanged. The protocol is `../PREREGISTRATION-v2.md` (the line above names the first run's file).
 
-- This is the Go held-out set measured again after three review fixes to the Go checker; see `../results-v2-after-review/RESULTS.md`. It is the second time these cases were run, so it is no longer a first look: `../results-v2-heldout/RESULTS.md`, measured before the fixes, is the held-out result and stands as published. Go passes every rule in both.
+- This is the Go held-out set measured again after the review fixes to the Go checker; see `../results-v2-after-review/RESULTS.md`. These cases had been run before, so it is no longer a first look: `../results-v2-heldout/RESULTS.md`, measured before the fixes, is the held-out result and stands as published. Go passes every rule in both.

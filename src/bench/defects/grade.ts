@@ -71,7 +71,7 @@ function tscDiagnostics(root: string): { items: { file: string; line: number; co
 }
 
 function goDiagnostics(root: string): { items: { file: string; line: number; message: string }[]; infra: string | null } {
-  const r = run(root, ['go', 'vet', './...'], { GOFLAGS: '-mod=mod', GOWORK: 'off' });
+  const r = run(root, ['go', 'vet', './...'], { GOFLAGS: '-mod=readonly', GOWORK: 'off' });
   if (r.infra) return { items: [], infra: r.infra };
   const items = [...r.output.matchAll(/^(?:vet: )?(?:\.\/)?([^\s:#]+\.go):(\d+):(?:\d+:)? (.*)$/gm)]
     .map((m) => ({ file: m[1]!.split(path.sep).join('/'), line: Number(m[2]), message: m[3]! }));

@@ -93,6 +93,19 @@ func TotalGrams(parcels []model.Parcel) (float64, error) {
 }
 ` });
     expect(broken.defects.typeErrors).toBeGreaterThan(0);
+    const undeclared = await graded('stock-parcel-weight', { 'shipping/weight.go': `package shipping
+
+import (
+	"github.com/example/absent/units"
+	"stockroom/model"
+)
+
+func TotalGrams(parcels []model.Parcel) (float64, error) {
+	return units.Sum(parcels)
+}
+` });
+    expect(undeclared.defects.typeErrors).toBeGreaterThan(0);
+    expect(undeclared.success).toBe(false);
     const shared = await graded('stock-restock-then-late', {
       'orders/restock_fee.go': `package orders
 

@@ -1,0 +1,8 @@
+# Legacy Smithery stdio configuration. The launcher must run in the local repository.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties: {}
+  commandFunction: |-
+    () => ({ command: 'npx', args: ['-y', 'groundwork-agent', 'mcp'] })

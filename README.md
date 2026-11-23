@@ -101,6 +101,11 @@ gw install    # detect your clients, preview project-level changes, then confirm
 
 Restart your agent after setup. Codex asks you to trust the new hooks once, under `/hooks`.
 
+For **Cursor MCP only**, open the repository in Cursor and choose
+[Add to Cursor](https://cursor.com/install-mcp?name=groundwork&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImdyb3VuZHdvcmstYWdlbnQiLCItLXJvb3QiLCIke3dvcmtzcGFjZUZvbGRlcn0iLCJtY3AiXX0%3D).
+The link starts the local MCP server with `npx` and points it at the open workspace.
+It adds MCP tools only; for project-level setup with hooks, use `gw install --client cursor` instead.
+
 Codex setup also installs the skill and references in `.agents/skills/groundwork/`,
 the [repository skill location Codex discovers](https://developers.openai.com/codex/skills/).
 Removal preserves pre-existing or subsequently edited skill files.

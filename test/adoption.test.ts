@@ -147,6 +147,7 @@ describe('gw update', () => {
     expect(selfUpdateBlocker(temp(), () => prefix)).toMatch(/not in npm's global directory/);
     expect(compareVersions('1.0.0-rc.10', '1.0.0-rc.9')).toBeGreaterThan(0);
     expect(compareVersions('1.0.0-rc.1', '1.0.0-rc')).toBeGreaterThan(0);
+    expect(compareVersions('1.0.0-dev.20261123011727001', '1.0.0-dev.20261123011727000')).toBeGreaterThan(0);
     expect(compareVersions('1.0.0-alpha', '1.0.0-1')).toBeGreaterThan(0);
   });
 });

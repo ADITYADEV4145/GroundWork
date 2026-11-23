@@ -51,7 +51,12 @@ export function compareVersions(a: string, b: string): number {
     if (r === undefined) return 1;
     if (l === r) continue;
     const ln = /^\d+$/.test(l), rn = /^\d+$/.test(r);
-    if (ln && rn) return Number(l) - Number(r);
+    if (ln && rn) {
+      // Length first, then text: exact for identifiers too long for a number, such as timestamps.
+      const m = l.replace(/^0+(?=\d)/, ''), n = r.replace(/^0+(?=\d)/, '');
+      if (m === n) continue;
+      return m.length !== n.length ? m.length - n.length : m < n ? -1 : 1;
+    }
     if (ln !== rn) return ln ? -1 : 1;
     return l < r ? -1 : 1;
   }

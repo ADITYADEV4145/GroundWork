@@ -1,0 +1,213 @@
+{
+  "suite": "multiturn-reuse",
+  "revision": "aa5d233f3a080d149c4cd3f9c7ff271257a1e50a",
+  "condition": "groundwork",
+  "run": 14,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795350507304,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin fusion",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "831fca40500094b904eb5078b5982884a057a439",
+  "chain": "click-values",
+  "sessionEndedAt": 1795350614074,
+  "observations": [
+    {
+      "task": "click-values-1",
+      "startedAt": 1795350517778,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350517778,
+          "endedAt": 1795350518747,
+          "durationMs": 967.948033,
+          "bytes": 0
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 363,
+          "startedAt": 1795350523145,
+          "endedAt": 1795350523416,
+          "durationMs": 269.772341
+        },
+        {
+          "action": "shell",
+          "bytes": 162,
+          "startedAt": 1795350523539,
+          "endedAt": 1795350523568,
+          "durationMs": 28.706693999999985
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795350531892,
+          "endedAt": 1795350532124,
+          "durationMs": 232.17191599999998
+        },
+        {
+          "action": "shell",
+          "bytes": 329,
+          "startedAt": 1795350537168,
+          "endedAt": 1795350537324,
+          "durationMs": 155.93815899999998
+        },
+        {
+          "action": "shell",
+          "bytes": 161,
+          "startedAt": 1795350546816,
+          "endedAt": 1795350547131,
+          "durationMs": 313.799854
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350551127,
+          "endedAt": 1795350552965,
+          "durationMs": 1837.513872,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350552965,
+      "wallMs": 35187,
+      "patch": "diff --git a/src/reusebench_click_values/__init__.py b/src/reusebench_click_values/__init__.py\nnew file mode 100644\nindex 0000000..8d6fd8b\n--- /dev/null\n+++ b/src/reusebench_click_values/__init__.py\n@@ -0,0 +1 @@\n+\"\"\"Reusable value preparation steps built on click utilities.\"\"\"\ndiff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nnew file mode 100644\nindex 0000000..b44a2f5\n--- /dev/null\n+++ b/src/reusebench_click_values/steps.py\n@@ -0,0 +1,33 @@\n+\"\"\"Record preparation steps reusing click value conversion helpers.\"\"\"\n+\n+from __future__ import annotations\n+\n+import typing as t\n+\n+from click.utils import make_str\n+\n+\n+def display(value: t.Any) -> str:\n+    \"\"\"Convert a value to its display string using click make_str semantics.\"\"\"\n+    return make_str(value)\n+\n+\n+def prepare(record: t.Any) -> dict[str, t.Any]:\n+    \"\"\"Validate a record and return a new prepared copy with a display string.\"\"\"\n+    if not isinstance(record, dict):\n+        raise ValueError(\"record must be a dict\")\n+    key = record.get(\"key\")\n+    if not isinstance(key, str) or not key.strip():\n+        raise ValueError(\"record key must be a nonempty string\")\n+    if \"value\" not in record:\n+        raise ValueError(\"record must have a value\")\n+    enabled = record.get(\"enabled\", True)\n+    if not isinstance(enabled, bool):\n+        raise ValueError(\"record enabled must be a bool\")\n+    value = record[\"value\"]\n+    return {\n+        \"key\": key.strip(),\n+        \"value\": value,\n+        \"display\": display(value),\n+        \"enabled\": enabled,\n+    }\n"
+    },
+    {
+      "task": "click-values-2",
+      "startedAt": 1795350556569,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350556569,
+          "endedAt": 1795350556665,
+          "durationMs": 96.31532299999999,
+          "bytes": 147
+        },
+        {
+          "action": "shell",
+          "bytes": 352,
+          "startedAt": 1795350563210,
+          "endedAt": 1795350563410,
+          "durationMs": 199.66125700000003
+        },
+        {
+          "action": "shell",
+          "bytes": 741,
+          "startedAt": 1795350569747,
+          "endedAt": 1795350570074,
+          "durationMs": 326.79636800000003
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350573650,
+          "endedAt": 1795350575487,
+          "durationMs": 1836.0335559999999,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350575487,
+      "wallMs": 18918,
+      "patch": "diff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex b44a2f5..cae150b 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -31,3 +31,19 @@ def prepare(record: t.Any) -> dict[str, t.Any]:\n         \"display\": display(value),\n         \"enabled\": enabled,\n     }\n+\n+\n+def batch(records: t.Any) -> list[dict[str, t.Any]]:\n+    \"\"\"Prepare a list of records in order, rejecting duplicate trimmed keys.\"\"\"\n+    if not isinstance(records, list):\n+        raise ValueError(\"records must be a list\")\n+    prepared: list[dict[str, t.Any]] = []\n+    seen: set[str] = set()\n+    for record in records:\n+        item = prepare(record)\n+        key = item[\"key\"]\n+        if key in seen:\n+            raise ValueError(f\"duplicate key: {key!r}\")\n+        seen.add(key)\n+        prepared.append(item)\n+    return prepared\n"
+    },
+    {
+      "task": "click-values-3",
+      "startedAt": 1795350575744,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350575744,
+          "endedAt": 1795350575812,
+          "durationMs": 66.886746,
+          "bytes": 209
+        },
+        {
+          "action": "shell",
+          "bytes": 93,
+          "startedAt": 1795350581784,
+          "endedAt": 1795350582045,
+          "durationMs": 260.334653
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350586021,
+          "endedAt": 1795350588898,
+          "durationMs": 2875.7805919999996,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350588898,
+      "wallMs": 13154,
+      "patch": "diff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex cae150b..615e0da 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -47,3 +47,12 @@ def batch(records: t.Any) -> list[dict[str, t.Any]]:\n         seen.add(key)\n         prepared.append(item)\n     return prepared\n+\n+\n+def group(records: t.Any) -> dict[str, list[str]]:\n+    \"\"\"Group display values of enabled records by the first character of their key.\"\"\"\n+    groups: dict[str, list[str]] = {}\n+    for item in batch(records):\n+        if item[\"enabled\"]:\n+            groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n+    return groups\n"
+    },
+    {
+      "task": "click-values-4",
+      "startedAt": 1795350589173,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350589173,
+          "endedAt": 1795350589246,
+          "durationMs": 72.38946600000001,
+          "bytes": 271
+        },
+        {
+          "action": "shell",
+          "bytes": 362,
+          "startedAt": 1795350595253,
+          "endedAt": 1795350595485,
+          "durationMs": 231.136842
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350599108,
+          "endedAt": 1795350600962,
+          "durationMs": 1854.006303,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350600962,
+      "wallMs": 11789,
+      "patch": "diff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex 615e0da..9975b56 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -56,3 +56,11 @@ def group(records: t.Any) -> dict[str, list[str]]:\n         if item[\"enabled\"]:\n             groups.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return groups\n+\n+\n+def merge(left: t.Any, right: t.Any) -> list[dict[str, t.Any]]:\n+    \"\"\"Merge two record lists; right records replace left ones sharing a key.\"\"\"\n+    merged = {item[\"key\"]: item for item in batch(left)}\n+    for item in batch(right):\n+        merged[item[\"key\"]] = item\n+    return list(merged.values())\n"
+    },
+    {
+      "task": "click-values-5",
+      "startedAt": 1795350601223,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795350601223,
+          "endedAt": 1795350601292,
+          "durationMs": 68.31654099999999,
+          "bytes": 344
+        },
+        {
+          "action": "shell",
+          "bytes": 459,
+          "startedAt": 1795350608214,
+          "endedAt": 1795350608469,
+          "durationMs": 254.008128
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795350612202,
+          "endedAt": 1795350614052,
+          "durationMs": 1849.553895,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795350614052,
+      "wallMs": 12829,
+      "patch": "diff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex 9975b56..5c81dd3 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -64,3 +64,14 @@ def merge(left: t.Any, right: t.Any) -> list[dict[str, t.Any]]:\n     for item in batch(right):\n         merged[item[\"key\"]] = item\n     return list(merged.values())\n+\n+\n+def report(left: t.Any, right: t.Any) -> dict[str, t.Any]:\n+    \"\"\"Summarize merged records with their groups and counts.\"\"\"\n+    items = merge(left, right)\n+    return {\n+        \"items\": items,\n+        \"groups\": group(items),\n+        \"count\": len(items),\n+        \"enabled\": sum(1 for item in items if item[\"enabled\"]),\n+    }\n"
+    }
+  ]
+}

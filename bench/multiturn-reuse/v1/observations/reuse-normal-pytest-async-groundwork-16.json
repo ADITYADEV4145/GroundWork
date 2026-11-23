@@ -1,0 +1,228 @@
+{
+  "suite": "multiturn-reuse",
+  "revision": "aa5d233f3a080d149c4cd3f9c7ff271257a1e50a",
+  "condition": "groundwork",
+  "run": 16,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795351030572,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "831fca40500094b904eb5078b5982884a057a439",
+  "chain": "pytest-async",
+  "sessionEndedAt": 1795351132644,
+  "observations": [
+    {
+      "task": "pytest-async-1",
+      "startedAt": 1795351033914,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795351033914,
+          "endedAt": 1795351037281,
+          "durationMs": 3365.7016900000003,
+          "bytes": 0
+        },
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 393,
+          "startedAt": 1795351040223,
+          "endedAt": 1795351040717,
+          "durationMs": 492.465302
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 894,
+          "startedAt": 1795351043722,
+          "endedAt": 1795351043817,
+          "durationMs": 94.17345500000002
+        },
+        {
+          "action": "shell",
+          "bytes": 111,
+          "startedAt": 1795351043969,
+          "endedAt": 1795351044233,
+          "durationMs": 264.037958
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795351052595,
+          "endedAt": 1795351053259,
+          "durationMs": 662.575873
+        },
+        {
+          "action": "shell",
+          "bytes": 164,
+          "startedAt": 1795351057951,
+          "endedAt": 1795351058305,
+          "durationMs": 353.38462599999997
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795351061286,
+          "endedAt": 1795351063004,
+          "durationMs": 1716.596491,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795351063004,
+      "wallMs": 29090,
+      "patch": "diff --git a/src/reusebench_pytest_async/__init__.py b/src/reusebench_pytest_async/__init__.py\nnew file mode 100644\nindex 0000000..3cb0ab1\n--- /dev/null\n+++ b/src/reusebench_pytest_async/__init__.py\n@@ -0,0 +1 @@\n+\"\"\"Reuse benchmark steps built on pytest internals.\"\"\"\ndiff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nnew file mode 100644\nindex 0000000..230c81d\n--- /dev/null\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -0,0 +1,45 @@\n+\"\"\"Record preparation steps reusing pytest helpers.\"\"\"\n+\n+from __future__ import annotations\n+\n+from typing import Any\n+from typing import Callable\n+\n+from _pytest.compat import is_async_function\n+\n+\n+def prepare_record(\n+    record: object, render: Callable[[Any], Any]\n+) -> dict[str, Any]:\n+    \"\"\"Validate ``record`` and return a new dict with ``display = render(value)``.\n+\n+    ``record`` must be a dict with a nonempty (after trimming) string ``key``\n+    and a ``value`` entry; ``enabled`` defaults to True and must be a bool.\n+    The input is never mutated.\n+    \"\"\"\n+    if not isinstance(record, dict):\n+        raise ValueError(\"record must be a dict\")\n+    key = record.get(\"key\")\n+    if not isinstance(key, str) or not key.strip():\n+        raise ValueError(\"record key must be a nonempty string\")\n+    if \"value\" not in record:\n+        raise ValueError(\"record must have a value\")\n+    enabled = record.get(\"enabled\", True)\n+    if not isinstance(enabled, bool):\n+        raise ValueError(\"record enabled must be a bool\")\n+    value = record[\"value\"]\n+    return {\n+        \"key\": key.strip(),\n+        \"value\": value,\n+        \"display\": render(value),\n+        \"enabled\": enabled,\n+    }\n+\n+\n+def display_async(value: object) -> bool:\n+    \"\"\"Whether ``value`` is a coroutine function or async generator function.\"\"\"\n+    return is_async_function(value)\n+\n+\n+def prepare(record: object) -> dict[str, Any]:\n+    return prepare_record(record, display_async)\n"
+    },
+    {
+      "task": "pytest-async-2",
+      "startedAt": 1795351068004,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795351068004,
+          "endedAt": 1795351068107,
+          "durationMs": 102.25038000000004,
+          "bytes": 185
+        },
+        {
+          "action": "shell",
+          "bytes": 352,
+          "startedAt": 1795351073661,
+          "endedAt": 1795351074032,
+          "durationMs": 370.74371199999996
+        },
+        {
+          "action": "shell",
+          "bytes": 155,
+          "startedAt": 1795351077737,
+          "endedAt": 1795351077983,
+          "durationMs": 244.702948
+        },
+        {
+          "action": "shell",
+          "bytes": 370,
+          "startedAt": 1795351081972,
+          "endedAt": 1795351082294,
+          "durationMs": 320.97489399999995
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795351084733,
+          "endedAt": 1795351086349,
+          "durationMs": 1614.8402689999998,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795351086349,
+      "wallMs": 18345,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex 230c81d..1de7eba 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -43,3 +43,18 @@ def display_async(value: object) -> bool:\n \n def prepare(record: object) -> dict[str, Any]:\n     return prepare_record(record, display_async)\n+\n+\n+def batch(records: object) -> list[dict[str, Any]]:\n+    \"\"\"Prepare each record in order; duplicate trimmed keys raise ValueError.\"\"\"\n+    if not isinstance(records, list):\n+        raise ValueError(\"records must be a list\")\n+    prepared: list[dict[str, Any]] = []\n+    seen: set[str] = set()\n+    for record in records:\n+        item = prepare(record)\n+        if item[\"key\"] in seen:\n+            raise ValueError('duplicate key: ' + repr(item['key']))\n+        seen.add(item[\"key\"])\n+        prepared.append(item)\n+    return prepared\n"
+    },
+    {
+      "task": "pytest-async-3",
+      "startedAt": 1795351089061,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795351089061,
+          "endedAt": 1795351089214,
+          "durationMs": 152.04639799999998,
+          "bytes": 248
+        },
+        {
+          "action": "shell",
+          "bytes": 86,
+          "startedAt": 1795351094392,
+          "endedAt": 1795351094810,
+          "durationMs": 416.5814730000001
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795351097217,
+          "endedAt": 1795351098829,
+          "durationMs": 1611.7758589999999,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795351098830,
+      "wallMs": 9769,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex 1de7eba..be767ea 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -58,3 +58,12 @@ def batch(records: object) -> list[dict[str, Any]]:\n         seen.add(item[\"key\"])\n         prepared.append(item)\n     return prepared\n+\n+\n+def group(records: object) -> dict[str, list[Any]]:\n+    \"\"\"Map the first character of each enabled key to its display values.\"\"\"\n+    grouped: dict[str, list[Any]] = {}\n+    for item in batch(records):\n+        if item[\"enabled\"]:\n+            grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n+    return grouped\n"
+    },
+    {
+      "task": "pytest-async-4",
+      "startedAt": 1795351101412,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795351101412,
+          "endedAt": 1795351101507,
+          "durationMs": 95.020891,
+          "bytes": 311
+        },
+        {
+          "action": "shell",
+          "bytes": 541,
+          "startedAt": 1795351106993,
+          "endedAt": 1795351107386,
+          "durationMs": 392.765386
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795351110548,
+          "endedAt": 1795351112161,
+          "durationMs": 1611.658683,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795351112161,
+      "wallMs": 10749,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex be767ea..443d9b8 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -67,3 +67,11 @@ def group(records: object) -> dict[str, list[Any]]:\n         if item[\"enabled\"]:\n             grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return grouped\n+\n+\n+def merge(left: object, right: object) -> list[dict[str, Any]]:\n+    \"\"\"Merge prepared records; right replaces left by key, new keys append.\"\"\"\n+    merged = {item[\"key\"]: item for item in batch(left)}\n+    for item in batch(right):\n+        merged[item[\"key\"]] = item\n+    return list(merged.values())\n"
+    },
+    {
+      "task": "pytest-async-5",
+      "startedAt": 1795351114844,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795351114844,
+          "endedAt": 1795351114944,
+          "durationMs": 99.19382100000001,
+          "bytes": 386
+        },
+        {
+          "action": "shell",
+          "bytes": 1176,
+          "startedAt": 1795351122700,
+          "endedAt": 1795351123279,
+          "durationMs": 578.3982579999999
+        },
+        {
+          "action": "shell",
+          "bytes": 628,
+          "startedAt": 1795351127413,
+          "endedAt": 1795351127722,
+          "durationMs": 308.835547
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795351130990,
+          "endedAt": 1795351132603,
+          "durationMs": 1612.1531659999998,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795351132603,
+      "wallMs": 17759,
+      "patch": "diff --git a/src/reusebench_pytest_async/steps.py b/src/reusebench_pytest_async/steps.py\nindex 443d9b8..16945c9 100644\n--- a/src/reusebench_pytest_async/steps.py\n+++ b/src/reusebench_pytest_async/steps.py\n@@ -60,18 +60,34 @@ def batch(records: object) -> list[dict[str, Any]]:\n     return prepared\n \n \n-def group(records: object) -> dict[str, list[Any]]:\n-    \"\"\"Map the first character of each enabled key to its display values.\"\"\"\n+def group_prepared(items: list[dict[str, Any]]) -> dict[str, list[Any]]:\n+    \"\"\"Map the first character of each enabled prepared key to its displays.\"\"\"\n     grouped: dict[str, list[Any]] = {}\n-    for item in batch(records):\n+    for item in items:\n         if item[\"enabled\"]:\n             grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return grouped\n \n \n+def group(records: object) -> dict[str, list[Any]]:\n+    \"\"\"Map the first character of each enabled key to its display values.\"\"\"\n+    return group_prepared(batch(records))\n+\n+\n def merge(left: object, right: object) -> list[dict[str, Any]]:\n     \"\"\"Merge prepared records; right replaces left by key, new keys append.\"\"\"\n     merged = {item[\"key\"]: item for item in batch(left)}\n     for item in batch(right):\n         merged[item[\"key\"]] = item\n     return list(merged.values())\n+\n+\n+def report(left: object, right: object) -> dict[str, Any]:\n+    \"\"\"Summarize the merge of ``left`` and ``right`` with its grouping.\"\"\"\n+    items = merge(left, right)\n+    return {\n+        \"items\": items,\n+        \"groups\": group_prepared(items),\n+        \"count\": len(items),\n+        \"enabled\": sum(1 for item in items if item[\"enabled\"]),\n+    }\n"
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "suite": "multiturn-reuse",
+  "revision": "aa5d233f3a080d149c4cd3f9c7ff271257a1e50a",
+  "condition": "groundwork",
+  "run": 7,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795348587078,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "831fca40500094b904eb5078b5982884a057a439",
+  "chain": "pytest-escape",
+  "sessionEndedAt": 1795348692368,
+  "observations": [
+    {
+      "task": "pytest-escape-1",
+      "startedAt": 1795348592870,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795348592870,
+          "endedAt": 1795348595994,
+          "durationMs": 3123.650702,
+          "bytes": 0
+        },
+        {
+          "action": "mcp",
+          "name": "find_code",
+          "bytes": 105,
+          "startedAt": 1795348605197,
+          "endedAt": 1795348605723,
+          "durationMs": 525.3197
+        },
+        {
+          "action": "shell",
+          "bytes": 36,
+          "startedAt": 1795348605866,
+          "endedAt": 1795348606117,
+          "durationMs": 249.879873
+        },
+        {
+          "action": "mcp",
+          "name": "read_symbol",
+          "bytes": 874,
+          "startedAt": 1795348610102,
+          "endedAt": 1795348610199,
+          "durationMs": 96.727389
+        },
+        {
+          "action": "shell",
+          "bytes": 367,
+          "startedAt": 1795348622395,
+          "endedAt": 1795348623233,
+          "durationMs": 836.9616759999999
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795348627127,
+          "endedAt": 1795348628745,
+          "durationMs": 1617.525503,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795348628745,
+      "wallMs": 35875,
+      "patch": "diff --git a/src/reusebench_pytest_escape/__init__.py b/src/reusebench_pytest_escape/__init__.py\nnew file mode 100644\nindex 0000000..29a6061\n--- /dev/null\n+++ b/src/reusebench_pytest_escape/__init__.py\n@@ -0,0 +1,3 @@\n+from reusebench_pytest_escape.steps import prepare\n+\n+__all__ = [\"prepare\"]\ndiff --git a/src/reusebench_pytest_escape/steps.py b/src/reusebench_pytest_escape/steps.py\nnew file mode 100644\nindex 0000000..d8cf88d\n--- /dev/null\n+++ b/src/reusebench_pytest_escape/steps.py\n@@ -0,0 +1,32 @@\n+from __future__ import annotations\n+\n+from typing import Any\n+\n+from _pytest.compat import ascii_escaped\n+\n+\n+def escape_display(value: Any) -> str:\n+    \"\"\"Escape str/bytes using pytest's ASCII-escaped diagnostic semantics.\"\"\"\n+    if not isinstance(value, (str, bytes)):\n+        raise ValueError(\"value must be str or bytes\")\n+    return ascii_escaped(value)\n+\n+\n+def prepare(record: Any) -> dict[str, Any]:\n+    if not isinstance(record, dict):\n+        raise ValueError(\"record must be a dict\")\n+    key = record.get(\"key\")\n+    if not isinstance(key, str) or not key.strip():\n+        raise ValueError(\"key must be a nonempty string\")\n+    if \"value\" not in record:\n+        raise ValueError(\"record must have a value\")\n+    enabled = record.get(\"enabled\", True)\n+    if not isinstance(enabled, bool):\n+        raise ValueError(\"enabled must be a bool\")\n+    value = record[\"value\"]\n+    return {\n+        \"key\": key.strip(),\n+        \"value\": value,\n+        \"display\": escape_display(value),\n+        \"enabled\": enabled,\n+    }\n"
+    },
+    {
+      "task": "pytest-escape-2",
+      "startedAt": 1795348632931,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795348632931,
+          "endedAt": 1795348633019,
+          "durationMs": 87.191666,
+          "bytes": 213
+        },
+        {
+          "action": "shell",
+          "bytes": 336,
+          "startedAt": 1795348640395,
+          "endedAt": 1795348640821,
+          "durationMs": 425.5879269999999
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795348644726,
+          "endedAt": 1795348646327,
+          "durationMs": 1600.282354,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795348646327,
+      "wallMs": 13396,
+      "patch": "diff --git a/src/reusebench_pytest_escape/__init__.py b/src/reusebench_pytest_escape/__init__.py\nindex 29a6061..8ccc4c1 100644\n--- a/src/reusebench_pytest_escape/__init__.py\n+++ b/src/reusebench_pytest_escape/__init__.py\n@@ -1,3 +1,3 @@\n-from reusebench_pytest_escape.steps import prepare\n+from reusebench_pytest_escape.steps import batch, prepare\n \n-__all__ = [\"prepare\"]\n+__all__ = [\"batch\", \"prepare\"]\ndiff --git a/src/reusebench_pytest_escape/steps.py b/src/reusebench_pytest_escape/steps.py\nindex d8cf88d..e32e278 100644\n--- a/src/reusebench_pytest_escape/steps.py\n+++ b/src/reusebench_pytest_escape/steps.py\n@@ -30,3 +30,17 @@ def prepare(record: Any) -> dict[str, Any]:\n         \"display\": escape_display(value),\n         \"enabled\": enabled,\n     }\n+\n+\n+def batch(records: Any) -> list[dict[str, Any]]:\n+    if not isinstance(records, list):\n+        raise ValueError(\"records must be a list\")\n+    prepared = []\n+    seen: set[str] = set()\n+    for record in records:\n+        item = prepare(record)\n+        if item[\"key\"] in seen:\n+            raise ValueError(f\"duplicate key: {item['key']!r}\")\n+        seen.add(item[\"key\"])\n+        prepared.append(item)\n+    return prepared\n"
+    },
+    {
+      "task": "pytest-escape-3",
+      "startedAt": 1795348646653,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795348646653,
+          "endedAt": 1795348646755,
+          "durationMs": 100.974399,
+          "bytes": 274
+        },
+        {
+          "action": "shell",
+          "bytes": 171,
+          "startedAt": 1795348654118,
+          "endedAt": 1795348654670,
+          "durationMs": 551.21369
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795348658582,
+          "endedAt": 1795348660217,
+          "durationMs": 1633.5583769999998,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795348660217,
+      "wallMs": 13564,
+      "patch": "diff --git a/src/reusebench_pytest_escape/__init__.py b/src/reusebench_pytest_escape/__init__.py\nindex 8ccc4c1..770d398 100644\n--- a/src/reusebench_pytest_escape/__init__.py\n+++ b/src/reusebench_pytest_escape/__init__.py\n@@ -1,3 +1,3 @@\n-from reusebench_pytest_escape.steps import batch, prepare\n+from reusebench_pytest_escape.steps import batch, group, prepare\n \n-__all__ = [\"batch\", \"prepare\"]\n+__all__ = [\"batch\", \"group\", \"prepare\"]\ndiff --git a/src/reusebench_pytest_escape/steps.py b/src/reusebench_pytest_escape/steps.py\nindex e32e278..0627f2d 100644\n--- a/src/reusebench_pytest_escape/steps.py\n+++ b/src/reusebench_pytest_escape/steps.py\n@@ -44,3 +44,11 @@ def batch(records: Any) -> list[dict[str, Any]]:\n         seen.add(item[\"key\"])\n         prepared.append(item)\n     return prepared\n+\n+\n+def group(records: Any) -> dict[str, list[str]]:\n+    grouped: dict[str, list[str]] = {}\n+    for item in batch(records):\n+        if item[\"enabled\"]:\n+            grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n+    return grouped\n"
+    },
+    {
+      "task": "pytest-escape-4",
+      "startedAt": 1795348660535,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795348660535,
+          "endedAt": 1795348660610,
+          "durationMs": 74.41917699999999,
+          "bytes": 335
+        },
+        {
+          "action": "shell",
+          "bytes": 536,
+          "startedAt": 1795348668038,
+          "endedAt": 1795348668486,
+          "durationMs": 446.700638
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795348672064,
+          "endedAt": 1795348673766,
+          "durationMs": 1701.5387429999998,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795348673766,
+      "wallMs": 13231,
+      "patch": "diff --git a/src/reusebench_pytest_escape/__init__.py b/src/reusebench_pytest_escape/__init__.py\nindex 770d398..73c6fb6 100644\n--- a/src/reusebench_pytest_escape/__init__.py\n+++ b/src/reusebench_pytest_escape/__init__.py\n@@ -1,3 +1,3 @@\n-from reusebench_pytest_escape.steps import batch, group, prepare\n+from reusebench_pytest_escape.steps import batch, group, merge, prepare\n \n-__all__ = [\"batch\", \"group\", \"prepare\"]\n+__all__ = [\"batch\", \"group\", \"merge\", \"prepare\"]\ndiff --git a/src/reusebench_pytest_escape/steps.py b/src/reusebench_pytest_escape/steps.py\nindex 0627f2d..40bc460 100644\n--- a/src/reusebench_pytest_escape/steps.py\n+++ b/src/reusebench_pytest_escape/steps.py\n@@ -52,3 +52,10 @@ def group(records: Any) -> dict[str, list[str]]:\n         if item[\"enabled\"]:\n             grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return grouped\n+\n+\n+def merge(left: Any, right: Any) -> list[dict[str, Any]]:\n+    merged = {item[\"key\"]: item for item in batch(left)}\n+    for item in batch(right):\n+        merged[item[\"key\"]] = item\n+    return list(merged.values())\n"
+    },
+    {
+      "task": "pytest-escape-5",
+      "startedAt": 1795348674054,
+      "tools": [
+        {
+          "action": "shell",
+          "name": "hook:prompt",
+          "startedAt": 1795348674054,
+          "endedAt": 1795348674136,
+          "durationMs": 80.49706900000001,
+          "bytes": 405
+        },
+        {
+          "action": "shell",
+          "bytes": 673,
+          "startedAt": 1795348685667,
+          "endedAt": 1795348686211,
+          "durationMs": 543.969745
+        },
+        {
+          "action": "shell",
+          "name": "hook:stop",
+          "startedAt": 1795348690692,
+          "endedAt": 1795348692330,
+          "durationMs": 1637.425243,
+          "bytes": 0
+        }
+      ],
+      "endedAt": 1795348692330,
+      "wallMs": 18276,
+      "patch": "diff --git a/src/reusebench_pytest_escape/__init__.py b/src/reusebench_pytest_escape/__init__.py\nindex 73c6fb6..ef0d54c 100644\n--- a/src/reusebench_pytest_escape/__init__.py\n+++ b/src/reusebench_pytest_escape/__init__.py\n@@ -1,3 +1,3 @@\n-from reusebench_pytest_escape.steps import batch, group, merge, prepare\n+from reusebench_pytest_escape.steps import batch, group, merge, prepare, report\n \n-__all__ = [\"batch\", \"group\", \"merge\", \"prepare\"]\n+__all__ = [\"batch\", \"group\", \"merge\", \"prepare\", \"report\"]\ndiff --git a/src/reusebench_pytest_escape/steps.py b/src/reusebench_pytest_escape/steps.py\nindex 40bc460..f391d33 100644\n--- a/src/reusebench_pytest_escape/steps.py\n+++ b/src/reusebench_pytest_escape/steps.py\n@@ -46,16 +46,30 @@ def batch(records: Any) -> list[dict[str, Any]]:\n     return prepared\n \n \n-def group(records: Any) -> dict[str, list[str]]:\n+def _group_prepared(items: list[dict[str, Any]]) -> dict[str, list[str]]:\n     grouped: dict[str, list[str]] = {}\n-    for item in batch(records):\n+    for item in items:\n         if item[\"enabled\"]:\n             grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return grouped\n \n \n+def group(records: Any) -> dict[str, list[str]]:\n+    return _group_prepared(batch(records))\n+\n+\n def merge(left: Any, right: Any) -> list[dict[str, Any]]:\n     merged = {item[\"key\"]: item for item in batch(left)}\n     for item in batch(right):\n         merged[item[\"key\"]] = item\n     return list(merged.values())\n+\n+\n+def report(left: Any, right: Any) -> dict[str, Any]:\n+    items = merge(left, right)\n+    return {\n+        \"items\": items,\n+        \"groups\": _group_prepared(items),\n+        \"count\": len(items),\n+        \"enabled\": sum(1 for item in items if item[\"enabled\"]),\n+    }\n"
+    }
+  ]
+}

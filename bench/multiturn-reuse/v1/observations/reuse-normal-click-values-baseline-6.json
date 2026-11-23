@@ -1,0 +1,141 @@
+{
+  "suite": "multiturn-reuse",
+  "revision": "aa5d233f3a080d149c4cd3f9c7ff271257a1e50a",
+  "condition": "baseline",
+  "run": 6,
+  "protocol": "stable-v1",
+  "sessionStartedAt": 1795348241043,
+  "sessionStartBasis": "workspace-ready",
+  "agent": "Devin normal",
+  "model": null,
+  "node": "v24.22.2",
+  "captureRevision": "831fca40500094b904eb5078b5982884a057a439",
+  "chain": "click-values",
+  "sessionEndedAt": 1795348361173,
+  "observations": [
+    {
+      "task": "click-values-1",
+      "startedAt": 1795348257099,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 138,
+          "startedAt": 1795348262707,
+          "endedAt": 1795348262722,
+          "durationMs": 14.623984999999976
+        },
+        {
+          "action": "read",
+          "bytes": 1805,
+          "file": "src/click/utils.py",
+          "readBytes": 1804,
+          "startedAt": 1795348267007,
+          "endedAt": 1795348267008,
+          "durationMs": 0.4249640000000028
+        },
+        {
+          "action": "shell",
+          "bytes": 81,
+          "startedAt": 1795348267134,
+          "endedAt": 1795348267457,
+          "durationMs": 322.249733
+        },
+        {
+          "action": "shell",
+          "bytes": 0,
+          "startedAt": 1795348277748,
+          "endedAt": 1795348277754,
+          "durationMs": 5.3665989999999795
+        },
+        {
+          "action": "shell",
+          "bytes": 474,
+          "startedAt": 1795348282504,
+          "endedAt": 1795348282622,
+          "durationMs": 116.870576
+        },
+        {
+          "action": "shell",
+          "bytes": 370,
+          "startedAt": 1795348292064,
+          "endedAt": 1795348292300,
+          "durationMs": 229.33519799999996
+        }
+      ],
+      "endedAt": 1795348295959,
+      "wallMs": 38860,
+      "patch": "diff --git a/src/reusebench_click_values/__init__.py b/src/reusebench_click_values/__init__.py\nnew file mode 100644\nindex 0000000..2d4ecbf\n--- /dev/null\n+++ b/src/reusebench_click_values/__init__.py\n@@ -0,0 +1,5 @@\n+\"\"\"Reusable value preparation steps built on click utilities.\"\"\"\n+\n+from .steps import prepare\n+\n+__all__ = [\"prepare\"]\ndiff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nnew file mode 100644\nindex 0000000..a642a73\n--- /dev/null\n+++ b/src/reusebench_click_values/steps.py\n@@ -0,0 +1,42 @@\n+\"\"\"Record preparation steps reusing click value conversion helpers.\"\"\"\n+\n+from __future__ import annotations\n+\n+import typing as t\n+\n+from click.utils import make_str\n+\n+\n+def to_display(value: t.Any) -> str:\n+    \"\"\"Convert a value to its display string using the click make-string rules.\"\"\"\n+    return make_str(value)\n+\n+\n+def validate_record(record: t.Any) -> tuple[str, t.Any, bool]:\n+    \"\"\"Validate a raw record and return its trimmed key, value and enabled flag.\"\"\"\n+    if not isinstance(record, dict):\n+        raise ValueError(\"record must be a dict\")\n+\n+    key = record.get(\"key\")\n+    if not isinstance(key, str) or not key.strip():\n+        raise ValueError(\"record key must be a nonempty string\")\n+\n+    if \"value\" not in record:\n+        raise ValueError(\"record must contain a value\")\n+\n+    enabled = record.get(\"enabled\", True)\n+    if not isinstance(enabled, bool):\n+        raise ValueError(\"record enabled must be a bool\")\n+\n+    return key.strip(), record[\"value\"], enabled\n+\n+\n+def prepare(record: dict[str, t.Any]) -> dict[str, t.Any]:\n+    \"\"\"Return a new prepared record; the input is never mutated.\"\"\"\n+    key, value, enabled = validate_record(record)\n+    return {\n+        \"key\": key,\n+        \"value\": value,\n+        \"display\": to_display(value),\n+        \"enabled\": enabled,\n+    }\n"
+    },
+    {
+      "task": "click-values-2",
+      "startedAt": 1795348299643,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 845,
+          "startedAt": 1795348307543,
+          "endedAt": 1795348307708,
+          "durationMs": 163.13056400000002
+        },
+        {
+          "action": "shell",
+          "bytes": 539,
+          "startedAt": 1795348317384,
+          "endedAt": 1795348317631,
+          "durationMs": 246.35837600000002
+        }
+      ],
+      "endedAt": 1795348321339,
+      "wallMs": 21696,
+      "patch": "diff --git a/src/reusebench_click_values/__init__.py b/src/reusebench_click_values/__init__.py\nindex 2d4ecbf..7794824 100644\n--- a/src/reusebench_click_values/__init__.py\n+++ b/src/reusebench_click_values/__init__.py\n@@ -1,5 +1,6 @@\n \"\"\"Reusable value preparation steps built on click utilities.\"\"\"\n \n+from .steps import batch\n from .steps import prepare\n \n-__all__ = [\"prepare\"]\n+__all__ = [\"batch\", \"prepare\"]\ndiff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex a642a73..09113c6 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -40,3 +40,20 @@ def prepare(record: dict[str, t.Any]) -> dict[str, t.Any]:\n         \"display\": to_display(value),\n         \"enabled\": enabled,\n     }\n+\n+\n+def batch(records: list[t.Any]) -> list[dict[str, t.Any]]:\n+    \"\"\"Prepare records in order, rejecting duplicate trimmed keys.\"\"\"\n+    if not isinstance(records, list):\n+        raise ValueError(\"records must be a list\")\n+\n+    prepared: list[dict[str, t.Any]] = []\n+    seen: set[str] = set()\n+    for record in records:\n+        item = prepare(record)\n+        key = item[\"key\"]\n+        if key in seen:\n+            raise ValueError(f\"duplicate record key: {key!r}\")\n+        seen.add(key)\n+        prepared.append(item)\n+    return prepared\n"
+    },
+    {
+      "task": "click-values-3",
+      "startedAt": 1795348321601,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 275,
+          "startedAt": 1795348328875,
+          "endedAt": 1795348329022,
+          "durationMs": 145.17003600000004
+        }
+      ],
+      "endedAt": 1795348332804,
+      "wallMs": 11203,
+      "patch": "diff --git a/src/reusebench_click_values/__init__.py b/src/reusebench_click_values/__init__.py\nindex 7794824..0364b12 100644\n--- a/src/reusebench_click_values/__init__.py\n+++ b/src/reusebench_click_values/__init__.py\n@@ -1,6 +1,7 @@\n \"\"\"Reusable value preparation steps built on click utilities.\"\"\"\n \n from .steps import batch\n+from .steps import group\n from .steps import prepare\n \n-__all__ = [\"batch\", \"prepare\"]\n+__all__ = [\"batch\", \"group\", \"prepare\"]\ndiff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex 09113c6..a9bd644 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -57,3 +57,12 @@ def batch(records: list[t.Any]) -> list[dict[str, t.Any]]:\n         seen.add(key)\n         prepared.append(item)\n     return prepared\n+\n+\n+def group(records: list[t.Any]) -> dict[str, list[str]]:\n+    \"\"\"Group enabled display values by the first character of their key.\"\"\"\n+    grouped: dict[str, list[str]] = {}\n+    for item in batch(records):\n+        if item[\"enabled\"]:\n+            grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n+    return grouped\n"
+    },
+    {
+      "task": "click-values-4",
+      "startedAt": 1795348333086,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 754,
+          "startedAt": 1795348340438,
+          "endedAt": 1795348340584,
+          "durationMs": 145.315902
+        }
+      ],
+      "endedAt": 1795348344707,
+      "wallMs": 11621,
+      "patch": "diff --git a/src/reusebench_click_values/__init__.py b/src/reusebench_click_values/__init__.py\nindex 0364b12..0489be6 100644\n--- a/src/reusebench_click_values/__init__.py\n+++ b/src/reusebench_click_values/__init__.py\n@@ -2,6 +2,7 @@\n \n from .steps import batch\n from .steps import group\n+from .steps import merge\n from .steps import prepare\n \n-__all__ = [\"batch\", \"group\", \"prepare\"]\n+__all__ = [\"batch\", \"group\", \"merge\", \"prepare\"]\ndiff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex a9bd644..b5d1a2d 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -66,3 +66,11 @@ def group(records: list[t.Any]) -> dict[str, list[str]]:\n         if item[\"enabled\"]:\n             grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return grouped\n+\n+\n+def merge(left: list[t.Any], right: list[t.Any]) -> list[dict[str, t.Any]]:\n+    \"\"\"Merge prepared records by key; right replaces left in its original slot.\"\"\"\n+    merged = {item[\"key\"]: item for item in batch(left)}\n+    for item in batch(right):\n+        merged[item[\"key\"]] = item\n+    return list(merged.values())\n"
+    },
+    {
+      "task": "click-values-5",
+      "startedAt": 1795348345008,
+      "tools": [
+        {
+          "action": "shell",
+          "bytes": 905,
+          "startedAt": 1795348356807,
+          "endedAt": 1795348357078,
+          "durationMs": 270.47368
+        }
+      ],
+      "endedAt": 1795348361146,
+      "wallMs": 16138,
+      "patch": "diff --git a/src/reusebench_click_values/__init__.py b/src/reusebench_click_values/__init__.py\nindex 0489be6..6b940d8 100644\n--- a/src/reusebench_click_values/__init__.py\n+++ b/src/reusebench_click_values/__init__.py\n@@ -4,5 +4,6 @@ from .steps import batch\n from .steps import group\n from .steps import merge\n from .steps import prepare\n+from .steps import report\n \n-__all__ = [\"batch\", \"group\", \"merge\", \"prepare\"]\n+__all__ = [\"batch\", \"group\", \"merge\", \"prepare\", \"report\"]\ndiff --git a/src/reusebench_click_values/steps.py b/src/reusebench_click_values/steps.py\nindex b5d1a2d..9170511 100644\n--- a/src/reusebench_click_values/steps.py\n+++ b/src/reusebench_click_values/steps.py\n@@ -59,18 +59,34 @@ def batch(records: list[t.Any]) -> list[dict[str, t.Any]]:\n     return prepared\n \n \n-def group(records: list[t.Any]) -> dict[str, list[str]]:\n-    \"\"\"Group enabled display values by the first character of their key.\"\"\"\n+def group_prepared(items: list[dict[str, t.Any]]) -> dict[str, list[str]]:\n+    \"\"\"Group enabled display values of prepared records by key first character.\"\"\"\n     grouped: dict[str, list[str]] = {}\n-    for item in batch(records):\n+    for item in items:\n         if item[\"enabled\"]:\n             grouped.setdefault(item[\"key\"][0], []).append(item[\"display\"])\n     return grouped\n \n \n+def group(records: list[t.Any]) -> dict[str, list[str]]:\n+    \"\"\"Group enabled display values by the first character of their key.\"\"\"\n+    return group_prepared(batch(records))\n+\n+\n def merge(left: list[t.Any], right: list[t.Any]) -> list[dict[str, t.Any]]:\n     \"\"\"Merge prepared records by key; right replaces left in its original slot.\"\"\"\n     merged = {item[\"key\"]: item for item in batch(left)}\n     for item in batch(right):\n         merged[item[\"key\"]] = item\n     return list(merged.values())\n+\n+\n+def report(left: list[t.Any], right: list[t.Any]) -> dict[str, t.Any]:\n+    \"\"\"Summarize merged records with their grouping and counts.\"\"\"\n+    items = merge(left, right)\n+    return {\n+        \"items\": items,\n+        \"groups\": group_prepared(items),\n+        \"count\": len(items),\n+        \"enabled\": sum(1 for item in items if item[\"enabled\"]),\n+    }\n"
+    }
+  ]
+}

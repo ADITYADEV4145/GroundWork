@@ -186,6 +186,28 @@ def dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int:
     });
     expect(g.success).toBe(true);
     expect(g.defects.duplicates).toBe(0);
+    const windows = `from routeplan.rounding import round_up_to_five as round_time
+from routeplan.timing import eta_minutes, round_up_to_five
+
+
+def pickup_window(distance_km: float, speed_kph: float) -> int:
+    return round_time(distance_km / speed_kph * 60 + 10)
+`;
+    const own = `import math
+
+
+def round_time(minutes: float) -> int:
+    return int(math.ceil(minutes / 5.0)) * 5
+
+
+def dropoff_window(distance_km: float, speed_kph: float, parcels: int) -> int:
+    return round_time(distance_km / speed_kph * 60 + 3 * parcels)
+`;
+    const shadowed = await graded('route-pickup-then-dropoff', { 'routeplan/windows.py': windows, 'routeplan/dropoff.py': own });
+    expect(shadowed.defects.duplicates).toBe(1);
+    const sibling = await graded('route-pickup-then-dropoff', { 'routeplan/windows.py': windows,
+      'routeplan/dropoff.py': own.replace('import math', 'import math\nfrom routeplan.windows import eta_minutes').replace(/round_time/g, 'nearest_five') });
+    expect(sibling.defects.duplicates).toBe(1);
   });
   it('does not count files written by arm setup as the agent\'s change', async () => {
     const { task, repo } = find('ledger-invoice-slug'), dir = path.join(work, 'setup-only');

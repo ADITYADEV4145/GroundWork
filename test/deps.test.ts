@@ -275,6 +275,9 @@ describe('review regressions', () => {
       expect(await run(dir, [{ file: 'src/req.cjs', ranges: null }])).toEqual(['src/req.cjs:3:arity:clamp']);
       write(dir, 'src/reassign.cjs', "let { clamp } = require('mathkit');\nclamp = () => 0;\nclamp();\n");
       expect(await run(dir, [{ file: 'src/reassign.cjs', ranges: null }])).toEqual([]);
+      write(dir, 'src/default.ts', "import { clamp } from 'mathkit';\nconst make = () => () => 0;\nexport function f(clamp = make()) {\n  return clamp();\n}\n");
+      write(dir, 'src/exported.ts', "export let { clamp } = require('mathkit');\nclamp = () => 0;\nclamp();\n");
+      expect(await run(dir, [{ file: 'src/default.ts', ranges: null }, { file: 'src/exported.ts', ranges: null }])).toEqual([]);
       // A class field of the same name is not a reassignment of an import.
       write(dir, 'src/field.ts', "import * as mk from 'mathkit';\nexport class Holder {\n  mk = 1;\n}\nmk.notReal();\n");
       expect(await run(dir, [{ file: 'src/field.ts', ranges: null }])).toEqual(['src/field.ts:5:unknown-member:notReal']);

@@ -174,13 +174,14 @@ func load() {
 	}
 	cache := ""
 	// The sizes of the build target, which need not be this machine's.
-	if output, err := exec.Command("go", "env", "GOMODCACHE", "GOARCH", "GOOS", "GOFLAGS", "CGO_ENABLED").Output(); err == nil {
-		if lines := strings.Split(strings.TrimRight(string(output), "\r\n"), "\n"); len(lines) == 5 {
-			cache = strings.TrimSpace(lines[0])
-			if types.SizesFor("gc", strings.TrimSpace(lines[1])) != nil {
-				arch = strings.TrimSpace(lines[1])
+	if output, err := exec.Command("go", "env", "-json", "GOMODCACHE", "GOARCH", "GOOS", "GOFLAGS", "CGO_ENABLED").Output(); err == nil {
+		var env map[string]string
+		if json.Unmarshal(output, &env) == nil {
+			cache = env["GOMODCACHE"]
+			if types.SizesFor("gc", env["GOARCH"]) != nil {
+				arch = env["GOARCH"]
 			}
-			buildTarget = strings.Join(lines[1:], "\x00")
+			buildTarget = strings.Join([]string{env["GOARCH"], env["GOOS"], env["GOFLAGS"], env["CGO_ENABLED"]}, "\x00")
 		}
 	}
 	for _, p := range goList(args...) {

@@ -12,9 +12,37 @@ export function verifyChanged(db: Db, root: string, changed: ChangedFile[], conf
   return changed.map((c) => g.verify(c.file, { ranges: c.ranges, ...(config ? { config } : {}) }));
 }
 
+/**
+ * `verifyChanged` plus checking beyond the repo: installed dependencies, sibling workspace packages and local
+ * service contracts. Fails open: any error in the dependency pass leaves the in-repo result untouched.
+ */
+export async function verifyChangedDeep(db: Db, root: string, changed: ChangedFile[], config?: GroundworkConfig): Promise<VerifyResult[]> {
+  const results = verifyChanged(db, root, changed, config);
+  if (config && !config.deps.enabled) return results;
+  try {
+    const { DependencyChecker } = await import('../deps/check.js');
+    const { checkContracts } = await import('../deps/contracts.js');
+    const checker = new DependencyChecker(db, root, config);
+    for (let i = 0; i < changed.length; i++) {
+      const r = results[i]!;
+      // In-repo grounding skips some files entirely (excluded, generated); those stay skipped here too.
+      if (r.unchecked && r.unchecked !== 'unsupported language') continue;
+      const dep = await checker.check(changed[i]!.file, changed[i]!.ranges);
+      const contract = config?.deps.contracts === false ? [] : checkContracts(root, changed[i]!.file, changed[i]!.ranges);
+      if (dep.checked && r.unchecked === 'unsupported language') r.unchecked = null;
+      const seen = new Set(r.findings.map((f) => `${f.line}:${f.kind}:${f.name}`));
+      for (const f of [...dep.findings, ...contract]) if (!seen.has(`${f.line}:${f.kind}:${f.name}`)) r.findings.push(f);
+      r.findings.sort((a, b) => a.line - b.line);
+    }
+  } catch {
+    // dependency checking is additive
+  }
+  return results;
+}
+
 /** Grounding part of `gw check` / the Stop gate: definite errors on lines changed since `base`. */
-export function groundingGate(db: Db, root: string, opts: { base?: string; config?: GroundworkConfig } = {}): { blocking: Finding[]; findings: Finding[] } {
-  const findings = verifyChanged(db, root, changedFromGit(root, opts.base), opts.config).flatMap((r) => r.findings);
+export async function groundingGate(db: Db, root: string, opts: { base?: string; config?: GroundworkConfig } = {}): Promise<{ blocking: Finding[]; findings: Finding[] }> {
+  const findings = (await verifyChangedDeep(db, root, changedFromGit(root, opts.base), opts.config)).flatMap((r) => r.findings);
   return { findings, blocking: findings.filter((f) => f.blocking) };
 }
 

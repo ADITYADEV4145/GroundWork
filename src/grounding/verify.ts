@@ -23,7 +23,7 @@ import { renderSuggestions, suggest, type Suggestion } from './suggest.js';
 // Grounding (Phase 4): flag imports, calls and arguments the agent invented. Precision first: every rule
 // only fires when the index proves the error; anything dynamic, unparsed, external or ambiguous is skipped.
 
-export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword' | 'type';
+export type FindingKind = 'missing-module' | 'unknown-export' | 'unknown-member' | 'arity' | 'unknown-keyword' | 'type' | 'deprecated' | 'contract';
 
 export interface Finding {
   file: string;

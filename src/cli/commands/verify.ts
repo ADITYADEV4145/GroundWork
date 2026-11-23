@@ -1,6 +1,6 @@
 import path from 'node:path';
 import type { Command } from 'commander';
-import { changedFromGit, parseLineSpec, renderResults, verifyChanged, type ChangedFile } from '../../grounding/index.js';
+import { changedFromGit, parseLineSpec, renderResults, verifyChangedDeep, type ChangedFile } from '../../grounding/index.js';
 import { toPosix } from '../../util/paths.js';
 import { globalOpts, withIndex } from '../context.js';
 import { emit, fail } from '../output.js';
@@ -18,7 +18,7 @@ export function register(program: Command): void {
       const opts = globalOpts(cmd);
       if (!files.length && !o.changed) fail(opts, 'give files to check or --changed');
       if (o.lines && files.length !== 1) fail(opts, '--lines needs exactly one file');
-      await withIndex({ ...opts, refresh: o.refresh }, ({ db, root, config }) => {
+      await withIndex({ ...opts, refresh: o.refresh }, async ({ db, root, config }) => {
         let changed: ChangedFile[];
         try {
           changed = o.changed
@@ -27,7 +27,7 @@ export function register(program: Command): void {
         } catch (e) {
           fail(opts, (e as Error).message);
         }
-        const results = verifyChanged(db, root, changed, config);
+        const results = await verifyChangedDeep(db, root, changed, config);
         const blocking = results.some((r) => r.findings.some((f) => f.blocking));
         emit(opts, { results, blocking }, () => renderResults(results, 2000, { showUnchecked: !o.changed, showClean: true }));
         if (blocking) process.exitCode = 1;

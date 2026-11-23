@@ -107,7 +107,7 @@ export async function checkRepository(root: string, options: CheckOptions = {}):
   try {
     state = readReuseState(db);
     candidates = new CandidateIndex(db, config.reuse.skipTests);
-    if (config.grounding.enabled) groundingFindings = groundingGate(db, root, { base: commit, config }).findings;
+    if (config.grounding.enabled) groundingFindings = (await groundingGate(db, root, { base: commit, config })).findings;
   }
   finally { db.close(); }
   return compareSnapshots(root, base, state, candidates, groundingFindings, config, commit, start, deadline, options, root, true);

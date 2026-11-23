@@ -297,6 +297,7 @@ Timeouts fail open; type checking is not enabled after individual edits by defau
 | `gw badge [--repo <owner/name>] [--workflow <file>]` | Print the `agent-checked` README badge for the workflow that runs the check. |
 | `gw receipt [--session <id>] [--png <file>]` | Counts for one agent session: calls checked, invented calls caught, duplicates prevented, callers updated, affected tests run, time added. Counts only, never file names or code. |
 | `gw verify [files...]` | Check grounding alone; exit 1 on definite errors. |
+| `gw deps [build\|show <module>]` | Inspect what is known about installed dependencies, workspace packages and local contracts. |
 | `gw refactor <symbol> --rename <name>` / `--body-file <path>` | Preview a TS/JS symbol rename or body replacement; use `--apply <preview-id>` to revalidate and write. |
 | `gw run -- <cmd>` | Keep the full command log locally and print a trimmed summary. |
 | `gw report` | Show session guard activity and estimated savings. |
@@ -585,9 +586,10 @@ wrappers or task timers cannot be established from these captures.
 | Check | What is measured | What not to assume |
 | --- | --- | --- |
 | Duplicate BLOCK findings | 95% precision on the labeled duplicate corpus; 100% recall for exact copies and 96% for renamed copies. | These are planted examples, not production-repository results. Heavily rewritten clones may be warnings or missed. |
-| Grounding | Resolves 99% of internal imports in this repository. | Dynamic dispatch, computed member names and external packages are skipped, not verified. |
+| Grounding | Resolves 99% of internal imports in this repository. | Dynamic dispatch and computed member names are skipped, not verified. |
+| Dependencies | 61 of 69 seeded dependency mistakes caught (88.4%) with 0 false blocks in 7,857 accepted checks, across npm, PyPI, Go and Maven; the first run failed at 71% and stays published. | Seeded cases, not agent sessions. PyPI recall is 12 of 18; packages without readable types are not checked; Rust and service contracts only warn. |
 
-See [reuse methodology](references/reuse.md) and [grounding behavior](references/grounding.md). These figures are not a claim about end-to-end token savings.
+See [reuse methodology](references/reuse.md), [grounding behavior](references/grounding.md) and [checking beyond the repository](docs/beyond-the-repo.md). These figures are not a claim about end-to-end token savings.
 
 ## Privacy and security
 

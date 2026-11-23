@@ -479,6 +479,38 @@
         "go",
         "test"
       ]
+    },
+    {
+      "id": "werkzeug-0f43c6e",
+      "language": "python",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/pallets/werkzeug",
+        "sha": "0f43c6ebd426039e4b99ec22535c2c8a2ec2f69f",
+        "license": "BSD-3-Clause"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "-o",
+        "pythonpath=src",
+        "tests/test_http.py",
+        "tests/test_utils.py"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "-o",
+        "pythonpath=src"
+      ]
     }
   ],
   "tasks": [
@@ -602,7 +634,7 @@
       "id": "ledger-card-on-file",
       "repo": "ledger-kit",
       "category": "hidden-helper",
-      "prompt": "The account page shows which card is on file. Add `cardOnFile(number: string): string | null` in a new file `src/accounts/card.ts`. The number may contain spaces and dashes, which are ignored. If what is left is 12 to 19 digits that pass the Luhn check, return four bullet characters, a space and the last four digits, for example `\u2022\u2022\u2022\u2022 4242`. Otherwise return null.",
+      "prompt": "The account page shows which card is on file. Add `cardOnFile(number: string): string | null` in a new file `src/accounts/card.ts`. The number may contain spaces and dashes, which are ignored. If what is left is 12 to 19 digits that pass the Luhn check, return four bullet characters, a space and the last four digits, for example `•••• 4242`. Otherwise return null.",
       "entry": "src/accounts/card.ts",
       "trap": {
         "existing": [
@@ -1475,6 +1507,78 @@
       "entry": "regexp.go",
       "hidden": "mux.mjs",
       "provenance": "https://github.com/gorilla/mux/commit/98cb6bf42e086f6af920b965c38cacc07402d51b"
+    },
+    {
+      "id": "werkzeug-prefer-then-negotiate",
+      "repo": "werkzeug-0f43c6e",
+      "category": "compaction",
+      "prompt": "In werkzeug, add `parse_prefer(value: str | None) -> dict[str, str | None]` in a new file `src/werkzeug/prefer.py`. It parses the value of an HTTP `Prefer` request header into its comma-separated preferences: names lower-cased, a preference without a value maps to None, and quoted values are unquoted the way this codebase parses header values. A missing or empty header gives an empty dict.",
+      "turns": [
+        {
+          "prompt": "Now add `dump_preference_applied(applied: Mapping[str, str | None]) -> str` in a new file `src/werkzeug/prefer_applied.py`: the value of a `Preference-Applied` response header, items in mapping order joined with `, `, a None value written as the bare name, and other values quoted only when needed, the way this codebase writes header values.",
+          "compactBefore": true
+        },
+        {
+          "prompt": "Now add `negotiate_preferences(environ, supported) -> tuple[dict[str, str | None], str]` in a new file `src/werkzeug/prefer_negotiate.py`. It reads the `Prefer` header from the WSGI environ, keeps the preferences whose name is in the collection `supported`, in header order, and returns them with the `Preference-Applied` value for them. Parse and write the headers exactly the way the two functions you added earlier do.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "src/werkzeug/prefer_negotiate.py",
+      "trap": {
+        "existing": [
+          "src/werkzeug/http.py#parse_dict_header",
+          "src/werkzeug/http.py#dump_header"
+        ]
+      },
+      "hidden": "werkzeug.py"
+    },
+    {
+      "id": "werkzeug-validators-then-revalidate",
+      "repo": "werkzeug-0f43c6e",
+      "category": "compaction",
+      "prompt": "In werkzeug, add `make_validators(data: bytes, modified: datetime) -> dict[str, str]` in a new file `src/werkzeug/validators.py`. It returns the `ETag` and `Last-Modified` header values for a response body: the same strong ETag header value werkzeug's `Response.add_etag()` sets for that body, and the modification time as an HTTP date written the way this codebase writes them (a naive datetime is UTC).",
+      "turns": [
+        {
+          "prompt": "Now add `seconds_until_stale(headers: Mapping[str, str], now: datetime) -> int | None` in a new file `src/werkzeug/freshness.py`: the whole seconds from the aware datetime `now` until the time in the `Expires` header, negative once it has passed, and None when the header is missing or is not a date this codebase's HTTP date parsing accepts.",
+          "compactBefore": true
+        },
+        {
+          "prompt": "Now add two functions in a new file `src/werkzeug/revalidate.py`. `revalidation_headers(data: bytes, modified: datetime, expires: datetime) -> dict[str, str]` returns the validators for the body plus an `Expires` header, dates written exactly the way you wrote `Last-Modified` earlier. `is_fresh(headers: Mapping[str, str], now: datetime) -> bool` is True only while the `Expires` time is still in the future, read exactly the way your earlier function reads it.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "src/werkzeug/revalidate.py",
+      "trap": {
+        "existing": [
+          "src/werkzeug/http.py#http_date",
+          "src/werkzeug/http.py#parse_date"
+        ]
+      },
+      "hidden": "werkzeug.py"
+    },
+    {
+      "id": "werkzeug-download-name-then-headers",
+      "repo": "werkzeug-0f43c6e",
+      "category": "compaction",
+      "prompt": "In werkzeug, add `safe_download_name(name: str, default: str = \"download\") -> str` in a new file `src/werkzeug/downloads.py`: the name made safe to use as a file name the way this codebase already sanitises uploaded file names, or `default` when nothing is left.",
+      "turns": [
+        {
+          "prompt": "Now add `content_disposition(name: str, inline: bool = False) -> str` in a new file `src/werkzeug/disposition.py`: a `Content-Disposition` header value, `attachment` (or `inline`) with a `filename` option, the option quoted only when needed, the way this codebase writes a header with options.",
+          "compactBefore": true
+        },
+        {
+          "prompt": "Now add `download_headers(name: str, data: bytes, inline: bool = False) -> dict[str, str]` in a new file `src/werkzeug/download_headers.py`. It returns `Content-Disposition` for the sanitised name, `Content-Type` guessed from the sanitised name with the standard library (`application/octet-stream` when unknown), and `Content-Length`. Sanitise the name and build the disposition exactly the way the two functions you added earlier do.",
+          "compactBefore": true
+        }
+      ],
+      "entry": "src/werkzeug/download_headers.py",
+      "trap": {
+        "existing": [
+          "src/werkzeug/utils.py#secure_filename",
+          "src/werkzeug/http.py#dump_options_header"
+        ]
+      },
+      "hidden": "werkzeug.py"
     }
   ]
 }

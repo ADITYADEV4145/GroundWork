@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, writeFileSync, realpathSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
@@ -43,7 +43,19 @@ export function compareVersions(a: string, b: string): number {
   if (x.pre === y.pre) return 0;
   if (x.pre === undefined) return 1;
   if (y.pre === undefined) return -1;
-  return x.pre < y.pre ? -1 : 1;
+  // Semver: compare dot-separated identifiers; numeric ones as numbers and below alphanumeric ones.
+  const p = x.pre.split('.'), q = y.pre.split('.');
+  for (let i = 0; i < Math.max(p.length, q.length); i++) {
+    const l = p[i], r = q[i];
+    if (l === undefined) return -1;
+    if (r === undefined) return 1;
+    if (l === r) continue;
+    const ln = /^\d+$/.test(l), rn = /^\d+$/.test(r);
+    if (ln && rn) return Number(l) - Number(r);
+    if (ln !== rn) return ln ? -1 : 1;
+    return l < r ? -1 : 1;
+  }
+  return 0;
 }
 
 /** Throws unless `data` hashes to the sha512 entry of an SRI string. Weaker algorithms are not accepted. */
@@ -67,11 +79,22 @@ export async function latestRelease(registry: string, timeoutMs: number): Promis
 }
 
 /** Why this copy cannot replace itself, or null when it is a normal global install. */
-export function selfUpdateBlocker(packageRoot = fileURLToPath(new URL('../../', import.meta.url))): string | null {
+export function selfUpdateBlocker(packageRoot = fileURLToPath(new URL('../../', import.meta.url)), npmGlobalRoot: () => string | null = defaultGlobalRoot): string | null {
   if (existsSync(path.join(packageRoot, '.git'))) return 'this is a source checkout; update it with `git pull && npm ci && npm run build`';
   if (/[\\/]Cellar[\\/]/.test(packageRoot)) return 'this copy was installed by Homebrew; update it with `brew upgrade groundwork`';
   if (/[\\/]_npx[\\/]/.test(packageRoot)) return 'this copy was started by npx, which fetches the latest version itself';
+  // `npm install -g` writes to npm's global directory; a copy anywhere else would keep running the old version.
+  const real = (p: string) => { try { return realpathSync(p); } catch { return path.resolve(p); } };
+  const globalRoot = npmGlobalRoot();
+  if (globalRoot === null) return 'npm is not available to install the update';
+  const rel = path.relative(real(globalRoot), real(packageRoot));
+  if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return `this copy is not in npm's global directory (${globalRoot}); update it with the tool that installed it`;
   return null;
+}
+
+function defaultGlobalRoot(): string | null {
+  const r = spawnSync('npm', ['root', '-g'], { encoding: 'utf8', shell: process.platform === 'win32' });
+  return r.status === 0 && r.stdout.trim() ? r.stdout.trim() : null;
 }
 
 function npmInstall(tarball: string): void {

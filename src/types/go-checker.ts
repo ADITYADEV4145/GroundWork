@@ -535,6 +535,8 @@ func main() {
 				base.load(p.ImportPath)
 				return
 			}
+			// Without its test files too: a test build also accepts a call to a helper only a test file declares.
+			base.load(p.ImportPath)
 			u := &universe{test: p.ImportPath, entries: map[string]*entry{}}
 			u.load(p.ImportPath)
 			if len(p.XTestGoFiles) > 0 {

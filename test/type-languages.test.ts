@@ -211,6 +211,51 @@ describe('compiled-language type checks', () => {
     expect(result.findings.filter((f) => f.blocking).map((f) => `${f.file} ${f.code}`).sort()).toEqual(['app/app.go undefined', 'store/store_ext_test.go missing-member']);
   }, 180_000);
 
+  it.skipIf(!toolchain.go)('blocks a Go call to a helper that only a test file declares', async () => {
+    const c = cases.find((x) => x.language === 'go')!;
+    const root = repo(c.files);
+    writeFileSync(path.join(root, 'store/helper_test.go'), 'package store\n\nfunc onlyInTests() string { return "x" }\n');
+    edit(root, 'store/store.go', 'package store\n', 'package store\n\nvar _ = onlyInTests()\n');
+    const result = await typeCheck(root, [{ file: 'store/store.go', ranges: null }, { file: 'store/helper_test.go', ranges: null }], config());
+    expect(result.findings.filter((f) => f.blocking).map((f) => `${f.file} ${f.code}`)).toEqual(['store/store.go undefined']);
+  }, 180_000);
+
+  it.skipIf(!toolchain.go || process.platform !== 'linux')('builds the Go checker for this machine when the project cross-compiles', async () => {
+    const c = cases.find((x) => x.language === 'go')!;
+    const root = repo(c.files);
+    const saved = process.env.GOOS;
+    process.env.GOOS = 'windows';
+    try {
+      edit(root, c.file, c.errors[0]![0], c.errors[0]![1]);
+      const { compilerDiagnostics, resetCompilerMemo } = await import('../src/types/compilers.js');
+      resetCompilerMemo();
+      expect(compilerDiagnostics('go', root, c.file, Date.now() + 120_000).map((f) => f.code)).toContain('undefined');
+      resetCompilerMemo();
+    } finally { if (saved === undefined) delete process.env.GOOS; else process.env.GOOS = saved; }
+  }, 180_000);
+
+  it.skipIf(!toolchain.go)('leaves Go unchecked when a cached dependency imports a package checked from source', async () => {
+    const cache = mkdtempSync(path.join(os.tmpdir(), 'gw-type-languages-modcache-')); directories.push(cache);
+    mkdirSync(path.join(cache, 'dep'), { recursive: true });
+    writeFileSync(path.join(cache, 'dep/go.mod'), 'module example.com/dep\n\ngo 1.21\n');
+    writeFileSync(path.join(cache, 'dep/dep.go'), 'package dep\n\nimport "example.com/lib"\n\nfunc Use(lib.T) {}\n');
+    const root = repo({
+      'go.mod': `module example.com/app\n\ngo 1.21\n\nrequire (\n\texample.com/dep v0.0.0\n\texample.com/lib v0.0.0\n)\n\nreplace example.com/dep => ${cache}/dep\n\nreplace example.com/lib => ./lib\n`,
+      'lib/go.mod': 'module example.com/lib\n\ngo 1.21\n',
+      'lib/lib.go': 'package lib\n\ntype T struct{}\n',
+      'main.go': 'package main\n\nfunc main() {}\n',
+    });
+    edit(root, 'main.go', 'package main\n\nfunc main() {}\n', 'package main\n\nimport (\n\t"example.com/dep"\n\t"example.com/lib"\n)\n\nfunc main() { dep.Use(lib.T{}) }\n');
+    const { compilerDiagnostics, resetCompilerMemo } = await import('../src/types/compilers.js');
+    const saved = process.env.GOMODCACHE;
+    process.env.GOMODCACHE = cache;
+    try {
+      resetCompilerMemo();
+      expect(() => compilerDiagnostics('go', root, 'main.go', Date.now() + 120_000)).toThrow(/checked from source/);
+      resetCompilerMemo();
+    } finally { if (saved === undefined) delete process.env.GOMODCACHE; else process.env.GOMODCACHE = saved; }
+  }, 180_000);
+
   it.skipIf(!toolchain.go)('reports a Go import cycle as unavailable instead of waiting on it', async () => {
     const c = cases.find((x) => x.language === 'go')!;
     const root = repo({ ...c.files, 'cmd/cmd.go': 'package cmd\n\nfunc Name() string { return "app" }\n' });

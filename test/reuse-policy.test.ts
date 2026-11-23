@@ -66,5 +66,9 @@ describe('binding hash quote style', () => {
     const ts = (body: string) => extractReuseSource(`export function slug(text: string): string { ${body} }\n`, 'typescript').symbols[0]!.bindingHash;
     expect(ts(`return text.normalize("NFKD").toLowerCase();`)).toBe(ts(`return text.normalize('NFKD').toLowerCase();`));
     expect(ts(`return text.normalize("NFKD").toLowerCase();`)).not.toBe(ts(`return text.normalize("NFC").toLowerCase();`));
+    const rb = (body: string) => extractReuseSource(`def slug(text)\n  ${body}\nend\n`, 'ruby').symbols[0]!.bindingHash;
+    expect(rb(`text.gsub('\\n', '_')`)).not.toBe(rb(`text.gsub("\\n", "_")`));
+    expect(rb(`text + '#{text}'`)).not.toBe(rb(`text + "#{text}"`));
+    expect(rb(`text + 'abc'`)).not.toBe(rb(`text + "abc"`));
   });
 });

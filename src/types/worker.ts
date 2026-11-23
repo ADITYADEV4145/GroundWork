@@ -16,6 +16,14 @@ process.on('message', (request: { root: string; changed: ChangedFile[]; config: 
     const result: TypeCheckResult = { available: { typescript: false, python: false, go: false, rust: false, java: false, csharp: false }, findings: [], timedOut: false };
     resetCompilerMemo();
     const show = (file: string) => execFileSync('git', ['show', `${request.base ?? 'HEAD'}:${file}`], { cwd: request.root, encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'ignore'] });
+    // A file deleted since the base has no changed lines, but the baseline must still compile with it.
+    let removed: string[] | undefined;
+    const deleted = () => {
+      if (removed) return removed;
+      try { removed = execFileSync('git', ['diff', '--name-only', '--diff-filter=D', '--no-renames', request.base ?? 'HEAD', '--'], { cwd: request.root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean); }
+      catch { removed = []; }
+      return removed;
+    };
     for (const changed of request.changed) {
       const compiled = compiledLanguage(changed.file);
       const language = /\.[cm]?tsx?$/.test(changed.file) ? 'typescript' : changed.file.endsWith('.py') ? 'python' : compiled;
@@ -27,8 +35,8 @@ process.on('message', (request: { root: string; changed: ChangedFile[]; config: 
         catch { return []; }
       }));
       // Compiled languages build a whole package, so the baseline holds every changed file of the language at its base text.
-      const baseTexts = (): BaseTexts => new Map(request.changed.filter((c) => compiledLanguage(c.file) === compiled).map((c) => {
-        try { return [c.file, show(c.file)] as const; } catch { return [c.file, null] as const; }
+      const baseTexts = (): BaseTexts => new Map([...request.changed.map((c) => c.file), ...deleted()].filter((f) => compiledLanguage(f) === compiled).map((f) => {
+        try { return [f, show(f)] as const; } catch { return [f, null] as const; }
       }));
       const check = (root: string, file: string, text?: string) => compiled ? compilerDiagnostics(compiled, root, file, request.deadline, text === undefined ? undefined : baseTexts())
         : language === 'typescript' ? tsDiagnostics(root, file, text, text === undefined ? undefined : baseOthers()) : pythonDiagnostics(root, file, text, request.deadline);

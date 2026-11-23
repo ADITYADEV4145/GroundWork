@@ -142,6 +142,38 @@ describe('compiled-language type checks', () => {
     expect(result.findings.every((f) => !f.blocking)).toBe(true);
   }, 180_000);
 
+  it.skipIf(!toolchain.java)('does not block a Java import from a sibling module that shares the package prefix', async () => {
+    const c = cases.find((x) => x.language === 'java')!;
+    const root = repo({ ...c.files, 'settings.gradle': "include 'app', 'sibling'\n" });
+    edit(root, c.file, 'import demo.store.Store;', 'import demo.store.Store;\nimport demo.sibling.Thing;');
+    const result = await typeCheck(root, [{ file: c.file, ranges: null }], config());
+    expect(result.findings.length).toBeGreaterThan(0);
+    expect(result.findings.every((f) => !f.blocking)).toBe(true);
+  }, 180_000);
+
+  it.skipIf(!toolchain.go)('blocks a call to a function whose file was deleted', async () => {
+    const root = repo({
+      'go.mod': 'module demo\n\ngo 1.21\n',
+      'helper.go': 'package main\n\nfunc helper(n int) int { return n }\n',
+      'main.go': 'package main\n\nfunc main() {\n\t_ = helper(1)\n}\n',
+    });
+    rmSync(path.join(root, 'helper.go'));
+    edit(root, 'main.go', 'helper(1)', 'helper(2)');
+    const result = await typeCheck(root, [{ file: 'main.go', ranges: [[4, 4]] }], config());
+    expect(result.findings.filter((f) => f.blocking).map((f) => f.code)).toEqual(['undefined']);
+  }, 180_000);
+
+  it.skipIf(!toolchain.csharp)('does not guess between several C# projects in one directory', async () => {
+    const c = cases.find((x) => x.language === 'csharp')!;
+    const project = Object.keys(c.files).find((f) => f.endsWith('.csproj'))!;
+    const root = repo(c.files, c.prepare);
+    writeFileSync(path.join(root, path.dirname(project), 'Another.csproj'), c.files[project]!);
+    edit(root, c.file, c.errors[0]![0], c.errors[0]![1]);
+    const result = await typeCheck(root, [{ file: c.file, ranges: null }], config());
+    expect(result.available.csharp).toBe('several .csproj in one directory');
+    expect(result.findings).toEqual([]);
+  }, 180_000);
+
   it('reports a missing toolchain as unavailable instead of failing', async () => {
     const root = repo(cases[0]!.files);
     const saved = process.env.PATH;

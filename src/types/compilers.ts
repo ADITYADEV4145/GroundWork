@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import type { TypeFinding } from './index.js';
@@ -40,7 +40,15 @@ function nearest(root: string, file: string, matches: (names: string[]) => strin
 }
 const unavailable = (output: string, fallback: string) => new Error((output.split('\n').map((l) => l.trim()).find((l) => /\berror\b|^go: |cannot|not found/i.test(l)) ?? fallback).slice(0, 200));
 
-const scratch = (root: string) => path.join(os.tmpdir(), `gw-types-${createHash('sha256').update(path.resolve(root)).digest('hex').slice(0, 16)}`);
+/** The per-repository scratch directory. Its path is predictable, so it is used only when it is a real directory that this user alone can write. */
+function scratch(root: string): string {
+  const directory = path.join(os.tmpdir(), `gw-types-${createHash('sha256').update(path.resolve(root)).digest('hex').slice(0, 16)}`);
+  try { mkdirSync(directory, { mode: 0o700 }); } catch { /* exists: verified below */ }
+  const stat = lstatSync(directory);
+  const uid = process.getuid?.();
+  if (!stat.isDirectory() || (uid !== undefined && (stat.uid !== uid || (stat.mode & 0o022) !== 0))) throw new Error('unsafe scratch directory');
+  return directory;
+}
 
 /**
  * A symlinked copy of the repository in which only the changed files carry their base text.
@@ -62,6 +70,13 @@ function baseTree(root: string, base: BaseTexts): string {
     }
   };
   mirror(path.resolve(root), top);
+  // A file deleted since the base is not in the working tree to mirror.
+  for (const [f, text] of overrides) {
+    const target = path.join(top, path.relative(path.resolve(root), f));
+    if (typeof text !== 'string' || existsSync(target)) continue;
+    mkdirSync(path.dirname(target), { recursive: true });
+    writeFileSync(target, text);
+  }
   return top;
 }
 
@@ -201,6 +216,16 @@ function javaRoot(absolute: string, text: string): string {
   for (const part of parts.reverse()) { if (path.basename(directory) !== part) return path.dirname(absolute); directory = path.dirname(directory); }
   return directory;
 }
+function javaMultiModule(root: string, project: string): boolean {
+  const top = path.resolve(root);
+  for (let directory = project; ; directory = path.dirname(directory)) {
+    try { if (/<modules>/.test(readFileSync(path.join(directory, 'pom.xml'), 'utf8'))) return true; } catch { /* not Maven */ }
+    for (const settings of ['settings.gradle', 'settings.gradle.kts']) {
+      try { if (/\binclude\b/.test(readFileSync(path.join(directory, settings), 'utf8'))) return true; } catch { /* not Gradle */ }
+    }
+    if (directory === top || path.dirname(directory) === directory || path.relative(top, directory).startsWith('..')) return false;
+  }
+}
 function javaDiagnostics(root: string, file: string, deadline: number, base?: BaseTexts): Raw[] {
   const absolute = path.resolve(root, file);
   const current = readFileSync(absolute, 'utf8');
@@ -246,11 +271,20 @@ function javaDiagnostics(root: string, file: string, deadline: number, base?: Ba
     }
     if (status !== 0 && !errors) throw unavailable(output, 'javac failed');
     // An import of a library that is not on the classpath makes every later error in the file unreliable.
+    // An import of a library that is not on the classpath makes every later error in the file unreliable.
+    // In a multi-module build a sibling module shares the package prefix, so there only a package in this module's sources is known.
     const own = javaPackage(text).split('.').slice(0, 2).join('.');
+    const modules = javaMultiModule(root, project);
     const lines = text.split('\n');
     const incomplete = found.some((f) => {
-      const imported = /^\s*import\s+(?:static\s+)?([\w.]+)/.exec(lines[f.line - 1] ?? '')?.[1];
-      return imported !== undefined && !(own && (imported === own || imported.startsWith(`${own}.`)));
+      const match = /^\s*import\s+(static\s+)?([\w.]+)/.exec(lines[f.line - 1] ?? '');
+      if (!match) return false;
+      const imported = match[2]!;
+      if (!(own && (imported === own || imported.startsWith(`${own}.`)))) return true;
+      if (!modules) return false;
+      const names = imported.split('.').filter(Boolean);
+      const parts = names.slice(0, names.length - (match[1] ? 2 : 1) + (imported.endsWith('.') ? 1 : 0));
+      return !sourcepath.some((r) => existsSync(path.join(r, ...parts)));
     });
     if (incomplete) for (const f of found) { f.blocking = false; if (!f.message.endsWith('(classpath incomplete)')) f.message += ' (classpath incomplete)'; }
     return found;
@@ -265,7 +299,10 @@ function dotnetBinary(): string {
 }
 function csharpDiagnostics(root: string, file: string, deadline: number, base?: BaseTexts): Raw[] {
   const pick = (names: string[]) => names.filter((n) => n.endsWith('.csproj')).sort()[0];
-  if (!nearest(root, file, pick)) throw new Error('no .csproj');
+  const owner = nearest(root, file, pick);
+  if (!owner) throw new Error('no .csproj');
+  // Which of several projects in one directory compiles the file is not knowable without evaluating them.
+  if (readdirSync(owner.directory).filter((n) => n.endsWith('.csproj')).length > 1) throw new Error('several .csproj in one directory');
   const tree = base ? baseTree(root, base) : path.resolve(root);
   try {
     const project = nearest(tree, file, pick);

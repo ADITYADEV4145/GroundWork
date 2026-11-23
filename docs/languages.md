@@ -4,7 +4,7 @@
 
 | Language | Files | Index, navigation, impact | Duplicate gate | Invented-call checks (grounding) | Type backend |
 | --- | --- | --- | --- | --- | --- |
-| TypeScript | `.ts`, `.tsx`, `.mts`, `.cts`, `.d.ts` | yes | yes | yes | TypeScript compiler (bundled) |
+| TypeScript | `.ts`, `.tsx`, `.mts`, `.cts`, `.d.ts` | yes | yes | yes | the project's TypeScript compiler |
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | yes | yes | yes | none |
 | Python | `.py`, `.pyi` | yes | yes | yes | pyright, if installed |
 | Go | `.go` | yes | yes | no | none |
@@ -17,7 +17,7 @@ Files in other languages are not indexed; the agent uses its normal tools for th
 
 ## TypeScript
 
-Groundwork uses the TypeScript compiler it ships with and reads your `tsconfig.json`. `gw doctor` shows the compiler version and whether a root `tsconfig.json` was found; without one, compiler defaults apply and path aliases will not resolve. Type errors on changed lines are reported, and only errors that were not already in the base commit can block. Turn it off with `{"types": {"typescript": "off"}}` in `.groundwork/config.json`.
+Groundwork uses the TypeScript compiler installed in your project (`npm i -D typescript`) and reads your `tsconfig.json`. Without one, `gw doctor` warns and type checks are skipped. `gw doctor` shows the compiler version and whether a root `tsconfig.json` was found; without one, compiler defaults apply and path aliases will not resolve. Type errors on changed lines are reported, and only errors that were not already in the base commit can block. Turn it off with `{"types": {"typescript": "off"}}` in `.groundwork/config.json`.
 
 ## JavaScript
 

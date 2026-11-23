@@ -1,6 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { accessSync, constants, existsSync, mkdirSync } from 'node:fs';
-import { createRequire } from 'node:module';
+import { accessSync, constants, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Command } from 'commander';
 import { ConfigError, loadConfig } from '../../config/load.js';
@@ -138,12 +137,18 @@ export async function runDoctor(root: string, options: DoctorOptions = {}): Prom
   if (has('typescript', 'tsx')) {
     let compiler: string | null = null;
     try {
-      compiler = (createRequire(import.meta.url)('typescript') as { version: string }).version;
+      // Type checks load the project's own compiler (src/types/typescript.ts), so look in the same place.
+      // Walk up by hand: require.resolve caches, and doctor must see a compiler that was just removed.
+      for (let dir = root; compiler === null; dir = path.dirname(dir)) {
+        const manifest = path.join(dir, 'node_modules', 'typescript', 'package.json');
+        if (existsSync(manifest)) compiler = (JSON.parse(readFileSync(manifest, 'utf8')) as { version: string }).version;
+        else if (dir === path.dirname(dir)) break;
+      }
     } catch {
       compiler = null;
     }
     const off = !typesOn || config?.types.typescript === 'off';
-    add('types:typescript', off || !compiler ? 'warn' : 'ok', off ? 'disabled in .groundwork/config.json (types); type errors will not be caught' : compiler ? `TypeScript ${compiler}${existsSync(path.join(root, 'tsconfig.json')) ? ', tsconfig.json found' : ', no tsconfig.json at the root (compiler defaults)'}` : 'TypeScript compiler could not be loaded; reinstall Groundwork');
+    add('types:typescript', off || !compiler ? 'warn' : 'ok', off ? 'disabled in .groundwork/config.json (types); type errors will not be caught' : compiler ? `TypeScript ${compiler}${existsSync(path.join(root, 'tsconfig.json')) ? ', tsconfig.json found' : ', no tsconfig.json at the root (compiler defaults)'}` : 'no TypeScript compiler in this project, so type checks are skipped; run npm i -D typescript');
   }
   if (has('python')) {
     const off = !typesOn || config?.types.python === 'off';

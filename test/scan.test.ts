@@ -55,7 +55,7 @@ describe('gw scan', () => {
 `;
     writeFileSync(path.join(root, '.gitignore'), '.groundwork/\n');
     writeFileSync(path.join(root, 'load.ts'), 'export const loadUsers = (id: number): string[] => [String(id)];\nexport const loadTeams = (id: number): string[] => [String(id), "t"];\n');
-    writeFileSync(path.join(root, 'memo.ts'), 'import { loadUsers, loadTeams } from "./load.js";\n' + getter('usersOf', 'loadUsers') + getter('teamsOf', 'loadTeams') + getter('membersOf', 'loadUsers')
+    writeFileSync(path.join(root, 'memo.ts'), 'import { loadUsers, loadTeams } from "./load.js";\n' + '// caf\u00e9 \u{1F600}\n' + getter('teamsOf', 'loadTeams') + getter('usersOf', 'loadUsers') + getter('membersOf', 'loadUsers').replace('id: number)', 'id: number = Number("1"))')
       + 'export async function timed(n: number): Promise<number> {\n  const start = Date.now();\n  const users = await Promise.resolve(loadUsers(n));\n  const names = users.map((u) => u.trim()).filter((u) => u.length > 0);\n  return Date.now() - start + users.length + names.length;\n}\n'
       + 'export function run(n: number) {\n  const again = async (): Promise<number> => {\n    const start = Date.now();\n    const users = await Promise.resolve(loadUsers(n));\n    const names = users.map((u) => u.trim()).filter((u) => u.length > 0);\n    return Date.now() - start + users.length + names.length;\n  };\n  return again;\n}\n');
     git(root, 'init'); git(root, 'add', '.');

@@ -54,6 +54,201 @@
         "go",
         "test"
       ]
+    },
+    {
+      "id": "more-itertools-08dca28",
+      "language": "python",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/more-itertools/more-itertools",
+        "sha": "08dca284ba5446a026afdc34067b658f9da989eb",
+        "license": "MIT"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "unittest"
+      ]
+    },
+    {
+      "id": "more-itertools-4aeb433",
+      "language": "python",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/more-itertools/more-itertools",
+        "sha": "4aeb4338ae1407d8da9723e86da99efeb446f719",
+        "license": "MIT"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "unittest"
+      ]
+    },
+    {
+      "id": "more-itertools-b21ec4e",
+      "language": "python",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/more-itertools/more-itertools",
+        "sha": "b21ec4ee8e139ebe297e2221980a694bebb69523",
+        "license": "MIT"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "unittest"
+      ]
+    },
+    {
+      "id": "more-itertools-1ea82a7",
+      "language": "python",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/more-itertools/more-itertools",
+        "sha": "1ea82a711c69f590054987b5cb194157f8ce8ac4",
+        "license": "MIT"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "unittest"
+      ]
+    },
+    {
+      "id": "more-itertools-9ed3dbb",
+      "language": "python",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/more-itertools/more-itertools",
+        "sha": "9ed3dbb0ae527230cd156d91d0af305478558fba",
+        "license": "MIT"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "unittest"
+      ]
+    },
+    {
+      "id": "more-itertools-ca71122",
+      "language": "python",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/more-itertools/more-itertools",
+        "sha": "ca711220a6657a22655f6fa497524d006a735c5f",
+        "license": "MIT"
+      },
+      "test": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "testOne": [
+        "python3",
+        "-m",
+        "unittest"
+      ]
+    },
+    {
+      "id": "mux-24c3e7f",
+      "language": "go",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/gorilla/mux",
+        "sha": "24c3e7f499efd8b1429cfe789c7e6a3631357045",
+        "license": "BSD-3-Clause"
+      },
+      "test": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "testOne": [
+        "go",
+        "test"
+      ]
+    },
+    {
+      "id": "mux-e44017d",
+      "language": "go",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/gorilla/mux",
+        "sha": "e44017df2b8798f6bfff81fff1c0b319c1a54496",
+        "license": "BSD-3-Clause"
+      },
+      "test": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "testOne": [
+        "go",
+        "test"
+      ]
+    },
+    {
+      "id": "mux-948bec3",
+      "language": "go",
+      "source": {
+        "kind": "git",
+        "url": "https://github.com/gorilla/mux",
+        "sha": "948bec34b5168796bf3fc4dbb09215baa970351a",
+        "license": "BSD-3-Clause"
+      },
+      "test": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "testOne": [
+        "go",
+        "test"
+      ]
     }
   ],
   "tasks": [
@@ -476,6 +671,87 @@
         ]
       },
       "hidden": "stock-room.mjs"
+    },
+    {
+      "id": "itertools-numeric-range-big",
+      "repo": "more-itertools-08dca28",
+      "category": "real-failure",
+      "prompt": "In more_itertools, numeric_range objects whose length is larger than sys.maxsize cannot be compared or hashed: `numeric_range(0, 10**30) == numeric_range(0, 10**30)` and `hash(numeric_range(0, 10**30))` both raise OverflowError, while the built-in range handles the same arguments. Make equality and hashing work for such ranges and agree with the built-in range. `len()` of such a range should keep raising OverflowError.",
+      "entry": "more_itertools/more.py",
+      "hidden": "more-itertools.py",
+      "provenance": "https://github.com/more-itertools/more-itertools/commit/c629214760c78c0a2235e896d335cccfb3a64466"
+    },
+    {
+      "id": "itertools-chunked-even-size",
+      "repo": "more-itertools-4aeb433",
+      "category": "real-failure",
+      "prompt": "In more_itertools, chunked_even does not validate its chunk size. `list(chunked_even(iter('ABC'), 0))` and a negative size both leak an unrelated error from inside the function, and with 0 some items of the source are consumed first. Make it behave like the library's other chunking functions (chunked, ichunked, sliced) for a size of zero and for a negative size, without consuming anything from the source in either case.",
+      "entry": "more_itertools/more.py",
+      "hidden": "more-itertools.py",
+      "provenance": "https://github.com/more-itertools/more-itertools/commit/fbd55137fe47b44f55190c3714c75f1b21bf834d"
+    },
+    {
+      "id": "itertools-peekable-reverse-slice",
+      "repo": "more-itertools-b21ec4e",
+      "category": "real-failure",
+      "prompt": "In more_itertools, slicing a peekable backwards from a fixed start with the stop left out, for example `peekable(itertools.count())[4::-2]`, never returns on an infinite source, and on a finite source it reads the whole iterable. Such a slice only needs the items up to the start index. Fix peekable so it reads no further than it has to for this kind of slice; other slices must keep working.",
+      "entry": "more_itertools/more.py",
+      "hidden": "more-itertools.py",
+      "provenance": "https://github.com/more-itertools/more-itertools/commit/e6ce1b0f65a57c459fc5004ad84158447b65b0ac"
+    },
+    {
+      "id": "itertools-bucket-falsey-validator",
+      "repo": "more-itertools-1ea82a7",
+      "category": "real-failure",
+      "prompt": "In more_itertools, bucket ignores a validator that is callable but falsey. For example an empty `set` subclass that defines `__call__` to test membership is silently replaced by a validator that accepts every key, so buckets for rejected keys return items and `key in bucket` reports True. Make bucket use whatever validator it is given.",
+      "entry": "more_itertools/more.py",
+      "hidden": "more-itertools.py",
+      "provenance": "https://github.com/more-itertools/more-itertools/commit/67fcf640477c78605580f5ee703a54c73c1e7a8a"
+    },
+    {
+      "id": "itertools-one-falsy-exception",
+      "repo": "more-itertools-9ed3dbb",
+      "category": "real-failure",
+      "prompt": "In more_itertools, one() and only() drop a user-supplied exception when the exception object is falsy (for example an Exception subclass whose `__bool__` returns False) and raise the default ValueError instead. This affects the too_short and too_long arguments. Fix it, and when a custom too_long is given do not build the default message at all, since building it calls repr() on the items.",
+      "entry": "more_itertools/more.py",
+      "hidden": "more-itertools.py",
+      "provenance": "https://github.com/more-itertools/more-itertools/commit/def2dabea858b6ecb84ee0c52e6e07929f2c409c"
+    },
+    {
+      "id": "itertools-seekable-maxlen-zero",
+      "repo": "more-itertools-ca71122",
+      "category": "real-failure",
+      "prompt": "In more_itertools, a seekable created with maxlen=0 loses items: after `s = seekable([10, 20, 30], maxlen=0)`, calling `s.peek()` or `bool(s)` consumes the first item, so `list(s)` no longer returns all three. Peeking and truth-testing must not drop items when maxlen is 0, and repeated peeks must return the same item.",
+      "entry": "more_itertools/more.py",
+      "hidden": "more-itertools.py",
+      "provenance": "https://github.com/more-itertools/more-itertools/commit/6b1907de293a655fb77881bf81948f95fd15bd7c"
+    },
+    {
+      "id": "mux-query-mismatch-status",
+      "repo": "mux-24c3e7f",
+      "category": "real-failure",
+      "prompt": "In gorilla/mux, register `/api` twice on one router: once for POST, and once for GET with the query requirement `Queries(\"time\", \"{time:[0-9]+}\")`. A GET request to `/api?time=-4` then fails with a method mismatch (405) although GET is an allowed method; no route fully matches, so the result must be not found (ErrNotFound, 404). A POST to `/api` must still match, and a request whose method no route for that path accepts must still report a method mismatch.",
+      "entry": "route.go",
+      "hidden": "mux.mjs",
+      "provenance": "https://github.com/gorilla/mux/commit/395ad81d0ebffa0c5a36f3e5a2e720a7d5870d92"
+    },
+    {
+      "id": "mux-subrouter-method-status",
+      "repo": "mux-e44017d",
+      "category": "real-failure",
+      "prompt": "In gorilla/mux, a subrouter under `PathPrefix(\"/v1\")` with two GET-only routes, `/api` and `/api/{id}`, answers `PUT /v1/api` with 404. The path exists and only the method differs, so the answer must be 405 Method Not Allowed. Fix it without breaking the existing behavior that a request failing a route's query requirement, when another route on the same path has a different method, is not found (404).",
+      "entry": "route.go",
+      "hidden": "mux.mjs",
+      "provenance": "https://github.com/gorilla/mux/commit/2b030fc311d07b8c5950807800b03b2d32a7142c"
+    },
+    {
+      "id": "mux-host-port-vars",
+      "repo": "mux-948bec3",
+      "category": "real-failure",
+      "prompt": "In gorilla/mux, a route whose host template has no port, such as `Host(\"{foo:[a-z][a-z][a-z]}.{bar:[a-z][a-z][a-z]}.{baz:[a-z][a-z][a-z]}\")`, matches a request for `http://abc.def.ghi:65535/` but the route variables come back empty. The variables must be extracted when the request carries a port and the template does not; templates that do name a port, such as `{sub}.domain.com:{port:.*}`, must keep working for matching and for URL building.",
+      "entry": "regexp.go",
+      "hidden": "mux.mjs",
+      "provenance": "https://github.com/gorilla/mux/commit/98cb6bf42e086f6af920b965c38cacc07402d51b"
     }
   ]
 }

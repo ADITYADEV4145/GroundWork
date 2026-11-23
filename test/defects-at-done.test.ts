@@ -28,8 +28,8 @@ async function graded(id: string, files: Record<string, string>, reference = fal
 }
 
 describe('DefectsAtDone manifest', () => {
-  it('covers five categories on three languages and hashes reproducibly', () => {
-    expect(new Set(manifest.tasks.map((t) => t.category)).size).toBe(5);
+  it('covers all six categories on three languages and hashes reproducibly', () => {
+    expect(new Set(manifest.tasks.map((t) => t.category)).size).toBe(6);
     expect(new Set(manifest.repos.map((r) => r.language))).toEqual(new Set(['typescript', 'python', 'go']));
     expect(taskSetHash()).toMatch(/^[a-f0-9]{64}$/);
     expect(taskSetHash()).toBe(taskSetHash());

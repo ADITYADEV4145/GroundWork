@@ -8,20 +8,20 @@ import { applyReference, materialize } from './workspaces.js';
 export interface ValidationRow { task: string; unmodifiedFails: boolean; referencePasses: boolean; referenceDefects: number; reference: Grade }
 
 /** Every task must fail untouched and pass, with zero defects, on its reference solution. */
-export async function validate(root = dataRoot): Promise<{ ok: boolean; rows: ValidationRow[] }> {
+export async function validate(root = dataRoot, cache?: string): Promise<{ ok: boolean; rows: ValidationRow[]; skipped: string[] }> {
   const manifest = loadManifest(root), work = mkdtempSync(path.join(os.tmpdir(), 'gw-dad-validate-'));
   try {
-    const rows: ValidationRow[] = [];
+    const rows: ValidationRow[] = [], skipped: string[] = [];
     for (const task of manifest.tasks) {
       const repo = manifest.repos.find((r) => r.id === task.repo)!;
-      if (repo.source.kind !== 'fixture') continue;
-      const dir = path.join(work, task.id), base = materialize(repo, dir, { root });
+      if (repo.source.kind !== 'fixture' && !cache) { skipped.push(task.id); continue; }
+      const dir = path.join(work, task.id), base = materialize(repo, dir, { root, ...(cache ? { cache } : {}) });
       const before = await grade(task, repo, dir, base, root);
       applyReference(task, dir, root);
       const after = await grade(task, repo, dir, base, root);
       rows.push({ task: task.id, unmodifiedFails: !before.hiddenPassed, referencePasses: after.success && !after.invalid.length,
         referenceDefects: after.totalDefects, reference: after });
     }
-    return { ok: rows.every((r) => r.unmodifiedFails && r.referencePasses && r.referenceDefects === 0), rows };
+    return { ok: rows.every((r) => r.unmodifiedFails && r.referencePasses && r.referenceDefects === 0), rows, skipped };
   } finally { rmSync(work, { recursive: true, force: true }); }
 }

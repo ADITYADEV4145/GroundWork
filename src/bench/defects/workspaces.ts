@@ -28,7 +28,8 @@ export function materialize(repo: Repo, dir: string, options: { root?: string; c
   if (repo.source.kind === 'fixture') {
     cpSync(path.join(options.root ?? dataRoot, 'repos', repo.id), dir, { recursive: true });
   } else {
-    const mirror = path.join(options.cache ?? '', repo.id);
+    // Tasks pinned at different commits of one project share its mirror, named after the project.
+    const mirror = [repo.id, path.basename(repo.source.url).replace(/\.git$/, '')].map((name) => path.join(options.cache ?? '', name)).find(existsSync) ?? path.join(options.cache ?? '', repo.id);
     if (!options.cache || !existsSync(mirror)) throw new Error(`No local mirror of ${repo.id}; clone ${repo.source.url} into ${mirror} first`);
     const archive = execFileSync('git', ['archive', repo.source.sha], { cwd: mirror, maxBuffer: 1024 * 1024 * 1024 });
     execFileSync('tar', ['-xf', '-'], { cwd: dir, input: archive });
@@ -41,7 +42,9 @@ export function materialize(repo: Repo, dir: string, options: { root?: string; c
 
 /** Copies a reference solution (an overlay of files) into a workspace. Used only by validation and tests. */
 export function applyReference(task: Task, dir: string, root = dataRoot): void {
-  const overlay = path.join(root, 'reference', task.id);
+  const overlay = path.join(root, 'reference', task.id), patch = `${overlay}.patch`;
+  // Pinned public repositories keep their reference as the upstream fix's patch instead of whole files.
+  if (existsSync(patch)) { git(dir, 'apply', '--whitespace=nowarn', patch); return; }
   if (!existsSync(overlay)) throw new Error(`${task.id}: no reference solution`);
   for (const file of filesUnder(overlay)) {
     mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });

@@ -36,6 +36,8 @@ suite with a task manifest and requires captures for each suite.
 
 Generic suites provide both `tasks.json` and `grade.mjs`; standalone harnesses such as `bench/grounding/` keep their own commands and are not generic suites. A manifest with recorded `evidence.json` remains discoverable even if its grader is missing, so broken recorded suites still fail validation rather than disappearing.
 
+Tool calls per task for every recorded navigation and long-horizon run, with and without GroundWork, are in [TOOL-CALLS.md](TOOL-CALLS.md); `npm run bench:tool-calls` regenerates it from the checked-in evidence without running an agent.
+
 ## Capture protocol
 
 For each condition (`baseline` and `groundwork`) and repeat, start a separate agent session in the same mode. Use a fresh state directory that does not yet exist. Each task starts from the same pinned source, and its result is checked against a fixed answer or behavioral test. Choose order before observing results; use the same order for both arms of a repeat.

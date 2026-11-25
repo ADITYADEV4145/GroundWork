@@ -60,7 +60,7 @@ export function writeExtraction(db: Db, fileId: number, file: string, ex: Extrac
   const insSym = db.prepare(
     `INSERT INTO symbols(id, file_id, name, qualified_name, kind, start_line, end_line, start_byte, end_byte, signature, params_json,
       return_type, min_arity, max_arity, docstring, decorators_json, exported, is_default_export, is_async, parent_id,
-      token_count, norm_hash, minhash, vocab_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      token_count, norm_hash, body_hash, minhash, vocab_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
   );
   const insFts = db.prepare('INSERT INTO symbols_fts(rowid, symbol_id, name_words, docstring, signature, path) VALUES(?,?,?,?,?,?)');
   ex.symbols.forEach((s, i) => {
@@ -88,6 +88,7 @@ export function writeExtraction(db: Db, fileId: number, file: string, ex: Extrac
       s.parent !== null ? ids[s.parent]! : null,
       fp?.tokenCount ?? null,
       fp?.normHash ?? null,
+      fp?.bodyHash ?? null,
       fp ? new Uint8Array(fp.minhash.buffer, fp.minhash.byteOffset, fp.minhash.byteLength) : null,
       fp ? JSON.stringify(fp.vocab) : null,
     );

@@ -124,6 +124,7 @@ export function fingerprint(body: Node, extraWords: string[] = []): BodyFingerpr
   const { norm, identifiers } = normalizedTokens(body);
   return {
     tokenCount: norm.length,
+    bodyHash: sha1(body.text),
     minhash: minhash(norm),
     normHash: sha1(norm.join(' ')),
     vocab: vocabulary([...identifiers, ...extraWords]),

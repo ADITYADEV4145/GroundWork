@@ -449,7 +449,7 @@ export function readFingerprintedSymbols(db: Db): FingerprintedSymbol[] {
     return {
       ...toHit(r),
       startByte: Number(r.start_byte), endByte: Number(r.end_byte),
-      fingerprint: { tokenCount: Number(r.token_count), normHash: String(r.norm_hash),
+      fingerprint: { tokenCount: Number(r.token_count), normHash: String(r.norm_hash), bodyHash: r.body_hash === null ? undefined : String(r.body_hash),
         minhash: new Uint32Array(Uint8Array.from(bytes).buffer), vocab: JSON.parse(String(r.vocab_json)) },
       params: JSON.parse(String(r.params_json)) as Param[],
       returnType: r.return_type === null ? null : String(r.return_type),
@@ -464,6 +464,18 @@ export interface ReuseState {
   symbols: (SymbolHit & { startByte: number; endByte: number; parentId: string | null })[];
   calls: { file: string; callerId: string | null; calleeId: string | null; calleeText: string; line: number; column: number; argCount: number; confidence: string | null }[];
   literals: { file: string; symbolId: string | null; value: string; kind: import('../types.js').LiteralKind; line: number; constName: string | null }[];
+}
+
+/** Small session-memory projection; no fingerprints, source reads or parser initialization. */
+export function readSessionSymbols(db: Db, file?: string) {
+  return db.prepare(`SELECT s.id, s.qualified_name, s.kind, s.start_line, s.signature, s.body_hash, f.path
+    FROM symbols s JOIN files f ON f.id = s.file_id
+    WHERE f.is_test = 0 AND f.is_generated = 0 AND f.status = 'ok' AND s.token_count >= 15
+    ${file === undefined ? '' : 'AND f.path = ?'}
+    ORDER BY f.path, s.start_line`).all(...(file === undefined ? [] : [file])).filter((r) =>
+      !/^__.*__$/.test(String(r.qualified_name).split('.').at(-1) ?? '') && !/^(get|set)\s/.test(String(r.signature)))
+    .map((r) => ({ id: String(r.id), qualifiedName: String(r.qualified_name), kind: String(r.kind),
+      line: Number(r.start_line), signature: String(r.signature), bodyHash: String(r.body_hash), file: String(r.path) }));
 }
 
 /** Complete, uncapped call/literal data for before/after change analysis. */

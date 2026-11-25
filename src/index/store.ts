@@ -7,7 +7,7 @@ import { ensureGwDir, gwPath } from '../util/paths.js';
 import { VERSION } from '../util/version.js';
 
 /** Bump when extraction output changes so existing indexes rebuild on next refresh. */
-export const EXTRACTOR_VERSION = 6;
+export const EXTRACTOR_VERSION = 7;
 
 export function indexDbPath(root: string): string {
   return gwPath(root, 'index.db');

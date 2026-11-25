@@ -44,6 +44,8 @@ Fall back to ordinary search and ranged reads for docs, logs, config, unsupporte
 
 ## 2. Reuse first: look before you write
 
+Session reuse memory offers code you wrote in earlier turns before new work; disable it with `reuse.sessionMemory: false`.
+
 Before writing a genuinely new non-trivial helper/function (including a class, hook or component with new reusable logic), check for existing code. Skip `find_similar` for small edits, inline code, simple constants and already-confirmed helpers; reuse known symbols directly. Reuse unchanged search evidence across continuing steps and sessions when it is carried into your current context; repeat only if the relevant code changed or the evidence is missing. Default results are actionable reuse/extend matches; request `detail: "full"` only when related matches are useful.
 
 Prefer one combined call when you need more than one answer: `before_write({ "new": { "description": "what it does", "name": "planned name" }, "calls": ["helperYouWillCall"], "changes": ["symbolYouWillChange"] })` returns code to reuse, exact signatures and the callers to update together. Pass only the parts you need; repeat with `expand: "reuse"` or `expand: "callers"` only when the short answer is cut. It replaces separate `find_similar`, `read_symbol` and `callers` calls for that step.

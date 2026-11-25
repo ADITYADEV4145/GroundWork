@@ -19,6 +19,7 @@ import { scoreSignals } from './model.js';
 import { pairSignals, type Signals } from './signals.js';
 import { canBlock } from './policy.js';
 import type { EmbedderFactory } from './embeddings.js';
+import type { SessionWritten } from '../hooks/session-memory.js';
 import { changedFromGit } from '../grounding/ranges.js';
 import type { TypeCheckResult } from '../types/index.js';
 import { log } from '../util/log.js';
@@ -36,6 +37,7 @@ export interface CheckFinding {
   probability?: number;
   fix: string;
   grounding?: GroundingFinding;
+  existingTurn?: number;
 }
 export interface CheckReport {
   status: 'BLOCK' | 'WARN' | 'PASS';
@@ -46,7 +48,7 @@ export interface CheckReport {
   ms: number;
   types?: TypeCheckResult;
 }
-export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number; embeddingFactory?: EmbedderFactory; stopHook?: boolean }
+export interface CheckOptions { base?: string; config?: GroundworkConfig; timeoutMs?: number; embeddingFactory?: EmbedderFactory; sessionWritten?: SessionWritten[]; stopHook?: boolean }
 
 const location = (s: IndexedSymbol): CheckLocation => ({ file: s.file, symbol: s.qualifiedName, line: s.line });
 const order = (s: { file: string; line: number }) => `${s.file}\0${String(s.line).padStart(10, '0')}`;
@@ -71,7 +73,7 @@ export function formatFinding(f: CheckFinding): string {
   const ref = (s: CheckLocation) => f.kind === 'duplicate-file' ? `${clean(s.file)}:${s.line}` : `${clean(s.symbol)} (${clean(s.file)}:${s.line})`;
   return [
     `${f.severity} ${f.kind}: ${ref(f.added)}`,
-    `Existing: ${f.existing ? ref(f.existing) : 'no valid duplicate exemption'}`,
+    `Existing: ${f.existing ? ref(f.existing) : 'no valid duplicate exemption'}${f.existingTurn === undefined ? '' : `, written by you in turn ${f.existingTurn}`}`,
     `Why: ${f.signals.slice(0, 3).map((s) => `${s.name}=${Number(s.value.toFixed(3))}`).join(', ')}${f.probability === undefined ? '' : `; p=${f.probability.toFixed(3)}`}`,
     `Fix: ${clean(f.fix)}`,
   ].join('\n');
@@ -234,6 +236,8 @@ async function compareSnapshots(root: string, base: { root: string; state: Reuse
     return exempt(symbols.get(id)?.parentId ?? null);
   };
   const matches = new Map<string, { target: IndexedSymbol; p: number; signals: Signals; score: ReturnType<typeof scoreSignals> }>();
+  const turns = new Map((config.reuse.sessionMemory ? options.sessionWritten ?? [] : [])
+    .filter((s) => candidateById.get(s.id)?.fingerprint.bodyHash === s.bodyHash).map((s) => [s.id, s.turn]));
   const delegates = new Map<string, Set<string>>();
   for (const call of state.calls) {
     if (!call.callerId || !call.calleeId || !['exact', 'import-resolved'].includes(call.confidence ?? '')) continue;
@@ -246,7 +250,10 @@ async function compareSnapshots(root: string, base: { root: string; state: Reuse
     const query = candidateById.get(s.id)!;
     let best: { target: IndexedSymbol; p: number; signals: Signals; score: ReturnType<typeof scoreSignals> } | undefined;
     for (const candidate of candidates.find(query)) {
-      if (!eligible.has(candidate.id) || (!baseSymbols.has(candidate.id) && order(candidate) >= order(s))) continue;
+      const candidateTurn = turns.get(candidate.id), addedTurn = turns.get(s.id);
+      const chronological = candidateTurn !== undefined && addedTurn !== undefined && candidateTurn !== addedTurn;
+      if (!eligible.has(candidate.id) || (!baseSymbols.has(candidate.id) && chronological && candidateTurn! > addedTurn!) ||
+        (!baseSymbols.has(candidate.id) && !(chronological && candidateTurn! < addedTurn!) && order(candidate) >= order(s))) continue;
       if (delegates.get(s.id)?.has(candidate.id)) continue;
       const signals = pairSignals(query, candidate, candidates.idf);
       const score = scoreSignals(signals, query.embedding?.model);
@@ -258,6 +265,7 @@ async function compareSnapshots(root: string, base: { root: string; state: Reuse
     if (!best || best.p < best.score.thresholds.warn) continue;
     matches.set(s.id, best);
     add({ kind: 'duplicate', severity: best.p >= best.score.thresholds.block && canBlock(query, best.target, best.signals) ? 'BLOCK' : 'WARN', added: location(s), existing: location(best.target),
+      ...(turns.has(best.target.id) && turns.has(s.id) && turns.get(best.target.id)! < turns.get(s.id)! ? { existingTurn: turns.get(best.target.id)! } : {}),
       probability: best.p, signals: topSignals(best.signals, best.score), fix: `Duplicate of ${best.target.qualifiedName}: REUSE it as-is or EXTEND/parameterize it instead of keeping both implementations.` });
   }
   const callKey = (c: ReuseState['calls'][number]) => `${c.file}\0${c.callerId ?? '<module>'}`;

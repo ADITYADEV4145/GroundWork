@@ -153,7 +153,7 @@ const findCodeTool = defineTool({
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'Outline file or files. A small single file includes source; include_body: false lists ranges only. locations_only: false adds signatures. Use read_symbol for known symbols.',
+  description: 'Outline file or files. A small single file includes source; include_body: false lists ranges only. locations_only: false adds signatures. Use read_symbol for known symbols; at most once per orientation.',
   inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, include_body: z.boolean().default(true), offset },
   handler(args, { root, db, config }) {
     if (Boolean(args.file) === Boolean(args.files)) return 'Provide exactly one of file or files.';
@@ -177,10 +177,8 @@ const outlineTool = defineTool({
     if (!entry) return 'File is not indexed. For non-code or unsupported files, use a ranged Read.';
     const title = `${prefixBytes(compact(file!, 100), 250)} (${entry.lines} lines; ${entry.symbols.length} symbols${entry.status === 'ok' ? '' : `; ${entry.status}${entry.reason ? `: ${entry.reason}` : ''}`})`;
     if (args.include_body && !args.offset && entry.symbols.length) {
-      let raw: Buffer | null;
-      try { raw = readRepoFile(root, file!, config.index.maxFileBytes); }
-      catch { raw = null; }
-      const whole = raw && sha1(raw) === sourceLocation(db, entry.symbols[0]!.id)?.hash ? `${title}; whole file:\n${raw.toString('utf8').trimEnd()}` : '';
+      const indexed = indexedSource({ root, db, config }, entry.symbols[0]!);
+      const whole = indexed ? `${title}; whole file:\n${indexed.source.trimEnd()}` : '';
       if (whole && printableSource(whole) && estimateTokens(whole) <= NAVIGATION_BUDGETS.outline) return whole;
     }
     return page({

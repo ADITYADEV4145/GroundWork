@@ -94,7 +94,7 @@ function snapshot(ctx: ToolContext, baseline: string, candidate: string, edits: 
 }
 
 function makePatch(directory: string): string {
-  const result = spawnSync('git', ['--no-pager', '-c', 'core.quotePath=true', 'diff', '--no-index',
+  const result = spawnSync('git', ['--no-pager', '-c', 'core.quotePath=true', '-c', 'core.autocrlf=false', 'diff', '--no-index',
     '--no-prefix', '--binary', '--no-renames', '--no-ext-diff', '--no-textconv', '--', 'before', 'after'],
   { ...gitOptions, env: gitEnv, cwd: directory });
   if (result.error) throw result.error;
@@ -180,5 +180,5 @@ export async function guardCandidate(ctx: ToolContext, edits: FileEdit[], rename
 
 export function applyPatch(root: string, patch: string): void {
   assertGitRoot(root);
-  git(root, ['apply', '-p1', '--whitespace=nowarn', '--'], patch);
+  git(root, ['-c', 'core.autocrlf=false', 'apply', '-p1', '--whitespace=nowarn', '--'], patch);
 }

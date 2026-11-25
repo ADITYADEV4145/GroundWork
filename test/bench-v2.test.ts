@@ -1,8 +1,9 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, describe, expect, it } from 'vitest';
+import { shellQuote } from '../src/guards/trimmer.js';
 import { addedLines, aggregateReview, applyOverride, labelReuse, newcombe, pythonAcceptanceCommand, renderReport, renderReview, summarize, wilson } from '../scripts/bench-v2-lib.js';
 import type { Result, ReviewRow, Task } from '../scripts/bench-v2-lib.js';
 import { evaluateBenchmarkV2, evaluateRealRepoReview } from '../src/selftest/real-repo-review.js';
@@ -115,7 +116,10 @@ describe('selected acceptance interpreter', () => {
     const acceptance = `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -c 'import json, os, sys; print(json.dumps([sys.executable, os.environ["PYTEST_DISABLE_PLUGIN_AUTOLOAD"], sys.argv[1:]]))' 'arg with spaces'`;
     const result = run(acceptance, python);
     expect(result.status, result.stderr).toBe(0);
-    expect(JSON.parse(result.stdout)).toEqual([python, '1', ['arg with spaces']]);
+    const [executable, environment, args] = JSON.parse(result.stdout);
+    expect(realpathSync(executable)).toBe(realpathSync(python));
+    expect(pythonAcceptanceCommand(acceptance, python)).toContain(shellQuote(python));
+    expect([environment, args]).toEqual(['1', ['arg with spaces']]);
   });
   it('does not alter non-Python or empty commands, and retains interpreter errors and exit codes', () => {
     expect(run('', '/missing/python').status).toBe(0);

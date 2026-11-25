@@ -4,7 +4,7 @@ const label = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const count = z.number().int().nonnegative();
 const revision = z.string().regex(/^[a-f0-9]{40}$/);
 const metricNames = z.string().regex(/^[a-z][a-zA-Z0-9_]*$/);
-export const condition = z.enum(['baseline', 'groundwork']);
+export const condition = z.enum(['baseline', 'groundwork', 'serena', 'codebase-memory']);
 export const taskSchema = z.object({
   id: label,
   repo: label,

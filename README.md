@@ -429,6 +429,43 @@ All 80 raw captures are retained: 32 navigation v9 (including deviation GroundWo
 
 <!-- phase-a-v9:end -->
 
+
+<!-- phase-b-v1:start -->
+
+### Phase B: five-turn reuse chains (PR #42 session memory, measured)
+
+Phase B gate failed in both modes: neither arm produced detectable duplicated logic at turn 5 (0% vs 0%), so the primary metric could not show a GroundWork reduction.
+
+Stable-v1; 64 chain-sessions, 16 per arm per mode, four per chain, five turns each. Collector/grader 831fca40500094b904eb5078b5982884a057a439; baseline product 10fc7493ed024d817b5cabf7cbf4aaa97533825c; GroundWork product 6fe635f586654359514c614402b0b0243c915b32. Product builds are attested by workflow notes, not independent binary hashes in exports.
+
+Normal and fusion are reported separately. Means equally weight the four chain means. All intervals are nominal 95% within-chain whole-session bootstrap CIs (10,000 draws, seed 0x51ab17ed); arm-mean CIs use the same draws as the frozen differences. Differences are baseline minus GroundWork: positive favors GroundWork for duplication/growth; negative favors GroundWork for reuse. No percent reduction is calculated from a zero baseline duplication rate.
+
+| Mode | Baseline rate % [95% CI] | GroundWork rate % [95% CI] | B − GW pp [95% CI] | Success B / GW | Gate |
+| --- | --- | --- | --- | --- | --- |
+| Normal | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] | 80/80 / 80/80; met | FAIL |
+| Fusion | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] | 0.00 [0.00, 0.00] | 80/80 / 80/80; met | FAIL |
+
+Both modes fail the required strictly positive primary lower CI bound; the overall gate also fails. All 320 turn acceptances and all 40 chain/turn success guardrails pass. Every snapshot has nonzero token exposure: these zeros mean no clones meeting the frozen detector's 50-token threshold, not proof of no semantic duplication or universal equivalence. Equal success is not a correctness win.
+
+**Secondary reuse and code growth: nominal intervals, not a substitute for the failed primary gate.** Reuse is the AST-resolved planted-opportunity rate, not agent self-report; growth counts net added nonblank Python lines. Secondary intervals do not establish a primary win or attribute effects to session-memory feedback.
+
+| Mode | Turn-5 secondary metric | Baseline mean [95% CI] | GroundWork mean [95% CI] | B − GW [95% CI] |
+| --- | --- | --- | --- | --- |
+| Normal | All-opportunities-to-date reuse (%) | 68.30 [58.48, 78.57] | 75.89 [66.52, 83.93] | −7.59 [−20.54, 5.80] |
+| Normal | Current-turn opportunity reuse (%) | 63.75 [55.00, 72.50] | 68.75 [61.25, 75.00] | −5.00 [−16.25, 7.50] |
+| Normal | Net nonblank Python LOC added | 83.06 [81.00, 85.12] | 73.06 [69.00, 78.75] | 10.00 [4.06, 14.75] |
+| Fusion | All-opportunities-to-date reuse (%) | 72.77 [68.30, 79.46] | 82.59 [75.00, 89.73] | −9.82 [−19.20, −0.45] |
+| Fusion | Current-turn opportunity reuse (%) | 68.75 [66.25, 72.50] | 76.25 [71.25, 82.50] | −7.50 [−13.75, −1.25] |
+| Fusion | Net nonblank Python LOC added | 69.69 [64.44, 74.75] | 65.88 [62.81, 68.44] | 3.81 [−2.06, 9.56] |
+
+Disclosures:
+- The split-product setup departs from the protocol's older "identical product pins" sentence; the explicitly approved pre-collection setup used the separate products above with one frozen collector. No metric, grader or protocol was changed for analysis.
+- The fusion pytest-async GroundWork run 8 ran uncaptured read-only recovery checks, and several sessions had shell-quoting retries, all kept in. Full execution notes and audit limits accompany the evidence.
+- Four never-started sessions were terminated and relaunched fresh on the same pins, with no data collected from the first attempts. They were normal click-values baseline-2 and GroundWork-2, fusion click-summary GroundWork-5, and fusion pytest-async GroundWork-16; only their finished fresh captures are included. Recorded sessions span 84.613–121.302 seconds with five positive-duration turns each; full UTC timestamps are in the analysis.
+
+All 64 raw captures and unchanged grader outputs are archived under [bench/multiturn-reuse/v1](bench/multiturn-reuse/v1/), with [input and artifact hashes](bench/PHASEB-INPUTS.json). No billed-token, dollar-savings or latency claim is made. [Full Phase B analysis, per-turn curves, provenance and timing audit](bench/PHASEB-ANALYSIS.md).
+
+<!-- phase-b-v1:end -->
 <!-- stable-protocol:start -->
 <!-- v10-results:start -->
 ### v10 (PR #48: engineering gates, not a speed win)

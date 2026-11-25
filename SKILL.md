@@ -40,6 +40,8 @@ Reuse definitions, signatures and source evidence across continuing steps and se
 
 For continuing or long-horizon work, do one orientation step: batched `outline` for unfamiliar files or batched `read_symbol` for known helpers. Do not repeat a map/outline cycle per task; fetch only missing or changed evidence thereafter.
 
+When a task needs definitions, callers and reusable helpers together, start with `task_context({ "task": "describe the change", "symbols": ["knownSymbol"], "budget_tokens": 1200 })`. Symbol and file hints are optional; follow up only for missing evidence. Use targeted tools for single lookups.
+
 Fall back to ordinary search and ranged reads for docs, logs, config, unsupported languages, and raw text the index does not hold. If a result is missing or incomplete, check the lines directly. If the MCP server is not connected, `gw symbols` and `gw show` find symbols from the shell.
 
 ## 2. Reuse first: look before you write

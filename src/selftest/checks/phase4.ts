@@ -16,7 +16,7 @@ import { validateStoredResults } from '../../bench/grounding/report.js';
 // Phase 4 gate: grounding catches every planted error, stays silent on valid dynamic code and clean repos,
 // and the PostToolUse path is fast enough to run on every edit.
 
-export const GROUNDING_FIXTURES = ['grounding-ts', 'grounding-py'];
+export const GROUNDING_FIXTURES = ['grounding-ts', 'grounding-py', 'grounding-go'];
 
 /** `// expect: arity` / `# expect: unknown-keyword` markers in a fixture, as `file:line:kind`. */
 export function plantedErrors(dir: string): Set<string> {

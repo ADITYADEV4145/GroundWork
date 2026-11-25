@@ -368,6 +368,11 @@ export function fileFacts(db: Db, ref: string | number): FileFacts | null {
   return r ? toFileFacts(r) : null;
 }
 
+export function indexedFileHash(db: Db, id: number): string | null {
+  const row = db.prepare('SELECT hash FROM files WHERE id = ?').get(id);
+  return row ? String(row.hash) : null;
+}
+
 export function importFacts(db: Db, fileId: number): ImportFact[] {
   return db
     .prepare('SELECT module, name, alias, kind, line, is_type_only, resolved_file_id, unresolved_reason FROM imports WHERE file_id = ? ORDER BY line, id')

@@ -18,6 +18,7 @@ import {
   type SymbolFact,
 } from '../index/query.js';
 import type { Db } from '../store/db.js';
+import { GoGrounder } from './go.js';
 import { renderSuggestions, suggest, type Suggestion } from './suggest.js';
 
 // Grounding (Phase 4): flag imports, calls and arguments the agent invented. Precision first: every rule
@@ -79,6 +80,7 @@ export class Grounder {
   private imports = new Map<number, ImportFact[]>();
   private aliases = new Map<number, { local: string; exported: string }[]>();
   private pool: SymbolFact[] | null = null;
+  private go: GoGrounder | null = null;
 
   constructor(
     private readonly db: Db,
@@ -340,10 +342,12 @@ export class Grounder {
     if (!f) return { ...res, unchecked: 'not indexed' };
     if (f.status !== 'ok') return { ...res, unchecked: f.status === 'partial' ? 'parse errors' : `index status ${f.status}` };
     if (f.isGenerated) return { ...res, unchecked: 'generated file' };
-    if (!isTs(f) && !isPy(f) && f.language !== 'javascript' && f.language !== 'jsx') return { ...res, unchecked: 'unsupported language' };
+    if (!isTs(f) && !isPy(f) && !['javascript', 'jsx', 'go'].includes(f.language ?? '')) return { ...res, unchecked: 'unsupported language' };
     const exclude = opts.config?.grounding.exclude ?? [];
     if (exclude.length && picomatch(exclude, { dot: true })(rel)) return { ...res, unchecked: 'excluded' };
     if (f.path.endsWith('.d.ts') || f.path.endsWith('.pyi')) return { ...res, unchecked: 'declaration file' };
+    if (f.language === 'go')
+      return (this.go ??= new GoGrounder(this.db, this.root)).verify(f, (call, lines) => inRanges(call.line, opts.ranges) && !suppressed(lines, call.line));
     const text = this.text(rel);
     if (text === null) return { ...res, unchecked: 'unreadable' };
     const lines = text.split('\n');

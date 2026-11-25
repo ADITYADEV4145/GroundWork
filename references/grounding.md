@@ -1,6 +1,8 @@
 # Grounding checks
 
-Grounding call verification supports TypeScript, JavaScript and Python only. Go, Rust, Java, C# and Ruby support indexing, navigation, impact analysis and the reuse gate; their grounding results remain unchecked.
+TypeScript, JavaScript and Python support in-repo import and call verification. Go supports unqualified calls resolved within the same package and package-qualified calls through imports within the same module. It checks arity for unambiguous functions, including the minimum for variadic calls. Methods on values, external imports, test files, cgo, build-conditional packages and ambiguous calls are not checked by Go in-repo grounding.
+
+Rust, Java, C# and Ruby support indexing, navigation, impact analysis and reuse but have no in-repo call verification. Dependency and compiler-backed checks are separate; see the [language coverage table](../README.md#what-it-does).
 
 An optional type layer also uses the target project's TypeScript compiler or Pyright.
 Use `gw types check [files...] [--base ref]` or MCP `check_types` with

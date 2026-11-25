@@ -96,7 +96,7 @@ export async function connectService(info: ServiceInfo): Promise<Socket> {
         if (startupError) throw startupError;
         launched = true;
       }
-      await delay(25);
+      await delay(launched ? 5 : 25);
     }
   } finally {
     if (owned) try { if (readFileSync(lock, 'utf8') === token) unlinkSync(lock); } catch { /* Already removed. */ }

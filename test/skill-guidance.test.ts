@@ -42,7 +42,13 @@ describe('shipped task-aware guidance', () => {
       expect(read(file)).toContain('Never re-read a file only to satisfy the verify rule.');
       expect(read(file)).toContain('one batched call instead of rereads');
     }
-    expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'find_code')!.description).toContain('include_body');
+    const findCode = NAVIGATION_TOOLS.find((tool) => tool.name === 'find_code')!.description;
+    expect(findCode).toContain('include_body');
+    expect(findCode).toContain('queries');
+    for (const file of ['SKILL.md', 'references/navigation.md']) {
+      expect(read(file)).toContain('"queries"');
+      expect(read(file)).not.toContain('Defaults stay location-only');
+    }
     expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'read_symbol')!.description).toContain('symbols');
     expect(verifyCallsTool.description).toContain('Never re-read');
     expect(verifyCallsTool.description).toContain('one batched call instead of rereads');

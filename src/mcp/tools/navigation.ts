@@ -5,6 +5,7 @@ import { readRepoFile, repoRelative } from '../../util/repo-file.js';
 import { estimateTokens, fitToBudget } from '../../util/tokens.js';
 import { defineTool, type GwTool, type ToolContext } from '../registry.js';
 
+export const FIND_BATCH_BUDGET = 1800;
 export const NAVIGATION_BUDGETS = { find_code: 600, outline: 400, read_symbol: 1200, explore: 1800, callers: 600, callees: 600, where_used: 600, repo_map: 1200 } as const;
 
 const printable = (s: string) => !/[\u0000-\u001f\u007f]/u.test(s) && Buffer.from(s).toString('utf8') === s;
@@ -16,6 +17,8 @@ const pageSize = z.number().int().min(1).max(100);
 const limit = (n: number) => pageSize.default(n);
 const kinds = z.enum(['function', 'method', 'class', 'interface', 'type', 'enum', 'constant', 'variable', 'component', 'dataclass']);
 const locationsOnly = z.boolean().default(true);
+
+const printableSource = (s: string) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(s);
 
 function compact(s: string, length = 180): string {
   const val = s.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -106,34 +109,56 @@ export function readSource(args: { symbol: string; context_lines: number; offset
   return title + part + next(part.length);
 }
 
+const FIND_BODIES = 3;
+const queryBatch = z.array(text).min(1).max(8).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter or fewer queries.');
+
+interface FindArgs { query: string; kind?: z.infer<typeof kinds>; limit?: number; locations_only: boolean; breadth: 'exact' | 'all'; include_body: boolean; offset: number }
+
+function findOne(args: FindArgs, ctx: ToolContext, budget: number, heading = ''): string {
+  const all = findCode(ctx.db, args.query, args.kind);
+  const query = args.query.toLowerCase();
+  const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
+  if (args.include_body && exact.length === 1 && args.breadth !== 'all' && args.offset === 0 && !heading)
+    return readSource({ symbol: exact[0]!.id, context_lines: 0, offset: 0 }, ctx, budget);
+  const narrowed = args.breadth !== 'all' && exact.length > 0;
+  const items = narrowed ? exact : all;
+  const count = args.limit ?? (args.locations_only ? 3 : 8);
+  const withBody = args.include_body && args.offset === 0 ? Math.min(FIND_BODIES, count, items.length) : 0;
+  // Bodies share the budget so one call can answer; each is cut at its share and keeps its own Next cursor.
+  const share = withBody ? Math.max(80, Math.floor((budget - 40) / withBody)) : 0;
+  const row = (s: (typeof items)[number]) => args.locations_only ? choice(s) :
+    `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`;
+  return page({
+    items, title: heading + (narrowed ? `Exact (${items.length})${all.length > exact.length ? '; more: breadth="all"' : ''}` : items.length ? `Code matches (${items.length}):` : 'No indexed matches. Try a different name or search plain text with your normal tools.'),
+    start: args.offset, count, budget,
+    render: (s) => {
+      if (items.indexOf(s) >= withBody) return row(s);
+      const body = readSource({ symbol: s.id, context_lines: 0, offset: 0 }, ctx, share);
+      return body.startsWith(`[${s.id}] `) ? body : row(s);
+    },
+    next: (offset) => call('find_code', { query: args.query, kind: args.kind, limit: args.limit, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, include_body: args.include_body ? undefined : false, offset }),
+  });
+}
+
 const findCodeTool = defineTool({
   name: 'find_code',
-  description: 'Find symbols by name or behavior. breadth: all expands exact matches. include_body returns source for a unique exact match; locations_only: false adds signatures/docs. Use rg for literals.',
-  inputSchema: { query: text, kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(false), offset },
+  description: 'Find symbols with budgeted source. Pass query or queries, not both. breadth: all expands exact matches; include_body: false returns locations; locations_only: false adds signatures/docs. Use rg for literals.',
+  inputSchema: { query: text.optional(), queries: queryBatch.optional(), kind: kinds.optional(), limit: pageSize.optional(), locations_only: locationsOnly, breadth: z.enum(['exact', 'all']).default('exact'), include_body: z.boolean().default(true), offset },
   handler(args, ctx) {
-    const { db } = ctx;
-    const all = findCode(db, args.query, args.kind);
-    const query = args.query.toLowerCase();
-    const exact = all.filter((s) => s.name.toLowerCase() === query || s.name.split('.').at(-1)?.toLowerCase() === query);
-    if (args.include_body && exact.length === 1 && args.offset === 0)
-      return readSource({ symbol: exact[0]!.id, context_lines: 0, offset: 0 }, ctx, NAVIGATION_BUDGETS.find_code);
-    const narrowed = args.breadth !== 'all' && exact.length > 0;
-    const items = narrowed ? exact : all;
-    return page({
-      items, title: narrowed ? `Exact (${items.length})${all.length > exact.length ? '; more: breadth="all"' : ''}` : items.length ? `Code matches (${items.length}):` : 'No indexed matches. Try a different name or search plain text with your normal tools.',
-      start: args.offset, count: args.limit ?? (args.locations_only ? 3 : 8), budget: NAVIGATION_BUDGETS.find_code,
-      render: (s) => args.locations_only ? choice(s) :
-        `${choice(s)} · ${s.score}\n  ${compact(s.signature)}${s.doc ? ` — ${compact(s.doc, 110)}` : ''}`,
-      next: (offset) => call('find_code', { ...args, locations_only: args.locations_only ? undefined : false, breadth: args.breadth === 'all' ? 'all' : undefined, include_body: args.include_body ? true : undefined, offset }),
-    });
+    if (Boolean(args.query) === Boolean(args.queries)) return 'Provide exactly one of query or queries.';
+    if (args.query) return findOne({ ...args, query: args.query }, ctx, NAVIGATION_BUDGETS.find_code);
+    if (args.offset) return 'Follow the Next call of one query to page it; a batch has no offset.';
+    const queries = [...new Set(args.queries!)];
+    const budget = Math.floor(Math.min(NAVIGATION_BUDGETS.find_code * queries.length, FIND_BATCH_BUDGET) / queries.length);
+    return queries.map((query) => findOne({ ...args, query }, ctx, budget, `## ${compact(query, 80)}\n`)).join('\n');
   },
 });
 
 const outlineTool = defineTool({
   name: 'outline',
-  description: 'List symbol ranges: file or files, at most once per orientation. locations_only: false adds signatures. For known symbols use read_symbol.',
-  inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, offset },
-  handler(args, { root, db }) {
+  description: 'Outline file or files. A small single file includes source; include_body: false lists ranges only. locations_only: false adds signatures. Use read_symbol for known symbols.',
+  inputSchema: { file: pathInput.optional(), files: z.array(pathInput).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter paths or fewer files.').optional(), locations_only: locationsOnly, include_body: z.boolean().default(true), offset },
+  handler(args, { root, db, config }) {
     if (Boolean(args.file) === Boolean(args.files)) return 'Provide exactly one of file or files.';
     if (args.files) {
       const items = args.files.flatMap((input) => {
@@ -147,17 +172,24 @@ const outlineTool = defineTool({
       return page({
         items, title: `Files (${args.files.length}; symbol locations):`, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
         render: (item) => item,
-        next: (offset) => call('outline', { ...args, offset }),
+        next: (offset) => call('outline', { ...args, include_body: undefined, offset }),
       });
     }
     const file = repoRelative(root, args.file!);
     const entry = file ? fileOutline(db, file) : null;
     if (!entry) return 'File is not indexed. For non-code or unsupported files, use a ranged Read.';
     const title = `${prefixBytes(compact(file!, 100), 250)} (${entry.lines} lines; ${entry.symbols.length} symbols${entry.status === 'ok' ? '' : `; ${entry.status}${entry.reason ? `: ${entry.reason}` : ''}`})`;
+    if (args.include_body && !args.offset && entry.symbols.length) {
+      let raw: Buffer | null;
+      try { raw = readRepoFile(root, file!, config.index.maxFileBytes); }
+      catch { raw = null; }
+      const whole = raw && sha1(raw) === sourceLocation(db, entry.symbols[0]!.id)?.hash ? `${title}; whole file:\n${raw.toString('utf8').trimEnd()}` : '';
+      if (whole && printableSource(whole) && estimateTokens(whole) <= NAVIGATION_BUDGETS.outline) return whole;
+    }
     return page({
       items: entry.symbols, title, start: args.offset, budget: NAVIGATION_BUDGETS.outline,
       render: (s) => `[${s.id}] ${s.line}-${s.endLine} ${compact(s.name, 70)} (${s.kind})${args.locations_only ? '' : ': ' + compact(s.signature)}`,
-      next: (offset) => call('outline', { ...args, locations_only: args.locations_only ? undefined : false, offset }),
+      next: (offset) => call('outline', { ...args, locations_only: args.locations_only ? undefined : false, include_body: args.include_body ? undefined : false, offset }),
     });
   },
 });

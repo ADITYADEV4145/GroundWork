@@ -36,8 +36,11 @@ if (command === 'hook' && process.argv.length === 5 &&
   catch { relay = await import('../mcp/relay.js'); }
   await relay.runMcp();
 } else if (command === '__mcp_service' && process.argv.length === 4) {
-  const { runService } = await import('../mcp/daemon.js');
-  await runService(agent!);
+  // The build bundles the service (scripts/bundle-hook.mjs) so a cold start loads one module; source runs fall back.
+  let daemon: typeof import('../mcp/daemon.js');
+  try { daemon = nodeModule.createRequire(import.meta.url)('../mcp/daemon.bundle.cjs') as typeof daemon; }
+  catch { daemon = await import('../mcp/daemon.js'); }
+  await daemon.runService(agent!);
 } else {
   await import('./program.js');
 }

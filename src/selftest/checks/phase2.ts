@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { loadEvidence, loadSuite, withPinnedWorkspace } from '../../bench/runner.js';
 import { defaultConfig } from '../../config/load.js';
 import { dispatch, normalise } from '../../hooks/run.js';
-import { NAVIGATION_BUDGETS, NAVIGATION_TOOLS } from '../../mcp/tools/navigation.js';
+import { FIND_BATCH_BUDGET, NAVIGATION_BUDGETS, NAVIGATION_TOOLS } from '../../mcp/tools/navigation.js';
 import type { ToolContext } from '../../mcp/registry.js';
 import { refreshIndex } from '../../index/refresh.js';
 import { indexDbPath } from '../../index/store.js';
@@ -17,7 +17,7 @@ import type { Check } from '../registry.js';
 export async function runNavigationTool(name: keyof typeof NAVIGATION_BUDGETS, args: object, ctx: ToolContext): Promise<string> {
   const tool = NAVIGATION_TOOLS.find((t) => t.name === name)!;
   const result = await tool.handler(z.object(tool.inputSchema).parse(args), ctx);
-  if (estimateTokens(result) > NAVIGATION_BUDGETS[name]) throw new Error(`${name} exceeded its token budget`);
+  if (estimateTokens(result) > ('queries' in args ? FIND_BATCH_BUDGET : NAVIGATION_BUDGETS[name])) throw new Error(`${name} exceeded its token budget`);
   return result;
 }
 

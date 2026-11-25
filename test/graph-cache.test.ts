@@ -108,6 +108,19 @@ describe('root-local graph cache', () => {
     expect((await refreshIndex(full, { full: true })).graphCacheHit).not.toBe(true);
   });
 
+  it('does not publish root-local embedding data into shared snapshots', async () => {
+    await initSqlBackend();
+    const { root, home } = setup(), first = root('first');
+    await refreshIndex(first);
+    const config = defaultConfig(), key = graph.graphFingerprint(first, config).key;
+    rmSync(path.join(home, 'cache', 'graphs'), { recursive: true });
+    const db = openDb(indexDbPath(first));
+    try { db.prepare('INSERT INTO reuse_embeddings(model, content_hash, vector) VALUES(?,?,?)').run('private', 'hash', '[1]'); }
+    finally { db.close(); }
+    graph.cacheGraph(first, config, key);
+    expect((await refreshIndex(root('second'))).graphCacheHit).not.toBe(true);
+  });
+
   it('invalidates graph keys on extractor and schema version changes', async () => {
     const { root } = setup(), dir = root('first'), config = defaultConfig();
     const key = graph.graphFingerprint(dir, config).key;

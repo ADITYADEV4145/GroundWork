@@ -60,16 +60,29 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
   let graphKey: string | undefined;
   let graphAttempted = false;
   let graphHit = false;
+  if (!opts.full && !opts.paths && !existsSync(indexDbPath(root))) {
+    try {
+      const snapshot = graphFingerprint(root, config);
+      graphKey = snapshot.key;
+      const languages = new Set<Language>();
+      for (const file of snapshot.files.keys()) {
+        const language = languageForPath(file);
+        if (language) languages.add(language);
+      }
+      if (languages.size) await initParsersFor([...languages]);
+      for (const language of languages) ready.add(language);
+    } catch { /* Normal refresh handles unavailable cache or parsers. */ }
+  }
   const refresh = () => withWriteLock(root, () => {
     const t0 = performance.now();
     if (!graphAttempted) {
       graphAttempted = true;
       if (!opts.full && !opts.paths && !existsSync(indexDbPath(root))) {
         try {
-          graphKey = graphFingerprint(root, config).key;
+          graphKey ??= graphFingerprint(root, config).key;
           graphHit = restoreGraph(root, config, graphKey);
         } catch { /* Cache failures must not prevent a normal refresh. */ }
-      }
+      } else graphKey = undefined;
     }
     const { db, rebuilt } = openIndex(root, config);
     let cacheReady = false;
@@ -103,7 +116,7 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
         const prev = existing.get(rel);
         let st: Stats;
         try { st = statSync(path.join(root, rel)); } catch { continue; }
-        if (prev && prev.size === st.size && prev.mtime === Math.floor(st.mtimeMs) && prev.indexedAt - prev.mtime > 2000) {
+        if (prev && !graphHit && prev.size === st.size && prev.mtime === Math.floor(st.mtimeMs) && prev.indexedAt - prev.mtime > 2000) {
           planned.set(rel, { st });
           continue;
         }
@@ -123,6 +136,7 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
         return { languages: [...needed] };
       }
 
+      const touchFile = db.prepare('UPDATE files SET mtime_ms = ?, indexed_at = ? WHERE id = ?');
       db.transaction(() => {
         if (opts.full) db.exec('DELETE FROM symbols_fts; DELETE FROM export_aliases; DELETE FROM literals; DELETE FROM calls; DELETE FROM imports; DELETE FROM symbols; DELETE FROM files;');
         for (const [p, row] of existing) {
@@ -143,7 +157,7 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
           }
           const lang = languageForPath(rel);
           if (prev && prev.hash === hash) {
-            db.prepare('UPDATE files SET mtime_ms = ?, indexed_at = ? WHERE id = ?').run(Math.floor(st.mtimeMs), now, prev.id);
+            touchFile.run(Math.floor(st.mtimeMs), now, prev.id);
             res.unchanged++;
             continue;
           }
@@ -210,7 +224,7 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
             ? { files: changedIds, names: [...changedNames] } : undefined);
         if (res.link) hookTiming('linkMs', res.link.ms);
         if (resolverChanged) writeMeta(db, 'resolver_key', resolverKey);
-        if (res.added || res.changed || res.removed || rebuilt || opts.full || resolverChanged || !readMeta(db, 'generation'))
+        if (res.added || res.changed || res.removed || rebuilt || opts.full || resolverChanged || graphHit || !readMeta(db, 'generation'))
           writeMeta(db, 'generation', randomUUID());
         writeMeta(db, 'last_refresh', String(now));
       });

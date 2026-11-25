@@ -6,6 +6,21 @@ import { rm } from 'node:fs/promises';
 await rm('dist/hooks/run.bundle.js', { force: true });
 
 await build({
+  entryPoints: ['dist/mcp/relay.js'],
+  outfile: 'dist/mcp/relay.bundle.cjs',
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  target: 'node22',
+  minify: true,
+  packages: 'external',
+  external: ['./server.js', './resume.js'],
+  define: { 'import.meta.url': '__gwImportMetaUrl' },
+  banner: { js: "const __gwImportMetaUrl = require('node:url').pathToFileURL(require('node:path').join(__dirname, 'relay.js')).href;" },
+  logLevel: 'warning',
+});
+
+await build({
   entryPoints: ['dist/hooks/client.js'],
   outfile: 'dist/hooks/client.bundle.cjs',
   bundle: true,

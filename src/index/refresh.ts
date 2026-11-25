@@ -1,4 +1,4 @@
-import { readFileSync, statSync, type Stats } from 'node:fs';
+import { existsSync, readFileSync, statSync, type Stats } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import type { GroundworkConfig } from '../config/schema.js';
@@ -15,9 +15,10 @@ import { log } from '../util/log.js';
 import { hookTiming } from '../util/hook-timing.js';
 import { discoverFiles, looksGenerated, makeTestMatcher } from './discover.js';
 import { withWriteLock } from './lock.js';
-import { openIndex } from './store.js';
+import { indexDbPath, openIndex } from './store.js';
 import { deleteFile, upsertFile, writeExtraction, type FileMeta } from './write.js';
 import { cacheExtraction, extractionKey, readExtraction } from './extraction-cache.js';
+import { cacheGraph, graphFingerprint, restoreGraph } from './graph-cache.js';
 
 export interface RefreshResult {
   files: number;
@@ -30,6 +31,7 @@ export interface RefreshResult {
   rebuilt: boolean;
   link: LinkStats | null;
   ms: number;
+  graphCacheHit?: boolean;
 }
 
 export interface RefreshOptions {
@@ -55,9 +57,22 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
   };
   let rebuiltForScope = false;
   let rebuiltDuringLoad = false;
+  let graphKey: string | undefined;
+  let graphAttempted = false;
+  let graphHit = false;
   const refresh = () => withWriteLock(root, () => {
     const t0 = performance.now();
+    if (!graphAttempted) {
+      graphAttempted = true;
+      if (!opts.full && !opts.paths && !existsSync(indexDbPath(root))) {
+        try {
+          graphKey = graphFingerprint(root, config).key;
+          graphHit = restoreGraph(root, config, graphKey);
+        } catch { /* Cache failures must not prevent a normal refresh. */ }
+      }
+    }
     const { db, rebuilt } = openIndex(root, config);
+    let cacheReady = false;
     hookTiming('indexOpenMs', performance.now() - t0);
     try {
       const isTest = makeTestMatcher(config);
@@ -98,6 +113,10 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
         const lang = languageForPath(rel);
         if (lang && prev?.hash !== hash && st.size <= config.index.maxFileBytes &&
           !(config.index.skipGenerated && looksGenerated(rel, buf.toString('utf8'))) && !ready.has(lang)) needed.add(lang);
+      }
+      if (graphHit) for (const file of existing.keys()) {
+        const lang = languageForPath(file);
+        if (lang && !ready.has(lang)) needed.add(lang);
       }
       if (needed.size) {
         rebuiltDuringLoad ||= rebuilt;
@@ -196,9 +215,20 @@ export async function refreshIndex(root: string, opts: RefreshOptions = {}): Pro
         writeMeta(db, 'last_refresh', String(now));
       });
       res.ms = Math.round(performance.now() - t0);
+      if (graphHit) {
+        res.graphCacheHit = true;
+        res.rebuilt = true;
+        res.added += res.unchanged;
+        res.unchanged = 0;
+      }
+      if (graphKey && !graphHit) {
+        try { cacheReady = db.backend === 'sql.js' || Number(db.prepare('PRAGMA wal_checkpoint(TRUNCATE)').get()?.busy) === 0; }
+        catch { /* A busy checkpoint only skips caching. */ }
+      }
       return res;
     } finally {
       db.close();
+      if (cacheReady && graphKey) cacheGraph(root, config, graphKey);
     }
   }, opts.lockTimeoutMs);
   for (;;) {

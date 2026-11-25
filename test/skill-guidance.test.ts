@@ -35,7 +35,8 @@ describe('shipped task-aware guidance', () => {
     for (const file of ['SKILL.md', 'references/navigation.md']) {
       expect(read(file)).toContain('include_body');
       expect(read(file)).toContain('"symbols":');
-      expect(read(file)).toContain('chain `callees` and `read_symbol`');
+      expect(read(file)).toContain('callee_depth');
+      expect(read(file)).toContain('location-only question');
     }
     for (const file of ['SKILL.md', 'references/grounding.md']) {
       expect(read(file)).toContain('Never re-read a file only to satisfy the verify rule.');
@@ -45,7 +46,7 @@ describe('shipped task-aware guidance', () => {
     expect(NAVIGATION_TOOLS.find((tool) => tool.name === 'read_symbol')!.description).toContain('symbols');
     expect(verifyCallsTool.description).toContain('Never re-read');
     expect(verifyCallsTool.description).toContain('one batched call instead of rereads');
-    expect(read('SKILL.md')).toContain('start with `explore(');
+    expect(read('SKILL.md')).toContain('Only with experimental read paths enabled, start with `explore`');
     for (const file of ['SKILL.md', 'references/navigation.md']) {
       expect(read(file)).toContain('Only with experimental read paths enabled');
       expect(read(file)).toContain('Experimental read paths default off.');

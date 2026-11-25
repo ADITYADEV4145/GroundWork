@@ -169,9 +169,33 @@ const readSymbolTool = defineTool({
     symbol: symbol.optional(),
     symbols: z.array(symbol).min(1).max(20).refine((items) => Buffer.byteLength(JSON.stringify(items)) <= 900, 'Use shorter selectors or IDs for a batch.').optional(),
     context_lines: z.number().int().min(0).max(20).default(0), offset, symbol_offset: offset,
+    callee_depth: z.number().int().min(0).max(2).default(0).describe('For a single symbol, include exact/import-resolved outgoing definitions up to this depth. Not a runtime call graph.'),
   },
   handler(args, ctx) {
     if (Boolean(args.symbol) === Boolean(args.symbols)) return 'Provide exactly one of symbol or symbols.';
+    if (args.callee_depth) {
+      if (args.symbols || args.offset) return 'Use callee_depth with one symbol and no source offset; follow individual source Next calls for longer bodies.';
+      const first = oneSymbol('read_symbol', { symbol: args.symbol!, offset: 0 }, ctx);
+      if (typeof first === 'string') return first;
+      const nodes = [{ id: first.id, depth: 0 }], seen = new Set([first.id]);
+      let omitted = false;
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i]!;
+        if (node.depth >= args.callee_depth) continue;
+        for (const edge of symbolCalls(ctx.db, node.id, 'callees')) {
+          if (!edge.target || !['exact', 'import-resolved'].includes(edge.confidence) || seen.has(edge.target.id)) continue;
+          seen.add(edge.target.id);
+          if (nodes.length === 20) { omitted = true; continue; }
+          nodes.push({ id: edge.target.id, depth: node.depth + 1 });
+        }
+      }
+      return page({
+        items: nodes, title: `Trace definitions (${nodes.length}; exact/import-resolved only, not runtime dispatch${omitted ? '; more targets: use callees' : ''}):`,
+        start: args.symbol_offset, budget: NAVIGATION_BUDGETS.read_symbol,
+        render: (node) => readSource({ symbol: node.id, context_lines: args.context_lines, offset: 0 }, ctx, 300, true),
+        next: (symbol_offset) => call('read_symbol', { symbol: first.id, callee_depth: args.callee_depth, context_lines: args.context_lines, symbol_offset }),
+      });
+    }
     if (args.symbols) {
       if (args.offset) return 'Use symbol_offset to page a batch; use the individual Next calls for source offsets.';
       return page({
